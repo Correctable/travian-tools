@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travian Spy Report Parser</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    textarea { width: 100%; height: 200px; margin-bottom: 10px; }
+    button { padding: 10px 20px; font-size: 16px; }
+    #result { margin-top: 20px; }
+    .result-line { margin: 5px 0; }
+  </style>
+</head>
+<body>
+  <h2>Travian Spy Report Parser</h2>
+  <p>Paste two spy reports below to estimate resource production per hour.</p>
+
+  <textarea id="report1" placeholder="Paste spy report #1 here..."></textarea>
+  <textarea id="report2" placeholder="Paste spy report #2 here..."></textarea>
+  <button onclick="compareReports()">Compare Reports</button>
+
+  <div id="result"></div>
+
+  <script>
+    function parsePlainResources(text) {
+      const resRegex = /Resources\s+([\d,.]+)\s+([\d,.]+)\s+([\d,.]+)\s+([\d,.]+)/;
+      const match = text.match(resRegex);
+      if (!match) return null;
+
+      const toNumber = (str) => parseInt(str.replace(/[^\d]/g, ''));
+      return {
+        wood: toNumber(match[1]),
+        clay: toNumber(match[2]),
+        iron: toNumber(match[3]),
+        crop: toNumber(match[4])
+      };
+    }
+
+    function extractTimestamp(text) {
+      const tsRegex = /(\d{2}\.\d{2}\.\d{2}), (\d{2}:\d{2}:\d{2})/;
+      const match = text.match(tsRegex);
+      if (!match) return null;
+      const [day, month, year] = match[1].split('.').map(Number);
+      const [hour, minute, second] = match[2].split(':').map(Number);
+      return new Date(2000 + year, month - 1, day, hour, minute, second);
+    }
+
+    function compareReports() {
+      const text1 = document.getElementById('report1').value;
+      const text2 = document.getElementById('report2').value;
+
+      const res1 = parsePlainResources(text1);
+      const res2 = parsePlainResources(text2);
+
+      const time1 = extractTimestamp(text1);
+      const time2 = extractTimestamp(text2);
+
+      if (!res1 || !res2 || !time1 || !time2) {
+        document.getElementById('result').innerHTML = '<div style="color:red">Gagal membaca data sumber daya atau waktu laporan. Pastikan formatnya benar.</div>';
+        return;
+      }
+
+      let earlierRes, laterRes, earlierTime, laterTime;
+      if (time1 < time2) {
+        earlierTime = time1;
+        laterTime = time2;
+        earlierRes = res1;
+        laterRes = res2;
+      } else {
+        earlierTime = time2;
+        laterTime = time1;
+        earlierRes = res2;
+        laterRes = res1;
+      }
+
+      const deltaT = (laterTime - earlierTime) / 3600000; // dalam jam
+      const delta = {
+        wood: Math.round((laterRes.wood - earlierRes.wood) / deltaT),
+        clay: Math.round((laterRes.clay - earlierRes.clay) / deltaT),
+        iron: Math.round((laterRes.iron - earlierRes.iron) / deltaT),
+        crop: Math.round((laterRes.crop - earlierRes.crop) / deltaT)
+      };
+
+      const resultHTML = `
+        <div class="result-line">🕒 Selisih waktu: ${deltaT.toFixed(2)} jam</div>
+        <div class="result-line">🌲 Wood/hr: ${delta.wood}</div>
+        <div class="result-line">🧱 Clay/hr: ${delta.clay}</div>
+        <div class="result-line">⚙️ Iron/hr: ${delta.iron}</div>
+        <div class="result-line">🌾 Crop/hr: ${delta.crop}</div>
+      `;
+
+      document.getElementById('result').innerHTML = resultHTML;
+    }
+  </script>
+</body>
+</html>
