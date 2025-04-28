@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travian NPC Troop Planner (Teuton)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    h2 {
+      margin-top: 0;
+    }
+    input[type="text"] {
+      width: 200px;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .summary {
+      margin: 15px 0;
+      padding: 10px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+      font-size: 15px;
+    }
+    .troop-group {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .troop-group h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .troop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 10px;
+    }
+    .troop-row {
+      background: #fdfdfd;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .res-icon, .unit-icon, .summary-unit-icon {
+      height: 20px;
+      width: 20px;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    .unit-icon, .summary-unit-icon {
+      background-image: url('https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/units/teuton/icon/teuton_small.png');
+      background-size: 20px auto;
+      background-repeat: no-repeat;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+<h2>Travian Teuton NPC Troop Planner</h2>
+<div style="margin-bottom: 10px;">
+  <label for="totalSDA"><strong>Total SDA:</strong></label><br />
+  <input type="text" id="totalSDA" placeholder="mis. 120.000" oninput="formatAndUpdate(this)" />
+</div>
+<div class="summary" id="totalUsage"></div>
+<div class="summary" id="troopSummary"></div>
+<div id="troopContainer"></div>
+
+<script>
+const resIcons = [
+  'https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png',
+  'https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png',
+  'https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png',
+  'https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png'
+];
+
+const teutonTroops = [
+  { name: 'Clubswinger', cost: [95, 75, 40, 40], group: 'Infanteri', iconIndex: 0 },
+  { name: 'Spearman', cost: [145, 70, 85, 40], group: 'Infanteri', iconIndex: 1 },
+  { name: 'Axeman', cost: [130, 120, 170, 70], group: 'Infanteri', iconIndex: 2 },
+  { name: 'Scout', cost: [160, 100, 50, 50], group: 'Infanteri', iconIndex: 3 },
+  { name: 'Paladin', cost: [370, 270, 290, 75], group: 'Kavaleri', iconIndex: 4 },
+  { name: 'Teutonic Knight', cost: [450, 515, 480, 80], group: 'Kavaleri', iconIndex: 5 },
+  { name: 'Ram', cost: [1000, 300, 350, 70], group: 'Alat Berat', iconIndex: 6 },
+  { name: 'Catapult', cost: [900, 1200, 600, 60], group: 'Alat Berat', iconIndex: 7 },
+  { name: 'Chief', cost: [35500, 26600, 25000, 27200], group: 'Other', iconIndex: 8 },
+  { name: 'Settler', cost: [5800, 4400, 4600, 5200], group: 'Other', iconIndex: 9 }
+];
+
+let currentSliderValues = Array(teutonTroops.length).fill(0);
+
+function formatNumber(n) {
+  return n.toLocaleString('de-DE');
+}
+
+function formatAndUpdate(el) {
+  let raw = el.value.replace(/\./g, '').replace(/[^\d]/g, '');
+  if (!raw) return;
+  el.value = formatNumber(parseInt(raw));
+  updateTroops();
+}
+
+function updateTroops() {
+  const totalSDA = parseInt(document.getElementById('totalSDA').value.replace(/\./g, ''));
+  if (isNaN(totalSDA) || totalSDA <= 0) {
+    document.getElementById('troopContainer').innerHTML = '';
+    document.getElementById('totalUsage').innerHTML = '';
+    document.getElementById('troopSummary').innerHTML = '';
+    return;
+  }
+
+  let groups = {};
+  teutonTroops.forEach((troop, index) => {
+    if (!groups[troop.group]) groups[troop.group] = [];
+    groups[troop.group].push({ ...troop, index });
+  });
+
+  let html = '';
+  for (const groupName in groups) {
+    html += `<div class="troop-group"><h3>${groupName}</h3><div class="troop-grid">`;
+    groups[groupName].forEach(troop => {
+      const costTotal = troop.cost.reduce((a, b) => a + b);
+      const maxUnits = Math.floor(totalSDA / costTotal);
+      html += `
+        <div class="troop-row">
+          <div class="unit-icon" style="background-position-y: -${troop.iconIndex * 20}px"></div>
+          <div style="flex: 1;">
+            <strong>${troop.name}</strong> (Max: ${formatNumber(maxUnits)})<br />
+            <input type="range" id="slider-${troop.index}" min="0" max="${maxUnits}" value="0" oninput="handleSliderChange(${troop.index})" />
+            <div id="res-${troop.index}"></div>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div></div>';
+  }
+
+  document.getElementById('troopContainer').innerHTML = html;
+  currentSliderValues.fill(0);
+  updateAllResources();
+}
+
+function handleSliderChange(changedIndex) {
+  const total = parseInt(document.getElementById('totalSDA').value.replace(/\./g, ''));
+  const changedSlider = document.getElementById(`slider-${changedIndex}`);
+  currentSliderValues[changedIndex] = parseInt(changedSlider.value);
+
+  let used = 0;
+  teutonTroops.forEach((troop, i) => {
+    used += troop.cost.reduce((a,b)=>a+b) * currentSliderValues[i];
+  });
+
+  const remaining = total - used;
+
+  teutonTroops.forEach((troop, i) => {
+    if (i !== changedIndex) {
+      const slider = document.getElementById(`slider-${i}`);
+      const cost = troop.cost.reduce((a,b)=>a+b);
+      const max = Math.floor((cost ? remaining / cost : 0) + currentSliderValues[i]);
+      slider.max = max;
+    }
+  });
+
+  updateAllResources();
+}
+
+function updateAllResources() {
+  let totalWood = 0, totalClay = 0, totalIron = 0, totalCrop = 0;
+  let troopSummary = [];
+
+  teutonTroops.forEach((troop, i) => {
+    const count = currentSliderValues[i];
+    const [w, c, ir, cr] = troop.cost;
+    totalWood += w * count;
+    totalClay += c * count;
+    totalIron += ir * count;
+    totalCrop += cr * count;
+
+    const el = document.getElementById(`res-${i}`);
+    if (el) {
+      el.innerHTML = `Jumlah: ${formatNumber(count)} | 
+        <img class='res-icon' src='${resIcons[0]}' />${formatNumber(w * count)} 
+        <img class='res-icon' src='${resIcons[1]}' />${formatNumber(c * count)} 
+        <img class='res-icon' src='${resIcons[2]}' />${formatNumber(ir * count)} 
+        <img class='res-icon' src='${resIcons[3]}' />${formatNumber(cr * count)}`;
+    }
+
+    if (count > 0) troopSummary.push(`<div><span class='summary-unit-icon' style='background-position-y: -${troop.iconIndex * 20}px'></span>${troop.name}: ${formatNumber(count)}</div>`);
+  });
+
+  const total = parseInt(document.getElementById('totalSDA').value.replace(/\./g, ''));
+  const used = totalWood + totalClay + totalIron + totalCrop;
+  const excess = total - used;
+
+  document.getElementById('totalUsage').innerHTML = `
+    <strong>Total SDA Terpakai:</strong><br>
+    <img class='res-icon' src='${resIcons[0]}' /> ${formatNumber(totalWood)}
+    <img class='res-icon' src='${resIcons[1]}' /> ${formatNumber(totalClay)}
+    <img class='res-icon' src='${resIcons[2]}' /> ${formatNumber(totalIron)}
+    <img class='res-icon' src='${resIcons[3]}' /> ${formatNumber(totalCrop)}<br>
+    Total: ${formatNumber(used)} | Excess: ${formatNumber(excess)}
+  `;
+
+  document.getElementById('troopSummary').innerHTML = troopSummary.length
+    ? `<strong>Pasukan Dipilih:</strong><br>${troopSummary.join('')}`
+    : '';
+}
+</script>
+</body>
+</html>
