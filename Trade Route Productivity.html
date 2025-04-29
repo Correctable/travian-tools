@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Travian Resource Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f0f0f0;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        input[type="number"]:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            background: #f0f4f7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .icon {
+            width: 20px;
+            height: 20px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+        select {
+            padding: 6px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .result-item {
+            margin-bottom: 10px;
+        }
+        .result-item span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Travian SDA Calculator</h1>
+
+    <h2>Produksi Per Jam</h2>
+    <table>
+        <tr>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png" alt="Wood">Wood</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png" alt="Clay">Clay</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png" alt="Iron">Iron</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png" alt="Crop">Crop</th>
+        </tr>
+        <tr>
+            <td><input type="number" id="prodWood" value="0"></td>
+            <td><input type="number" id="prodClay" value="0"></td>
+            <td><input type="number" id="prodIron" value="0"></td>
+            <td><input type="number" id="prodCrop" value="0"></td>
+        </tr>
+    </table>
+
+    <h2>Kebutuhan SDA</h2>
+    <table>
+        <tr>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png" alt="Wood">Wood</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png" alt="Clay">Clay</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png" alt="Iron">Iron</th>
+            <th><img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png" alt="Crop">Crop</th>
+            <th>Waktu (jam)</th>
+        </tr>
+        <tr>
+            <td><input type="number" id="needWood" value="0"></td>
+            <td><input type="number" id="needClay" value="0"></td>
+            <td><input type="number" id="needIron" value="0"></td>
+            <td><input type="number" id="needCrop" value="0"></td>
+            <td><input type="number" id="hours" value="1"></td>
+        </tr>
+    </table>
+
+    <h2>Pilih Periode Trade Route</h2>
+    <select id="tradeRouteTime">
+        <option value="1">1 Jam</option>
+        <option value="2">2 Jam</option>
+        <option value="3">3 Jam</option>
+        <option value="4">4 Jam</option>
+        <option value="6">6 Jam</option>
+        <option value="8">8 Jam</option>
+        <option value="12">12 Jam</option>
+        <option value="24">24 Jam</option>
+    </select>
+
+    <div style="text-align:center;">
+        <button onclick="calculate()">Hitung</button>
+    </div>
+
+    <div class="result" id="result">
+        <!-- Hasil perhitungan akan muncul di sini -->
+    </div>
+</div>
+
+<script>
+function calculate() {
+    // Ambil input produksi per jam
+    let prodWood = parseInt(document.getElementById('prodWood').value) || 0;
+    let prodClay = parseInt(document.getElementById('prodClay').value) || 0;
+    let prodIron = parseInt(document.getElementById('prodIron').value) || 0;
+    let prodCrop = parseInt(document.getElementById('prodCrop').value) || 0;
+
+    // Ambil input kebutuhan
+    let needWood = parseInt(document.getElementById('needWood').value) || 0;
+    let needClay = parseInt(document.getElementById('needClay').value) || 0;
+    let needIron = parseInt(document.getElementById('needIron').value) || 0;
+    let needCrop = parseInt(document.getElementById('needCrop').value) || 0;
+
+    // Ambil input waktu
+    let hours = parseInt(document.getElementById('hours').value) || 0;
+
+    // Hitung total resource terkumpul
+    let totalWood = prodWood * hours;
+    let totalClay = prodClay * hours;
+    let totalIron = prodIron * hours;
+    let totalCrop = prodCrop * hours;
+
+    // Hitung sisa SDA
+    let remainWood = totalWood - needWood;
+    let remainClay = totalClay - needClay;
+    let remainIron = totalIron - needIron;
+    let remainCrop = totalCrop - needCrop;
+
+    // Ambil pilihan periode trade route
+    let tradeRouteTime = parseInt(document.getElementById('tradeRouteTime').value) || 1;
+
+    // Hitung jumlah SDA yang dapat digunakan per jam untuk trade route
+    let tradeRouteWood = Math.floor(remainWood / hours);
+    let tradeRouteClay = Math.floor(remainClay / hours);
+    let tradeRouteIron = Math.floor(remainIron / hours);
+    let tradeRouteCrop = Math.floor(remainCrop / hours);
+
+    // Batasi trade route agar tidak melebihi kapasitas per jam
+    tradeRouteWood = Math.min(tradeRouteWood * tradeRouteTime);
+    tradeRouteClay = Math.min(tradeRouteClay * tradeRouteTime);
+    tradeRouteIron = Math.min(tradeRouteIron * tradeRouteTime);
+    tradeRouteCrop = Math.min(tradeRouteCrop * tradeRouteTime);
+
+    // Output hasil
+    let output = `
+        <h3>Hasil Perhitungan:</h3>
+        <div class="result-item">
+            <span>Dalam ${hours} jam, kamu akan mengumpulkan:</span><br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png" alt="Wood"> ${totalWood} Kayu<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png" alt="Clay"> ${totalClay} Tanah Liat<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png" alt="Iron"> ${totalIron} Besi<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png" alt="Crop"> ${totalCrop} Gandum
+        </div>
+        <div class="result-item">
+            <span>Sisa SDA untuk Trade Route:</span><br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png" alt="Wood"> ${remainWood} Kayu<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png" alt="Clay"> ${remainClay} Tanah Liat<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png" alt="Iron"> ${remainIron} Besi<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png" alt="Crop"> ${remainCrop} Gandum
+        </div>
+        <div class="result-item">
+            <span>SDA yang dapat digunakan untuk Trade Route per ${tradeRouteTime} Jam:</span><br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/lumber_small.png" alt="Wood"> ${tradeRouteWood} Kayu per Jam<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/clay_small.png" alt="Clay"> ${tradeRouteClay} Tanah Liat per Jam<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/iron_small.png" alt="Iron"> ${tradeRouteIron} Besi per Jam<br>
+            <img class="icon" src="https://cdn.legends.travian.com/gpack/135.12/img_ltr/global/resources/crop_small.png" alt="Crop"> ${tradeRouteCrop} Gandum per Jam
+        </div>
+    `;
+
+    // Tampilkan hasil
+    document.getElementById('result').innerHTML = output;
+}
+</script>
+
+</body>
+</html>
