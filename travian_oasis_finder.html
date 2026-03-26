@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travian Oasis Finder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+
+  :root {
+    --bg:        #0b0e14;
+    --surface:   #131720;
+    --surface2:  #1b2133;
+    --border:    #2a3655;
+    --accent:    #c8a84b;
+    --accent2:   #4a8fff;
+    --text:      #d4c9b0;
+    --muted:     #6a7590;
+    --wood:      #5d9e5c;
+    --clay:      #c1614a;
+    --iron:      #7b9ab5;
+    --crop:      #d4a730;
+    --danger:    #e05555;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 16px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(74,143,255,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(200,168,75,0.06) 0%, transparent 50%);
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: linear-gradient(180deg, #0d1018 0%, #131720 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+  .logo-icon { font-size: 40px; filter: drop-shadow(0 0 12px var(--accent)); }
+  header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-shadow: 0 0 20px rgba(200,168,75,0.4);
+  }
+  header p { color: var(--muted); font-style: italic; font-size: 14px; margin-top: 2px; }
+  .header-right { margin-left: auto; text-align: right; }
+  #server-info { font-family: 'Cinzel', serif; font-size: 12px; color: var(--accent2); letter-spacing: 1px; }
+  #fetch-date  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ─── LOADING STATE ─── */
+  #loading-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  #loading-state .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-state p { color: var(--muted); font-style: italic; }
+
+  /* ─── ERROR STATE ─── */
+  #error-state {
+    display: none;
+    text-align: center;
+    padding: 80px 20px;
+  }
+  #error-state .icon { font-size: 40px; margin-bottom: 16px; }
+  #error-state h2 { font-family: 'Cinzel', serif; color: var(--danger); margin-bottom: 8px; }
+  #error-state p { color: var(--muted); font-size: 14px; }
+
+  /* ─── MAIN ─── */
+  .container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+
+  /* ─── CONTROLS ─── */
+  #controls {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .control-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .control-card label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .coord-row { display: flex; gap: 8px; align-items: center; }
+  .coord-row span { color: var(--muted); font-size: 14px; }
+
+  input[type="number"], select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="number"]:focus, select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(200,168,75,0.1);
+  }
+  .coord-input { width: 80px; text-align: center; }
+  select option { background: var(--surface); }
+
+  /* ─── RESOURCE FILTER BUTTONS ─── */
+  .res-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .res-btn {
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .res-btn.active-wood  { border-color: var(--wood); background: rgba(93,158,92,0.15); color: var(--wood); }
+  .res-btn.active-clay  { border-color: var(--clay); background: rgba(193,97,74,0.15); color: var(--clay); }
+  .res-btn.active-iron  { border-color: var(--iron); background: rgba(123,154,181,0.15); color: var(--iron); }
+  .res-btn.active-crop  { border-color: var(--crop); background: rgba(212,167,48,0.15); color: var(--crop); }
+  .res-btn:not([class*="active"]):hover { border-color: var(--text); color: var(--text); }
+
+  /* ─── STATS BAR ─── */
+  #stats-bar {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+  .stat-item { text-align: center; }
+  .stat-val { font-family: 'Cinzel', serif; font-size: 20px; color: var(--accent); font-weight: 600; }
+  .stat-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .stat-sep { width: 1px; height: 32px; background: var(--border); }
+
+  /* ─── TABLE ─── */
+  #table-wrap {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: #0d1018; border-bottom: 1px solid var(--border); }
+  thead th {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    padding: 12px 16px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  tbody tr { border-bottom: 1px solid rgba(42,54,85,0.5); transition: background 0.15s; }
+  tbody tr:hover { background: rgba(200,168,75,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 11px 16px; font-size: 15px; vertical-align: middle; }
+
+  .coord-cell { font-family: 'Cinzel', serif; font-size: 12px; color: var(--accent2); white-space: nowrap; }
+  .coord-cell a { color: inherit; text-decoration: none; }
+  .coord-cell a:hover { text-decoration: underline; color: var(--accent); }
+
+  .dist-cell { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; }
+  .dist-near { color: #5fce7f; }
+  .dist-mid  { color: var(--crop); }
+  .dist-far  { color: var(--danger); }
+
+  .bonus-cell { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; }
+  .bonus-50 { color: #ff8c42; }
+  .bonus-25 { color: #a0b8c8; }
+
+  /* ─── NO RESULTS ─── */
+  #no-results { display: none; text-align: center; padding: 48px; color: var(--muted); }
+  #no-results .icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ─── PAGINATION ─── */
+  #pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .page-btn {
+    padding: 5px 14px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .page-btn:hover, .page-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,168,75,0.05); }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  #page-info { font-family: 'Cinzel', serif; font-size: 11px; color: var(--muted); letter-spacing: 1px; padding: 0 8px; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  @media (max-width: 700px) {
+    header { padding: 16px; }
+    header h1 { font-size: 18px; }
+    .container { padding: 16px; }
+    #controls { grid-template-columns: 1fr 1fr; }
+    td, th { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-icon">🌿</div>
+  <div>
+    <h1>OASIS FINDER</h1>
+    <p>Travian map intelligence — locate every oasis by coordinate &amp; resource</p>
+  </div>
+  <div class="header-right">
+    <div id="server-info">—</div>
+    <div id="fetch-date">Loading database...</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LOADING -->
+  <div id="loading-state">
+    <div class="spinner"></div>
+    <p>Loading oasis database...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-state">
+    <div class="icon">⚠️</div>
+    <h2>Database Not Found</h2>
+    <p>Could not load <code>oases.json</code> from the repository.<br>
+    Make sure the file has been uploaded to GitHub.</p>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls">
+    <div class="control-card">
+      <label>Your Coordinates</label>
+      <div class="coord-row">
+        <input type="number" id="cx" class="coord-input" placeholder="X" value="0">
+        <span>|</span>
+        <input type="number" id="cy" class="coord-input" placeholder="Y" value="0">
+      </div>
+    </div>
+
+    <div class="control-card">
+      <label>Search Radius</label>
+      <input type="number" id="radius" value="20" min="1" max="400">
+    </div>
+
+    <div class="control-card">
+      <label>Resource Type</label>
+      <div class="res-btns">
+        <button class="res-btn" data-res="all"  onclick="toggleRes(this)">All</button>
+        <button class="res-btn" data-res="wood" onclick="toggleRes(this)">🌲 Wood</button>
+        <button class="res-btn" data-res="clay" onclick="toggleRes(this)">🟫 Clay</button>
+        <button class="res-btn" data-res="iron" onclick="toggleRes(this)">⚙️ Iron</button>
+        <button class="res-btn" data-res="crop" onclick="toggleRes(this)">🌾 Crop</button>
+      </div>
+    </div>
+
+    <div class="control-card">
+      <label>Min Bonus</label>
+      <select id="min-bonus">
+        <option value="0">Any bonus</option>
+        <option value="25">+25% and above</option>
+        <option value="50">+50% only</option>
+      </select>
+    </div>
+
+    <div class="control-card">
+      <label>Sort By</label>
+      <select id="sort-by">
+        <option value="distance">Distance (nearest first)</option>
+        <option value="bonus_desc">Bonus (highest first)</option>
+        <option value="x">X coordinate</option>
+        <option value="y">Y coordinate</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats-bar">
+    <div class="stat-item">
+      <div class="stat-val" id="stat-total">0</div>
+      <div class="stat-lbl">Total Oases</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-shown">0</div>
+      <div class="stat-lbl">Shown</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-wood" style="color:var(--wood)">0</div>
+      <div class="stat-lbl">Wood</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-clay" style="color:var(--clay)">0</div>
+      <div class="stat-lbl">Clay</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-iron" style="color:var(--iron)">0</div>
+      <div class="stat-lbl">Iron</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-crop" style="color:var(--crop)">0</div>
+      <div class="stat-lbl">Crop</div>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat-item">
+      <div class="stat-val" id="stat-double" style="color:#ff8c42">0</div>
+      <div class="stat-lbl">Double (+50%)</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div id="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Coordinates</th>
+          <th>Distance</th>
+          <th>Type</th>
+          <th>Bonus</th>
+          <th>Resources</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+    <div id="no-results">
+      <div class="icon">🔍</div>
+      <div>No oases found with current filters</div>
+    </div>
+    <div id="pagination"></div>
+  </div>
+
+</div>
+
+<script>
+  // ─── JSON URL — fetched from same GitHub repo ─────────────────────────────
+  const JSON_URL = 'https://correctable.github.io/travian-tools/oases.json';
+
+  const RES_EMOJI = { wood: '🌲', clay: '🟫', iron: '⚙️', crop: '🌾' };
+
+  let allOases  = [];
+  let filtered  = [];
+  let activeRes = 'all';
+  let currentPage = 1;
+  const PAGE_SIZE = 50;
+
+  // ─── LOAD DATABASE ON PAGE OPEN ──────────────────────────────────────────
+  async function loadDatabase() {
+    try {
+      const res = await fetch(JSON_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      allOases = Array.isArray(data) ? data : (data.oases || []);
+
+      // Normalise fields
+      allOases = allOases.map(o => ({
+        ...o,
+        resources: o.resources || [],
+        isDouble:  o.isDouble !== undefined ? o.isDouble : (o.maxBonus === 50 || o.bonus === 50),
+        maxBonus:  o.maxBonus || o.bonus || 0,
+      }));
+
+      // Update header info
+      document.getElementById('server-info').textContent =
+        data.server || 'ts5.x1.asia.travian.com';
+      document.getElementById('fetch-date').textContent =
+        data.fetchedAt
+          ? 'Database: ' + data.fetchedAt.slice(0, 10)
+          : allOases.length + ' oases loaded';
+
+      document.getElementById('stat-total').textContent = allOases.length;
+
+      // Show UI
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('controls').style.display      = 'grid';
+      document.getElementById('stats-bar').style.display     = 'flex';
+      document.getElementById('table-wrap').style.display    = 'block';
+
+      applyFilters();
+
+    } catch (err) {
+      console.error('Failed to load oases.json:', err);
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display   = 'block';
+    }
+  }
+
+  // ─── DISTANCE ─────────────────────────────────────────────────────────────
+  function distance(x1, y1, x2, y2) {
+    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+  }
+
+  // ─── RESOURCE TOGGLE ──────────────────────────────────────────────────────
+  function toggleRes(btn) {
+    activeRes = btn.dataset.res;
+    document.querySelectorAll('.res-btn').forEach(b => {
+      b.className = 'res-btn';
+      b.style.borderColor = '';
+      b.style.color = '';
+    });
+    if (activeRes !== 'all') {
+      btn.classList.add('active-' + activeRes);
+    } else {
+      btn.style.borderColor = 'var(--accent)';
+      btn.style.color = 'var(--accent)';
+    }
+    applyFilters();
+  }
+
+  // ─── FILTER + SORT ────────────────────────────────────────────────────────
+  function applyFilters() {
+    const cx       = parseFloat(document.getElementById('cx').value)      || 0;
+    const cy       = parseFloat(document.getElementById('cy').value)      || 0;
+    const radius   = parseFloat(document.getElementById('radius').value)  || 9999;
+    const minBonus = parseInt(document.getElementById('min-bonus').value) || 0;
+    const sortKey  = document.getElementById('sort-by').value;
+
+    filtered = allOases.filter(o => {
+      const dist = distance(cx, cy, o.x, o.y);
+      if (dist > radius) return false;
+      if (activeRes !== 'all' && !o.resources.includes(activeRes)) return false;
+      if ((o.maxBonus || 0) < minBonus) return false;
+      return true;
+    });
+
+    filtered.forEach(o => { o._dist = distance(cx, cy, o.x, o.y); });
+
+    filtered.sort((a, b) => {
+      if (sortKey === 'distance')    return a._dist - b._dist;
+      if (sortKey === 'bonus_desc')  return (b.maxBonus || 0) - (a.maxBonus || 0);
+      if (sortKey === 'x')           return a.x - b.x;
+      if (sortKey === 'y')           return a.y - b.y;
+      return 0;
+    });
+
+    currentPage = 1;
+    updateStats();
+    renderTable();
+  }
+
+  // ─── STATS ────────────────────────────────────────────────────────────────
+  function updateStats() {
+    document.getElementById('stat-shown').textContent  = filtered.length;
+    document.getElementById('stat-wood').textContent   = filtered.filter(o => o.resources.includes('wood')).length;
+    document.getElementById('stat-clay').textContent   = filtered.filter(o => o.resources.includes('clay')).length;
+    document.getElementById('stat-iron').textContent   = filtered.filter(o => o.resources.includes('iron')).length;
+    document.getElementById('stat-crop').textContent   = filtered.filter(o => o.resources.includes('crop')).length;
+    document.getElementById('stat-double').textContent = filtered.filter(o => o.isDouble).length;
+  }
+
+  // ─── RENDER TABLE ─────────────────────────────────────────────────────────
+  function renderTable() {
+    const body  = document.getElementById('table-body');
+    const noRes = document.getElementById('no-results');
+
+    if (filtered.length === 0) {
+      body.innerHTML = '';
+      noRes.style.display = 'block';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+    noRes.style.display = 'none';
+
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const page  = filtered.slice(start, start + PAGE_SIZE);
+
+    body.innerHTML = page.map(o => {
+      const dist      = o._dist;
+      const distClass = dist < 10 ? 'dist-near' : dist < 30 ? 'dist-mid' : 'dist-far';
+      const mapLink   = `https://ts5.x1.asia.travian.com/karte.php?x=${o.x}&y=${o.y}`;
+
+      const resPills = (o.resources || []).map(r =>
+        `<span style="color:var(--${r});font-size:18px;">${RES_EMOJI[r]}</span>`
+      ).join(' ');
+
+      const bonusNum   = o.maxBonus || 0;
+      const bonusClass = bonusNum >= 50 ? 'bonus-50' : 'bonus-25';
+      const bonusLabel = o.bonusStr || (bonusNum ? `+${bonusNum}%` : '—');
+
+      return `
+        <tr>
+          <td class="coord-cell">
+            <a href="${mapLink}" target="_blank">(${o.x} | ${o.y})</a>
+          </td>
+          <td class="dist-cell ${distClass}">${dist.toFixed(1)}</td>
+          <td>${o.typeName || '—'}</td>
+          <td class="bonus-cell ${bonusClass}">${bonusLabel}</td>
+          <td>${resPills}</td>
+        </tr>
+      `;
+    }).join('');
+
+    renderPagination();
+  }
+
+  // ─── PAGINATION ───────────────────────────────────────────────────────────
+  function renderPagination() {
+    const total = Math.ceil(filtered.length / PAGE_SIZE);
+    const el    = document.getElementById('pagination');
+    if (total <= 1) { el.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹ Prev</button>`;
+    html += `<span id="page-info">Page ${currentPage} / ${total}</span>`;
+
+    const start = Math.max(1, currentPage - 2);
+    const end   = Math.min(total, currentPage + 2);
+    for (let i = start; i <= end; i++) {
+      html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+    }
+
+    html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>Next ›</button>`;
+    el.innerHTML = html;
+  }
+
+  function goPage(n) {
+    const total = Math.ceil(filtered.length / PAGE_SIZE);
+    if (n < 1 || n > total) return;
+    currentPage = n;
+    renderTable();
+    window.scrollTo({ top: document.getElementById('table-wrap').offsetTop - 20, behavior: 'smooth' });
+  }
+
+  // ─── LIVE FILTER ──────────────────────────────────────────────────────────
+  ['cx', 'cy', 'radius', 'min-bonus', 'sort-by'].forEach(id => {
+    document.getElementById(id).addEventListener('input', applyFilters);
+    document.getElementById(id).addEventListener('change', applyFilters);
+  });
+
+  // Default highlight All button
+  document.querySelector('.res-btn[data-res="all"]').style.borderColor = 'var(--accent)';
+  document.querySelector('.res-btn[data-res="all"]').style.color = 'var(--accent)';
+
+  // ─── INIT ─────────────────────────────────────────────────────────────────
+  loadDatabase();
+</script>
+</body>
+</html>
