@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log In — Travian Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #f7f4ef;
+      --surface:    #ffffff;
+      --border:     #e0d8cc;
+      --border2:    #c8bfaf;
+      --gold:       #a07830;
+      --gold-light: #c8a84b;
+      --gold-bg:    #fdf6e8;
+      --text:       #2c2418;
+      --text2:      #6b5c44;
+      --muted:      #9e8e78;
+      --red:        #b03a2a;
+      --red-bg:     #fdf0ee;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(160,120,48,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* NAVBAR */
+    nav {
+      position: relative;
+      z-index: 10;
+      background: rgba(247,244,239,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-brand-icon { font-size: 1.4rem; }
+    .nav-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+    }
+
+    .nav-link {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text2);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--gold); }
+
+    /* MAIN */
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .login-wrap {
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .login-header .icon {
+      font-size: 2.4rem;
+      display: block;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 2px 8px rgba(160,120,48,0.25));
+    }
+
+    .login-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .login-header p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* CARD */
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    /* FORM */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--text2);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      font-family: 'Lora', serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(160,120,48,0.1);
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+
+    .forgot-link {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-decoration: none;
+      font-style: italic;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--gold); }
+
+    /* ERROR */
+    .error-box {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      background: var(--red-bg);
+      border: 1px solid rgba(176,58,42,0.2);
+      border-radius: 7px;
+      font-size: 0.83rem;
+      color: var(--red);
+      margin-bottom: 20px;
+    }
+    .error-box.show { display: flex; }
+
+    /* SUBMIT */
+    .btn-submit {
+      width: 100%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--gold);
+      border: none;
+      padding: 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      margin-top: 6px;
+      position: relative;
+    }
+
+    .btn-submit:hover {
+      background: var(--gold-light);
+      box-shadow: 0 6px 18px rgba(160,120,48,0.28);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active { transform: translateY(0); }
+
+    .btn-submit.loading {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .btn-submit .spinner {
+      display: none;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .btn-submit.loading .spinner { display: block; }
+
+    /* DIVIDER */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .or-divider span {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* REGISTER LINK */
+    .register-cta {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+    .register-cta a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .register-cta a:hover { color: var(--gold-light); }
+
+    /* FOOTER */
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes spin {
+      to { transform: translateY(-50%) rotate(360deg); }
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 28px 20px; }
+      nav { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <span class="nav-brand-icon">⚔️</span>
+      <span class="nav-brand-name">TRAVIAN TOOLS</span>
+    </a>
+    <a href="index.html" class="nav-link">← Back to Home</a>
+  </nav>
+
+  <main>
+    <div class="login-wrap">
+
+      <div class="login-header">
+        <span class="icon">⚔️</span>
+        <h1>Welcome Back</h1>
+        <p>Log in to access your tools and data</p>
+      </div>
+
+      <div class="login-card">
+
+        <div class="error-box" id="errorBox">
+          <span>⚠️</span>
+          <span id="errorMsg">Invalid email or password.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="commander@example.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+          <div class="form-row">
+            <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="loginBtn" onclick="handleLogin()">
+          Log In
+          <span class="spinner"></span>
+        </button>
+
+        <div class="or-divider"><span>or</span></div>
+
+        <div class="register-cta">
+          Don't have an account? <a href="register.html">Sign up for free</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>sonybukansoni.com &nbsp;·&nbsp; Travian Tools</footer>
+
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ── CONFIG ── ganti dengan Supabase project kamu
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function showError(msg) {
+      const box = document.getElementById('errorBox');
+      document.getElementById('errorMsg').textContent = msg;
+      box.classList.add('show');
+    }
+
+    function hideError() {
+      document.getElementById('errorBox').classList.remove('show');
+    }
+
+    async function handleLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('loginBtn');
+
+      hideError();
+
+      if (!email || !password) {
+        showError('Please fill in both email and password.');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.textContent = 'Logging in…';
+
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+      btn.classList.remove('loading');
+      btn.textContent = 'Log In';
+
+      if (error) {
+        showError(error.message || 'Invalid email or password.');
+        return;
+      }
+
+      // Redirect after login
+      window.location.href = 'index.html';
+    }
+
+    // Allow Enter key to submit
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+
+    // Check if already logged in
+    sb.auth.getSession().then(({ data }) => {
+      if (data.session) window.location.href = 'index.html';
+    });
+  </script>
+
+</body>
+</html>

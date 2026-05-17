@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — Travian Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #f7f4ef;
+      --surface:    #ffffff;
+      --border:     #e0d8cc;
+      --border2:    #c8bfaf;
+      --gold:       #a07830;
+      --gold-light: #c8a84b;
+      --gold-bg:    #fdf6e8;
+      --text:       #2c2418;
+      --text2:      #6b5c44;
+      --muted:      #9e8e78;
+      --red:        #b03a2a;
+      --red-bg:     #fdf0ee;
+      --green:      #2d6e45;
+      --green-bg:   #eef7f2;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lora', Georgia, serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(160,120,48,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: relative;
+      z-index: 10;
+      background: rgba(247,244,239,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-brand-icon { font-size: 1.4rem; }
+    .nav-brand-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+    }
+    .nav-link {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--text2);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--gold); }
+
+    main {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 420px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .login-header .icon {
+      font-size: 2.4rem;
+      display: block;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 2px 8px rgba(160,120,48,0.25));
+    }
+    .login-header h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .login-header p {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .login-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 36px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+
+    .form-group { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--text2);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      font-family: 'Lora', serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(160,120,48,0.1);
+    }
+
+    .hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 5px;
+    }
+
+    .alert-box {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 7px;
+      font-size: 0.83rem;
+      margin-bottom: 20px;
+    }
+    .alert-box.error {
+      display: flex;
+      background: var(--red-bg);
+      border: 1px solid rgba(176,58,42,0.2);
+      color: var(--red);
+    }
+    .alert-box.success {
+      display: flex;
+      background: var(--green-bg);
+      border: 1px solid rgba(45,110,69,0.2);
+      color: var(--green);
+    }
+
+    .btn-submit {
+      width: 100%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--gold);
+      border: none;
+      padding: 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+      margin-top: 6px;
+      position: relative;
+    }
+    .btn-submit:hover {
+      background: var(--gold-light);
+      box-shadow: 0 6px 18px rgba(160,120,48,0.28);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); }
+    .btn-submit.loading { pointer-events: none; opacity: 0.7; }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+    .or-divider::before, .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .or-divider span { font-size: 0.72rem; color: var(--muted); font-style: italic; }
+
+    .login-cta {
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+    .login-cta a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .login-cta a:hover { color: var(--gold-light); }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-style: italic;
+      border-top: 1px solid var(--border);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 28px 20px; }
+      nav { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <span class="nav-brand-icon">⚔️</span>
+      <span class="nav-brand-name">TRAVIAN TOOLS</span>
+    </a>
+    <a href="index.html" class="nav-link">← Back to Home</a>
+  </nav>
+
+  <main>
+    <div class="wrap">
+
+      <div class="login-header">
+        <span class="icon">🛡️</span>
+        <h1>Create Account</h1>
+        <p>Join and access all intelligence tools</p>
+      </div>
+
+      <div class="login-card">
+
+        <div class="alert-box" id="alertBox">
+          <span id="alertIcon">⚠️</span>
+          <span id="alertMsg"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="YourCommanderName" autocomplete="username">
+          <p class="hint">This will be your display name.</p>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="commander@example.com" autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Min. 8 characters" autocomplete="new-password">
+        </div>
+
+        <div class="form-group">
+          <label for="confirm">Confirm Password</label>
+          <input type="password" id="confirm" placeholder="Repeat password" autocomplete="new-password">
+        </div>
+
+        <button class="btn-submit" id="registerBtn" onclick="handleRegister()">
+          Create Account
+        </button>
+
+        <div class="or-divider"><span>or</span></div>
+
+        <div class="login-cta">
+          Already have an account? <a href="login.html">Log in</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer>sonybukansoni.com &nbsp;·&nbsp; Travian Tools</footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL  = 'YOUR_SUPABASE_URL';
+    const SUPABASE_ANON = 'YOUR_SUPABASE_ANON_KEY';
+
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alertBox');
+      document.getElementById('alertIcon').textContent = type === 'error' ? '⚠️' : '✅';
+      document.getElementById('alertMsg').textContent = msg;
+      box.className = `alert-box ${type}`;
+    }
+
+    async function handleRegister() {
+      const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm').value;
+      const btn      = document.getElementById('registerBtn');
+
+      if (!username || !email || !password || !confirm) {
+        showAlert('Please fill in all fields.'); return;
+      }
+      if (password.length < 8) {
+        showAlert('Password must be at least 8 characters.'); return;
+      }
+      if (password !== confirm) {
+        showAlert('Passwords do not match.'); return;
+      }
+
+      btn.classList.add('loading');
+      btn.textContent = 'Creating account…';
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { username } }
+      });
+
+      btn.classList.remove('loading');
+      btn.textContent = 'Create Account';
+
+      if (error) {
+        showAlert(error.message || 'Registration failed. Please try again.');
+        return;
+      }
+
+      showAlert('Account created! Check your email to confirm, then log in.', 'success');
+      setTimeout(() => window.location.href = 'login.html', 3000);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleRegister();
+    });
+  </script>
+
+</body>
+</html>
