@@ -1,598 +1,1181 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Travian Oasis Finder</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oasis Finder — Travian Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --bg:        #0b0e14;
-    --surface:   #131720;
-    --surface2:  #1b2133;
-    --border:    #2a3655;
-    --accent:    #c8a84b;
-    --accent2:   #4a8fff;
-    --text:      #d4c9b0;
-    --muted:     #6a7590;
-    --wood:      #5d9e5c;
-    --clay:      #c1614a;
-    --iron:      #7b9ab5;
-    --crop:      #d4a730;
-    --danger:    #e05555;
-  }
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+      --wood:       #16a34a;
+      --wood-bg:    rgba(22,163,74,0.08);
+      --clay:       #ea580c;
+      --clay-bg:    rgba(234,88,12,0.08);
+      --iron:       #0891b2;
+      --iron-bg:    rgba(8,145,178,0.08);
+      --crop:       #ca8a04;
+      --crop-bg:    rgba(202,138,4,0.08);
+    }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #ffffff;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Crimson Pro', serif;
-    font-size: 16px;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 10%, rgba(74,143,255,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 80%, rgba(200,168,75,0.06) 0%, transparent 50%);
-  }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* ─── HEADER ─── */
-  header {
-    background: linear-gradient(180deg, #0d1018 0%, #131720 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 24px 32px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  }
-  .logo-icon { font-size: 40px; filter: drop-shadow(0 0 12px var(--accent)); }
-  header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--accent);
-    letter-spacing: 3px;
-    text-shadow: 0 0 20px rgba(200,168,75,0.4);
-  }
-  header p { color: var(--muted); font-style: italic; font-size: 14px; margin-top: 2px; }
-  .header-right { margin-left: auto; text-align: right; }
-  #server-info { font-family: 'Cinzel', serif; font-size: 12px; color: var(--accent2); letter-spacing: 1px; }
-  #fetch-date  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
 
-  /* ─── LOADING STATE ─── */
-  #loading-state {
-    text-align: center;
-    padding: 80px 20px;
-  }
-  #loading-state .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 20px;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  #loading-state p { color: var(--muted); font-style: italic; }
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
+      padding: 0 40px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+    .nav-brand-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; box-shadow: 0 0 16px rgba(37,99,235,0.4);
+    }
+    .nav-brand-name { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em; }
+    .nav-brand-name span { color: var(--blue-light); }
+    .nav-menu { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: center; }
+    .nav-item { position: relative; }
+    .nav-link {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.875rem; font-weight: 500; color: var(--text2);
+      text-decoration: none; padding: 8px 14px; border-radius: 8px;
+      transition: all 0.18s; cursor: pointer; background: none; border: none;
+      font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    }
+    .nav-link:hover, .nav-item:hover > .nav-link { color: var(--navy); background: var(--surface2); }
+    .nav-link .chevron { font-size: 0.6rem; opacity: 0.6; transition: transform 0.2s; }
+    .nav-item:hover > .nav-link .chevron { transform: rotate(180deg); }
+    .dropdown {
+      position: absolute; top: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: #ffffff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 8px; min-width: 240px; opacity: 0; visibility: hidden;
+      transition: all 0.2s ease;
+      box-shadow: 0 20px 60px rgba(15,33,83,0.12), 0 4px 16px rgba(37,99,235,0.06);
+    }
+    .nav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .dropdown-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 8px; text-decoration: none; transition: background 0.15s; }
+    .dropdown-item:hover { background: var(--surface2); }
+    .dropdown-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
+    .dropdown-text strong { display: block; font-size: 0.825rem; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+    .dropdown-text span { font-size: 0.72rem; color: var(--text3); }
+    .dropdown-badge { margin-left: auto; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 100px; }
+    .badge-free  { background: var(--green-bg);  color: var(--green); }
+    .badge-pro   { background: var(--blue-glow); color: var(--blue-light); }
+    .badge-soon  { background: rgba(122,147,188,0.12); color: var(--text3); }
+    .badge-new   { background: var(--amber-bg);  color: var(--amber); }
+    .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-ghost {
+      font-size: 0.825rem; font-weight: 500; color: var(--text2);
+      background: none; border: 1px solid var(--border); padding: 8px 18px; border-radius: 8px;
+      cursor: pointer; text-decoration: none; transition: all 0.18s; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-ghost:hover { border-color: var(--blue-light); color: var(--navy); background: var(--blue-glow); }
+    .btn-primary {
+      font-size: 0.825rem; font-weight: 600; color: #fff; background: var(--blue2);
+      border: 1px solid transparent; padding: 8px 20px; border-radius: 8px;
+      cursor: pointer; text-decoration: none; transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif; box-shadow: 0 0 20px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { background: var(--blue-light); box-shadow: 0 0 28px rgba(59,130,246,0.45); transform: translateY(-1px); }
 
-  /* ─── ERROR STATE ─── */
-  #error-state {
-    display: none;
-    text-align: center;
-    padding: 80px 20px;
-  }
-  #error-state .icon { font-size: 40px; margin-bottom: 16px; }
-  #error-state h2 { font-family: 'Cinzel', serif; color: var(--danger); margin-bottom: 8px; }
-  #error-state p { color: var(--muted); font-size: 14px; }
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
 
-  /* ─── MAIN ─── */
-  .container { max-width: 1300px; margin: 0 auto; padding: 24px; }
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 40px; animation: fadeDown 0.4s ease both; }
+    .page-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--green); background: var(--green-bg);
+      border: 1px solid rgba(5,150,105,0.2); padding: 4px 12px; border-radius: 100px; margin-bottom: 16px;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 700;
+      color: var(--text); letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 10px;
+    }
+    .page-desc { font-size: 0.975rem; color: var(--text2); line-height: 1.7; max-width: 600px; }
 
-  /* ─── CONTROLS ─── */
-  #controls {
-    display: none;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .control-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px;
-  }
-  .control-card label {
-    display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-  }
-  .coord-row { display: flex; gap: 8px; align-items: center; }
-  .coord-row span { color: var(--muted); font-size: 14px; }
+    /* ── SERVER SELECTOR ── */
+    .server-section {
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 24px; margin-bottom: 24px;
+      animation: fadeUp 0.4s 0.05s ease both;
+    }
+    .server-section-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.875rem; font-weight: 700;
+      color: var(--text); margin-bottom: 14px; letter-spacing: -0.01em;
+    }
+    .server-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .server-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: var(--surface2); cursor: pointer; transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif; font-size: 0.825rem; font-weight: 500; color: var(--text2);
+    }
+    .server-btn:hover { border-color: var(--blue-light); color: var(--navy); background: var(--blue-glow); }
+    .server-btn.active { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
+    .server-btn .server-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .server-btn .server-dot.offline { background: var(--text3); }
+    .server-unavail-note {
+      margin-top: 12px; font-size: 0.775rem; color: var(--text3);
+      display: none; align-items: center; gap: 8px;
+    }
+    .server-unavail-note a { color: var(--blue2); font-weight: 600; text-decoration: none; }
+    .server-unavail-note a:hover { text-decoration: underline; }
 
-  input[type="number"], select {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-family: 'Crimson Pro', serif;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  input[type="number"]:focus, select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(200,168,75,0.1);
-  }
-  .coord-input { width: 80px; text-align: center; }
-  select option { background: var(--surface); }
+    /* ── CONTROLS ── */
+    #controls {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 12px; margin-bottom: 20px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .control-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px;
+    }
+    .control-label {
+      display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 8px;
+    }
+    .coord-row { display: flex; gap: 8px; align-items: center; }
+    .coord-sep { font-size: 0.85rem; color: var(--text3); font-weight: 600; }
 
-  /* ─── RESOURCE FILTER BUTTONS ─── */
-  .res-btns { display: flex; gap: 6px; flex-wrap: wrap; }
-  .res-btn {
-    padding: 5px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: 'Crimson Pro', serif;
-    font-size: 14px;
-    transition: all 0.2s;
-  }
-  .res-btn.active-wood  { border-color: var(--wood); background: rgba(93,158,92,0.15); color: var(--wood); }
-  .res-btn.active-clay  { border-color: var(--clay); background: rgba(193,97,74,0.15); color: var(--clay); }
-  .res-btn.active-iron  { border-color: var(--iron); background: rgba(123,154,181,0.15); color: var(--iron); }
-  .res-btn.active-crop  { border-color: var(--crop); background: rgba(212,167,48,0.15); color: var(--crop); }
-  .res-btn:not([class*="active"]):hover { border-color: var(--text); color: var(--text); }
+    input[type="number"], select {
+      width: 100%; height: 38px;
+      background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px;
+      color: var(--text); padding: 0 12px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      outline: none; transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    input[type="number"]:focus, select:focus {
+      border-color: var(--blue2); background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+    .coord-input { width: 70px; text-align: center; }
+    select option { background: #fff; }
 
-  /* ─── STATS BAR ─── */
-  #stats-bar {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 20px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 24px;
-    align-items: center;
-  }
-  .stat-item { text-align: center; }
-  .stat-val { font-family: 'Cinzel', serif; font-size: 20px; color: var(--accent); font-weight: 600; }
-  .stat-lbl { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
-  .stat-sep { width: 1px; height: 32px; background: var(--border); }
+    /* Resource filter buttons */
+    .res-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .res-btn {
+      height: 30px; padding: 0 11px; border-radius: 7px;
+      border: 1.5px solid var(--border); background: var(--surface2);
+      color: var(--text2); cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 0.775rem; font-weight: 500;
+      transition: all 0.18s; white-space: nowrap;
+    }
+    .res-btn:hover { border-color: var(--blue-light); color: var(--navy); }
+    .res-btn.active-all  { border-color: var(--blue2);  background: var(--blue-glow);  color: var(--blue2);  font-weight: 600; }
+    .res-btn.active-wood { border-color: var(--wood);   background: var(--wood-bg);    color: var(--wood);   font-weight: 600; }
+    .res-btn.active-clay { border-color: var(--clay);   background: var(--clay-bg);    color: var(--clay);   font-weight: 600; }
+    .res-btn.active-iron { border-color: var(--iron);   background: var(--iron-bg);    color: var(--iron);   font-weight: 600; }
+    .res-btn.active-crop { border-color: var(--crop);   background: var(--crop-bg);    color: var(--crop);   font-weight: 600; }
 
-  /* ─── TABLE ─── */
-  #table-wrap {
-    display: none;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-  table { width: 100%; border-collapse: collapse; }
-  thead { background: #0d1018; border-bottom: 1px solid var(--border); }
-  thead th {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--muted);
-    text-transform: uppercase;
-    padding: 12px 16px;
-    text-align: left;
-    white-space: nowrap;
-  }
-  tbody tr { border-bottom: 1px solid rgba(42,54,85,0.5); transition: background 0.15s; }
-  tbody tr:hover { background: rgba(200,168,75,0.04); }
-  tbody tr:last-child { border-bottom: none; }
-  td { padding: 11px 16px; font-size: 15px; vertical-align: middle; }
+    /* ── STATS BAR ── */
+    #stats-bar {
+      display: none; background: #fff; border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 20px; margin-bottom: 16px;
+      flex-wrap: wrap; gap: 20px; align-items: center;
+    }
+    .stat-item { text-align: center; min-width: 48px; }
+    .stat-val { font-family: 'Space Grotesk', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .stat-lbl { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-top: 1px; }
+    .stat-sep { width: 1px; height: 32px; background: var(--border); }
 
-  .coord-cell { font-family: 'Cinzel', serif; font-size: 12px; color: var(--accent2); white-space: nowrap; }
-  .coord-cell a { color: inherit; text-decoration: none; }
-  .coord-cell a:hover { text-decoration: underline; color: var(--accent); }
+    /* ── TABLE SECTION ── */
+    #table-section { display: none; }
 
-  .dist-cell { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; }
-  .dist-near { color: #5fce7f; }
-  .dist-mid  { color: var(--crop); }
-  .dist-far  { color: var(--danger); }
+    .table-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .table-info { font-size: 0.8rem; color: var(--text3); }
+    .table-info strong { color: var(--text2); }
 
-  .bonus-cell { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600; }
-  .bonus-50 { color: #ff8c42; }
-  .bonus-25 { color: #a0b8c8; }
+    .page-size-wrap { display: flex; align-items: center; gap: 8px; }
+    .page-size-label { font-size: 0.775rem; color: var(--text3); white-space: nowrap; }
+    .page-size-select { width: auto; height: 34px; padding: 0 10px; font-size: 0.8rem; }
 
-  /* ─── NO RESULTS ─── */
-  #no-results { display: none; text-align: center; padding: 48px; color: var(--muted); }
-  #no-results .icon { font-size: 40px; margin-bottom: 12px; }
+    .table-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      overflow: hidden; box-shadow: 0 2px 12px rgba(15,33,83,0.04);
+    }
 
-  /* ─── PAGINATION ─── */
-  #pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    padding: 16px;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-  }
-  .page-btn {
-    padding: 5px 14px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    color: var(--muted);
-    cursor: pointer;
-    font-family: 'Crimson Pro', serif;
-    font-size: 14px;
-    transition: all 0.2s;
-  }
-  .page-btn:hover, .page-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(200,168,75,0.05); }
-  .page-btn:disabled { opacity: 0.3; cursor: default; }
-  #page-info { font-family: 'Cinzel', serif; font-size: 11px; color: var(--muted); letter-spacing: 1px; padding: 0 8px; }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: var(--surface2); border-bottom: 1px solid var(--border); }
+    thead th {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text3); padding: 12px 16px; text-align: left; white-space: nowrap;
+    }
+    thead th.sortable { cursor: pointer; user-select: none; transition: color 0.15s; }
+    thead th.sortable:hover { color: var(--text2); }
+    thead th.sort-active { color: var(--blue2); }
+    .sort-arrow { margin-left: 4px; opacity: 0.7; }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.12s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: 11px 16px; font-size: 0.875rem; vertical-align: middle; }
 
-  @media (max-width: 700px) {
-    header { padding: 16px; }
-    header h1 { font-size: 18px; }
-    .container { padding: 16px; }
-    #controls { grid-template-columns: 1fr 1fr; }
-    td, th { padding: 8px 10px; }
-  }
-</style>
+    .coord-cell { font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; color: var(--blue2); white-space: nowrap; font-weight: 500; }
+    .coord-cell a { color: inherit; text-decoration: none; }
+    .coord-cell a:hover { text-decoration: underline; color: var(--blue-light); }
+
+    .dist-cell { font-family: 'Space Grotesk', sans-serif; font-size: 0.825rem; font-weight: 600; }
+    .dist-near { color: var(--green); }
+    .dist-mid  { color: var(--amber); }
+    .dist-far  { color: var(--red); }
+
+    .type-cell { font-size: 0.825rem; color: var(--text2); }
+
+    .bonus-cell { font-family: 'Space Grotesk', sans-serif; font-size: 0.825rem; font-weight: 600; }
+    .bonus-50 { color: var(--amber); }
+    .bonus-25 { color: var(--blue-light); }
+    .bonus-0  { color: var(--text3); }
+
+    .res-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+    .res-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px; border-radius: 100px; font-size: 0.7rem; font-weight: 600;
+    }
+    .res-pill.wood { background: var(--wood-bg); color: var(--wood); }
+    .res-pill.clay { background: var(--clay-bg); color: var(--clay); }
+    .res-pill.iron { background: var(--iron-bg); color: var(--iron); }
+    .res-pill.crop { background: var(--crop-bg); color: var(--crop); }
+
+    /* ── PAGINATION ── */
+    #pagination {
+      display: flex; justify-content: center; align-items: center;
+      gap: 6px; padding: 14px 16px; border-top: 1px solid var(--border);
+      background: var(--surface2);
+    }
+    .page-btn {
+      height: 32px; min-width: 32px; padding: 0 10px; border-radius: 7px;
+      border: 1px solid var(--border); background: #fff;
+      color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem; font-weight: 500; transition: all 0.15s;
+    }
+    .page-btn:hover { border-color: var(--blue-light); color: var(--navy); background: var(--blue-glow); }
+    .page-btn.active { border-color: var(--blue2); background: var(--blue2); color: #fff; font-weight: 600; }
+    .page-btn:disabled { opacity: 0.3; cursor: default; }
+    .page-info { font-size: 0.775rem; color: var(--text3); padding: 0 8px; white-space: nowrap; }
+
+    /* ── PAYWALL BANNER ── */
+    .paywall-banner {
+      margin-top: 2px;
+      background: linear-gradient(135deg, var(--navy3), var(--navy2));
+      border: 1px solid var(--border2);
+      border-radius: 14px; padding: 32px 28px;
+      display: flex; align-items: center; gap: 24px;
+      box-shadow: 0 8px 32px rgba(15,33,83,0.12);
+    }
+    .paywall-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; flex-shrink: 0;
+    }
+    .paywall-text { flex: 1; }
+    .paywall-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700;
+      color: #ffffff; letter-spacing: -0.01em; margin-bottom: 5px;
+    }
+    .paywall-desc { font-size: 0.825rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+    .paywall-desc strong { color: rgba(255,255,255,0.85); }
+    .paywall-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+    .btn-unlock {
+      display: inline-flex; align-items: center; gap: 7px;
+      height: 42px; padding: 0 22px; border-radius: 10px; border: none;
+      background: var(--blue2); color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; transition: all 0.18s;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.4); white-space: nowrap;
+    }
+    .btn-unlock:hover { background: var(--blue-light); box-shadow: 0 6px 24px rgba(59,130,246,0.5); transform: translateY(-1px); }
+    .paywall-note { font-size: 0.72rem; color: rgba(255,255,255,0.4); text-align: right; }
+
+    /* ── NO RESULTS ── */
+    #no-results {
+      display: none; text-align: center; padding: 48px 24px;
+      color: var(--text3); font-size: 0.875rem;
+    }
+    #no-results .no-icon { font-size: 2rem; margin-bottom: 10px; }
+
+    /* ── LOADING / ERROR ── */
+    #loading-state { text-align: center; padding: 64px 20px; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border); border-top-color: var(--blue2);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-state p { font-size: 0.875rem; color: var(--text3); }
+
+    #error-state {
+      display: none; text-align: center; padding: 64px 20px;
+    }
+    #error-state .err-icon { font-size: 2rem; margin-bottom: 12px; }
+    #error-state h3 { font-family: 'Space Grotesk', sans-serif; color: var(--red); font-size: 1rem; margin-bottom: 6px; }
+    #error-state p { font-size: 0.825rem; color: var(--text3); }
+
+    /* ── REQUEST SECTION ── */
+    .request-section {
+      margin-top: 64px;
+      animation: fadeUp 0.4s 0.1s ease both;
+    }
+    .section-divider {
+      height: 1px; background: var(--border);
+      margin-bottom: 48px;
+    }
+    .request-header { margin-bottom: 32px; }
+    .request-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--blue-light); background: var(--blue-glow);
+      border: 1px solid rgba(59,130,246,0.2); padding: 4px 12px; border-radius: 100px; margin-bottom: 14px;
+    }
+    .request-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em; margin-bottom: 8px;
+    }
+    .request-desc { font-size: 0.9rem; color: var(--text2); line-height: 1.7; max-width: 560px; }
+
+    .request-layout {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start;
+    }
+
+    .request-info { }
+    .info-card {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
+      margin-bottom: 16px;
+    }
+    .info-card-title {
+      font-size: 0.775rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text3); margin-bottom: 12px;
+    }
+    .info-step {
+      display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;
+    }
+    .info-step:last-child { margin-bottom: 0; }
+    .info-step-num {
+      width: 20px; height: 20px; border-radius: 50%; background: var(--blue2); color: #fff;
+      font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .info-step-text { font-size: 0.8rem; color: var(--text2); line-height: 1.55; }
+
+    .available-servers-list { }
+    .avail-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+    }
+    .avail-row:last-child { border-bottom: none; }
+    .avail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .avail-dot.live { background: var(--green); }
+    .avail-dot.pending { background: var(--amber); }
+    .avail-name { flex: 1; color: var(--text2); }
+    .avail-badge {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 2px 7px; border-radius: 100px;
+    }
+    .avail-badge.live { background: var(--green-bg); color: var(--green); }
+    .avail-badge.pending { background: var(--amber-bg); color: var(--amber); }
+
+    /* Request Form */
+    .request-form-card {
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 28px; box-shadow: 0 2px 12px rgba(15,33,83,0.04);
+    }
+    .form-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.975rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.01em; margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 0.75rem; font-weight: 600; color: var(--text); margin-bottom: 6px;
+    }
+    .form-input, .form-textarea, .form-select {
+      width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 9px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      padding: 0 14px; height: 42px; outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--blue2); background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
+    .form-textarea { height: 90px; padding: 10px 14px; resize: vertical; line-height: 1.6; }
+    .form-hint { font-size: 0.7rem; color: var(--text3); margin-top: 4px; }
+
+    .btn-request {
+      width: 100%; height: 44px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: var(--surface2); color: var(--text3); font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem; font-weight: 600; cursor: not-allowed; opacity: 0.7;
+      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
+    }
+    .btn-request-badge {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2);
+      padding: 2px 7px; border-radius: 100px;
+    }
+    .form-submit-note { font-size: 0.72rem; color: var(--text3); text-align: center; margin-top: 8px; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1; border-top: 1px solid var(--border);
+      background: var(--surface2); padding: 32px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+    }
+    .footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--text2); }
+    .footer-links { display: flex; align-items: center; gap: 24px; }
+    .footer-link { font-size: 0.775rem; color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .footer-link:hover { color: var(--text2); }
+    .footer-copy { font-size: 0.75rem; color: var(--text3); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp   { from { opacity: 0; transform: translateY(18px);  } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-menu { display: none; }
+      footer { flex-direction: column; gap: 20px; text-align: center; padding: 24px 16px; }
+      .request-layout { grid-template-columns: 1fr; }
+      .paywall-banner { flex-direction: column; text-align: center; }
+      .paywall-actions { align-items: center; }
+    }
+    @media (max-width: 520px) {
+      .page-wrap { padding: 32px 16px 60px; }
+      td, th { padding: 9px 10px; }
+    }
+  </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-icon">🌿</div>
-  <div>
-    <h1>OASIS FINDER</h1>
-    <p>Travian map intelligence — locate every oasis by coordinate &amp; resource</p>
-  </div>
-  <div class="header-right">
-    <div id="server-info">—</div>
-    <div id="fetch-date">Loading database...</div>
-  </div>
-</header>
+  <!-- ── NAVBAR ── -->
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-logo">⚔️</div>
+      <span class="nav-brand-name">Travian<span>Tools</span></span>
+    </a>
 
-<div class="container">
+    <div class="nav-menu">
+      <div class="nav-item">
+        <button class="nav-link">Tools <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="travian_oasis_finder.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="spy-on-productivity.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
+            <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
+            <div class="dropdown-text"><strong>Troop Simulator</strong><span>Simulate battles</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🗺️</div>
+            <div class="dropdown-text"><strong>Map Scanner</strong><span>Scan & track map changes</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
 
-  <!-- LOADING -->
-  <div id="loading-state">
-    <div class="spinner"></div>
-    <p>Loading oasis database...</p>
-  </div>
+      <div class="nav-item">
+        <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
+            <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
+            <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
+            <div class="dropdown-text"><strong>Alliance Stats</strong><span>Compare alliance performance</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
 
-  <!-- ERROR -->
-  <div id="error-state">
-    <div class="icon">⚠️</div>
-    <h2>Database Not Found</h2>
-    <p>Could not load <code>oases.json</code> from the repository.<br>
-    Make sure the file has been uploaded to GitHub.</p>
-  </div>
+      <div class="nav-item">
+        <button class="nav-link">Calculators <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">⚡</div>
+            <div class="dropdown-text"><strong>Crop Calculator</strong><span>Plan your crop consumption</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:rgba(8,145,178,0.1)">🏗️</div>
+            <div class="dropdown-text"><strong>Build Optimizer</strong><span>Optimize building queues</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🚀</div>
+            <div class="dropdown-text"><strong>Travel Time</strong><span>Troop arrival & timing calc</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
 
-  <!-- CONTROLS -->
-  <div id="controls">
-    <div class="control-card">
-      <label>Your Coordinates</label>
-      <div class="coord-row">
-        <input type="number" id="cx" class="coord-input" placeholder="X" value="0">
-        <span>|</span>
-        <input type="number" id="cy" class="coord-input" placeholder="Y" value="0">
+      <div class="nav-item">
+        <button class="nav-link">Guides <span class="chevron">▼</span></button>
+        <div class="dropdown" style="min-width:220px">
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
+            <div class="dropdown-text"><strong>Beginner Guide</strong><span>Start your Travian journey</span></div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
+            <div class="dropdown-text"><strong>Defense Guide</strong><span>Build an impenetrable defense</span></div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Raiding Strategy</strong><span>Maximize your raid income</span></div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" class="nav-link">Changelog</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn-ghost">Log In</a>
+      <a href="register.html" class="btn-primary">Sign Up Free</a>
+    </div>
+  </nav>
+
+  <!-- ── PAGE ── -->
+  <div class="page-wrap">
+
+    <!-- Header -->
+    <div class="page-header">
+      <div class="page-tag">🌿 Free Preview</div>
+      <h1 class="page-title">Oasis Finder</h1>
+      <p class="page-desc">Find every oasis near your village. Filter by resource type, bonus percentage, and radius. Preview shows the 100 closest results — full access requires an account.</p>
+    </div>
+
+    <!-- Server Selector -->
+    <div class="server-section">
+      <div class="server-section-title">Select Server</div>
+      <div class="server-grid">
+        <button class="server-btn active" id="btn-asia5" onclick="selectServer(this, 'asia5')">
+          <span class="server-dot"></span>
+          Asia 5 · x1
+        </button>
+        <button class="server-btn" onclick="selectServer(this, null)">
+          <span class="server-dot offline"></span>
+          Asia 1 · x1
+        </button>
+        <button class="server-btn" onclick="selectServer(this, null)">
+          <span class="server-dot offline"></span>
+          Asia 2 · x1
+        </button>
+        <button class="server-btn" onclick="selectServer(this, null)">
+          <span class="server-dot offline"></span>
+          COM 1 · x1
+        </button>
+        <button class="server-btn" onclick="selectServer(this, null)">
+          <span class="server-dot offline"></span>
+          COM 2 · x3
+        </button>
+      </div>
+      <div class="server-unavail-note" id="unavail-note">
+        ℹ️ Data for this server isn't available yet. <a href="#request-section">Request it below →</a>
       </div>
     </div>
 
-    <div class="control-card">
-      <label>Search Radius</label>
-      <input type="number" id="radius" value="20" min="1" max="400">
+    <!-- Loading -->
+    <div id="loading-state">
+      <div class="spinner"></div>
+      <p>Loading oasis database…</p>
     </div>
 
-    <div class="control-card">
-      <label>Resource Type</label>
-      <div class="res-btns">
-        <button class="res-btn" data-res="all"  onclick="toggleRes(this)">All</button>
-        <button class="res-btn" data-res="wood" onclick="toggleRes(this)">🌲 Wood</button>
-        <button class="res-btn" data-res="clay" onclick="toggleRes(this)">🟫 Clay</button>
-        <button class="res-btn" data-res="iron" onclick="toggleRes(this)">⚙️ Iron</button>
-        <button class="res-btn" data-res="crop" onclick="toggleRes(this)">🌾 Crop</button>
+    <!-- Error -->
+    <div id="error-state">
+      <div class="err-icon">⚠️</div>
+      <h3>Database Not Found</h3>
+      <p>Could not load oases.json. Make sure the file is uploaded to GitHub.</p>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls">
+      <div class="control-card">
+        <label class="control-label">Your Coordinates</label>
+        <div class="coord-row">
+          <input type="number" id="cx" class="coord-input" placeholder="X" value="0">
+          <span class="coord-sep">|</span>
+          <input type="number" id="cy" class="coord-input" placeholder="Y" value="0">
+        </div>
+      </div>
+      <div class="control-card">
+        <label class="control-label">Search Radius</label>
+        <input type="number" id="radius" value="20" min="1" max="400">
+      </div>
+      <div class="control-card">
+        <label class="control-label">Resource Type</label>
+        <div class="res-btns">
+          <button class="res-btn active-all" data-res="all" onclick="toggleRes(this)">All</button>
+          <button class="res-btn" data-res="wood" onclick="toggleRes(this)">🌲 Wood</button>
+          <button class="res-btn" data-res="clay" onclick="toggleRes(this)">🟫 Clay</button>
+          <button class="res-btn" data-res="iron" onclick="toggleRes(this)">⚙️ Iron</button>
+          <button class="res-btn" data-res="crop" onclick="toggleRes(this)">🌾 Crop</button>
+        </div>
+      </div>
+      <div class="control-card">
+        <label class="control-label">Min Bonus</label>
+        <select id="min-bonus">
+          <option value="0">Any bonus</option>
+          <option value="25">+25% and above</option>
+          <option value="50">+50% only</option>
+        </select>
       </div>
     </div>
 
-    <div class="control-card">
-      <label>Min Bonus</label>
-      <select id="min-bonus">
-        <option value="0">Any bonus</option>
-        <option value="25">+25% and above</option>
-        <option value="50">+50% only</option>
-      </select>
+    <!-- Stats Bar -->
+    <div id="stats-bar">
+      <div class="stat-item">
+        <div class="stat-val" id="stat-total">0</div>
+        <div class="stat-lbl">Total in DB</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-filtered">0</div>
+        <div class="stat-lbl">Matched</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-shown">0</div>
+        <div class="stat-lbl">Showing</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-wood" style="color:var(--wood)">0</div>
+        <div class="stat-lbl">Wood</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-clay" style="color:var(--clay)">0</div>
+        <div class="stat-lbl">Clay</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-iron" style="color:var(--iron)">0</div>
+        <div class="stat-lbl">Iron</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-crop" style="color:var(--crop)">0</div>
+        <div class="stat-lbl">Crop</div>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-item">
+        <div class="stat-val" id="stat-double" style="color:var(--amber)">0</div>
+        <div class="stat-lbl">+50% Bonus</div>
+      </div>
     </div>
 
-    <div class="control-card">
-      <label>Sort By</label>
-      <select id="sort-by">
-        <option value="distance">Distance (nearest first)</option>
-        <option value="bonus_desc">Bonus (highest first)</option>
-        <option value="x">X coordinate</option>
-        <option value="y">Y coordinate</option>
-      </select>
+    <!-- Table Section -->
+    <div id="table-section">
+      <div class="table-toolbar">
+        <div class="table-info">
+          Showing <strong id="info-range">—</strong> of <strong id="info-total">—</strong> results
+          <span id="info-cap" style="color:var(--amber);margin-left:4px;"></span>
+        </div>
+        <div class="page-size-wrap">
+          <span class="page-size-label">Rows per page:</span>
+          <select class="page-size-select" id="page-size" onchange="changePageSize()">
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable sort-active" data-sort="distance" onclick="setSort(this)">
+                Distance <span class="sort-arrow" id="arr-distance">↑</span>
+              </th>
+              <th class="sortable" data-sort="x" onclick="setSort(this)">
+                Coordinates <span class="sort-arrow" id="arr-x"></span>
+              </th>
+              <th>Type</th>
+              <th class="sortable" data-sort="bonus" onclick="setSort(this)">
+                Bonus <span class="sort-arrow" id="arr-bonus"></span>
+              </th>
+              <th>Resources</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+        <div id="no-results">
+          <div class="no-icon">🔍</div>
+          <div>No oases found with current filters</div>
+        </div>
+        <div id="pagination"></div>
+      </div>
+
+      <!-- Paywall banner (shown after table when preview cap hit) -->
+      <div class="paywall-banner" id="paywall-banner" style="display:none">
+        <div class="paywall-icon">🔒</div>
+        <div class="paywall-text">
+          <div class="paywall-title">You're seeing the free preview — 100 of 20,000+ oases</div>
+          <div class="paywall-desc">
+            Sign up for a <strong>Pro account</strong> to unlock the full database, export to farmlist, and access all servers.
+          </div>
+        </div>
+        <div class="paywall-actions">
+          <a href="register.html" class="btn-unlock">Unlock Full Access →</a>
+          <span class="paywall-note">Free to try · No credit card required</span>
+        </div>
+      </div>
     </div>
+
+    <!-- ── REQUEST SECTION ── -->
+    <div class="request-section" id="request-section">
+      <div class="section-divider"></div>
+      <div class="request-header">
+        <div class="request-tag">📡 Database Requests</div>
+        <h2 class="request-title">Request a Server</h2>
+        <p class="request-desc">Oasis data is scraped manually for each game world. If your server isn't listed, request it here — we'll prioritize based on demand.</p>
+      </div>
+
+      <div class="request-layout">
+        <!-- Left: info -->
+        <div class="request-info">
+          <div class="info-card">
+            <div class="info-card-title">How it works</div>
+            <div class="info-step">
+              <div class="info-step-num">1</div>
+              <div class="info-step-text">Submit a request with your server's URL and details</div>
+            </div>
+            <div class="info-step">
+              <div class="info-step-num">2</div>
+              <div class="info-step-text">We run the scraper and validate the dataset</div>
+            </div>
+            <div class="info-step">
+              <div class="info-step-num">3</div>
+              <div class="info-step-text">Server goes live on the selector above, usually within a few days</div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="info-card-title">Current Servers</div>
+            <div class="avail-row">
+              <div class="avail-dot live"></div>
+              <span class="avail-name">Asia 5 · x1 — ts5.x1.asia.travian.com</span>
+              <span class="avail-badge live">Live</span>
+            </div>
+            <div class="avail-row">
+              <div class="avail-dot pending"></div>
+              <span class="avail-name">More servers</span>
+              <span class="avail-badge pending">Pending</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: form -->
+        <div class="request-form-card">
+          <div class="form-title">Request Form</div>
+
+          <div class="form-group">
+            <label class="form-label">Server / World Name <span style="color:var(--red)">*</span></label>
+            <input type="text" class="form-input" placeholder="e.g. Asia 1 x1, COM3, Arabia 2…" disabled>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Server URL</label>
+            <input type="text" class="form-input" placeholder="e.g. ts1.x1.asia.travian.com" disabled>
+            <span class="form-hint">Find it in your browser's address bar when logged in</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Your In-Game Name / Contact <span style="color:var(--red)">*</span></label>
+            <input type="text" class="form-input" placeholder="IGN or email address" disabled>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes</label>
+            <textarea class="form-textarea" placeholder="Anything else we should know — server start date, speed, etc." disabled></textarea>
+          </div>
+
+          <button class="btn-request" disabled>
+            📨 Submit Request
+            <span class="btn-request-badge">Coming Soon</span>
+          </button>
+          <div class="form-submit-note">Request system launching soon — check back shortly</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- STATS -->
-  <div id="stats-bar">
-    <div class="stat-item">
-      <div class="stat-val" id="stat-total">0</div>
-      <div class="stat-lbl">Total Oases</div>
+  <!-- ── FOOTER ── -->
+  <footer>
+    <a href="index.html" class="footer-brand">
+      <div class="footer-logo">⚔️</div>
+      <span class="footer-name">TravianTools · sonybukansoni.com</span>
+    </a>
+    <div class="footer-links">
+      <a href="#" class="footer-link">Tools</a>
+      <a href="#" class="footer-link">Guides</a>
+      <a href="#" class="footer-link">Changelog</a>
+      <a href="#" class="footer-link">Contact</a>
     </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-shown">0</div>
-      <div class="stat-lbl">Shown</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-wood" style="color:var(--wood)">0</div>
-      <div class="stat-lbl">Wood</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-clay" style="color:var(--clay)">0</div>
-      <div class="stat-lbl">Clay</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-iron" style="color:var(--iron)">0</div>
-      <div class="stat-lbl">Iron</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-crop" style="color:var(--crop)">0</div>
-      <div class="stat-lbl">Crop</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="stat-double" style="color:#ff8c42">0</div>
-      <div class="stat-lbl">Double (+50%)</div>
-    </div>
-  </div>
+    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+  </footer>
 
-  <!-- TABLE -->
-  <div id="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Coordinates</th>
-          <th>Distance</th>
-          <th>Type</th>
-          <th>Bonus</th>
-          <th>Resources</th>
-        </tr>
-      </thead>
-      <tbody id="table-body"></tbody>
-    </table>
-    <div id="no-results">
-      <div class="icon">🔍</div>
-      <div>No oases found with current filters</div>
-    </div>
-    <div id="pagination"></div>
-  </div>
+  <script>
+    const JSON_URL = 'https://correctable.github.io/travian-tools/oases.json';
+    const PREVIEW_CAP = 100;
 
-</div>
+    const RES_EMOJI = { wood: '🌲', clay: '🟫', iron: '⚙️', crop: '🌾' };
+    const RES_LABELS = { wood: 'Wood', clay: 'Clay', iron: 'Iron', crop: 'Crop' };
 
-<script>
-  // ─── JSON URL — fetched from same GitHub repo ─────────────────────────────
-  const JSON_URL = 'https://correctable.github.io/travian-tools/oases.json';
+    let allOases  = [];
+    let filtered  = [];     // after filters, sorted, capped at 100
+    let activeRes = 'all';
+    let currentPage = 1;
+    let pageSize = 50;
+    let sortKey = 'distance';
+    let sortDir = 'asc';
 
-  const RES_EMOJI = { wood: '🌲', clay: '🟫', iron: '⚙️', crop: '🌾' };
+    // ── SERVER SELECTOR ──────────────────────────────────────────────
+    function selectServer(btn, serverId) {
+      document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
 
-  let allOases  = [];
-  let filtered  = [];
-  let activeRes = 'all';
-  let currentPage = 1;
-  const PAGE_SIZE = 50;
-
-  // ─── LOAD DATABASE ON PAGE OPEN ──────────────────────────────────────────
-  async function loadDatabase() {
-    try {
-      const res = await fetch(JSON_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
-      allOases = Array.isArray(data) ? data : (data.oases || []);
-
-      // Normalise fields
-      allOases = allOases.map(o => ({
-        ...o,
-        resources: o.resources || [],
-        isDouble:  o.isDouble !== undefined ? o.isDouble : (o.maxBonus === 50 || o.bonus === 50),
-        maxBonus:  o.maxBonus || o.bonus || 0,
-      }));
-
-      // Update header info
-      document.getElementById('server-info').textContent =
-        data.server || 'ts5.x1.asia.travian.com';
-      document.getElementById('fetch-date').textContent =
-        data.fetchedAt
-          ? 'Database: ' + data.fetchedAt.slice(0, 10)
-          : allOases.length + ' oases loaded';
-
-      document.getElementById('stat-total').textContent = allOases.length;
-
-      // Show UI
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('controls').style.display      = 'grid';
-      document.getElementById('stats-bar').style.display     = 'flex';
-      document.getElementById('table-wrap').style.display    = 'block';
-
-      applyFilters();
-
-    } catch (err) {
-      console.error('Failed to load oases.json:', err);
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('error-state').style.display   = 'block';
+      const note = document.getElementById('unavail-note');
+      if (!serverId) {
+        // Unavailable server
+        note.style.display = 'flex';
+        hideToolUI();
+      } else {
+        note.style.display = 'none';
+        loadDatabase();
+      }
     }
-  }
 
-  // ─── DISTANCE ─────────────────────────────────────────────────────────────
-  function distance(x1, y1, x2, y2) {
-    return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-  }
+    function hideToolUI() {
+      document.getElementById('controls').style.display = 'none';
+      document.getElementById('stats-bar').style.display = 'none';
+      document.getElementById('table-section').style.display = 'none';
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'none';
+    }
 
-  // ─── RESOURCE TOGGLE ──────────────────────────────────────────────────────
-  function toggleRes(btn) {
-    activeRes = btn.dataset.res;
-    document.querySelectorAll('.res-btn').forEach(b => {
-      b.className = 'res-btn';
-      b.style.borderColor = '';
-      b.style.color = '';
-    });
-    if (activeRes !== 'all') {
+    // ── LOAD DATABASE ─────────────────────────────────────────────────
+    async function loadDatabase() {
+      document.getElementById('loading-state').style.display = 'block';
+      document.getElementById('error-state').style.display = 'none';
+      document.getElementById('controls').style.display = 'none';
+      document.getElementById('stats-bar').style.display = 'none';
+      document.getElementById('table-section').style.display = 'none';
+
+      try {
+        const res = await fetch(JSON_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        allOases = (Array.isArray(data) ? data : (data.oases || [])).map(o => ({
+          ...o,
+          resources: o.resources || [],
+          isDouble:  o.isDouble !== undefined ? o.isDouble : (o.maxBonus === 50),
+          maxBonus:  o.maxBonus || o.bonus || 0,
+        }));
+
+        document.getElementById('stat-total').textContent = allOases.length.toLocaleString();
+
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('controls').style.display = 'grid';
+        document.getElementById('stats-bar').style.display = 'flex';
+        document.getElementById('table-section').style.display = 'block';
+
+        applyFilters();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loading-state').style.display = 'none';
+        document.getElementById('error-state').style.display = 'block';
+      }
+    }
+
+    // ── DISTANCE ──────────────────────────────────────────────────────
+    function dist(x1, y1, x2, y2) {
+      return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+    }
+
+    // ── RESOURCE TOGGLE ───────────────────────────────────────────────
+    function toggleRes(btn) {
+      activeRes = btn.dataset.res;
+      document.querySelectorAll('.res-btn').forEach(b => {
+        b.className = 'res-btn';
+      });
       btn.classList.add('active-' + activeRes);
-    } else {
-      btn.style.borderColor = 'var(--accent)';
-      btn.style.color = 'var(--accent)';
+      currentPage = 1;
+      applyFilters();
     }
-    applyFilters();
-  }
 
-  // ─── FILTER + SORT ────────────────────────────────────────────────────────
-  function applyFilters() {
-    const cx       = parseFloat(document.getElementById('cx').value)      || 0;
-    const cy       = parseFloat(document.getElementById('cy').value)      || 0;
-    const radius   = parseFloat(document.getElementById('radius').value)  || 9999;
-    const minBonus = parseInt(document.getElementById('min-bonus').value) || 0;
-    const sortKey  = document.getElementById('sort-by').value;
+    // ── SORT ──────────────────────────────────────────────────────────
+    function setSort(th) {
+      const key = th.dataset.sort;
+      if (sortKey === key) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortKey = key;
+        sortDir = 'asc';
+      }
+      // Update header arrows
+      document.querySelectorAll('thead th').forEach(h => {
+        h.classList.remove('sort-active');
+        const id = 'arr-' + h.dataset.sort;
+        const el = document.getElementById(id);
+        if (el) el.textContent = '';
+      });
+      th.classList.add('sort-active');
+      const arrEl = document.getElementById('arr-' + key);
+      if (arrEl) arrEl.textContent = sortDir === 'asc' ? '↑' : '↓';
 
-    filtered = allOases.filter(o => {
-      const dist = distance(cx, cy, o.x, o.y);
-      if (dist > radius) return false;
-      if (activeRes !== 'all' && !o.resources.includes(activeRes)) return false;
-      if ((o.maxBonus || 0) < minBonus) return false;
-      return true;
+      currentPage = 1;
+      applyFilters();
+    }
+
+    // ── PAGE SIZE ─────────────────────────────────────────────────────
+    function changePageSize() {
+      pageSize = parseInt(document.getElementById('page-size').value);
+      currentPage = 1;
+      renderTable();
+    }
+
+    // ── FILTERS + SORT ────────────────────────────────────────────────
+    function applyFilters() {
+      const cx       = parseFloat(document.getElementById('cx').value)      || 0;
+      const cy       = parseFloat(document.getElementById('cy').value)      || 0;
+      const radius   = parseFloat(document.getElementById('radius').value)  || 9999;
+      const minBonus = parseInt(document.getElementById('min-bonus').value) || 0;
+
+      let result = allOases.filter(o => {
+        const d = dist(cx, cy, o.x, o.y);
+        if (d > radius) return false;
+        if (activeRes !== 'all' && !o.resources.includes(activeRes)) return false;
+        if ((o.maxBonus || 0) < minBonus) return false;
+        return true;
+      });
+
+      // Attach computed distance
+      result.forEach(o => { o._dist = dist(cx, cy, o.x, o.y); });
+
+      // Sort
+      result.sort((a, b) => {
+        let v = 0;
+        if (sortKey === 'distance') v = a._dist - b._dist;
+        else if (sortKey === 'bonus') v = (b.maxBonus || 0) - (a.maxBonus || 0);
+        else if (sortKey === 'x') v = a.x - b.x;
+        else if (sortKey === 'y') v = a.y - b.y;
+        return sortDir === 'asc' ? v : -v;
+      });
+
+      // Stats (before cap)
+      const totalMatched = result.length;
+      document.getElementById('stat-filtered').textContent = totalMatched.toLocaleString();
+      document.getElementById('stat-wood').textContent   = result.filter(o => o.resources.includes('wood')).length;
+      document.getElementById('stat-clay').textContent   = result.filter(o => o.resources.includes('clay')).length;
+      document.getElementById('stat-iron').textContent   = result.filter(o => o.resources.includes('iron')).length;
+      document.getElementById('stat-crop').textContent   = result.filter(o => o.resources.includes('crop')).length;
+      document.getElementById('stat-double').textContent = result.filter(o => o.isDouble).length;
+
+      // Cap at PREVIEW_CAP
+      const capped = result.length > PREVIEW_CAP;
+      filtered = result.slice(0, PREVIEW_CAP);
+
+      document.getElementById('stat-shown').textContent = filtered.length;
+
+      // Paywall banner
+      document.getElementById('paywall-banner').style.display = capped ? 'flex' : 'none';
+
+      // Info cap note
+      const capNote = document.getElementById('info-cap');
+      capNote.textContent = capped ? `(preview capped at ${PREVIEW_CAP})` : '';
+
+      currentPage = 1;
+      renderTable();
+    }
+
+    // ── RENDER TABLE ─────────────────────────────────────────────────
+    function renderTable() {
+      const body  = document.getElementById('table-body');
+      const noRes = document.getElementById('no-results');
+
+      if (filtered.length === 0) {
+        body.innerHTML = '';
+        noRes.style.display = 'block';
+        document.getElementById('pagination').innerHTML = '';
+        document.getElementById('info-range').textContent = '0';
+        document.getElementById('info-total').textContent = '0';
+        return;
+      }
+
+      noRes.style.display = 'none';
+
+      const start = (currentPage - 1) * pageSize;
+      const end   = Math.min(start + pageSize, filtered.length);
+      const page  = filtered.slice(start, end);
+
+      document.getElementById('info-range').textContent = `${start + 1}–${end}`;
+      document.getElementById('info-total').textContent = filtered.length;
+
+      body.innerHTML = page.map(o => {
+        const d = o._dist;
+        const distClass = d < 10 ? 'dist-near' : d < 30 ? 'dist-mid' : 'dist-far';
+        const mapLink   = `https://ts5.x1.asia.travian.com/karte.php?x=${o.x}&y=${o.y}`;
+
+        const resPills = (o.resources || []).map(r =>
+          `<span class="res-pill ${r}">${RES_EMOJI[r]} ${RES_LABELS[r]}</span>`
+        ).join('');
+
+        const bonus     = o.maxBonus || 0;
+        const bonusCls  = bonus >= 50 ? 'bonus-50' : bonus > 0 ? 'bonus-25' : 'bonus-0';
+        const bonusLbl  = o.bonusStr || (bonus ? `+${bonus}%` : '—');
+
+        return `<tr>
+          <td class="dist-cell ${distClass}">${d.toFixed(1)}</td>
+          <td class="coord-cell"><a href="${mapLink}" target="_blank">(${o.x} | ${o.y})</a></td>
+          <td class="type-cell">${o.typeName || '—'}</td>
+          <td class="bonus-cell ${bonusCls}">${bonusLbl}</td>
+          <td><div class="res-pills">${resPills}</div></td>
+        </tr>`;
+      }).join('');
+
+      renderPagination();
+    }
+
+    // ── PAGINATION ────────────────────────────────────────────────────
+    function renderPagination() {
+      const totalPages = Math.ceil(filtered.length / pageSize);
+      const el = document.getElementById('pagination');
+      if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+      let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+
+      const start = Math.max(1, currentPage - 2);
+      const end   = Math.min(totalPages, currentPage + 2);
+      if (start > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button><span class="page-info">…</span>`;
+      for (let i = start; i <= end; i++) {
+        html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+      }
+      if (end < totalPages) html += `<span class="page-info">…</span><button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`;
+
+      html += `<span class="page-info">${currentPage} / ${totalPages}</span>`;
+      html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+      el.innerHTML = html;
+    }
+
+    function goPage(n) {
+      const total = Math.ceil(filtered.length / pageSize);
+      if (n < 1 || n > total) return;
+      currentPage = n;
+      renderTable();
+      window.scrollTo({ top: document.getElementById('table-section').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    // ── LIVE FILTER ───────────────────────────────────────────────────
+    ['cx', 'cy', 'radius', 'min-bonus'].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => { currentPage = 1; applyFilters(); });
+      el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
     });
 
-    filtered.forEach(o => { o._dist = distance(cx, cy, o.x, o.y); });
+    // ── INIT ──────────────────────────────────────────────────────────
+    loadDatabase();
+  </script>
 
-    filtered.sort((a, b) => {
-      if (sortKey === 'distance')    return a._dist - b._dist;
-      if (sortKey === 'bonus_desc')  return (b.maxBonus || 0) - (a.maxBonus || 0);
-      if (sortKey === 'x')           return a.x - b.x;
-      if (sortKey === 'y')           return a.y - b.y;
-      return 0;
-    });
-
-    currentPage = 1;
-    updateStats();
-    renderTable();
-  }
-
-  // ─── STATS ────────────────────────────────────────────────────────────────
-  function updateStats() {
-    document.getElementById('stat-shown').textContent  = filtered.length;
-    document.getElementById('stat-wood').textContent   = filtered.filter(o => o.resources.includes('wood')).length;
-    document.getElementById('stat-clay').textContent   = filtered.filter(o => o.resources.includes('clay')).length;
-    document.getElementById('stat-iron').textContent   = filtered.filter(o => o.resources.includes('iron')).length;
-    document.getElementById('stat-crop').textContent   = filtered.filter(o => o.resources.includes('crop')).length;
-    document.getElementById('stat-double').textContent = filtered.filter(o => o.isDouble).length;
-  }
-
-  // ─── RENDER TABLE ─────────────────────────────────────────────────────────
-  function renderTable() {
-    const body  = document.getElementById('table-body');
-    const noRes = document.getElementById('no-results');
-
-    if (filtered.length === 0) {
-      body.innerHTML = '';
-      noRes.style.display = 'block';
-      document.getElementById('pagination').innerHTML = '';
-      return;
-    }
-    noRes.style.display = 'none';
-
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const page  = filtered.slice(start, start + PAGE_SIZE);
-
-    body.innerHTML = page.map(o => {
-      const dist      = o._dist;
-      const distClass = dist < 10 ? 'dist-near' : dist < 30 ? 'dist-mid' : 'dist-far';
-      const mapLink   = `https://ts5.x1.asia.travian.com/karte.php?x=${o.x}&y=${o.y}`;
-
-      const resPills = (o.resources || []).map(r =>
-        `<span style="color:var(--${r});font-size:18px;">${RES_EMOJI[r]}</span>`
-      ).join(' ');
-
-      const bonusNum   = o.maxBonus || 0;
-      const bonusClass = bonusNum >= 50 ? 'bonus-50' : 'bonus-25';
-      const bonusLabel = o.bonusStr || (bonusNum ? `+${bonusNum}%` : '—');
-
-      return `
-        <tr>
-          <td class="coord-cell">
-            <a href="${mapLink}" target="_blank">(${o.x} | ${o.y})</a>
-          </td>
-          <td class="dist-cell ${distClass}">${dist.toFixed(1)}</td>
-          <td>${o.typeName || '—'}</td>
-          <td class="bonus-cell ${bonusClass}">${bonusLabel}</td>
-          <td>${resPills}</td>
-        </tr>
-      `;
-    }).join('');
-
-    renderPagination();
-  }
-
-  // ─── PAGINATION ───────────────────────────────────────────────────────────
-  function renderPagination() {
-    const total = Math.ceil(filtered.length / PAGE_SIZE);
-    const el    = document.getElementById('pagination');
-    if (total <= 1) { el.innerHTML = ''; return; }
-
-    let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹ Prev</button>`;
-    html += `<span id="page-info">Page ${currentPage} / ${total}</span>`;
-
-    const start = Math.max(1, currentPage - 2);
-    const end   = Math.min(total, currentPage + 2);
-    for (let i = start; i <= end; i++) {
-      html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
-    }
-
-    html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === total ? 'disabled' : ''}>Next ›</button>`;
-    el.innerHTML = html;
-  }
-
-  function goPage(n) {
-    const total = Math.ceil(filtered.length / PAGE_SIZE);
-    if (n < 1 || n > total) return;
-    currentPage = n;
-    renderTable();
-    window.scrollTo({ top: document.getElementById('table-wrap').offsetTop - 20, behavior: 'smooth' });
-  }
-
-  // ─── LIVE FILTER ──────────────────────────────────────────────────────────
-  ['cx', 'cy', 'radius', 'min-bonus', 'sort-by'].forEach(id => {
-    document.getElementById(id).addEventListener('input', applyFilters);
-    document.getElementById(id).addEventListener('change', applyFilters);
-  });
-
-  // Default highlight All button
-  document.querySelector('.res-btn[data-res="all"]').style.borderColor = 'var(--accent)';
-  document.querySelector('.res-btn[data-res="all"]').style.color = 'var(--accent)';
-
-  // ─── INIT ─────────────────────────────────────────────────────────────────
-  loadDatabase();
-</script>
 </body>
 </html>

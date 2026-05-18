@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Village Tree — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
+
+    body {
+      background: #ffffff;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .nav-brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 0 16px rgba(37,99,235,0.4);
+    }
+
+    .nav-brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .nav-brand-name span { color: var(--blue-light); }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-item { position: relative; }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text2);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all 0.18s;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover, .nav-item:hover > .nav-link {
+      color: var(--navy);
+      background: var(--surface2);
+    }
+
+    .nav-link .chevron {
+      font-size: 0.6rem;
+      opacity: 0.6;
+      transition: transform 0.2s;
+    }
+
+    .nav-item:hover > .nav-link .chevron { transform: rotate(180deg); }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px;
+      min-width: 240px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      box-shadow: 0 20px 60px rgba(15,33,83,0.12), 0 4px 16px rgba(37,99,235,0.06);
+    }
+
+    .nav-item:hover .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .dropdown-item:hover { background: var(--surface2); }
+
+    .dropdown-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .dropdown-text strong {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1px;
+    }
+
+    .dropdown-text span {
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+
+    .dropdown-badge {
+      margin-left: auto;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 100px;
+    }
+
+    .badge-free  { background: var(--green-bg);  color: var(--green); }
+    .badge-pro   { background: var(--blue-glow);  color: var(--blue-light); }
+    .badge-soon  { background: rgba(122,147,188,0.12); color: var(--text3); }
+    .badge-new   { background: var(--amber-bg);   color: var(--amber); }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-ghost {
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--text2);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-ghost:hover {
+      border-color: var(--blue-light);
+      color: var(--navy);
+      background: var(--blue-glow);
+    }
+
+    .btn-primary {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--blue2);
+      border: 1px solid transparent;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 0 20px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover {
+      background: var(--blue-light);
+      box-shadow: 0 0 28px rgba(59,130,246,0.45);
+      transform: translateY(-1px);
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      margin-bottom: 40px;
+      animation: fadeDown 0.45s ease both;
+    }
+
+    .page-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-light);
+      margin-bottom: 10px;
+    }
+
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .page-title span {
+      background: linear-gradient(135deg, var(--blue-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-desc {
+      font-size: 0.9rem;
+      color: var(--text2);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    /* ── TOOL CARD ── */
+    .tool-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp 0.45s 0.1s ease both;
+    }
+
+    /* ── IMPORT PANEL ── */
+    .import-panel {
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .import-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .import-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .import-hint {
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+
+    .import-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .import-textarea {
+      flex: 1;
+      min-height: 100px;
+      padding: 12px 14px;
+      font-family: 'DM Sans', monospace;
+      font-size: 0.8rem;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      resize: vertical;
+      transition: border-color 0.18s;
+      line-height: 1.6;
+    }
+
+    .import-textarea:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    .import-textarea::placeholder { color: var(--text3); }
+
+    .import-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .btn-import {
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--blue2);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+      white-space: nowrap;
+      box-shadow: 0 0 16px rgba(37,99,235,0.25);
+    }
+    .btn-import:hover {
+      background: var(--blue-light);
+      box-shadow: 0 0 24px rgba(59,130,246,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text2);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .btn-secondary:hover {
+      border-color: var(--blue-light);
+      color: var(--navy);
+      background: var(--blue-glow);
+    }
+
+    /* ── TOOLBAR ── */
+    .tree-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.775rem;
+      font-weight: 500;
+      color: var(--text2);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 7px 13px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+    .toolbar-btn:hover {
+      border-color: var(--blue-light);
+      color: var(--navy);
+      background: var(--blue-glow);
+    }
+    .toolbar-btn.active {
+      background: rgba(37,99,235,0.08);
+      border-color: rgba(37,99,235,0.35);
+      color: var(--blue2);
+    }
+    .toolbar-btn.danger {
+      color: var(--red);
+      border-color: rgba(220,38,38,0.25);
+    }
+    .toolbar-btn.danger:hover {
+      background: var(--red-bg);
+      border-color: rgba(220,38,38,0.4);
+    }
+
+    .toolbar-sep {
+      width: 1px;
+      height: 18px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .toolbar-status {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+
+    /* ── CANVAS ── */
+    .canvas-wrap {
+      position: relative;
+      height: 560px;
+      overflow: hidden;
+      background: #ffffff;
+      cursor: default;
+    }
+
+    #tree-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .empty-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .empty-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    .empty-sub {
+      font-size: 0.78rem;
+      color: var(--text3);
+      text-align: center;
+      max-width: 260px;
+      line-height: 1.6;
+    }
+
+    /* ── NODE STYLES (SVG inline) ── */
+    .vnode-body {
+      fill: #ffffff;
+      stroke: var(--border);
+      stroke-width: 1.5;
+    }
+    .vnode-body.is-capital {
+      stroke: var(--blue2);
+      stroke-width: 2;
+    }
+    .vnode-body.is-selected {
+      stroke: var(--blue2);
+    }
+
+    /* ── EDIT PANEL ── */
+    .edit-panel {
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 20px 28px;
+      display: none;
+      animation: fadeUp 0.22s ease both;
+    }
+
+    .edit-panel.open { display: block; }
+
+    .edit-panel-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .edit-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 140px;
+    }
+
+    .edit-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .edit-input {
+      font-size: 0.825rem;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .edit-input:focus {
+      outline: none;
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+
+    .edit-select {
+      font-size: 0.825rem;
+      color: var(--text);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 7px 10px;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .edit-select:focus {
+      outline: none;
+      border-color: var(--blue-light);
+    }
+
+    /* Slot selector */
+    .slot-selector {
+      display: flex;
+      gap: 6px;
+    }
+
+    .slot-opt {
+      width: 36px;
+      height: 32px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text3);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slot-opt:hover {
+      border-color: var(--blue-light);
+      color: var(--blue2);
+    }
+    .slot-opt.active {
+      background: var(--blue2);
+      border-color: var(--blue2);
+      color: #ffffff;
+    }
+
+    .edit-actions {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      margin-left: auto;
+    }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .legend-line {
+      width: 20px;
+      height: 0;
+      border-top: 2px dashed var(--border);
+    }
+
+    /* ── VALIDATION TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 10px 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(15,33,83,0.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.22s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .toast.warn { background: var(--amber); }
+    .toast.err  { background: var(--red); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .nav-menu { display: none; }
+      .page-wrap { padding: 32px 16px 48px; }
+      .import-panel { padding: 20px 16px; }
+      .import-row { flex-direction: column; }
+      .import-actions { flex-direction: row; }
+      .canvas-wrap { height: 420px; }
+      .edit-panel-inner { gap: 12px; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <div class="nav-brand-logo">⚔️</div>
+      <span class="nav-brand-name">Travian<span>Tools</span></span>
+    </a>
+
+    <div class="nav-menu">
+      <div class="nav-item">
+        <button class="nav-link">Tools <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="travian_oasis_finder.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="spy-on-productivity.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
+            <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="village-tree.html" class="dropdown-item" style="background:var(--surface2)">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">🌳</div>
+            <div class="dropdown-text"><strong>Village Tree</strong><span>Map expansion structure</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🗺️</div>
+            <div class="dropdown-text"><strong>Map Scanner</strong><span>Scan & track map changes</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
+            <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
+            <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link">Calculators <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">⚡</div>
+            <div class="dropdown-text"><strong>Crop Calculator</strong><span>Plan your crop consumption</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🚀</div>
+            <div class="dropdown-text"><strong>Travel Time</strong><span>Troop arrival & timing calc</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link">Guides <span class="chevron">▼</span></button>
+        <div class="dropdown" style="min-width:220px">
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
+            <div class="dropdown-text"><strong>Beginner Guide</strong><span>Start your Travian journey</span></div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
+            <div class="dropdown-text"><strong>Defense Guide</strong><span>Build an impenetrable defense</span></div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Raiding Strategy</strong><span>Maximize your raid income</span></div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" class="nav-link">Changelog</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="login.html" class="btn-ghost">Log In</a>
+      <a href="register.html" class="btn-primary">Sign Up Free</a>
+    </div>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="page-wrap">
+
+    <div class="page-header">
+      <div class="page-tag">Tools · Free</div>
+      <h1 class="page-title">Village <span>Expansion Tree</span></h1>
+      <p class="page-desc">Visualize your village expansion structure. Import from your Travian profile, then drag nodes and connect villages to map out your expansion slots.</p>
+    </div>
+
+    <div class="tool-card">
+
+      <!-- IMPORT PANEL -->
+      <div class="import-panel">
+        <div class="import-panel-header">
+          <span class="import-label">Import from Travian profile</span>
+          <span class="import-hint">Ctrl+A on your profile page, then paste here</span>
+        </div>
+        <div class="import-row">
+          <textarea class="import-textarea" id="import-ta" placeholder="Paste your full Ctrl+A result from the Travian profile page here…"></textarea>
+          <div class="import-actions">
+            <button class="btn-import" onclick="doImport()">Import →</button>
+            <button class="btn-secondary" onclick="loadSample()">Load sample</button>
+            <button class="btn-secondary" onclick="clearAll()">Clear all</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="tree-toolbar">
+        <button class="toolbar-btn" onclick="addVillageManual()" title="Add a new village manually">
+          ＋ Add village
+        </button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" id="connect-btn" onclick="toggleConnectMode()">
+          ⤷ Connect
+        </button>
+        <button class="toolbar-btn" id="disconnect-btn" onclick="disconnectSelected()" style="display:none">
+          ✕ Remove link
+        </button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" onclick="autoLayout()">⊞ Auto layout</button>
+        <button class="toolbar-btn" onclick="fitView()">⤢ Fit view</button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn" onclick="saveTree()" title="Save current layout to browser">
+          💾 Save
+        </button>
+        <button class="toolbar-btn" onclick="loadTree()" title="Load saved layout" id="load-btn">
+          📂 Load saved
+        </button>
+        <div class="toolbar-sep"></div>
+        <button class="toolbar-btn danger" id="delete-btn" onclick="deleteSelected()" style="display:none">
+          ␡ Delete village
+        </button>
+        <span class="toolbar-status" id="toolbar-status">No villages loaded</span>
+      </div>
+
+      <!-- CANVAS -->
+      <div class="canvas-wrap" id="canvas-wrap">
+        <svg id="tree-svg" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5"
+              markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#cbd5e1"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+            <marker id="arr-connect" viewBox="0 0 10 10" refX="8" refY="5"
+              markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#2563eb"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <g id="edges-g"></g>
+          <g id="nodes-g"></g>
+          <line id="connect-preview" stroke="#2563eb" stroke-width="1.5"
+            stroke-dasharray="5 3" marker-end="url(#arr-connect)"
+            style="display:none;pointer-events:none"/>
+        </svg>
+
+        <div class="empty-state" id="empty-state">
+          <div class="empty-icon">🌳</div>
+          <div class="empty-title">No villages yet</div>
+          <div class="empty-sub">Paste your Travian profile data above and click Import, or add villages manually.</div>
+        </div>
+      </div>
+
+      <!-- EDIT PANEL -->
+      <div class="edit-panel" id="edit-panel">
+        <div class="edit-panel-inner">
+          <div class="edit-group" style="min-width:180px">
+            <label class="edit-label">Village name</label>
+            <input class="edit-input" id="ep-name" type="text" placeholder="Village name" oninput="applyEdit()">
+          </div>
+          <div class="edit-group" style="min-width:120px">
+            <label class="edit-label">Coordinates</label>
+            <input class="edit-input" id="ep-coord" type="text" placeholder="−71|4" oninput="applyEdit()">
+          </div>
+          <div class="edit-group" style="min-width:130px">
+            <label class="edit-label">Village type</label>
+            <select class="edit-select" id="ep-type" onchange="applyEdit()">
+              <option value="normal">Normal</option>
+              <option value="capital">Capital</option>
+            </select>
+          </div>
+          <div class="edit-actions">
+            <button class="btn-secondary" onclick="closeEdit()">Done</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEGEND -->
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#2563eb;border:2px solid #2563eb;width:12px;height:12px;border-radius:3px"></div>
+          Capital
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e2e8f3;border:1px solid #cbd5e1;width:10px;height:10px;border-radius:2px"></div>
+          Normal
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#2563eb;border-radius:50%"></div>
+          Slot used
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e2e8f3;border:1px solid #cbd5e1;border-radius:50%"></div>
+          Slot free
+        </div>
+        <div class="legend-item" style="margin-left:auto">
+          <span style="font-size:0.7rem;color:var(--text3)">Double-click node to edit · Drag to move · Esc to cancel</span>
+        </div>
+      </div>
+
+    </div><!-- /tool-card -->
+  </div><!-- /page-wrap -->
+
+  <!-- FOOTER -->
+  <footer style="position:relative;z-index:1;border-top:1px solid var(--border);background:var(--surface2);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+      <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem">⚔️</div>
+      <span style="font-family:'Space Grotesk',sans-serif;font-size:.875rem;font-weight:600;color:var(--text2)">TravianTools · sonybukansoni.com</span>
+    </a>
+    <div style="display:flex;align-items:center;gap:24px">
+      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Tools</a>
+      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Guides</a>
+      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Changelog</a>
+      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Contact</a>
+    </div>
+    <span style="font-size:.75rem;color:var(--text3)">© 2025 sonybukansoni.com</span>
+  </footer>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+<script>
+// ─── Constants ───────────────────────────────────────────
+const NW = 158, NH = 76, SLOT_R = 5, SLOT_GAP = 15;
+const TYPE_COLORS = {
+  capital: { stroke:'#2563eb', badgeBg:'#2563eb', badgeFg:'#fff', label:'CAPITAL' },
+  normal:  { stroke:'#e2e8f3', badgeBg:null,      badgeFg:null,   label:'' },
+};
+
+let villages = [], edges = [], selected = null;
+let connectMode = false, connectFrom = null;
+let dragState = null;
+let idN = 1;
+
+const svg      = document.getElementById('tree-svg');
+const nodesG   = document.getElementById('nodes-g');
+const edgesG   = document.getElementById('edges-g');
+const prevLine = document.getElementById('connect-preview');
+const emptyEl  = document.getElementById('empty-state');
+
+// ─── ID ───────────────────────────────────────────────────
+function uid() { return 'v' + (idN++); }
+
+// ─── PARSE ───────────────────────────────────────────────
+// Strips all Unicode bidirectional/invisible control chars that Travian injects
+function clean(s) {
+  return s
+    .replace(/[\u200e\u200f\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069\u206a-\u206f\ufeff]/g, '')
+    .replace(/\u2212/g, '-')   // proper minus → hyphen
+    .replace(/\u2011/g, '-')   // non-breaking hyphen
+    .replace(/[−–]/g,  '-')   // various dash chars
+    .trim();
+}
+
+function parseCoord(s) {
+  // Matches things like (-71|4) (−132|118) (-133|-115) with any Unicode junk around digits
+  const m = s.match(/\(\s*(-?\d+)\s*[|,]\s*(-?\d+)\s*\)/);
+  if (!m) return null;
+  return { x: parseInt(m[1]), y: parseInt(m[2]) };
+}
+
+function parseProfile(raw) {
+  // 1. Strip unicode control chars globally first
+  const text = clean(raw);
+  const lines = text.split('\n').map(l => l.trim());
+
+  const results = [];
+
+  const NOISE = /^(\d[\d,.\s]*|oases|coordinates|village name|village groups.*|homepage.*|©.*|task overview|body|medal|details|tribe|alliance|gender|days playing|ranks and level|population|attacker|defender|hero level|overview|edit profile|server time|info box|link list|del|switch to avatar.*)$/i;
+
+  // Build coord line indices first
+  const coordLines = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (parseCoord(lines[i])) coordLines.push(i);
+  }
+
+  for (let ci = 0; ci < coordLines.length; ci++) {
+    const i = coordLines[ci];
+    const coord = parseCoord(lines[i]);
+
+    // Find name: walk backwards from i, but STOP before the previous coord line
+    const stopAt = ci > 0 ? coordLines[ci - 1] : -1;
+    let name = '';
+    let isCapital = false;
+
+    for (let j = i - 1; j > stopAt && j >= i - 8; j--) {
+      const prev = lines[j].trim();
+      if (!prev) continue;
+      // Detect (Capital) marker
+      if (/^\(capital\)$/i.test(prev)) { isCapital = true; continue; }
+      if (NOISE.test(prev)) continue;
+      // Must look like a village name
+      if (/^[^\d\(]/.test(prev) || /^\d+\s+\S/.test(prev)) {
+        name = prev.replace(/\(capital\)/i,'').trim();
+        name = name.replace(/[\u{1F300}-\u{1FAFF}]/gu,'').replace(/🔨/g,'').trim();
+        break;
+      }
+    }
+
+    // Also check if (Capital) appears on the name line itself
+    if (name && /\(capital\)/i.test(name)) {
+      isCapital = true;
+      name = name.replace(/\(capital\)/i,'').trim();
+    }
+
+    // Enforce only one capital across entire results
+    if (isCapital && results.some(r => r.isCapital)) isCapital = false;
+
+    // Skip duplicate coords
+    if (results.find(r => r.x === coord.x && r.y === coord.y)) continue;
+
+    if (name) results.push({ name, x: coord.x, y: coord.y, isCapital });
+  }
+
+  return results;
+}
+
+// ─── ADD VILLAGE ─────────────────────────────────────────
+function addVillage(name, x, y, type, vx, vy) {
+  const id = uid();
+  const wrap = document.getElementById('canvas-wrap');
+  const cx = wrap.clientWidth / 2, cy = wrap.clientHeight / 2;
+  villages.push({
+    id, name,
+    x: x !== undefined ? x : null,
+    y: y !== undefined ? y : null,
+    type: type || 'normal',
+    vx: vx !== undefined ? vx : cx + (Math.random()-0.5)*80,
+    vy: vy !== undefined ? vy : cy + (Math.random()-0.5)*80,
+  });
+  renderNode(id);
+  syncEmpty();
+  updateStatus();
+  return id;
+}
+
+function addVillageManual() {
+  const id = addVillage('New Village', null, null, 'normal');
+  setSelected(id);
+  openEdit();
+}
+
+// ─── RENDER NODE ─────────────────────────────────────────
+function renderNode(id) {
+  const v = villages.find(v => v.id === id);
+  if (!v) return;
+
+  let g = document.getElementById('ng-' + id);
+  if (!g) {
+    g = document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.id = 'ng-' + id;
+    nodesG.appendChild(g);
+    g.addEventListener('mousedown', e => onNodeDown(e, id));
+    g.addEventListener('dblclick',  e => { e.stopPropagation(); setSelected(id); openEdit(); });
+  }
+
+  const tc = TYPE_COLORS[v.type] || TYPE_COLORS.normal;
+  const isSel = selected === id;
+  const strokeW = (v.type === 'capital') ? 2 : 1.5;
+  const strokeC = isSel ? '#2563eb' : tc.stroke;
+  const shadow  = isSel ? 'filter:drop-shadow(0 0 8px rgba(37,99,235,0.25))' : '';
+
+  g.setAttribute('transform', `translate(${v.vx - NW/2},${v.vy - NH/2})`);
+  g.setAttribute('style', `cursor:grab;user-select:none;${shadow}`);
+
+  // Slot pips — biru = koneksi aktif keluar dari desa ini
+  const activeLinks = edges.filter(e => e.from === id).length;
+  const slotStartX = 10, slotY = NH - 13;
+  let pips = '';
+  for (let i = 0; i < 3; i++) {
+    const used = i < activeLinks;
+    pips += `<circle cx="${slotStartX + i*SLOT_GAP}" cy="${slotY}" r="${SLOT_R}"
+      fill="${used ? '#2563eb' : '#e2e8f3'}" stroke="${used ? '#1d4ed8' : '#cbd5e1'}" stroke-width="1"/>`;
+  }
+
+  // Slot label
+  const slotLabel = activeLinks > 0
+    ? `<text x="${slotStartX + 3*SLOT_GAP + 6}" y="${slotY}" font-size="9" font-family="DM Sans,sans-serif" fill="#7a93bc" dominant-baseline="central">${activeLinks}/3 linked</text>`
+    : '';
+
+  // Badge
+  const badge = tc.label ? `
+    <rect x="${NW - 44}" y="8" width="36" height="14" rx="7" fill="${tc.badgeBg}"/>
+    <text x="${NW - 26}" y="15" text-anchor="middle" font-size="8" font-weight="700"
+      font-family="DM Sans,sans-serif" fill="${tc.badgeFg}" dominant-baseline="central">${tc.label}</text>` : '';
+
+  // Coord line
+  const coordText = v.x !== null
+    ? `<text x="${NW/2}" y="38" text-anchor="middle" font-size="10" font-family="DM Sans,sans-serif" fill="#7a93bc" dominant-baseline="central">(${v.x}|${v.y})</text>`
+    : '';
+
+  g.innerHTML = `
+    <rect width="${NW}" height="${NH}" rx="10"
+      fill="#ffffff" stroke="${strokeC}" stroke-width="${strokeW}"/>
+    ${badge}
+    <text x="${tc.label ? 10 : NW/2}" y="22" ${tc.label ? '' : 'text-anchor="middle"'}
+      font-size="12" font-weight="600" font-family="Space Grotesk,sans-serif"
+      fill="#0f2153" dominant-baseline="central">${esc(v.name)}</text>
+    ${coordText}
+    ${pips}
+    ${slotLabel}
+  `;
+
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── RENDER EDGE ─────────────────────────────────────────
+function renderEdge(e) {
+  const a = villages.find(v => v.id === e.from);
+  const b = villages.find(v => v.id === e.to);
+  if (!a || !b) return;
+
+  let el = document.getElementById('eg-' + e.id);
+  if (!el) {
+    el = document.createElementNS('http://www.w3.org/2000/svg','path');
+    el.id = 'eg-' + e.id;
+    el.setAttribute('fill','none');
+    el.setAttribute('stroke','#cbd5e1');
+    el.setAttribute('stroke-width','1.5');
+    el.setAttribute('stroke-dasharray','5 3');
+    el.setAttribute('marker-end','url(#arr)');
+    edgesG.appendChild(el);
+  }
+
+  const dx = b.vx - a.vx, dy = b.vy - a.vy;
+  const len = Math.sqrt(dx*dx+dy*dy) || 1;
+  const nx = dx/len, ny = dy/len;
+  const x1 = a.vx + nx*(NW/2);
+  const y1 = a.vy + ny*(NH/2);
+  const x2 = b.vx - nx*(NW/2+3);
+  const y2 = b.vy - ny*(NH/2+3);
+  // Slight curve
+  const mx = (x1+x2)/2 - ny*20, my = (y1+y2)/2 + nx*20;
+  el.setAttribute('d',`M${x1} ${y1} Q${mx} ${my} ${x2} ${y2}`);
+}
+
+function renderAll() {
+  // Remove stale
+  Array.from(nodesG.children).forEach(el => {
+    if (!villages.find(v => 'ng-'+v.id === el.id)) el.remove();
+  });
+  Array.from(edgesG.children).forEach(el => {
+    if (!edges.find(e => 'eg-'+e.id === el.id)) el.remove();
+  });
+  edges.forEach(e => renderEdge(e));
+  villages.forEach(v => renderNode(v.id));
+  syncEmpty();
+  updateStatus();
+}
+
+// ─── SELECTION ───────────────────────────────────────────
+function setSelected(id) {
+  const prev = selected;
+  selected = id;
+  if (prev) renderNode(prev);
+  if (id)   renderNode(id);
+
+  document.getElementById('delete-btn').style.display = id ? '' : 'none';
+
+  // Show disconnect btn if there's an edge involving selected
+  const hasEdge = id && edges.some(e => e.from===id||e.to===id);
+  document.getElementById('disconnect-btn').style.display = hasEdge ? '' : 'none';
+}
+
+// ─── DRAG ────────────────────────────────────────────────
+function onNodeDown(e, id) {
+  e.stopPropagation();
+  if (e.button !== 0) return;
+
+  // Connect mode
+  if (connectMode) {
+    handleConnectClick(id);
+    return;
+  }
+
+  setSelected(id);
+
+  const pt = svgPoint(e.clientX, e.clientY);
+  const v  = villages.find(v => v.id === id);
+  dragState = { id, ox: v.vx - pt.x, oy: v.vy - pt.y };
+
+  window.addEventListener('mousemove', onDragMove);
+  window.addEventListener('mouseup',   onDragUp, { once:true });
+}
+
+function onDragMove(e) {
+  if (!dragState) return;
+  const pt = svgPoint(e.clientX, e.clientY);
+  const v  = villages.find(v => v.id === dragState.id);
+  if (!v) return;
+  v.vx = pt.x + dragState.ox;
+  v.vy = pt.y + dragState.oy;
+  renderNode(dragState.id);
+  edges.filter(e => e.from===dragState.id||e.to===dragState.id).forEach(e => renderEdge(e));
+}
+
+function onDragUp() {
+  dragState = null;
+  window.removeEventListener('mousemove', onDragMove);
+}
+
+function svgPoint(cx, cy) {
+  const pt = svg.createSVGPoint();
+  pt.x = cx; pt.y = cy;
+  return pt.matrixTransform(svg.getScreenCTM().inverse());
+}
+
+// ─── CONNECT MODE ────────────────────────────────────────
+function toggleConnectMode() {
+  connectMode = !connectMode;
+  connectFrom = null;
+  prevLine.style.display = 'none';
+  const btn = document.getElementById('connect-btn');
+  btn.classList.toggle('active', connectMode);
+  updateHint();
+}
+
+function handleConnectClick(id) {
+  if (!connectFrom) {
+    connectFrom = id;
+    updateHint();
+  } else {
+    if (connectFrom === id) { connectFrom = null; prevLine.style.display='none'; updateHint(); return; }
+    const dup = edges.find(e => (e.from===connectFrom&&e.to===id)||(e.from===id&&e.to===connectFrom));
+    if (!dup) {
+      // Max 3 outgoing connections per village
+      const childCount = edges.filter(e => e.from === connectFrom).length;
+      if (childCount >= 3) {
+        const parent = villages.find(v => v.id === connectFrom);
+        showToast(`${parent.name} already has 3 linked villages (max)`, 'warn');
+        connectFrom = null;
+        prevLine.style.display = 'none';
+        toggleConnectMode();
+        return;
+      }
+      edges.push({ id: uid(), from: connectFrom, to: id });
+      renderEdge(edges[edges.length-1]);
+      renderNode(connectFrom);
+      renderNode(id);
+      // Refresh disconnect btn
+      setSelected(selected);
+    }
+    connectFrom = null;
+    prevLine.style.display = 'none';
+    toggleConnectMode();
+  }
+}
+
+svg.addEventListener('mousemove', e => {
+  if (!connectMode || !connectFrom) return;
+  const pt = svgPoint(e.clientX, e.clientY);
+  const from = villages.find(v => v.id === connectFrom);
+  if (!from) return;
+  prevLine.style.display = '';
+  prevLine.setAttribute('x1', from.vx);
+  prevLine.setAttribute('y1', from.vy);
+  prevLine.setAttribute('x2', pt.x);
+  prevLine.setAttribute('y2', pt.y);
+});
+
+svg.addEventListener('click', e => {
+  if (e.target === svg || e.target.closest('#edges-g')) {
+    setSelected(null);
+    if (connectMode && connectFrom) {
+      connectFrom = null;
+      prevLine.style.display = 'none';
+      updateHint();
+    }
+  }
+});
+
+// ─── DISCONNECT ───────────────────────────────────────────
+function disconnectSelected() {
+  if (!selected) return;
+  const affected = new Set([selected]);
+  edges = edges.filter(e => {
+    if (e.from===selected||e.to===selected) {
+      document.getElementById('eg-'+e.id)?.remove();
+      affected.add(e.from); affected.add(e.to);
+      return false;
+    }
+    return true;
+  });
+  affected.forEach(id => renderNode(id));
+  setSelected(selected);
+}
+
+// ─── DELETE ───────────────────────────────────────────────
+function deleteSelected() {
+  if (!selected) return;
+  // Remove edges
+  edges = edges.filter(e => {
+    if (e.from===selected||e.to===selected) {
+      document.getElementById('eg-'+e.id)?.remove();
+      return false;
+    }
+    return true;
+  });
+  document.getElementById('ng-'+selected)?.remove();
+  villages = villages.filter(v => v.id !== selected);
+  selected = null;
+  closeEdit();
+  setSelected(null);
+  syncEmpty();
+  updateStatus();
+}
+
+// ─── EDIT PANEL ───────────────────────────────────────────
+function openEdit() {
+  document.getElementById('edit-panel').classList.add('open');
+  syncEditPanel();
+}
+
+function closeEdit() {
+  document.getElementById('edit-panel').classList.remove('open');
+}
+
+function syncEditPanel() {
+  if (!selected) return;
+  const v = villages.find(v => v.id === selected);
+  if (!v) return;
+  document.getElementById('ep-name').value  = v.name;
+  document.getElementById('ep-coord').value = v.x !== null ? `${v.x}|${v.y}` : '';
+  document.getElementById('ep-type').value  = v.type;
+}
+
+function applyEdit() {
+  if (!selected) return;
+  const v = villages.find(v => v.id === selected);
+  if (!v) return;
+  v.name = document.getElementById('ep-name').value || 'Village';
+  v.type = document.getElementById('ep-type').value;
+  const raw = document.getElementById('ep-coord').value.trim();
+  const cm  = raw.match(/([−\-]?\s*\d+)\s*[\|,]\s*([−\-]?\s*\d+)/);
+  if (cm) {
+    v.x = parseInt(cm[1].replace('−','-').replace(/\s/g,''));
+    v.y = parseInt(cm[2].replace('−','-').replace(/\s/g,''));
+  } else { v.x = null; v.y = null; }
+  renderNode(selected);
+}
+
+// ─── AUTO LAYOUT ─────────────────────────────────────────
+function autoLayout() {
+  if (villages.length === 0) return;
+  const wrap = document.getElementById('canvas-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const VW = NW + 40, VH = NH + 60;
+
+  const childMap = {};
+  villages.forEach(v => { childMap[v.id] = []; });
+  edges.forEach(e => { if (childMap[e.from]) childMap[e.from].push(e.to); });
+
+  const hasParent = new Set(edges.map(e => e.to));
+  let roots = villages.filter(v => !hasParent.has(v.id));
+  if (roots.length === 0) roots = [villages[0]];
+
+  const positioned = new Set();
+
+  function subtreeW(id) {
+    const kids = (childMap[id]||[]).filter(k => !positioned.has(k));
+    if (!kids.length) return VW;
+    return kids.reduce((s,k) => s + subtreeW(k), 0);
+  }
+
+  function layout(id, depth, ox) {
+    const v = villages.find(v => v.id === id);
+    const sw = subtreeW(id);
+    v.vx = ox + sw/2;
+    v.vy = 70 + depth * VH;
+    positioned.add(id);
+    let cx = ox;
+    (childMap[id]||[]).filter(k=>!positioned.has(k)).forEach(k => {
+      const kw = subtreeW(k);
+      layout(k, depth+1, cx);
+      cx += kw;
+    });
+  }
+
+  let rx = 20;
+  roots.forEach(r => {
+    const sw = subtreeW(r.id);
+    layout(r.id, 0, rx);
+    rx += sw + 40;
+  });
+
+  // Center
+  const xs = villages.map(v => v.vx), ys = villages.map(v => v.vy);
+  const minX = Math.min(...xs), maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const shiftX = (W - (maxX - minX + NW)) / 2 - minX + NW/2;
+  const shiftY = 40 - minY + NH/2;
+  villages.forEach(v => { v.vx += shiftX; v.vy += shiftY; });
+
+  renderAll();
+}
+
+// ─── FIT VIEW ─────────────────────────────────────────────
+function fitView() {
+  if (villages.length === 0) return;
+  const wrap = document.getElementById('canvas-wrap');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  const xs = villages.map(v => v.vx), ys = villages.map(v => v.vy);
+  const minX = Math.min(...xs)-NW/2-20, maxX = Math.max(...xs)+NW/2+20;
+  const minY = Math.min(...ys)-NH/2-20, maxY = Math.max(...ys)+NH/2+20;
+  const scaleX = W/(maxX-minX), scaleY = H/(maxY-minY);
+  const scale  = Math.min(scaleX, scaleY, 1);
+  const cx = (minX+maxX)/2, cy = (minY+maxY)/2;
+  villages.forEach(v => {
+    v.vx = W/2 + (v.vx - cx)*scale;
+    v.vy = H/2 + (v.vy - cy)*scale;
+  });
+  renderAll();
+}
+
+// ─── IMPORT ───────────────────────────────────────────────
+function doImport() {
+  const text = document.getElementById('import-ta').value.trim();
+  if (!text) { showToast('Paste your profile data first', 'warn'); return; }
+
+  const parsed = parseProfile(text);
+  if (parsed.length === 0) { showToast('No villages detected. Check the format.', 'err'); return; }
+
+  // Clear existing
+  villages = []; edges = [];
+  nodesG.innerHTML = ''; edgesG.innerHTML = '';
+  idN = 1; selected = null;
+  closeEdit();
+
+  const wrap = document.getElementById('canvas-wrap');
+  const W = wrap.clientWidth;
+  const cols = Math.ceil(Math.sqrt(parsed.length));
+  const padX = 40, padY = 60;
+
+  parsed.forEach((p, i) => {
+    const col = i % cols, row = Math.floor(i / cols);
+    const vx  = padX + col*(NW+40) + NW/2;
+    const vy  = padY + row*(NH+60) + NH/2;
+    addVillage(p.name, p.x, p.y, p.isCapital ? 'capital' : 'normal', vx, vy);
+  });
+
+  document.getElementById('import-ta').value = '';
+  showToast(`Imported ${parsed.length} village${parsed.length>1?'s':''}`, '');
+  setTimeout(autoLayout, 80);
+}
+
+function loadSample() {
+  document.getElementById('import-ta').value =
+`Village name\tOases\t\tCoordinates
+My Capital
+(Capital)\t\t\t821\t(-10|5)
+North Farm\t\t\t634\t(-12|8)
+East Outpost\t\t\t510\t(-7|3)
+South Base\t\t\t389\t(-11|6)
+West Grain\t\t\t241\t(-9|4)`;
+}
+
+function clearAll() {
+  if (villages.length > 0 && !confirm('Clear canvas? Your saved data is still kept — use Load to restore.')) return;
+  villages = []; edges = [];
+  nodesG.innerHTML = ''; edgesG.innerHTML = '';
+  idN = 1; selected = null;
+  closeEdit(); setSelected(null);
+  syncEmpty(); updateStatus();
+  document.getElementById('import-ta').value = '';
+}
+
+// ─── SAVE / LOAD ─────────────────────────────────────────
+const STORAGE_KEY = 'traviantools_village_tree_v1';
+
+function saveTree() {
+  if (villages.length === 0) { showToast('Nothing to save yet', 'warn'); return; }
+  const data = { villages, edges, idN, savedAt: new Date().toISOString() };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    showToast(`Saved! ${villages.length} villages · ${edges.length} connections`, '');
+    updateLoadBtn();
+  } catch(e) {
+    showToast('Save failed (storage full?)', 'err');
+  }
+}
+
+function loadTree() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) { showToast('No saved data found', 'warn'); return; }
+    const data = JSON.parse(raw);
+    villages = data.villages || [];
+    edges    = data.edges    || [];
+    idN      = data.idN      || (villages.length + 1);
+    selected = null;
+    nodesG.innerHTML = ''; edgesG.innerHTML = '';
+    closeEdit(); setSelected(null);
+    renderAll();
+    const d = data.savedAt ? new Date(data.savedAt).toLocaleString() : '?';
+    showToast(`Loaded! ${villages.length} villages — saved ${d}`, '');
+  } catch(e) {
+    showToast('Load failed — data may be corrupted', 'err');
+  }
+}
+
+function updateLoadBtn() {
+  const btn = document.getElementById('load-btn');
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const data = JSON.parse(raw);
+      const d = data.savedAt ? new Date(data.savedAt).toLocaleDateString() : '';
+      btn.title = `Load saved layout (${d})`;
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'rgba(5,150,105,0.3)';
+    } else {
+      btn.style.color = '';
+      btn.style.borderColor = '';
+    }
+  } catch(e) {}
+}
+
+// ─── HELPERS ─────────────────────────────────────────────
+function syncEmpty() {
+  emptyEl.style.display = villages.length === 0 ? '' : 'none';
+}
+
+function updateStatus() {
+  const el = document.getElementById('toolbar-status');
+  if (villages.length === 0) { el.textContent = 'No villages loaded'; return; }
+  el.textContent = `${villages.length} villages · ${edges.length} connection${edges.length !== 1 ? 's' : ''}`;
+}
+
+function updateHint() {
+  const el = document.getElementById('toolbar-status');
+  if (connectMode && !connectFrom) el.textContent = 'Click source village…';
+  else if (connectMode && connectFrom) {
+    const v = villages.find(v => v.id === connectFrom);
+    el.textContent = `From "${v?.name}" — click target village`;
+  } else updateStatus();
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type ? ' '+type : '');
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (connectMode) toggleConnectMode();
+    else closeEdit();
+    connectFrom = null;
+    prevLine.style.display = 'none';
+  }
+  if ((e.key === 'Delete'||e.key === 'Backspace') && selected) {
+    const tag = document.activeElement?.tagName;
+    if (tag !== 'INPUT' && tag !== 'TEXTAREA' && tag !== 'SELECT') deleteSelected();
+  }
+});
+
+// Init
+syncEmpty();
+updateStatus();
+updateLoadBtn();
+
+// Auto-load saved data if exists and canvas is empty
+try {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    const data = JSON.parse(raw);
+    if (data.villages && data.villages.length > 0) {
+      loadTree();
+    }
+  }
+} catch(e) {}
+</script>
+</body>
+</html>

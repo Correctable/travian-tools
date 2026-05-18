@@ -3,45 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travian Tools</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <title>Travian Tools — sonybukansoni.com</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:         #f7f4ef;
-      --bg2:        #eeeae2;
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.1);
+      --cyan:       #0891b2;
       --surface:    #ffffff;
-      --border:     #e0d8cc;
-      --border2:    #c8bfaf;
-      --gold:       #a07830;
-      --gold-light: #c8a84b;
-      --gold-bg:    #fdf6e8;
-      --text:       #2c2418;
-      --text2:      #6b5c44;
-      --muted:      #9e8e78;
-      --green:      #3a7d52;
-      --green-bg:   #eef7f2;
-      --blue:       #2a5fa8;
-      --blue-bg:    #edf3fc;
-      --red:        #b03a2a;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
     }
 
     body {
-      background: var(--bg);
+      background: #ffffff;
       color: var(--text);
-      font-family: 'Lora', Georgia, serif;
+      font-family: 'DM Sans', sans-serif;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
-    /* Subtle parchment texture overlay */
+    /* Subtle dot grid */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image:
-        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(160,120,48,0.08) 0%, transparent 60%),
-        url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Light blue glow top */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
       pointer-events: none;
       z-index: 0;
     }
@@ -50,15 +71,17 @@
     nav {
       position: sticky;
       top: 0;
-      z-index: 100;
-      background: rgba(247,244,239,0.92);
-      backdrop-filter: blur(12px);
+      z-index: 200;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      padding: 0 32px;
-      height: 60px;
+      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
+      padding: 0 40px;
+      height: 64px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 32px;
     }
 
     .nav-brand {
@@ -66,63 +89,206 @@
       align-items: center;
       gap: 10px;
       text-decoration: none;
+      flex-shrink: 0;
     }
 
-    .nav-brand-icon {
-      font-size: 1.4rem;
-      filter: drop-shadow(0 1px 3px rgba(160,120,48,0.3));
+    .nav-brand-logo {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      box-shadow: 0 0 16px rgba(37,99,235,0.4);
     }
 
     .nav-brand-name {
-      font-family: 'Cinzel', serif;
-      font-size: 0.95rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.15em;
-      color: var(--gold);
+      color: var(--text);
+      letter-spacing: -0.01em;
     }
 
+    .nav-brand-name span {
+      color: var(--blue-light);
+    }
+
+    /* Nav center menu */
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .nav-item {
+      position: relative;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text2);
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all 0.18s;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .nav-link:hover, .nav-item:hover > .nav-link {
+      color: var(--navy);
+      background: var(--surface2);
+    }
+
+    .nav-link .chevron {
+      font-size: 0.6rem;
+      opacity: 0.6;
+      transition: transform 0.2s;
+    }
+
+    .nav-item:hover > .nav-link .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Dropdown */
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 8px;
+      min-width: 240px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-8px);
+      transition: all 0.2s ease;
+      box-shadow: 0 20px 60px rgba(15,33,83,0.12), 0 4px 16px rgba(37,99,235,0.06);
+    }
+
+    .nav-item:hover .dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .dropdown-item:hover {
+      background: var(--surface2);
+    }
+
+    .dropdown-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .dropdown-text strong {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1px;
+    }
+
+    .dropdown-text span {
+      font-size: 0.72rem;
+      color: var(--text3);
+    }
+
+    .dropdown-badge {
+      margin-left: auto;
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 2px 7px;
+      border-radius: 100px;
+    }
+
+    .badge-free { background: var(--green-bg); color: var(--green); }
+    .badge-pro { background: var(--blue-glow); color: var(--blue-light); }
+    .badge-soon { background: rgba(255,255,255,0.05); color: var(--text3); }
+    .badge-new { background: var(--amber-bg); color: var(--amber); }
+
+    .dropdown-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 6px 0;
+    }
+
+    /* Nav actions */
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     .btn-ghost {
-      font-family: 'Cinzel', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
+      font-size: 0.825rem;
+      font-weight: 500;
       color: var(--text2);
       background: none;
-      border: 1px solid var(--border2);
-      padding: 7px 18px;
-      border-radius: 4px;
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 8px;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif;
     }
     .btn-ghost:hover {
-      border-color: var(--gold);
-      color: var(--gold);
-      background: var(--gold-bg);
+      border-color: var(--blue-light);
+      color: var(--navy);
+      background: var(--blue-glow);
     }
 
     .btn-primary {
-      font-family: 'Cinzel', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
+      font-size: 0.825rem;
+      font-weight: 600;
       color: #fff;
-      background: var(--gold);
-      border: 1px solid var(--gold);
-      padding: 7px 20px;
-      border-radius: 4px;
+      background: var(--blue2);
+      border: 1px solid transparent;
+      padding: 8px 20px;
+      border-radius: 8px;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 0 20px rgba(37,99,235,0.3);
     }
     .btn-primary:hover {
-      background: var(--gold-light);
-      border-color: var(--gold-light);
-      box-shadow: 0 4px 12px rgba(160,120,48,0.25);
+      background: var(--blue-light);
+      box-shadow: 0 0 28px rgba(59,130,246,0.45);
+      transform: translateY(-1px);
     }
 
     /* ── HERO ── */
@@ -130,231 +296,481 @@
       position: relative;
       z-index: 1;
       text-align: center;
-      padding: 80px 24px 64px;
+      padding: 100px 24px 72px;
     }
 
     .hero-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      font-family: 'Cinzel', serif;
-      letter-spacing: 0.18em;
-      color: var(--gold);
-      background: var(--gold-bg);
-      border: 1px solid rgba(160,120,48,0.25);
-      padding: 5px 14px;
+      gap: 7px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--blue-light);
+      background: var(--blue-glow);
+      border: 1px solid rgba(59,130,246,0.25);
+      padding: 6px 16px;
       border-radius: 100px;
-      margin-bottom: 28px;
+      margin-bottom: 32px;
       animation: fadeDown 0.5s ease both;
     }
 
     .hero h1 {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
       font-weight: 700;
       color: var(--text);
-      letter-spacing: 0.05em;
-      line-height: 1.15;
-      margin-bottom: 18px;
-      animation: fadeDown 0.5s 0.05s ease both;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      margin-bottom: 20px;
+      animation: fadeDown 0.5s 0.07s ease both;
     }
 
-    .hero h1 span {
-      color: var(--gold);
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--blue-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .hero p {
       font-size: 1.05rem;
       color: var(--text2);
-      font-style: italic;
-      max-width: 480px;
-      margin: 0 auto 36px;
-      line-height: 1.7;
-      animation: fadeDown 0.5s 0.1s ease both;
+      max-width: 520px;
+      margin: 0 auto 40px;
+      line-height: 1.75;
+      animation: fadeDown 0.5s 0.12s ease both;
     }
 
-    .hero-divider {
+    .hero-cta {
       display: flex;
       align-items: center;
-      gap: 16px;
-      max-width: 200px;
-      margin: 0 auto;
-      animation: fadeIn 0.5s 0.2s ease both;
+      justify-content: center;
+      gap: 12px;
+      animation: fadeDown 0.5s 0.18s ease both;
     }
-    .hero-divider::before, .hero-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border2));
+
+    .btn-hero-primary {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #fff;
+      background: var(--blue2);
+      border: none;
+      padding: 12px 28px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 0 30px rgba(37,99,235,0.4);
+      font-family: 'DM Sans', sans-serif;
     }
-    .hero-divider::after {
-      background: linear-gradient(90deg, var(--border2), transparent);
+    .btn-hero-primary:hover {
+      background: var(--blue-light);
+      box-shadow: 0 0 40px rgba(59,130,246,0.55);
+      transform: translateY(-2px);
     }
-    .hero-divider span {
-      color: var(--gold);
-      font-size: 1rem;
+
+    .btn-hero-ghost {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text2);
+      background: #f1f5fd;
+      border: 1px solid var(--border);
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-hero-ghost:hover {
+      color: var(--navy);
+      background: #e8eefb;
+      border-color: var(--border2);
+    }
+
+    /* Stats strip */
+    .stats-strip {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      padding: 28px 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      animation: fadeIn 0.6s 0.3s ease both;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+    }
+
+    .stat-value span {
+      color: var(--blue-light);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 36px;
+      background: var(--border);
     }
 
     /* ── TOOLS GRID ── */
-    .tools-section {
+    .section {
       position: relative;
       z-index: 1;
-      max-width: 900px;
+      max-width: 1060px;
       margin: 0 auto;
-      padding: 0 24px 80px;
+      padding: 72px 24px;
     }
 
-    .section-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.65rem;
-      letter-spacing: 0.22em;
-      color: var(--muted);
-      text-transform: uppercase;
-      text-align: center;
-      margin-bottom: 28px;
-      animation: fadeIn 0.5s 0.2s ease both;
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 40px;
     }
+
+    .section-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue-light);
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .section-link {
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--blue-light);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: gap 0.18s;
+    }
+    .section-link:hover { gap: 9px; }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
     }
 
     .card {
-      background: var(--surface);
+      background: #ffffff;
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px 24px 24px;
+      border-radius: 14px;
+      padding: 24px;
       text-decoration: none;
       color: inherit;
       position: relative;
       overflow: hidden;
-      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
-      animation: fadeUp 0.5s ease both;
+      transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+      animation: fadeUp 0.45s ease both;
     }
 
-    .card:nth-child(1) { animation-delay: 0.15s; }
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.25s; }
+    .card:nth-child(1) { animation-delay: 0.08s; }
+    .card:nth-child(2) { animation-delay: 0.14s; }
+    .card:nth-child(3) { animation-delay: 0.20s; }
+    .card:nth-child(4) { animation-delay: 0.26s; }
+    .card:nth-child(5) { animation-delay: 0.32s; }
+    .card:nth-child(6) { animation-delay: 0.38s; }
 
-    .card::after {
+    .card::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--card-tint, rgba(160,120,48,0.03)) 0%, transparent 60%);
-      pointer-events: none;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--card-gradient, linear-gradient(90deg, var(--blue2), var(--cyan)));
+      opacity: 0;
+      transition: opacity 0.22s;
     }
 
     .card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
-      border-color: var(--card-accent, var(--gold-light));
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(15,33,83,0.1), 0 0 0 1px var(--card-color, var(--blue-light));
+      border-color: var(--card-color, var(--blue-light));
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-disabled {
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     .card-top {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
 
     .card-icon-wrap {
-      width: 44px;
-      height: 44px;
-      border-radius: 10px;
-      background: var(--card-icon-bg, var(--gold-bg));
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: var(--card-icon-bg, var(--blue-glow));
+      border: 1px solid var(--card-border, rgba(59,130,246,0.2));
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
     }
 
-    .card-tag {
-      font-family: 'Cinzel', serif;
-      font-size: 0.55rem;
-      letter-spacing: 0.15em;
-      color: var(--card-accent, var(--gold));
-      background: var(--card-tag-bg, var(--gold-bg));
-      border: 1px solid var(--card-border, rgba(160,120,48,0.2));
-      padding: 3px 8px;
+    .card-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      padding: 3px 9px;
       border-radius: 100px;
     }
 
-    .card h2 {
-      font-family: 'Cinzel', serif;
-      font-size: 0.9rem;
+    .card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.975rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
       color: var(--text);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
     }
 
     .card p {
-      font-size: 0.85rem;
+      font-size: 0.825rem;
       color: var(--text2);
-      line-height: 1.7;
+      line-height: 1.65;
     }
 
     .card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 20px;
-      padding-top: 16px;
+      margin-top: 18px;
+      padding-top: 14px;
       border-top: 1px solid var(--border);
     }
 
-    .card-access {
-      font-size: 0.72rem;
-      color: var(--muted);
-      font-style: italic;
+    .card-meta {
+      font-size: 0.7rem;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
     .card-arrow {
-      font-size: 0.85rem;
-      color: var(--card-accent, var(--gold));
-      transition: transform 0.2s;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--text2);
+      transition: all 0.18s;
     }
-    .card:hover .card-arrow { transform: translateX(4px); }
 
-    /* card variants */
-    .card-oasis {
-      --card-accent: var(--green);
+    .card:hover .card-arrow {
+      background: var(--card-color, var(--blue2));
+      border-color: var(--card-color, var(--blue2));
+      color: white;
+      transform: translateX(2px);
+    }
+
+    /* Card color variants */
+    .card-green {
+      --card-color: var(--green);
+      --card-gradient: linear-gradient(90deg, #10b981, #06b6d4);
       --card-icon-bg: var(--green-bg);
-      --card-tag-bg: var(--green-bg);
-      --card-border: rgba(58,125,82,0.2);
-      --card-tint: rgba(58,125,82,0.03);
+      --card-border: rgba(16,185,129,0.25);
     }
 
-    .card-spy {
-      --card-accent: var(--blue);
-      --card-icon-bg: var(--blue-bg);
-      --card-tag-bg: var(--blue-bg);
-      --card-border: rgba(42,95,168,0.2);
-      --card-tint: rgba(42,95,168,0.03);
+    .card-amber {
+      --card-color: var(--amber);
+      --card-gradient: linear-gradient(90deg, #f59e0b, #ef4444);
+      --card-icon-bg: var(--amber-bg);
+      --card-border: rgba(245,158,11,0.25);
+    }
+
+    .card-purple {
+      --card-color: var(--purple);
+      --card-gradient: linear-gradient(90deg, #8b5cf6, #3b82f6);
+      --card-icon-bg: var(--purple-bg);
+      --card-border: rgba(139,92,246,0.25);
+    }
+
+    .card-red {
+      --card-color: var(--red);
+      --card-gradient: linear-gradient(90deg, #ef4444, #f59e0b);
+      --card-icon-bg: var(--red-bg);
+      --card-border: rgba(239,68,68,0.25);
+    }
+
+    .card-cyan {
+      --card-color: var(--cyan);
+      --card-gradient: linear-gradient(90deg, #06b6d4, #3b82f6);
+      --card-icon-bg: rgba(6,182,212,0.1);
+      --card-border: rgba(6,182,212,0.25);
+    }
+
+    /* ── COMING SOON SECTION ── */
+    .soon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .soon-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: fadeUp 0.45s ease both;
+    }
+
+    .soon-card:nth-child(1) { animation-delay: 0.05s; }
+    .soon-card:nth-child(2) { animation-delay: 0.1s; }
+    .soon-card:nth-child(3) { animation-delay: 0.15s; }
+    .soon-card:nth-child(4) { animation-delay: 0.2s; }
+    .soon-card:nth-child(5) { animation-delay: 0.25s; }
+    .soon-card:nth-child(6) { animation-delay: 0.3s; }
+
+    .soon-icon {
+      font-size: 1.2rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .soon-name {
+      font-size: 0.825rem;
+      font-weight: 500;
+      color: var(--text2);
+    }
+
+    .soon-tag {
+      font-size: 0.58rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--text3);
+      background: rgba(255,255,255,0.04);
+      padding: 2px 7px;
+      border-radius: 100px;
+      margin-top: 2px;
+      display: inline-block;
+    }
+
+    /* Divider */
+    .section-divider {
+      position: relative;
+      z-index: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 1060px;
+      margin: 0 auto;
     }
 
     /* ── FOOTER ── */
     footer {
       position: relative;
       z-index: 1;
-      text-align: center;
-      padding: 24px;
       border-top: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .footer-logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+    }
+
+    .footer-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-link {
+      font-size: 0.775rem;
+      color: var(--text3);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-link:hover { color: var(--text2); }
+
+    .footer-copy {
       font-size: 0.75rem;
-      color: var(--muted);
-      font-style: italic;
+      color: var(--text3);
     }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-12px); }
+      from { opacity: 0; transform: translateY(-14px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(16px); }
+      from { opacity: 0; transform: translateY(18px); }
       to   { opacity: 1; transform: translateY(0); }
     }
     @keyframes fadeIn {
@@ -362,10 +778,13 @@
       to   { opacity: 1; }
     }
 
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
       nav { padding: 0 16px; }
-      .nav-brand-name { font-size: 0.8rem; }
-      .hero { padding: 48px 16px 40px; }
+      .nav-menu { display: none; }
+      .hero { padding: 64px 16px 48px; }
+      .stats-strip { gap: 24px; flex-wrap: wrap; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
     }
   </style>
 </head>
@@ -374,58 +793,345 @@
   <!-- NAVBAR -->
   <nav>
     <a href="/" class="nav-brand">
-      <span class="nav-brand-icon">⚔️</span>
-      <span class="nav-brand-name">TRAVIAN TOOLS</span>
+      <div class="nav-brand-logo">⚔️</div>
+      <span class="nav-brand-name">Travian<span>Tools</span></span>
     </a>
+
+    <div class="nav-menu">
+
+      <!-- Tools dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Tools <span class="chevron">▼</span>
+        </button>
+        <div class="dropdown">
+          <a href="travian_oasis_finder.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text">
+              <strong>Oasis Finder</strong>
+              <span>Find oases near your coords</span>
+            </div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="spy-on-productivity.html" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
+            <div class="dropdown-text">
+              <strong>Spy Productivity</strong>
+              <span>Estimate resource production</span>
+            </div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+            <div class="dropdown-text">
+              <strong>Attack Planner</strong>
+              <span>Plan multi-wave attacks</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
+            <div class="dropdown-text">
+              <strong>Troop Simulator</strong>
+              <span>Simulate battles</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🗺️</div>
+            <div class="dropdown-text">
+              <strong>Map Scanner</strong>
+              <span>Scan & track map changes</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Intelligence dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Intelligence <span class="chevron">▼</span>
+        </button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
+            <div class="dropdown-text">
+              <strong>Player Tracker</strong>
+              <span>Track player activity & growth</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
+            <div class="dropdown-text">
+              <strong>Village Analyzer</strong>
+              <span>Deep dive on enemy villages</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
+            <div class="dropdown-text">
+              <strong>Alliance Stats</strong>
+              <span>Compare alliance performance</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Calculators dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Calculators <span class="chevron">▼</span>
+        </button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">⚡</div>
+            <div class="dropdown-text">
+              <strong>Crop Calculator</strong>
+              <span>Plan your crop consumption</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--cyan) / 10">🏗️</div>
+            <div class="dropdown-text">
+              <strong>Build Optimizer</strong>
+              <span>Optimize building queues</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">🚀</div>
+            <div class="dropdown-text">
+              <strong>Travel Time</strong>
+              <span>Troop arrival & timing calc</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Guides dropdown -->
+      <div class="nav-item">
+        <button class="nav-link">
+          Guides <span class="chevron">▼</span>
+        </button>
+        <div class="dropdown" style="min-width:220px">
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
+            <div class="dropdown-text">
+              <strong>Beginner Guide</strong>
+              <span>Start your Travian journey</span>
+            </div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
+            <div class="dropdown-text">
+              <strong>Defense Guide</strong>
+              <span>Build an impenetrable defense</span>
+            </div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
+            <div class="dropdown-text">
+              <strong>Raiding Strategy</strong>
+              <span>Maximize your raid income</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" class="nav-link">Changelog</a>
+
+    </div>
+
     <div class="nav-actions">
       <a href="login.html" class="btn-ghost">Log In</a>
-      <a href="register.html" class="btn-primary">Sign Up</a>
+      <a href="register.html" class="btn-primary">Sign Up Free</a>
     </div>
   </nav>
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-badge">⚔️ For Travian: Legends</div>
-    <h1>Smart tools for<br><span>smarter commanders</span></h1>
-    <p>Intelligence, analysis, and data — everything you need to dominate your server.</p>
-    <div class="hero-divider"><span>✦</span></div>
+    <div class="hero-badge">
+      ⚔️ &nbsp;Built for Travian: Legends
+    </div>
+    <h1>Smart tools for<br><span class="gradient">smarter commanders</span></h1>
+    <p>Intelligence, simulation, and data — everything you need to dominate your server and outsmart every enemy.</p>
+    <div class="hero-cta">
+      <a href="register.html" class="btn-hero-primary">Get started free →</a>
+      <a href="#tools" class="btn-hero-ghost">Explore tools</a>
+    </div>
   </section>
 
-  <!-- TOOLS -->
-  <section class="tools-section">
-    <p class="section-label">Available Tools</p>
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat">
+      <div class="stat-value"><span>10</span>+</div>
+      <div class="stat-label">Tools available</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value"><span>2</span></div>
+      <div class="stat-label">Free forever</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value"><span>All</span></div>
+      <div class="stat-label">Travian servers</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-value"><span>0</span></div>
+      <div class="stat-label">Ads, ever</div>
+    </div>
+  </div>
+
+  <!-- TOOLS SECTION -->
+  <section class="section" id="tools">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Available Now</div>
+        <div class="section-title">Tools you can use today</div>
+      </div>
+      <a href="#" class="section-link">View all tools →</a>
+    </div>
     <div class="cards">
 
-      <a class="card card-oasis" href="travian_oasis_finder.html">
+      <a class="card card-green" href="travian_oasis_finder.html">
         <div class="card-top">
           <div class="card-icon-wrap">🌿</div>
-          <span class="card-tag">FREE PREVIEW</span>
+          <span class="card-badge badge-free">FREE PREVIEW</span>
         </div>
-        <h2>Oasis Finder</h2>
-        <p>Find every oasis near your coordinates — filter by resource type, bonus percentage, and distance.</p>
+        <h3>Oasis Finder</h3>
+        <p>Find every oasis near your coordinates. Filter by resource type, bonus percentage, and distance radius.</p>
         <div class="card-footer">
-          <span class="card-access">Full data requires account</span>
-          <span class="card-arrow">→</span>
+          <span class="card-meta">⚡ Full data requires account</span>
+          <div class="card-arrow">→</div>
         </div>
       </a>
 
-      <a class="card card-spy" href="spy-on-productivity.html">
+      <a class="card" href="spy-on-productivity.html">
         <div class="card-top">
-          <div class="card-icon-wrap">🕵️</div>
-          <span class="card-tag">FREE</span>
+          <div class="card-icon-wrap" style="background:var(--blue-glow);border:1px solid rgba(59,130,246,0.2)">🕵️</div>
+          <span class="card-badge badge-free">FREE</span>
         </div>
-        <h2>Spy on Productivity</h2>
-        <p>Paste two spy reports to estimate a village's resource production per hour based on the difference between scans.</p>
+        <h3>Spy Productivity</h3>
+        <p>Paste two spy reports to estimate a village's resource production per hour from the difference between scans.</p>
         <div class="card-footer">
-          <span class="card-access">No account needed</span>
-          <span class="card-arrow">→</span>
+          <span class="card-meta">✓ No account needed</span>
+          <div class="card-arrow">→</div>
         </div>
       </a>
 
     </div>
   </section>
 
-  <footer>sonybukansoni.com &nbsp;·&nbsp; Travian Tools</footer>
+  <div class="section-divider"></div>
+
+  <!-- COMING SOON -->
+  <section class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Roadmap</div>
+        <div class="section-title">Coming soon</div>
+      </div>
+    </div>
+    <div class="soon-grid">
+
+      <div class="soon-card">
+        <div class="soon-icon">⚔️</div>
+        <div>
+          <div class="soon-name">Attack Planner</div>
+          <span class="soon-tag">IN DEV</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">📊</div>
+        <div>
+          <div class="soon-name">Troop Simulator</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">🗺️</div>
+        <div>
+          <div class="soon-name">Map Scanner</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">🔭</div>
+        <div>
+          <div class="soon-name">Player Tracker</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">🏰</div>
+        <div>
+          <div class="soon-name">Village Analyzer</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">⚡</div>
+        <div>
+          <div class="soon-name">Crop Calculator</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">🏗️</div>
+        <div>
+          <div class="soon-name">Build Optimizer</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">🚀</div>
+        <div>
+          <div class="soon-name">Travel Time Calc</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+      <div class="soon-card">
+        <div class="soon-icon">📈</div>
+        <div>
+          <div class="soon-name">Alliance Stats</div>
+          <span class="soon-tag">PLANNED</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-brand">
+      <div class="footer-logo">⚔️</div>
+      <span class="footer-name">TravianTools · sonybukansoni.com</span>
+    </a>
+    <div class="footer-links">
+      <a href="#" class="footer-link">Tools</a>
+      <a href="#" class="footer-link">Guides</a>
+      <a href="#" class="footer-link">Changelog</a>
+      <a href="#" class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+  </footer>
 
 </body>
 </html>
