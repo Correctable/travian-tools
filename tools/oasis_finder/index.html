@@ -525,107 +525,170 @@
 </head>
 <body>
 
-  <!-- ── NAVBAR ── -->
-  <nav>
+  <!-- ──   <nav>
     <a href="/" class="nav-brand">
       <div class="nav-brand-logo">⚔️</div>
       <span class="nav-brand-name">Travian<span>Tools</span></span>
     </a>
 
     <div class="nav-menu">
+
+      <!-- Tools dropdown -->
       <div class="nav-item">
-        <button class="nav-link">Tools <span class="chevron">▼</span></button>
+        <button class="nav-link">
+          Tools <span class="chevron">▼</span>
+        </button>
         <div class="dropdown">
-          <a href="travian_oasis_finder.html" class="dropdown-item">
+          <a href="tools/oasis_finder/" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
-            <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
+            <div class="dropdown-text">
+              <strong>Oasis Finder</strong>
+              <span>Find oases near your coords</span>
+            </div>
             <span class="dropdown-badge badge-free">FREE</span>
           </a>
-          <a href="spy-on-productivity.html" class="dropdown-item">
+          <a href="/tools/spy-on-productivity/" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
-            <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
+            <div class="dropdown-text">
+              <strong>Spy Productivity</strong>
+              <span>Estimate resource production</span>
+            </div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="/tools/attack-planner/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+            <div class="dropdown-text">
+              <strong>Attack Planner</strong>
+              <span>Plan multi-wave attacks</span>
+            </div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="/tools/village-tree/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
+            <div class="dropdown-text">
+              <strong>Village Tree</strong>
+              <span>Plan your building queue</span>
+            </div>
             <span class="dropdown-badge badge-free">FREE</span>
           </a>
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
-            <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
-            <div class="dropdown-text"><strong>Troop Simulator</strong><span>Simulate battles</span></div>
+            <div class="dropdown-text">
+              <strong>Troop Simulator</strong>
+              <span>Simulate battles</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--red-bg)">🗺️</div>
-            <div class="dropdown-text"><strong>Map Scanner</strong><span>Scan & track map changes</span></div>
+            <div class="dropdown-text">
+              <strong>Map Scanner</strong>
+              <span>Scan & track map changes</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
         </div>
       </div>
 
+      <!-- Intelligence dropdown -->
       <div class="nav-item">
-        <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
+        <button class="nav-link">
+          Intelligence <span class="chevron">▼</span>
+        </button>
         <div class="dropdown">
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
-            <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
+            <div class="dropdown-text">
+              <strong>Player Tracker</strong>
+              <span>Track player activity & growth</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
-            <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
+            <div class="dropdown-text">
+              <strong>Village Analyzer</strong>
+              <span>Deep dive on enemy villages</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
-            <div class="dropdown-text"><strong>Alliance Stats</strong><span>Compare alliance performance</span></div>
+            <div class="dropdown-text">
+              <strong>Alliance Stats</strong>
+              <span>Compare alliance performance</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
         </div>
       </div>
 
+      <!-- Calculators dropdown -->
       <div class="nav-item">
-        <button class="nav-link">Calculators <span class="chevron">▼</span></button>
+        <button class="nav-link">
+          Calculators <span class="chevron">▼</span>
+        </button>
         <div class="dropdown">
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--purple-bg)">⚡</div>
-            <div class="dropdown-text"><strong>Crop Calculator</strong><span>Plan your crop consumption</span></div>
+            <div class="dropdown-text">
+              <strong>Crop Calculator</strong>
+              <span>Plan your crop consumption</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:rgba(8,145,178,0.1)">🏗️</div>
-            <div class="dropdown-text"><strong>Build Optimizer</strong><span>Optimize building queues</span></div>
+            <div class="dropdown-icon" style="background:var(--cyan) / 10">🏗️</div>
+            <div class="dropdown-text">
+              <strong>Build Optimizer</strong>
+              <span>Optimize building queues</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
             <div class="dropdown-icon" style="background:var(--red-bg)">🚀</div>
-            <div class="dropdown-text"><strong>Travel Time</strong><span>Troop arrival & timing calc</span></div>
+            <div class="dropdown-text">
+              <strong>Travel Time</strong>
+              <span>Troop arrival & timing calc</span>
+            </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
         </div>
       </div>
 
+      <!-- Guides dropdown -->
       <div class="nav-item">
-        <button class="nav-link">Guides <span class="chevron">▼</span></button>
+        <button class="nav-link">
+          Guides <span class="chevron">▼</span>
+        </button>
         <div class="dropdown" style="min-width:220px">
           <a href="#" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
-            <div class="dropdown-text"><strong>Beginner Guide</strong><span>Start your Travian journey</span></div>
+            <div class="dropdown-text">
+              <strong>Beginner Guide</strong>
+              <span>Start your Travian journey</span>
+            </div>
           </a>
           <a href="#" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
-            <div class="dropdown-text"><strong>Defense Guide</strong><span>Build an impenetrable defense</span></div>
+            <div class="dropdown-text">
+              <strong>Defense Guide</strong>
+              <span>Build an impenetrable defense</span>
+            </div>
           </a>
           <a href="#" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
-            <div class="dropdown-text"><strong>Raiding Strategy</strong><span>Maximize your raid income</span></div>
+            <div class="dropdown-text">
+              <strong>Raiding Strategy</strong>
+              <span>Maximize your raid income</span>
+            </div>
           </a>
         </div>
       </div>
 
       <a href="#" class="nav-link">Changelog</a>
+
     </div>
 
     <div class="nav-actions">
