@@ -540,7 +540,7 @@
           Tools <span class="chevron">▼</span>
         </button>
         <div class="dropdown">
-          <a href="tools/oasis_finder/" class="dropdown-item">
+          <a href="/tools/oasis_finder/" class="dropdown-item">
             <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
             <div class="dropdown-text">
               <strong>Oasis Finder</strong>
@@ -625,33 +625,50 @@
         </div>
       </div>
 
-      <!-- Calculators dropdown -->
+      <!-- Simulators dropdown -->
       <div class="nav-item">
         <button class="nav-link">
-          Calculators <span class="chevron">▼</span>
+          Simulators <span class="chevron">▼</span>
         </button>
         <div class="dropdown">
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--purple-bg)">⚡</div>
+          <a href="/simulators/field-production/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🌾</div>
             <div class="dropdown-text">
-              <strong>Crop Calculator</strong>
-              <span>Plan your crop consumption</span>
+              <strong>Field Production</strong>
+              <span>Simulate resource output per hour</span>
+            </div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
+            <div class="dropdown-text">
+              <strong>Village Planner</strong>
+              <span>Plan buildings & upgrade path</span>
             </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--cyan) / 10">🏗️</div>
+            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
             <div class="dropdown-text">
-              <strong>Build Optimizer</strong>
-              <span>Optimize building queues</span>
+              <strong>Battle Simulator</strong>
+              <span>Simulate attack vs defense</span>
             </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
           <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--red-bg)">🚀</div>
+            <div class="dropdown-icon" style="background:var(--blue-glow)">⏱️</div>
             <div class="dropdown-text">
-              <strong>Travel Time</strong>
-              <span>Troop arrival & timing calc</span>
+              <strong>Troop Training</strong>
+              <span>Time & cost to build an army</span>
+            </div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text">
+              <strong>Crop Balance</strong>
+              <span>Net crop after troop consumption</span>
             </div>
             <span class="dropdown-badge badge-soon">SOON</span>
           </a>
@@ -693,8 +710,8 @@
     </div>
 
     <div class="nav-actions">
-      <a href="login.html" class="btn-ghost">Log In</a>
-      <a href="register.html" class="btn-primary">Sign Up Free</a>
+      <a href="/login/" class="btn-ghost">Log In</a>
+      <a href="/register/" class="btn-primary">Sign Up Free</a>
     </div>
   </nav>
 
@@ -705,7 +722,7 @@
     <div class="page-header">
       <div class="page-tag">🌿 Free Preview</div>
       <h1 class="page-title">Oasis Finder</h1>
-      <p class="page-desc">Find every oasis near your village. Filter by resource type, bonus percentage, and radius. Preview shows the 100 closest results — full access requires an account.</p>
+      <p class="page-desc">Find every oasis near your village. Filter by resource type, bonus percentage, and radius. Preview shows the 1,000 closest results — full access requires an account.</p>
     </div>
 
     <!-- Server Selector -->
@@ -748,7 +765,7 @@
     <div id="error-state">
       <div class="err-icon">⚠️</div>
       <h3>Database Not Found</h3>
-      <p>Could not load oases.json. Make sure the file is uploaded to GitHub.</p>
+      <p>Could not load oases.json. Please contact the administrator.</p>
     </div>
 
     <!-- Controls -->
@@ -872,13 +889,13 @@
       <div class="paywall-banner" id="paywall-banner" style="display:none">
         <div class="paywall-icon">🔒</div>
         <div class="paywall-text">
-          <div class="paywall-title">You're seeing the free preview — 100 of 20,000+ oases</div>
+              <div class="paywall-title">You're seeing the free preview — 1,000 of 20,000+ oases</div>
           <div class="paywall-desc">
             Sign up for a <strong>Pro account</strong> to unlock the full database, export to farmlist, and access all servers.
           </div>
         </div>
         <div class="paywall-actions">
-          <a href="register.html" class="btn-unlock">Unlock Full Access →</a>
+          <a href="/register/" class="btn-unlock">Unlock Full Access →</a>
           <span class="paywall-note">Free to try · No credit card required</span>
         </div>
       </div>
@@ -979,14 +996,14 @@
   </footer>
 
   <script>
-    const JSON_URL = './tools/oasis-finder/oases.json';
-    const PREVIEW_CAP = 100;
+    const JSON_URL = './oases.json';
+    const PREVIEW_CAP = 1000;
 
     const RES_EMOJI = { wood: '🌲', clay: '🟫', iron: '⚙️', crop: '🌾' };
     const RES_LABELS = { wood: 'Wood', clay: 'Clay', iron: 'Iron', crop: 'Crop' };
 
     let allOases  = [];
-    let filtered  = [];     // after filters, sorted, capped at 100
+    let filtered  = [];     // after filters, sorted, capped at 1,000
     let activeRes = 'all';
     let currentPage = 1;
     let pageSize = 50;

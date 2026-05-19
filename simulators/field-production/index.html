@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field Production Simulator — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.1);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --amber-border: rgba(217,119,6,0.2);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+      /* Simulator surface — slightly warm white to echo parchment without going full medieval */
+      --sim-bg:     #fafaf8;
+      --sim-panel:  #ffffff;
+      --sim-border: #e8e4dc;
+      --sim-border2:#d4cfc4;
+      --sim-gold:   #b07c28;
+      --sim-gold2:  #c8943e;
+      --sim-gold-bg:#fdf6e8;
+    }
+
+    body {
+      background: var(--surface2);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle dot grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAVBAR (identical to index) ── */
+    nav {
+      position: sticky; top: 0; z-index: 200;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
+      padding: 0 40px; height: 64px;
+      display: flex; align-items: center; justify-content: space-between; gap: 32px;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; flex-shrink: 0; }
+    .nav-brand-logo {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; box-shadow: 0 0 16px rgba(37,99,235,0.4);
+    }
+    .nav-brand-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.01em;
+    }
+    .nav-brand-name span { color: var(--blue-light); }
+    .nav-menu { display: flex; align-items: center; gap: 4px; flex: 1; justify-content: center; }
+    .nav-item { position: relative; }
+    .nav-link {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.875rem; font-weight: 500; color: var(--text2);
+      text-decoration: none; padding: 8px 14px; border-radius: 8px;
+      transition: all 0.18s; cursor: pointer; background: none; border: none;
+      font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    }
+    .nav-link:hover, .nav-item:hover > .nav-link { color: var(--navy); background: var(--surface2); }
+    .nav-link.active { color: var(--blue2); background: var(--blue-glow); }
+    .nav-link .chevron { font-size: 0.6rem; opacity: 0.6; transition: transform 0.2s; }
+    .nav-item:hover > .nav-link .chevron { transform: rotate(180deg); }
+    .dropdown {
+      position: absolute; top: calc(100% + 8px); left: 50%;
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 8px; min-width: 240px;
+      opacity: 0; visibility: hidden;
+      transform: translateX(-50%) translateY(-8px);
+      transition: all 0.2s ease;
+      box-shadow: 0 20px 60px rgba(15,33,83,0.12), 0 4px 16px rgba(37,99,235,0.06);
+    }
+    .nav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 12px; border-radius: 8px; text-decoration: none; transition: background 0.15s;
+    }
+    .dropdown-item:hover { background: var(--surface2); }
+    .dropdown-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; flex-shrink: 0;
+    }
+    .dropdown-text strong { display: block; font-size: 0.825rem; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+    .dropdown-text span { font-size: 0.72rem; color: var(--text3); }
+    .dropdown-badge {
+      margin-left: auto; font-size: 0.6rem; font-weight: 600;
+      letter-spacing: 0.05em; padding: 2px 7px; border-radius: 100px;
+    }
+    .badge-free { background: var(--green-bg); color: var(--green); }
+    .badge-soon { background: rgba(0,0,0,0.04); color: var(--text3); }
+    .dropdown-divider { height: 1px; background: var(--border); margin: 6px 0; }
+    .nav-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .btn-ghost {
+      font-size: 0.825rem; font-weight: 500; color: var(--text2);
+      background: none; border: 1px solid var(--border); padding: 8px 18px;
+      border-radius: 8px; cursor: pointer; text-decoration: none;
+      transition: all 0.18s; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-ghost:hover { border-color: var(--blue-light); color: var(--navy); background: var(--blue-glow); }
+    .btn-primary {
+      font-size: 0.825rem; font-weight: 600; color: #fff;
+      background: var(--blue2); border: 1px solid transparent;
+      padding: 8px 20px; border-radius: 8px; cursor: pointer;
+      text-decoration: none; transition: all 0.18s;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 0 20px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { background: var(--blue-light); box-shadow: 0 0 28px rgba(59,130,246,0.45); transform: translateY(-1px); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--amber-bg); border: 1px solid var(--amber-border);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+    }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-badges { display: flex; align-items: center; gap: 8px; }
+    .page-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .page-badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      position: relative; z-index: 1;
+      max-width: 1060px; margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    /* ── SIMULATOR TOOLBAR ── */
+    .sim-toolbar {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 16px; margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(15,33,83,0.05);
+    }
+    .sim-toolbar-label { font-size: 0.75rem; font-weight: 500; color: var(--text3); white-space: nowrap; }
+    .sim-select {
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text); border-radius: 7px; padding: 5px 10px;
+      font-size: 0.8rem; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .sim-select:focus { border-color: var(--blue2); outline: none; box-shadow: 0 0 0 3px var(--blue-glow); }
+    .toolbar-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; flex-shrink: 0; }
+    .speed-btn {
+      padding: 4px 11px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface2); font-size: 0.75rem; cursor: pointer;
+      color: var(--text2); font-weight: 600; transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .speed-btn:hover { border-color: var(--blue-light); color: var(--navy); }
+    .speed-btn.active { background: var(--blue-glow); border-color: var(--blue2); color: var(--blue2); }
+
+    /* ── SIMULATOR LAYOUT ── */
+    .sim-wrapper {
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .sim-left  { display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+    .sim-right { flex: 1; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+    /* ── RESOURCE MAP ── */
+    #resourceFieldContainer {
+      position: relative; width: 473px; height: 304px;
+      overflow: hidden; border-radius: 10px;
+      box-shadow: 0 2px 16px rgba(15,33,83,0.12), 0 0 0 1px var(--border);
+      background-size: cover;
+    }
+    #resourceFieldContainer.resourceField1  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField1.png'); }
+    #resourceFieldContainer.resourceField2  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField2.png'); }
+    #resourceFieldContainer.resourceField3  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField3.png'); }
+    #resourceFieldContainer.resourceField4  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField4.png'); }
+    #resourceFieldContainer.resourceField5  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField5.png'); }
+    #resourceFieldContainer.resourceField6  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField6.png'); }
+    #resourceFieldContainer.resourceField7  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField7.png'); }
+    #resourceFieldContainer.resourceField8  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField8.png'); }
+    #resourceFieldContainer.resourceField9  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField9.png'); }
+    #resourceFieldContainer.resourceField10 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField10.png'); }
+    #resourceFieldContainer.resourceField11 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField11.png'); }
+    #resourceFieldContainer.resourceField12 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField12.png'); }
+    #resourceFieldContainer.resourceField13 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField13.png'); }
+    #villageCenterImg {
+      position: absolute; top: 0; left: 0; width: 473px; height: 304px;
+      z-index: 5; pointer-events: none;
+    }
+    .labelLayer {
+      position: absolute; border-radius: 50%; width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; font-family: 'Space Grotesk', sans-serif;
+      box-shadow: 0 2px 6px rgba(0,0,0,.45);
+      cursor: pointer; z-index: 20;
+      transform: translate(-50%, -50%);
+      transition: transform .12s, box-shadow .12s;
+      border: 2px solid rgba(255,255,255,.3);
+    }
+    .labelLayer:hover { transform: translate(-50%, -50%) scale(1.18); box-shadow: 0 4px 10px rgba(0,0,0,.55); }
+    .labelLayer.res-1 { background: radial-gradient(circle at 35% 35%, #c8f07a, #4a8a1a); color:#fff; border-color:#2a6000; }
+    .labelLayer.res-2 { background: radial-gradient(circle at 35% 35%, #f0a070, #b84018); color:#fff; border-color:#7a2800; }
+    .labelLayer.res-3 { background: radial-gradient(circle at 35% 35%, #a0b8c8, #506070); color:#fff; border-color:#304050; }
+    .labelLayer.res-4 { background: radial-gradient(circle at 35% 35%, #ffe97a, #c8a030); color:#2a1800; border-color:#8a6800; }
+
+    /* ── PANELS ── */
+    .panel {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px 16px;
+      box-shadow: 0 1px 4px rgba(15,33,83,0.04);
+    }
+    .panel-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--text3);
+      margin-bottom: 10px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .panel-title-right {
+      font-size: 0.7rem; font-weight: 500; text-transform: none;
+      letter-spacing: 0; color: var(--amber); font-family: 'DM Sans', sans-serif;
+    }
+
+    /* ── FIELD TYPE GRID ── */
+    .ftype-category { margin-bottom: 8px; }
+    .ftype-category:last-child { margin-bottom: 0; }
+    .ftype-cat-label {
+      font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text3); margin-bottom: 4px;
+    }
+    .ftype-group { display: flex; gap: 4px; flex-wrap: wrap; }
+    .ftype-btn {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 7px; padding: 5px 9px; text-align: center;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+    }
+    .ftype-btn:hover { border-color: var(--blue-light); background: var(--blue-glow); }
+    .ftype-btn.active { background: var(--blue-glow); border-color: var(--blue2); }
+    .ftype-btn.special { border-color: var(--amber-border); background: var(--amber-bg); }
+    .ftype-btn.special.active { background: rgba(217,119,6,0.18); border-color: var(--amber); }
+    .fn { font-size: 0.8rem; font-weight: 700; color: var(--text); }
+    .fs { font-size: 0.65rem; color: var(--text3); }
+    .ftype-btn.active .fn { color: var(--blue2); }
+    .ftype-btn.active .fs { color: var(--blue-light); }
+    .ftype-btn.special.active .fn { color: var(--amber); }
+    .ftype-btn.special.active .fs { color: var(--amber); }
+    .fr { font-size: 0.75rem; font-weight: 600; font-family: 'Space Grotesk', monospace; color: var(--text2); letter-spacing: -0.02em; }
+    .ftype-btn.active .fr { color: var(--blue2); }
+
+    /* ── SETTINGS ROWS (plus + mass) ── */
+    .setting-section { margin-bottom: 12px; }
+    .setting-section:last-child { margin-bottom: 0; }
+    .capital-row { margin-bottom: 10px; }
+    .check-label {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.8rem; color: var(--text2); cursor: pointer;
+    }
+    .check-label input[type=checkbox] { accent-color: var(--blue2); width: 14px; height: 14px; }
+
+    .res-control-row {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: nowrap;
+    }
+    .res-control-row .row-label {
+      font-size: 0.75rem; color: var(--text3); white-space: nowrap; flex: 0 0 84px; font-weight: 500;
+    }
+    .res-ctrl-cell { display: flex; align-items: center; gap: 3px; flex: 1; min-width: 0; }
+    .res-icon-sm { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+    .res-ctrl-cell input[type=number] {
+      flex: 1; width: 0; min-width: 0; padding: 4px 4px; font-size: 0.78rem;
+      border: 1px solid var(--border); border-radius: 6px; text-align: center;
+      background: var(--surface2); color: var(--text); font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .res-ctrl-cell input[type=number]:focus { border-color: var(--blue2); outline: none; box-shadow: 0 0 0 3px var(--blue-glow); }
+    .plus-select {
+      font-size: 0.78rem; padding: 4px 4px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface2); cursor: pointer;
+      flex: 1; width: 0; min-width: 0;
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s;
+    }
+    .plus-select:focus { border-color: var(--blue2); outline: none; box-shadow: 0 0 0 3px var(--blue-glow); }
+
+    /* ── FACTORIES ── */
+    .factory-grid {
+      display: grid; grid-template-columns: auto auto auto auto auto auto;
+      gap: 5px 12px; align-items: center;
+      font-size: 0.78rem; color: var(--text2);
+    }
+    .factory-grid label { white-space: nowrap; font-weight: 500; }
+    .factory-grid select {
+      font-size: 0.78rem; padding: 3px 5px;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface2); cursor: pointer; color: var(--text);
+      font-family: 'DM Sans', sans-serif; transition: border-color 0.15s;
+    }
+    .factory-grid select:focus { border-color: var(--blue2); outline: none; box-shadow: 0 0 0 3px var(--blue-glow); }
+
+    /* ── OASIS CUSTOM PICKER ── */
+    .oasis-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .oasis-item { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+    .oasis-item > label { font-size: 0.72rem; color: var(--text3); font-weight: 500; }
+    .oasis-wrapper { position: relative; }
+    .oasis-btn {
+      display: flex; align-items: center; gap: 5px;
+      padding: 5px 8px; border: 1px solid var(--border); border-radius: 7px;
+      background: var(--surface2); cursor: pointer; font-size: 0.78rem; color: var(--text2);
+      min-height: 32px; width: 100%; transition: border-color 0.15s; font-family: 'DM Sans', sans-serif;
+    }
+    .oasis-btn:hover { border-color: var(--blue-light); }
+    .oasis-btn.has-value { border-color: rgba(5,150,105,0.35); background: var(--green-bg); }
+    .oasis-btn img { width: 20px; height: 20px; object-fit: contain; flex-shrink: 0; }
+    .oasis-btn-text { flex: 1; text-align: left; font-size: 0.72rem; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .oasis-arrow { font-size: 0.55rem; color: var(--text3); }
+    .oasis-dropdown {
+      display: none; position: absolute; z-index: 300;
+      background: #fff; border: 1px solid var(--border); border-radius: 10px;
+      box-shadow: 0 8px 32px rgba(15,33,83,0.14); padding: 5px; min-width: 190px; top: calc(100% + 4px); left: 0;
+    }
+    .oasis-dropdown.open { display: block; }
+    .oasis-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 9px; border-radius: 6px; cursor: pointer;
+      font-size: 0.78rem; color: var(--text2); transition: background 0.12s;
+    }
+    .oasis-opt:hover { background: var(--surface2); }
+    .oasis-opt.selected { background: var(--blue-glow); color: var(--blue2); font-weight: 600; }
+    .oasis-opt img { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+    .oasis-opt .opt-label { flex: 1; }
+    .oasis-opt .opt-pct { font-size: 0.68rem; color: var(--text3); font-family: 'Space Grotesk', sans-serif; }
+    .oasis-opt.selected .opt-pct { color: var(--blue-light); }
+
+    /* ── WATERWORKS ── */
+    .waterworks-section { display: none; }
+    .waterworks-section.visible { display: block; }
+    .waterworks-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      padding: 8px 10px; background: var(--amber-bg);
+      border: 1px solid var(--amber-border); border-radius: 8px;
+      font-size: 0.78rem; color: var(--amber);
+    }
+    .waterworks-row label { font-weight: 600; white-space: nowrap; font-family: 'Space Grotesk', sans-serif; }
+    .waterworks-row select {
+      font-size: 0.78rem; padding: 3px 7px;
+      border: 1px solid var(--amber-border); border-radius: 6px;
+      background: #fff; cursor: pointer; color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+    }
+    .waterworks-info { font-size: 0.7rem; color: var(--amber); opacity: 0.8; font-style: italic; }
+
+    /* ── PRODUCTION TABLE ── */
+    .prod-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .prod-table th {
+      background: var(--surface2); font-size: 0.65rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3);
+      padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--border);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .prod-table th:first-child { text-align: left; }
+    .prod-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: right; }
+    .prod-table td:first-child { text-align: left; }
+    .prod-table td.num { font-weight: 600; color: var(--text); font-family: 'Space Grotesk', sans-serif; }
+    .prod-table td.bonus { font-size: 0.75rem; color: var(--green); font-weight: 500; }
+    .prod-table td.zero  { font-size: 0.75rem; color: var(--text3); }
+    .prod-table tr.total-row td {
+      background: var(--surface2); font-weight: 700; font-size: 0.85rem;
+      border-top: 2px solid var(--border2); border-bottom: none;
+    }
+    .prod-table tr.total-row td.grand {
+      color: var(--blue2); font-size: 1rem;
+      font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em;
+    }
+    .res-label-cell { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--text); }
+    .res-icon-tbl { width: 16px; height: 16px; object-fit: contain; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,33,83,0.4); backdrop-filter: blur(4px);
+      z-index: 400; align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 24px; width: 320px;
+      box-shadow: 0 24px 64px rgba(15,33,83,0.2);
+      animation: fadeUp 0.2s ease;
+    }
+    .modal h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; color: var(--text); margin-bottom: 3px; }
+    .modal .modal-sub { font-size: 0.72rem; color: var(--text3); margin-bottom: 14px; }
+    .modal-bldg-img { display: block; margin: 0 auto 14px; height: 52px; image-rendering: pixelated; }
+    .modal-level { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .modal-level label { font-size: 0.78rem; color: var(--text2); font-weight: 500; }
+    .modal-level input[type=range] { flex: 1; accent-color: var(--blue2); }
+    .modal-lv-val {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700;
+      color: var(--blue2); min-width: 32px; text-align: center;
+    }
+    .modal-actions { display: flex; gap: 8px; }
+    .modal-actions button {
+      flex: 1; padding: 8px; border-radius: 8px;
+      font-size: 0.825rem; font-weight: 600; cursor: pointer; border: none;
+      font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+    }
+    .btn-confirm { background: var(--blue2); color: #fff; box-shadow: 0 0 16px rgba(37,99,235,0.3); }
+    .btn-confirm:hover { background: var(--blue-light); }
+    .btn-cancel { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+    .btn-cancel:hover { background: var(--border); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); }  to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border); background: var(--surface);
+      padding: 24px 40px; display: flex;
+      align-items: center; justify-content: space-between;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo {
+      width: 26px; height: 26px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+    }
+    .footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.825rem; font-weight: 600; color: var(--text2); }
+    .footer-copy { font-size: 0.72rem; color: var(--text3); }
+
+    @media (max-width: 860px) {
+      nav { padding: 0 16px; }
+      .nav-menu { display: none; }
+      .page-header { padding: 20px 16px 16px; }
+      .main { padding: 16px 12px 40px; }
+      .sim-toolbar { gap: 6px; }
+      .sim-wrapper { flex-direction: column; }
+      #resourceFieldContainer { width: 100%; max-width: 473px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="/" class="nav-brand">
+      <div class="nav-brand-logo">⚔️</div>
+      <span class="nav-brand-name">Travian<span>Tools</span></span>
+    </a>
+
+    <div class="nav-menu">
+      <div class="nav-item">
+        <button class="nav-link">Tools <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="/tools/oasis_finder/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="/tools/spy-on-productivity/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
+            <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="/tools/attack-planner/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <a href="/tools/village-tree/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
+            <div class="dropdown-text"><strong>Village Tree</strong><span>Plan your building queue</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
+            <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
+            <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link active">Simulators <span class="chevron">▼</span></button>
+        <div class="dropdown">
+          <a href="/simulators/field-production/" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🌾</div>
+            <div class="dropdown-text"><strong>Field Production</strong><span>Simulate resource output per hour</span></div>
+            <span class="dropdown-badge badge-free">FREE</span>
+          </a>
+          <div class="dropdown-divider"></div>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
+            <div class="dropdown-text"><strong>Village Planner</strong><span>Plan buildings & upgrade path</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
+            <div class="dropdown-text"><strong>Battle Simulator</strong><span>Simulate attack vs defense</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--blue-glow)">⏱️</div>
+            <div class="dropdown-text"><strong>Troop Training</strong><span>Time & cost to build an army</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+            <div class="dropdown-text"><strong>Crop Balance</strong><span>Net crop after troop consumption</span></div>
+            <span class="dropdown-badge badge-soon">SOON</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="nav-item">
+        <button class="nav-link">Guides <span class="chevron">▼</span></button>
+        <div class="dropdown" style="min-width:220px">
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
+            <div class="dropdown-text"><strong>Beginner Guide</strong><span>Start your Travian journey</span></div>
+          </a>
+          <a href="#" class="dropdown-item">
+            <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
+            <div class="dropdown-text"><strong>Defense Guide</strong><span>Build an impenetrable defense</span></div>
+          </a>
+        </div>
+      </div>
+
+      <a href="#" class="nav-link">Changelog</a>
+    </div>
+
+    <div class="nav-actions">
+      <a href="/login/" class="btn-ghost">Log In</a>
+      <a href="/register/" class="btn-primary">Sign Up Free</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="#">Simulators</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">Field Production</span>
+    </div>
+    <div class="page-header-inner">
+      <div class="page-title-group">
+        <div class="page-icon">🌾</div>
+        <div>
+          <div class="page-title">Field Production</div>
+          <div class="page-subtitle">Simulate hourly resource output — fields, tribe, oases, factories & more</div>
+        </div>
+      </div>
+      <div class="page-badges">
+        <span class="page-badge free">FREE</span>
+        <span class="page-badge no-login">No login required</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- SIMULATOR TOOLBAR -->
+    <div class="sim-toolbar">
+      <span class="sim-toolbar-label">Field type</span>
+      <select class="sim-select" id="fieldTypeSelect" onchange="setFieldType(+this.value)">
+        <option value="13">18c — 0-0-0-18</option>
+        <option value="6">15c — 1-1-1-15</option>
+        <option value="1">9c — 3-3-3-9</option>
+        <option value="7">7c — 4-4-3-7</option>
+        <option value="8">7c — 3-4-4-7</option>
+        <option value="9">7c — 4-3-4-7</option>
+        <option value="2">6c — 3-4-5-6</option>
+        <option value="3">6c — 4-4-4-6</option>
+        <option value="4">6c — 4-5-3-6</option>
+        <option value="5" selected>6c — 5-3-4-6</option>
+        <option value="10">6c — 3-5-4-6</option>
+        <option value="11">6c — 4-3-5-6</option>
+        <option value="12">6c — 5-4-3-6</option>
+      </select>
+      <div class="toolbar-divider"></div>
+      <span class="sim-toolbar-label">Tribe</span>
+      <select class="sim-select" id="tribeSelect" onchange="setTribe(this.value)">
+        <option value="roman">Roman</option>
+        <option value="teuton" selected>Teuton</option>
+        <option value="gaul">Gaul</option>
+        <option value="huns">Huns</option>
+        <option value="egyptians">Egyptians</option>
+        <option value="spartans">Spartans</option>
+        <option value="natars">Natars</option>
+      </select>
+      <div class="toolbar-divider"></div>
+      <span class="sim-toolbar-label">Speed</span>
+      <button class="speed-btn active" data-speed="1" onclick="setSpeed(1)">1×</button>
+      <button class="speed-btn" data-speed="2" onclick="setSpeed(2)">2×</button>
+      <button class="speed-btn" data-speed="3" onclick="setSpeed(3)">3×</button>
+      <button class="speed-btn" data-speed="5" onclick="setSpeed(5)">5×</button>
+      <button class="speed-btn" data-speed="10" onclick="setSpeed(10)">10×</button>
+    </div>
+
+    <!-- SIMULATOR BODY -->
+    <div class="sim-wrapper">
+
+      <!-- LEFT: map + field type -->
+      <div class="sim-left">
+        <div id="resourceFieldContainer" class="resourceField5">
+          <img id="villageCenterImg" src="" alt="">
+          <div id="labelContainer"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">Field Type</div>
+          <div id="ftypeGrid"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: settings + production -->
+      <div class="sim-right">
+
+        <!-- Village Settings -->
+        <div class="panel">
+          <div class="panel-title">Village Settings</div>
+
+          <div class="capital-row">
+            <label class="check-label">
+              <input type="checkbox" id="chkCapital" onchange="onCapitalChange()">
+              Capital village (max level 22)
+            </label>
+          </div>
+
+          <div class="res-control-row">
+            <span class="row-label">Plus account</span>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
+              <select class="plus-select" id="plusLumber" onchange="updateProduction()">
+                <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
+              </select>
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="C">
+              <select class="plus-select" id="plusClay" onchange="updateProduction()">
+                <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
+              </select>
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="I">
+              <select class="plus-select" id="plusIron" onchange="updateProduction()">
+                <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
+              </select>
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="W">
+              <select class="plus-select" id="plusCrop" onchange="updateProduction()">
+                <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="res-control-row">
+            <span class="row-label">Set all to lv</span>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
+              <input type="number" id="massLumber" min="0" max="10" placeholder="—" oninput="setAllLevel(1,+this.value)">
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="C">
+              <input type="number" id="massClay" min="0" max="10" placeholder="—" oninput="setAllLevel(2,+this.value)">
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="I">
+              <input type="number" id="massIron" min="0" max="10" placeholder="—" oninput="setAllLevel(3,+this.value)">
+            </div>
+            <div class="res-ctrl-cell">
+              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="W">
+              <input type="number" id="massCrop" min="0" max="10" placeholder="—" oninput="setAllLevel(4,+this.value)">
+            </div>
+          </div>
+
+          <div class="factory-grid">
+            <label>Sawmill</label>
+            <select id="fSawmill" onchange="updateProduction()">
+              <option value="0">Lv 0</option><option value="1">Lv 1</option><option value="2">Lv 2</option><option value="3">Lv 3</option><option value="4">Lv 4</option><option value="5">Lv 5</option>
+            </select>
+            <label>Brickyard</label>
+            <select id="fBrickyard" onchange="updateProduction()">
+              <option value="0">Lv 0</option><option value="1">Lv 1</option><option value="2">Lv 2</option><option value="3">Lv 3</option><option value="4">Lv 4</option><option value="5">Lv 5</option>
+            </select>
+            <label>Iron Foundry</label>
+            <select id="fFoundry" onchange="updateProduction()">
+              <option value="0">Lv 0</option><option value="1">Lv 1</option><option value="2">Lv 2</option><option value="3">Lv 3</option><option value="4">Lv 4</option><option value="5">Lv 5</option>
+            </select>
+            <label>Flour Mill</label>
+            <select id="fMill" onchange="updateProduction()">
+              <option value="0">Lv 0</option><option value="1">Lv 1</option><option value="2">Lv 2</option><option value="3">Lv 3</option><option value="4">Lv 4</option><option value="5">Lv 5</option>
+            </select>
+            <label>Bakery</label>
+            <select id="fBakery" onchange="updateProduction()">
+              <option value="0">Lv 0</option><option value="1">Lv 1</option><option value="2">Lv 2</option><option value="3">Lv 3</option><option value="4">Lv 4</option><option value="5">Lv 5</option>
+            </select>
+            <div></div>
+          </div>
+        </div>
+
+        <!-- Oasis + Waterworks -->
+        <div class="panel">
+          <div class="panel-title">Oases (up to 3)</div>
+          <div class="oasis-row">
+            <div class="oasis-item">
+              <label>Oasis 1</label>
+              <div class="oasis-wrapper" id="oasisWrap1">
+                <div class="oasis-btn" id="oasisBtn1" onclick="toggleOasisDrop(1)">
+                  <span class="oasis-btn-text">— None —</span><span class="oasis-arrow">▼</span>
+                </div>
+                <div class="oasis-dropdown" id="oasisDrop1"></div>
+              </div>
+            </div>
+            <div class="oasis-item">
+              <label>Oasis 2</label>
+              <div class="oasis-wrapper" id="oasisWrap2">
+                <div class="oasis-btn" id="oasisBtn2" onclick="toggleOasisDrop(2)">
+                  <span class="oasis-btn-text">— None —</span><span class="oasis-arrow">▼</span>
+                </div>
+                <div class="oasis-dropdown" id="oasisDrop2"></div>
+              </div>
+            </div>
+            <div class="oasis-item">
+              <label>Oasis 3</label>
+              <div class="oasis-wrapper" id="oasisWrap3">
+                <div class="oasis-btn" id="oasisBtn3" onclick="toggleOasisDrop(3)">
+                  <span class="oasis-btn-text">— None —</span><span class="oasis-arrow">▼</span>
+                </div>
+                <div class="oasis-dropdown" id="oasisDrop3"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="waterworks-section" id="waterworksSection">
+            <div class="waterworks-row">
+              <label>🏺 Waterworks (Egyptian)</label>
+              <select id="fWaterworks" onchange="updateProduction()">
+                <option value="0">Lv 0 — Off</option>
+                <option value="1">Lv 1 — +5%</option><option value="2">Lv 2 — +10%</option>
+                <option value="3">Lv 3 — +15%</option><option value="4">Lv 4 — +20%</option>
+                <option value="5">Lv 5 — +25%</option><option value="6">Lv 6 — +30%</option>
+                <option value="7">Lv 7 — +35%</option><option value="8">Lv 8 — +40%</option>
+                <option value="9">Lv 9 — +45%</option><option value="10">Lv 10 — +50%</option>
+                <option value="11">Lv 11 — +55%</option><option value="12">Lv 12 — +60%</option>
+                <option value="13">Lv 13 — +65%</option><option value="14">Lv 14 — +70%</option>
+                <option value="15">Lv 15 — +75%</option><option value="16">Lv 16 — +80%</option>
+                <option value="17">Lv 17 — +85%</option><option value="18">Lv 18 — +90%</option>
+                <option value="19">Lv 19 — +95%</option>
+                <option value="20">Lv 20 — +100% (doubles all oases)</option>
+              </select>
+              <span class="waterworks-info" id="waterworksInfo">+5% oasis bonus per level (max lv 20)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Production Table -->
+        <div class="panel">
+          <div class="panel-title">
+            Production / Hour
+            <span class="panel-title-right" id="speedLabel"></span>
+          </div>
+          <table class="prod-table">
+            <thead>
+              <tr>
+                <th>Resource</th><th>Fields</th><th>Factory</th><th>Oasis</th><th>Plus</th><th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="">Lumber</span></td>
+                <td class="num" id="pLumberBase">0</td><td id="pLumberFact" class="zero">—</td>
+                <td id="pLumberOasis" class="zero">—</td><td id="pLumberPlus" class="zero">—</td>
+                <td class="num" id="pLumberTotal">0</td>
+              </tr>
+              <tr>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="">Clay</span></td>
+                <td class="num" id="pClayBase">0</td><td id="pClayFact" class="zero">—</td>
+                <td id="pClayOasis" class="zero">—</td><td id="pClayPlus" class="zero">—</td>
+                <td class="num" id="pClayTotal">0</td>
+              </tr>
+              <tr>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="">Iron</span></td>
+                <td class="num" id="pIronBase">0</td><td id="pIronFact" class="zero">—</td>
+                <td id="pIronOasis" class="zero">—</td><td id="pIronPlus" class="zero">—</td>
+                <td class="num" id="pIronTotal">0</td>
+              </tr>
+              <tr>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="">Crop</span></td>
+                <td class="num" id="pCropBase">0</td><td id="pCropFact" class="zero">—</td>
+                <td id="pCropOasis" class="zero">—</td><td id="pCropPlus" class="zero">—</td>
+                <td class="num" id="pCropTotal">0</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total</td>
+                <td id="pAllBase" class="num" colspan="4"></td>
+                <td id="pAllTotal" class="num grand"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div><!-- /sim-right -->
+    </div><!-- /sim-wrapper -->
+  </main>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h3 id="modalTitle"></h3>
+      <div class="modal-sub" id="modalSub"></div>
+      <img class="modal-bldg-img" id="modalImg" src="" alt="">
+      <div class="modal-level">
+        <label>Level</label>
+        <input type="range" id="modalRange" min="0" max="10" value="0"
+          oninput="document.getElementById('modalLvVal').textContent=this.value">
+        <div class="modal-lv-val" id="modalLvVal">0</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <a href="/" class="footer-brand">
+      <div class="footer-logo">⚔️</div>
+      <span class="footer-name">TravianTools · sonybukansoni.com</span>
+    </a>
+    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+  </footer>
+
+<script>
+const CDN    = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/buildings';
+const CDN_VC = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/tribeSpecificCenter';
+const CDN_RES= 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources';
+
+const FIELD_TYPES = {
+  1:{ratio:'3-3-3-9',dist:[4,4,1,4,4,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  2:{ratio:'3-4-5-6',dist:[3,4,1,3,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  3:{ratio:'4-4-4-6',dist:[1,4,1,3,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  4:{ratio:'4-5-3-6',dist:[1,4,1,2,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  5:{ratio:'5-3-4-6',dist:[1,4,1,3,1,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  6:{ratio:'1-1-1-15',dist:[4,4,1,3,4,4,4,4,4,4,4,4,4,4,4,2,4,4]},
+  7:{ratio:'4-4-3-7',dist:[1,4,4,1,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  8:{ratio:'3-4-4-7',dist:[3,4,4,1,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  9:{ratio:'4-3-4-7',dist:[3,4,4,1,1,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  10:{ratio:'3-5-4-6',dist:[3,4,1,2,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  11:{ratio:'4-3-5-6',dist:[3,1,1,3,1,4,4,3,3,2,2,3,1,4,4,2,4,4]},
+  12:{ratio:'5-4-3-6',dist:[1,4,1,1,2,2,3,4,4,3,3,4,4,1,4,2,1,2]},
+  13:{ratio:'0-0-0-18',dist:[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4]},
+};
+
+const FTYPE_CATS = [
+  {label:'High Crop',special:true,ratioOnly:false,entries:[
+    {ft:13,name:'18c',sub:'0-0-0-18'},{ft:6,name:'15c',sub:'1-1-1-15'},{ft:1,name:'9c',sub:'3-3-3-9'},
+  ]},
+  {label:'7c',special:false,ratioOnly:true,entries:[
+    {ft:7,name:'4-4-3-7'},{ft:8,name:'3-4-4-7'},{ft:9,name:'4-3-4-7'},
+  ]},
+  {label:'6c',special:false,ratioOnly:true,entries:[
+    {ft:2,name:'3-4-5-6'},{ft:3,name:'4-4-4-6'},{ft:4,name:'4-5-3-6'},
+    {ft:5,name:'5-3-4-6'},{ft:10,name:'3-5-4-6'},{ft:11,name:'4-3-5-6'},{ft:12,name:'5-4-3-6'},
+  ]},
+];
+
+const GID_INFO = {1:{name:'Woodcutter',res:'lumber'},2:{name:'Clay Pit',res:'clay'},3:{name:'Iron Mine',res:'iron'},4:{name:'Cropland',res:'crop'}};
+const TRIBE_VID = {roman:1,teuton:2,gaul:3,huns:4,egyptians:5,spartans:6,natars:7};
+const PROD = [0,7,13,21,31,46,70,98,140,203,280,392,525,693,889,1120,1400,1820,2240,2800,3430,4270,5250];
+const FACT_BONUS = [0,5,10,15,20,25];
+
+const OASIS_TYPES = [
+  {label:'— None —',l:0,c:0,i:0,w:0,icon:null,pct:''},
+  {label:'Lumber +50%',l:50,c:0,i:0,w:0,icon:'lumber-lumber_medium',pct:'+50%'},
+  {label:'Lumber +25%',l:25,c:0,i:0,w:0,icon:'lumber_tiny',pct:'+25%'},
+  {label:'Clay +50%',l:0,c:50,i:0,w:0,icon:'clay-clay_medium',pct:'+50%'},
+  {label:'Clay +25%',l:0,c:25,i:0,w:0,icon:'clay_tiny',pct:'+25%'},
+  {label:'Iron +50%',l:0,c:0,i:50,w:0,icon:'iron-iron_medium',pct:'+50%'},
+  {label:'Iron +25%',l:0,c:0,i:25,w:0,icon:'iron_tiny',pct:'+25%'},
+  {label:'Crop +50%',l:0,c:0,i:0,w:50,icon:'crop-crop_medium',pct:'+50%'},
+  {label:'Crop +25%',l:0,c:0,i:0,w:25,icon:'crop_tiny',pct:'+25%'},
+  {label:'Lumber + Crop 25%',l:25,c:0,i:0,w:25,icon:'lumber-crop_medium',pct:'+25%+25%'},
+  {label:'Clay + Crop 25%',l:0,c:25,i:0,w:25,icon:'clay-crop_medium',pct:'+25%+25%'},
+  {label:'Iron + Crop 25%',l:0,c:0,i:25,w:25,icon:'iron-crop_medium',pct:'+25%+25%'},
+];
+
+const oasisSel = {1:0,2:0,3:0};
+let currentFieldType=5, currentTribe='teuton', isCapital=false, activeSlot=null, gameSpeed=1;
+const slotLevels={};
+for(let i=1;i<=18;i++) slotLevels[i]=0;
+
+const SLOT_CENTERS = {
+  1:{x:171,y:23},2:{x:261,y:24},3:{x:329,y:36},4:{x:113,y:62},5:{x:226,y:75},
+  6:{x:283,y:82},7:{x:368,y:80},8:{x:53,y:113},9:{x:134,y:113},10:{x:324,y:114},
+  11:{x:412,y:114},12:{x:61,y:174},13:{x:134,y:164},14:{x:270,y:200},
+  15:{x:392,y:169},16:{x:165,y:254},17:{x:256,y:259},18:{x:346,y:236},
+};
+
+function buildFTypeGrid(){
+  const g=document.getElementById('ftypeGrid'); g.innerHTML='';
+  FTYPE_CATS.forEach(cat=>{
+    const cd=document.createElement('div'); cd.className='ftype-category';
+    const cl=document.createElement('div'); cl.className='ftype-cat-label'; cl.textContent=cat.label;
+    cd.appendChild(cl);
+    const cg=document.createElement('div'); cg.className='ftype-group';
+    cat.entries.forEach(e=>{
+      const b=document.createElement('div');
+      b.className='ftype-btn'+(cat.special?' special':'')+(e.ft===currentFieldType?' active':'');
+      b.innerHTML=cat.ratioOnly?`<span class="fr">${e.name}</span>`:`<span class="fn">${e.name}</span><span class="fs">${e.sub}</span>`;
+      b.onclick=()=>setFieldType(e.ft); cg.appendChild(b);
+    });
+    cd.appendChild(cg); g.appendChild(cd);
+  });
+}
+
+function setFieldType(ft){
+  currentFieldType=+ft;
+  document.getElementById('fieldTypeSelect').value=ft;
+  const el=document.getElementById('resourceFieldContainer');
+  el.className=el.className.replace(/resourceField\d+/,`resourceField${ft}`);
+  buildFTypeGrid(); updateMassMaxes(); renderLabels(); updateProduction();
+}
+
+function setTribe(t){
+  currentTribe=t;
+  const img=document.getElementById('villageCenterImg');
+  img.src=`${CDN_VC}/villageCenter_vid${TRIBE_VID[t]||2}.png`;
+  img.onerror=()=>{img.src=`${CDN_VC}/villageCenter_vid2.png`;img.onerror=null;};
+  const ww=document.getElementById('waterworksSection');
+  if(t==='egyptians'){ww.classList.add('visible');}
+  else{ww.classList.remove('visible');document.getElementById('fWaterworks').value=0;}
+  updateProduction();
+}
+
+function setSpeed(s){
+  gameSpeed=s;
+  document.querySelectorAll('.speed-btn').forEach(b=>b.classList.toggle('active',+b.dataset.speed===s));
+  document.getElementById('speedLabel').textContent=s>1?`${s}× speed server`:'';
+  updateProduction();
+}
+
+function onCapitalChange(){
+  isCapital=document.getElementById('chkCapital').checked;
+  updateMassMaxes();
+  const max=isCapital?22:10;
+  for(let i=1;i<=18;i++) if(slotLevels[i]>max) slotLevels[i]=max;
+  renderLabels(); updateProduction();
+}
+
+function updateMassMaxes(){
+  const max=isCapital?22:10;
+  ['massLumber','massClay','massIron','massCrop'].forEach(id=>{
+    const el=document.getElementById(id); el.max=max;
+    if(el.value!==''&&+el.value>max) el.value=max;
+  });
+}
+
+function setAllLevel(gid,val){
+  if(isNaN(val)||val<0) return;
+  const lv=Math.min(Math.floor(val),isCapital?22:10);
+  const ft=FIELD_TYPES[currentFieldType];
+  for(let s=1;s<=18;s++) if(ft.dist[s-1]===gid) slotLevels[s]=lv;
+  renderLabels(); updateProduction();
+}
+
+function renderLabels(){
+  const lc=document.getElementById('labelContainer'); lc.innerHTML='';
+  const ft=FIELD_TYPES[currentFieldType];
+  for(let s=1;s<=18;s++){
+    const c=SLOT_CENTERS[s]; if(!c) continue;
+    const d=document.createElement('div');
+    d.className=`labelLayer res-${ft.dist[s-1]}`;
+    d.textContent=slotLevels[s]; d.style.left=c.x+'px'; d.style.top=c.y+'px';
+    d.onclick=()=>openModal(s); lc.appendChild(d);
+  }
+}
+
+function openModal(slot){
+  activeSlot=slot;
+  const gid=FIELD_TYPES[currentFieldType].dist[slot-1];
+  const info=GID_INFO[gid]; const max=isCapital?22:10;
+  document.getElementById('modalTitle').textContent=`${info.name} — Slot ${slot}`;
+  document.getElementById('modalSub').textContent=`GID ${gid} · ${info.res} · f${currentFieldType} (${FIELD_TYPES[currentFieldType].ratio})`;
+  const img=document.getElementById('modalImg');
+  img.src=`${CDN}/${currentTribe}/g${gid}.png`; img.onerror=()=>{img.style.display='none';}; img.style.display='block';
+  const range=document.getElementById('modalRange');
+  range.max=max; range.value=slotLevels[slot];
+  document.getElementById('modalLvVal').textContent=slotLevels[slot];
+  document.getElementById('modalOverlay').classList.add('show');
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show');activeSlot=null;}
+function confirmModal(){
+  if(activeSlot===null) return;
+  slotLevels[activeSlot]=+document.getElementById('modalRange').value;
+  renderLabels(); updateProduction(); closeModal();
+}
+
+function buildOasisPickers(){
+  [1,2,3].forEach(slot=>{
+    const drop=document.getElementById(`oasisDrop${slot}`);
+    OASIS_TYPES.forEach((t,idx)=>{
+      const el=document.createElement('div');
+      el.className='oasis-opt'+(idx===0?' selected':''); el.dataset.idx=idx;
+      const iconHtml=t.icon?`<img src="${CDN_RES}/${t.icon}.png" onerror="this.style.display='none'" alt="">`:`<span style="width:22px;display:inline-block"></span>`;
+      el.innerHTML=`${iconHtml}<span class="opt-label">${t.label}</span><span class="opt-pct">${t.pct}</span>`;
+      el.onclick=()=>selectOasis(slot,idx); drop.appendChild(el);
+    });
+  });
+}
+
+function selectOasis(slot,idx){
+  oasisSel[slot]=idx; const t=OASIS_TYPES[idx];
+  const btn=document.getElementById(`oasisBtn${slot}`);
+  btn.innerHTML='';
+  if(t.icon){const img=document.createElement('img');img.src=`${CDN_RES}/${t.icon}.png`;img.onerror=()=>img.style.display='none';btn.appendChild(img);}
+  const txt=document.createElement('span'); txt.className='oasis-btn-text'; txt.textContent=t.label;
+  const arrow=document.createElement('span'); arrow.className='oasis-arrow'; arrow.textContent='▼';
+  btn.appendChild(txt); btn.appendChild(arrow);
+  btn.classList.toggle('has-value',idx!==0);
+  document.querySelectorAll(`#oasisDrop${slot} .oasis-opt`).forEach(el=>el.classList.toggle('selected',+el.dataset.idx===idx));
+  closeAllOasisDrops(); updateProduction();
+}
+
+function toggleOasisDrop(slot){
+  const drop=document.getElementById(`oasisDrop${slot}`);
+  const isOpen=drop.classList.contains('open');
+  closeAllOasisDrops(); if(!isOpen) drop.classList.add('open');
+}
+function closeAllOasisDrops(){document.querySelectorAll('.oasis-dropdown').forEach(d=>d.classList.remove('open'));}
+function getOasisBonus(k){let p=0;[1,2,3].forEach(s=>p+=OASIS_TYPES[oasisSel[s]][k]);return p;}
+
+function getWaterworksMult(){
+  if(currentTribe!=='egyptians') return 1;
+  return 1+ +document.getElementById('fWaterworks').value*0.05;
+}
+
+function updateProduction(){
+  const ft=FIELD_TYPES[currentFieldType];
+  const plusPcts={1:+document.getElementById('plusLumber').value,2:+document.getElementById('plusClay').value,3:+document.getElementById('plusIron').value,4:+document.getElementById('plusCrop').value};
+  const wwMult=getWaterworksMult();
+  if(currentTribe==='egyptians'){
+    const lv=+document.getElementById('fWaterworks').value;
+    document.getElementById('waterworksInfo').textContent=lv===0?'+5% oasis bonus per level (max lv 20)':`Oasis ×${(1+lv*0.05).toFixed(2)} — all oases boosted`;
+  }
+  const base={1:0,2:0,3:0,4:0};
+  for(let s=1;s<=18;s++) base[ft.dist[s-1]]+=(PROD[slotLevels[s]]||0);
+  const resources=[
+    {gid:1,key:'Lumber',factIds:['fSawmill'],oasisKey:'l'},
+    {gid:2,key:'Clay',factIds:['fBrickyard'],oasisKey:'c'},
+    {gid:3,key:'Iron',factIds:['fFoundry'],oasisKey:'i'},
+    {gid:4,key:'Crop',factIds:['fMill','fBakery'],oasisKey:'w'},
+  ];
+  let sumBase=0,sumTotal=0;
+  resources.forEach(r=>{
+    const b=base[r.gid]; let factPct=0;
+    r.factIds.forEach(id=>factPct+=FACT_BONUS[+document.getElementById(id).value]);
+    const rawOasis=getOasisBonus(r.oasisKey); const effOasis=rawOasis*wwMult;
+    const plusPct=plusPcts[r.gid];
+    const total=Math.floor(b*(1+factPct/100)*(1+effOasis/100)*(1+plusPct/100)*gameSpeed);
+    document.getElementById(`p${r.key}Base`).textContent=b*gameSpeed;
+    const factEl=document.getElementById(`p${r.key}Fact`);
+    const oasisEl=document.getElementById(`p${r.key}Oasis`);
+    const plusEl=document.getElementById(`p${r.key}Plus`);
+    factEl.textContent=factPct?`+${factPct}%`:'—'; factEl.className=factPct?'bonus':'zero';
+    if(effOasis>0){oasisEl.textContent=effOasis===rawOasis?`+${rawOasis}%`:`+${Math.round(effOasis)}%`;oasisEl.className='bonus';}
+    else{oasisEl.textContent='—';oasisEl.className='zero';}
+    plusEl.textContent=plusPct?`+${plusPct}%`:'—'; plusEl.className=plusPct?'bonus':'zero';
+    document.getElementById(`p${r.key}Total`).textContent=total;
+    sumBase+=b*gameSpeed; sumTotal+=total;
+  });
+  document.getElementById('pAllBase').textContent=sumBase;
+  document.getElementById('pAllTotal').textContent=sumTotal;
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  buildFTypeGrid(); buildOasisPickers(); setTribe('teuton'); renderLabels(); updateProduction();
+  document.getElementById('tribeSelect').addEventListener('change',e=>setTribe(e.target.value));
+  document.getElementById('fieldTypeSelect').addEventListener('change',e=>setFieldType(+e.target.value));
+  document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))closeModal();});
+  document.addEventListener('click',e=>{if(!e.target.closest('.oasis-wrapper'))closeAllOasisDrops();});
+});
+</script>
+</body>
+</html>
