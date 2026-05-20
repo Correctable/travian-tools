@@ -512,7 +512,7 @@ function resolveHiddenCosts(){
 // ── Cost calculator ────────────────────────────────────────────────────────
 function calcCost(gid, toLevel){
   const b = dbMap.get(gid);
-  if(!b?.levels) return {lumber:0,clay:0,iron:0,crop:0};
+  if(!b?.levels||toLevel===undefined||toLevel===null) return {lumber:0,clay:0,iron:0,crop:0};
   const r={lumber:0,clay:0,iron:0,crop:0};
   for(const lv of b.levels){
     if(lv.level<=toLevel){
@@ -616,18 +616,19 @@ function renderCostTable(){
   for(const entry of sorted){
     const b=dbMap.get(entry.gid);
     const name=b?.name??`gid${entry.gid}`;
-    const buildTo=entry.tempLevel??entry.level;
+    const buildTo = entry.tempLevel ?? entry.targetLevel;
+    if(buildTo===undefined||buildTo===null) continue;
     const cost=calcCost(entry.gid,buildTo);
     totals.lumber+=cost.lumber; totals.clay+=cost.clay; totals.iron+=cost.iron; totals.crop+=cost.crop;
     let nameCell=name, demolishNote='', rowClass='';
     if(!entry.userPlaced){
       rowClass='hidden-row';
-      const byName=entry.autoBy?gidName(entry.autoBy):(entry.autoReason||'');
+      const byName=entry.autoAddedByGid?gidName(entry.autoAddedByGid):(entry.autoReason||'');
       nameCell=`<i class="ti ti-alert-triangle" style="font-size:11px;margin-right:3px"></i>${name}<br><span class="req-badge">req. ${byName}</span>`;
-      if(entry.demolish) demolishNote=`<span class="demolish-note">→ demolish to lv${entry.demolishTo} after use</span>`;
-    } else if(entry.demolish&&entry.tempLevel){
+      if(entry.willDemolish) demolishNote=`<span class="demolish-note">→ demolish to lv${entry.demolishToLevel} after use</span>`;
+    } else if(entry.willDemolish&&entry.tempLevel){
       nameCell=`<i class="ti ti-arrow-bar-up" style="font-size:11px;margin-right:3px;color:var(--amber)"></i>${name}`;
-      demolishNote=`<span class="demolish-note">→ build to lv${entry.tempLevel} first, demolish to lv${entry.demolishTo}</span>`;
+      demolishNote=`<span class="demolish-note">→ build to lv${entry.tempLevel} first, demolish to lv${entry.demolishToLevel}</span>`;
     }
     rows+=`<tr class="${rowClass}">
       <td class="col-name">${nameCell}${demolishNote}</td>
@@ -701,8 +702,9 @@ function getAvailable(type,aid){
 
   return buildingDB.filter(b=>{
     const tribes=b.tribes;
-    if(type==='wall') return b.isWall!==undefined?b.isWall:[31,32,33,42,43].includes(b.gid)&&(tribes==='all'||tribes.includes(tribe));
-    if([31,32,33,42,43].includes(b.gid)) return false;
+    const wallGids=[31,32,33,42,43];
+    if(type==='wall') return wallGids.includes(b.gid)&&(tribes==='all'||tribes.includes(tribe));
+    if(wallGids.includes(b.gid)) return false;
     if(b.gid===16&&(!pos||!pos.rpOnly)) return false;
     if(pos?.rpOnly&&b.gid!==16) return false;
     if(b.natarOnly) return false;
