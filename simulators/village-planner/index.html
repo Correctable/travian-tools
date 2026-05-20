@@ -112,7 +112,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop
 .ww-slot:hover img.building-img{filter:drop-shadow(0 2px 18px rgba(200,160,60,0.65))}
 .slot-bubble{position:absolute;bottom:4%;left:50%;transform:translateX(-50%);min-width:clamp(14px,3.5vw,22px);height:clamp(14px,3.5vw,22px);padding:0 3px;border-radius:50px;background:#e8f0d8;border:2px solid #8aaa50;color:#2a3a10;font-size:clamp(7px,1.6vw,11px);font-weight:700;display:flex;align-items:center;justify-content:center;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.25);white-space:nowrap;z-index:1}
 .map-slot.empty .slot-bubble{display:none}
-.ww-slot .slot-bubble{bottom:1%;min-width:clamp(16px,4vw,26px);height:clamp(16px,4vw,26px);font-size:clamp(8px,1.8vw,13px)}
+.ww-slot .slot-bubble{bottom:auto;top:50%;transform:translate(-50%,-50%);min-width:clamp(16px,4vw,26px);height:clamp(16px,4vw,26px);font-size:clamp(8px,1.8vw,13px)}
 .slot-tooltip{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);background:rgba(15,25,60,.9);border:1px solid rgba(37,99,235,.2);color:#fff;font-size:11px;padding:4px 8px;border-radius:6px;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:20}
 .map-slot:hover .slot-tooltip{opacity:1}
 
@@ -298,6 +298,16 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop
       <input type="checkbox" id="wwCheck">
       <label for="wwCheck">WW Village</label>
     </div>
+    <div class="ctrl-group">
+      <label for="speedSelect">Speed</label>
+      <select id="speedSelect" class="ctrl-select">
+        <option value="1">1x</option>
+        <option value="2">2x</option>
+        <option value="3">3x</option>
+        <option value="5">5x</option>
+        <option value="10">10x</option>
+      </select>
+    </div>
     <div class="spacer"></div>
     <button class="btn-clear" id="clearBtn"><i class="ti ti-trash"></i>Clear all</button>
   </div>
@@ -380,6 +390,14 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop
             <img class="res-icon" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" alt="Crop">
             <div><div class="res-label">Crop</div><div class="res-value" id="totalCrop">0</div></div>
           </div>
+        </div>
+        <div id="totalTimeRow" style="display:none;margin:0 12px 12px;padding:10px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--text2);font-weight:500">
+            <i class="ti ti-clock" style="color:var(--blue2)"></i>
+            Total build time
+            <span style="font-size:.7rem;color:var(--text3)" id="timeNote">(MB lv0, 1x)</span>
+          </div>
+          <div style="font-size:.925rem;font-weight:700;color:var(--navy)" id="totalTime">—</div>
         </div>
       </div>
 
@@ -489,8 +507,39 @@ const gidName = g => dbMap.get(g)?.name ?? `gid${g}`;
 const bIcon   = (gid,t) => `${CDN_B}/${t}/big/g${gid}.png`;
 const wallUrl = (t,part) => { const g=TRIBE_WALL_GID[t]; return g?`${CDN_W}/${t}/g${g}${part}.png`:''; };
 const wwPhase = lv => lv<=0?1:lv<=25?1:lv<=50?2:lv<=75?3:lv<=99?4:5;
+const FIELD_GIDS = new Set([1,2,3,4]); // Woodcutter, Clay Pit, Iron Mine, Cropland
+
 const fmt     = n => n>=10000?(n/1000).toFixed(0)+'k':n>=1000?(n/1000).toFixed(1)+'k':n.toString();
 const fmtFull = n => n.toLocaleString();
+
+function fmtTime(seconds){
+  if(!seconds||seconds<=0) return '—';
+  const d=Math.floor(seconds/86400);
+  const h=Math.floor((seconds%86400)/3600);
+  const m=Math.floor((seconds%3600)/60);
+  if(d>0) return `${d}d ${h}h`;
+  if(h>0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function getMBLevel(){
+  // Auto-detect from slot — find Main Building (gid 15)
+  for(const [aid, s] of slots){
+    if(s && s.gid===15) return s.level||0;
+  }
+  return 0;
+}
+
+function getServerSpeed(){
+  return parseFloat(document.getElementById('speedSelect')?.value||'1');
+}
+
+function calcActualTime(baseSeconds){
+  const mbLv = getMBLevel();
+  const speed = getServerSpeed();
+  const wwMult = isWW ? 2 : 1; // WW village builds 2x faster
+  return baseSeconds / (1 + mbLv * 0.05) / speed / wwMult;
+}
 
 function getActiveAids(){ return isWW?WW_AIDS:NORMAL_AIDS; }
 function initSlots(){
@@ -501,23 +550,52 @@ function initSlots(){
 
 // ── Prereq resolver (uses prereq_logic.js) ─────────────────────────────────
 function resolveHiddenCosts(){
-  if(!dbReady) return [];
+  if(!dbReady) return {plan:[], warnings:[], fieldWarnings:[]};
   const userPlan=new Map();
   slots.forEach((s,aid)=>{ if(s) userPlan.set(s.gid, s.level||1); });
   if(wallSlot) userPlan.set(wallSlot.gid, wallSlot.level||1);
-  const {plan, hiddenCosts, warnings} = resolvePrerequisites(userPlan, buildingDB);
-  return {plan, warnings};
+
+  // Collect field prereqs as warnings instead of auto-adding
+  const fieldWarnings=[];
+  const allGids=[...userPlan.keys()];
+  const visited=new Set();
+  const queue=[...allGids];
+  while(queue.length){
+    const gid=queue.shift();
+    if(visited.has(gid)) continue;
+    visited.add(gid);
+    const b=dbMap.get(gid);
+    if(!b) continue;
+    for(const req of (b.prerequisites||[])){
+      if(FIELD_GIDS.has(req.gid)){
+        const fieldB=dbMap.get(req.gid);
+        fieldWarnings.push(`<b>${b.name}</b> requires ${fieldB?.name??`gid${req.gid}`} lv${req.level}`);
+      } else if(!visited.has(req.gid)){
+        queue.push(req.gid);
+      }
+    }
+  }
+
+  // Filter out field prereqs from buildings before passing to resolver
+  const filteredDB = buildingDB.map(b=>({
+    ...b,
+    prerequisites: (b.prerequisites||[]).filter(p=>!FIELD_GIDS.has(p.gid))
+  }));
+
+  const {plan, warnings} = resolvePrerequisites(userPlan, filteredDB);
+  return {plan, warnings, fieldWarnings};
 }
 
 // ── Cost calculator ────────────────────────────────────────────────────────
 function calcCost(gid, toLevel){
   const b = dbMap.get(gid);
-  if(!b?.levels||toLevel===undefined||toLevel===null) return {lumber:0,clay:0,iron:0,crop:0};
-  const r={lumber:0,clay:0,iron:0,crop:0};
+  if(!b?.levels||toLevel===undefined||toLevel===null) return {lumber:0,clay:0,iron:0,crop:0,time:0};
+  const r={lumber:0,clay:0,iron:0,crop:0,time:0};
   for(const lv of b.levels){
     if(lv.level<=toLevel){
       r.lumber+=lv.cost[0]; r.clay+=lv.cost[1];
       r.iron+=lv.cost[2];   r.crop+=lv.cost[3];
+      r.time+=(lv.time||0);
     }
   }
   return r;
@@ -597,7 +675,7 @@ function renderMap(){
 function renderCostTable(){
   if(!dbReady) return;
   const tbody=document.getElementById('costTableBody');
-  const {plan, warnings}=resolveHiddenCosts();
+  const {plan, warnings, fieldWarnings}=resolveHiddenCosts();
   const wcard=document.getElementById('warnCard');
   const wlist=document.getElementById('warnList');
 
@@ -606,10 +684,11 @@ function renderCostTable(){
     updateTotals({lumber:0,clay:0,iron:0,crop:0});
     wcard.classList.remove('visible');
     document.getElementById('buildingCount').textContent='—';
+    document.getElementById('totalTimeRow').style.display='none';
     return;
   }
 
-  const totals={lumber:0,clay:0,iron:0,crop:0};
+  const totals={lumber:0,clay:0,iron:0,crop:0,time:0};
   let rows='';
   const sorted=[...plan].sort((a,b)=>a.userPlaced===b.userPlaced?0:a.userPlaced?-1:1);
 
@@ -619,7 +698,7 @@ function renderCostTable(){
     const buildTo = entry.tempLevel ?? entry.targetLevel;
     if(buildTo===undefined||buildTo===null) continue;
     const cost=calcCost(entry.gid,buildTo);
-    totals.lumber+=cost.lumber; totals.clay+=cost.clay; totals.iron+=cost.iron; totals.crop+=cost.crop;
+    totals.lumber+=cost.lumber; totals.clay+=cost.clay; totals.iron+=cost.iron; totals.crop+=cost.crop; totals.time+=cost.time;
     let nameCell=name, demolishNote='', rowClass='';
     if(!entry.userPlaced){
       rowClass='hidden-row';
@@ -650,9 +729,23 @@ function renderCostTable(){
   updateTotals(totals);
   document.getElementById('buildingCount').textContent=`${sorted.filter(e=>e.userPlaced).length} building${sorted.filter(e=>e.userPlaced).length!==1?'s':''}`;
 
-  if(warnings?.length>0){
+  // Total time row
+  const mbLv=getMBLevel();
+  const speed=getServerSpeed();
+  const actualTime=calcActualTime(totals.time);
+  const timeRow=document.getElementById('totalTimeRow');
+  timeRow.style.display='flex';
+  document.getElementById('totalTime').textContent=fmtTime(actualTime);
+  document.getElementById('timeNote').textContent=`(MB lv${mbLv}, ${speed}x${isWW?' WW':''})`;
+
+  // Warnings — prereq + field warnings
+  const allWarnings=[
+    ...(warnings||[]).filter(w=>w.tempLevel).map(w=>`<b>${w.name}</b>: target lv${w.userTargetLevel}, needs temp build to lv${w.tempLevel} then demolish to lv${w.demolishToLevel}`),
+    ...(fieldWarnings||[])
+  ];
+  if(allWarnings.length>0){
     wcard.classList.add('visible');
-    wlist.innerHTML=warnings.map(w=>`<div class="warn-item"><i class="ti ti-point-filled" style="font-size:9px;flex-shrink:0;margin-top:3px"></i><span>${w.name}: target lv${w.userTargetLevel}, needs temp build to lv${w.tempLevel} then demolish to lv${w.demolishToLevel}</span></div>`).join('');
+    wlist.innerHTML=allWarnings.map(w=>`<div class="warn-item"><i class="ti ti-point-filled" style="font-size:9px;flex-shrink:0;margin-top:3px"></i><span>${w}</span></div>`).join('');
   } else {
     wcard.classList.remove('visible');
   }
@@ -760,6 +853,7 @@ function renderModalList(query,aid){
 }
 
 // ── Events ─────────────────────────────────────────────────────────────────
+document.getElementById('speedSelect').addEventListener('change',()=>renderCostTable());
 document.getElementById('tribeSelect').addEventListener('change',e=>{ tribe=e.target.value; initSlots(); renderMap(); });
 document.getElementById('capitalCheck').addEventListener('change',e=>{
   isCapital=e.target.checked;
