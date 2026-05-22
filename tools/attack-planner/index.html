@@ -65,217 +65,7 @@
       z-index: 0;
     }
 
-    /* ── NAVBAR ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 32px;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .nav-brand-logo {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      box-shadow: 0 0 16px rgba(37,99,235,0.4);
-    }
-
-    .nav-brand-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-
-    .nav-brand-name span { color: var(--blue-light); }
-
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex: 1;
-      justify-content: center;
-    }
-
-    .nav-item { position: relative; }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text2);
-      text-decoration: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: all 0.18s;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: 'DM Sans', sans-serif;
-      white-space: nowrap;
-    }
-
-    .nav-link:hover, .nav-item:hover > .nav-link {
-      color: var(--navy);
-      background: var(--surface2);
-    }
-
-    .nav-link .chevron {
-      font-size: 0.6rem;
-      opacity: 0.6;
-      transition: transform 0.2s;
-    }
-
-    .nav-item:hover > .nav-link .chevron { transform: rotate(180deg); }
-
-    .dropdown {
-      position: absolute;
-      top: calc(100% + 8px);
-      left: 50%;
-      transform: translateX(-50%) translateY(-8px);
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 8px;
-      min-width: 240px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.2s ease;
-      box-shadow: 0 20px 60px rgba(15,33,83,0.12), 0 4px 16px rgba(37,99,235,0.06);
-    }
-
-    .nav-item:hover .dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background 0.15s;
-    }
-
-    .dropdown-item:hover { background: var(--surface2); }
-
-    .dropdown-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      flex-shrink: 0;
-    }
-
-    .dropdown-text strong {
-      display: block;
-      font-size: 0.825rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 1px;
-    }
-
-    .dropdown-text span {
-      font-size: 0.72rem;
-      color: var(--text3);
-    }
-
-    .dropdown-badge {
-      margin-left: auto;
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      padding: 2px 7px;
-      border-radius: 100px;
-    }
-
-    .badge-free  { background: var(--green-bg);  color: var(--green); }
-    .badge-pro   { background: var(--blue-glow);  color: var(--blue-light); }
-    .badge-soon  { background: rgba(122,147,188,0.12); color: var(--text3); }
-    .badge-new   { background: var(--amber-bg);   color: var(--amber); }
-
-    .dropdown-divider {
-      height: 1px;
-      background: var(--border);
-      margin: 6px 0;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .btn-ghost {
-      font-size: 0.825rem;
-      font-weight: 500;
-      color: var(--text2);
-      background: none;
-      border: 1px solid var(--border);
-      padding: 8px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.18s;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .btn-ghost:hover {
-      border-color: var(--blue-light);
-      color: var(--navy);
-      background: var(--blue-glow);
-    }
-
-    .btn-primary {
-      font-size: 0.825rem;
-      font-weight: 600;
-      color: #fff;
-      background: var(--blue2);
-      border: 1px solid transparent;
-      padding: 8px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.18s;
-      font-family: 'DM Sans', sans-serif;
-      box-shadow: 0 0 20px rgba(37,99,235,0.3);
-    }
-    .btn-primary:hover {
-      background: var(--blue-light);
-      box-shadow: 0 0 28px rgba(59,130,246,0.45);
-      transform: translateY(-1px);
-    }
+    /* Navbar di-handle oleh navbar.js */ 
 
     /* ── PAGE LAYOUT ── */
     .page-wrap {
@@ -288,41 +78,38 @@
 
     /* ── PAGE HEADER ── */
     .page-header {
-      margin-bottom: 40px;
-      animation: fadeDown 0.45s ease both;
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
     }
-
-    .page-tag {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--blue-light);
-      margin-bottom: 10px;
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
     }
-
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--amber-bg); border: 1px solid var(--amber-border);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
     .page-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.03em;
-      margin-bottom: 10px;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
     }
-
-    .page-title span {
-      background: linear-gradient(135deg, var(--red), var(--amber));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-badges { display: flex; align-items: center; gap: 8px; }
+    .page-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 100px;
     }
-
-    .page-desc {
-      font-size: 0.9rem;
-      color: var(--text2);
-      line-height: 1.7;
-      max-width: 560px;
-    }
+    .page-badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
 
     /* ── MAIN LAYOUT ── */
     .planner-layout {
@@ -808,203 +595,33 @@
 <body>
 
   <!-- NAVBAR -->
-  <nav>
-    <a href="/" class="nav-brand">
-      <div class="nav-brand-logo">⚔️</div>
-      <span class="nav-brand-name">Travian<span>Tools</span></span>
-    </a>
-
-    <div class="nav-menu">
-
-      <!-- Tools dropdown -->
-      <div class="nav-item">
-        <button class="nav-link">
-          Tools <span class="chevron">▼</span>
-        </button>
-        <div class="dropdown">
-          <a href="/tools/oasis_finder/" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
-            <div class="dropdown-text">
-              <strong>Oasis Finder</strong>
-              <span>Find oases near your coords</span>
-            </div>
-            <span class="dropdown-badge badge-free">FREE</span>
-          </a>
-          <a href="/tools/spy-on-productivity/" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
-            <div class="dropdown-text">
-              <strong>Spy Productivity</strong>
-              <span>Estimate resource production</span>
-            </div>
-            <span class="dropdown-badge badge-free">FREE</span>
-          </a>
-          <a href="/tools/attack-planner/" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
-            <div class="dropdown-text">
-              <strong>Attack Planner</strong>
-              <span>Plan multi-wave attacks</span>
-            </div>
-            <span class="dropdown-badge badge-free">FREE</span>
-          </a>
-          <a href="/tools/village-tree/" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
-            <div class="dropdown-text">
-              <strong>Village Tree</strong>
-              <span>Plan your building queue</span>
-            </div>
-            <span class="dropdown-badge badge-free">FREE</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
-            <div class="dropdown-text">
-              <strong>Troop Simulator</strong>
-              <span>Simulate battles</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--red-bg)">🗺️</div>
-            <div class="dropdown-text">
-              <strong>Map Scanner</strong>
-              <span>Scan & track map changes</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Intelligence dropdown -->
-      <div class="nav-item">
-        <button class="nav-link">
-          Intelligence <span class="chevron">▼</span>
-        </button>
-        <div class="dropdown">
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
-            <div class="dropdown-text">
-              <strong>Player Tracker</strong>
-              <span>Track player activity & growth</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
-            <div class="dropdown-text">
-              <strong>Village Analyzer</strong>
-              <span>Deep dive on enemy villages</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
-            <div class="dropdown-text">
-              <strong>Alliance Stats</strong>
-              <span>Compare alliance performance</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Simulators dropdown -->
-      <div class="nav-item">
-        <button class="nav-link">
-          Simulators <span class="chevron">▼</span>
-        </button>
-        <div class="dropdown">
-          <a href="/simulators/field-production/" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--amber-bg)">🌾</div>
-            <div class="dropdown-text">
-              <strong>Field Production</strong>
-              <span>Simulate resource output per hour</span>
-            </div>
-            <span class="dropdown-badge badge-free">FREE</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
-            <div class="dropdown-text">
-              <strong>Village Planner</strong>
-              <span>Plan buildings & upgrade path</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
-            <div class="dropdown-text">
-              <strong>Battle Simulator</strong>
-              <span>Simulate attack vs defense</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--blue-glow)">⏱️</div>
-            <div class="dropdown-text">
-              <strong>Troop Training</strong>
-              <span>Time & cost to build an army</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-          <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-            <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
-            <div class="dropdown-text">
-              <strong>Crop Balance</strong>
-              <span>Net crop after troop consumption</span>
-            </div>
-            <span class="dropdown-badge badge-soon">SOON</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Guides dropdown -->
-      <div class="nav-item">
-        <button class="nav-link">
-          Guides <span class="chevron">▼</span>
-        </button>
-        <div class="dropdown" style="min-width:220px">
-          <a href="#" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--green-bg)">📖</div>
-            <div class="dropdown-text">
-              <strong>Beginner Guide</strong>
-              <span>Start your Travian journey</span>
-            </div>
-          </a>
-          <a href="#" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--amber-bg)">🛡️</div>
-            <div class="dropdown-text">
-              <strong>Defense Guide</strong>
-              <span>Build an impenetrable defense</span>
-            </div>
-          </a>
-          <a href="#" class="dropdown-item">
-            <div class="dropdown-icon" style="background:var(--red-bg)">⚔️</div>
-            <div class="dropdown-text">
-              <strong>Raiding Strategy</strong>
-              <span>Maximize your raid income</span>
-            </div>
-          </a>
-        </div>
-      </div>
-
-      <a href="#" class="nav-link">Changelog</a>
-
-    </div>
-
-    <div class="nav-actions">
-      <a href="/login/" class="btn-ghost">Log In</a>
-      <a href="/register/" class="btn-primary">Sign Up Free</a>
-    </div>
-  </nav>
+  <div id="navbar-root"></div>
   
   <!-- PAGE -->
-  <div class="page-wrap">
-
-    <div class="page-header">
-      <div class="page-tag">Tools · Free</div>
-      <h1 class="page-title">Attack <span>Planner</span></h1>
-      <p class="page-desc">Plan coordinated attacks from your village to multiple targets. Enter target coordinates and troop type — get precise departure times so every wave lands exactly on time.</p>
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="/tools/">Tools</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">Attack Planner</span>
     </div>
+    <div class="page-header-inner">
+      <div class="page-title-group">
+        <div class="page-icon">⚔️</div>
+        <div>
+          <div class="page-title">Attack Planner</div>
+          <div class="page-subtitle">Plan coordinated attacks — get precise departure times so every wave lands exactly on time.</div>
+        </div>
+      </div>
+      <div class="page-badges">
+        <span class="page-badge free">FREE</span>
+        <span class="page-badge no-login">No login required</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
 
     <div class="planner-layout">
 
@@ -1671,5 +1288,7 @@ function showToast(msg, type) {
   t._tid = setTimeout(() => t.classList.remove('show'), 2800);
 }
 </script>
+<script src="/navbar.js"></script>
+
 </body>
 </html>

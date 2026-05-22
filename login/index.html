@@ -63,63 +63,7 @@
       z-index: 0;
     }
 
-    /* ── NAVBAR ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 200;
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 1px 0 rgba(37,99,235,0.06);
-      padding: 0 40px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .nav-brand-logo {
-      width: 32px;
-      height: 32px;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      box-shadow: 0 0 16px rgba(37,99,235,0.25);
-    }
-
-    .nav-brand-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-
-    .nav-brand-name span { color: var(--blue-light); }
-
-    .nav-right {
-      font-size: 0.825rem;
-      color: var(--text2);
-    }
-
-    .nav-right a {
-      color: var(--blue2);
-      text-decoration: none;
-      font-weight: 600;
-      transition: color 0.15s;
-    }
-    .nav-right a:hover { color: var(--blue-light); }
+    /* Navbar di-handle oleh navbar.js */
 
     /* ── MAIN LAYOUT ── */
     .page-wrap {
@@ -435,15 +379,7 @@
 <body>
 
   <!-- NAVBAR -->
-  <nav>
-    <a href="/" class="nav-brand">
-      <div class="nav-brand-logo">⚔️</div>
-      <span class="nav-brand-name">Travian<span>Tools</span></span>
-    </a>
-    <div class="nav-right">
-      New here? <a href="/register/">Create an account</a>
-    </div>
-  </nav>
+  <div id="navbar-root"></div>
 
   <!-- MAIN -->
   <div class="page-wrap">
@@ -567,6 +503,7 @@
       }, 1200);
     }
   </script>
-
+  <script src="/navbar.js"></script>
+  
 </body>
 </html>

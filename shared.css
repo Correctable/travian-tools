@@ -1,0 +1,341 @@
+/*
+ * TravianTools — shared.css
+ * Komponen bersama yang dipakai di semua halaman tool.
+ *
+ * CARA PAKAI:
+ * 1. Taruh file ini di root folder (sama dengan navbar.js)
+ * 2. Di setiap halaman, tambahkan di dalam <head>:
+ *    <link rel="stylesheet" href="shared.css">
+ *    (Sesuaikan path jika di subfolder: "../shared.css" atau "../../shared.css")
+ * 3. Hapus CSS yang sama dari <style> di masing-masing halaman
+ *
+ * ISI FILE INI:
+ * - CSS Variables (warna, font)
+ * - Base reset & body
+ * - Background dot grid
+ * - Page header standar (breadcrumb + title + badges)
+ * - Badge variants
+ * - Footer standar
+ * - Tombol umum (btn-ghost, btn-primary)
+ * - Responsive dasar
+ */
+
+/* ─── RESET ──────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── CSS VARIABLES ──────────────────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --navy:       #0f2153;
+  --navy2:      #1a3068;
+  --navy3:      #0b1a3d;
+  --blue:       #1d4ed8;
+  --blue2:      #2563eb;
+  --blue-light: #3b82f6;
+  --blue-glow:  rgba(59,130,246,0.10);
+  --cyan:       #0891b2;
+
+  /* Surface */
+  --surface:    #ffffff;
+  --surface2:   #f8faff;
+  --border:     #e2e8f3;
+  --border2:    rgba(37,99,235,0.25);
+
+  /* Text */
+  --text:       #0f2153;
+  --text2:      #3d5a8a;
+  --text3:      #7a93bc;
+
+  /* Accent */
+  --green:      #059669;
+  --green-bg:   rgba(5,150,105,0.08);
+  --amber:      #d97706;
+  --amber-bg:   rgba(217,119,6,0.08);
+  --amber-border: rgba(217,119,6,0.2);
+  --red:        #dc2626;
+  --red-bg:     rgba(220,38,38,0.08);
+  --purple:     #7c3aed;
+  --purple-bg:  rgba(124,58,237,0.08);
+}
+
+/* ─── BASE ───────────────────────────────────────────────────────────────── */
+body {
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Dot grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(37,99,235,0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── PAGE HEADER ────────────────────────────────────────────────────────── */
+/*
+  STRUKTUR HTML:
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="#">Kategori</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">Nama Halaman</span>
+    </div>
+    <div class="page-header-inner">
+      <div class="page-title-group">
+        <div class="page-icon">🌾</div>
+        <div>
+          <div class="page-title">Nama Tool</div>
+          <div class="page-subtitle">Deskripsi singkat tool</div>
+        </div>
+      </div>
+      <div class="page-badges">
+        <span class="page-badge free">FREE</span>
+        <span class="page-badge no-login">No login required</span>
+      </div>
+    </div>
+  </div>
+
+  VARIASI page-badge:
+  - free        → hijau
+  - pro         → biru
+  - no-login    → biru muda
+  - preview     → amber
+  - soon        → abu
+
+  VARIASI page-icon (warna background):
+  Default: --blue-glow / rgba(59,130,246,0.2) — biru
+  Tambahkan style inline untuk warna lain:
+  <div class="page-icon" style="background:var(--green-bg);border-color:rgba(5,150,105,0.2)">🌿</div>
+  <div class="page-icon" style="background:var(--amber-bg);border-color:var(--amber-border)">🌾</div>
+  <div class="page-icon" style="background:var(--purple-bg);border-color:rgba(124,58,237,0.2)">🏘️</div>
+  <div class="page-icon" style="background:var(--red-bg);border-color:rgba(220,38,38,0.2)">⚔️</div>
+*/
+
+.page-header {
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 28px 40px 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text3);
+  margin-bottom: 10px;
+}
+.breadcrumb a {
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.breadcrumb a:hover { color: var(--blue2); }
+.breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+.breadcrumb-current { color: var(--text2); font-weight: 500; }
+
+.page-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-title-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.page-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--blue-glow);
+  border: 1px solid rgba(59,130,246,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  font-size: 0.8rem;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+.page-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.page-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid transparent;
+}
+.page-badge.free     { background: var(--green-bg);  color: var(--green);      border-color: rgba(5,150,105,0.2); }
+.page-badge.pro      { background: var(--blue-glow); color: var(--blue2);      border-color: rgba(37,99,235,0.2); }
+.page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border-color: rgba(59,130,246,0.2); }
+.page-badge.preview  { background: var(--amber-bg);  color: var(--amber);      border-color: var(--amber-border); }
+.page-badge.soon     { background: rgba(120,140,170,0.08); color: var(--text3); border-color: var(--border); }
+
+/* ─── MAIN CONTENT WRAPPER ───────────────────────────────────────────────── */
+/*
+  Pakai class .page-main sebagai wrapper konten utama:
+  <main class="page-main"> ... </main>
+*/
+.page-main {
+  position: relative;
+  z-index: 1;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 28px 24px 60px;
+}
+
+/* ─── TOMBOL UMUM ────────────────────────────────────────────────────────── */
+.btn-ghost {
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: var(--text2);
+  background: none;
+  border: 1px solid var(--border);
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s;
+  font-family: 'DM Sans', sans-serif;
+  display: inline-flex;
+  align-items: center;
+}
+.btn-ghost:hover {
+  border-color: var(--blue-light);
+  color: var(--navy);
+  background: var(--blue-glow);
+}
+
+.btn-primary {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--blue2);
+  border: 1px solid transparent;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.18s;
+  font-family: 'DM Sans', sans-serif;
+  box-shadow: 0 0 20px rgba(37,99,235,0.3);
+  display: inline-flex;
+  align-items: center;
+}
+.btn-primary:hover {
+  background: var(--blue-light);
+  box-shadow: 0 0 28px rgba(59,130,246,0.45);
+  transform: translateY(-1px);
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────────────── */
+/*
+  STRUKTUR HTML:
+  <footer class="site-footer">
+    <a href="/" class="footer-brand">
+      <div class="footer-logo">⚔️</div>
+      <span class="footer-name">TravianTools · sonybukansoni.com</span>
+    </a>
+    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+  </footer>
+*/
+.site-footer {
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.footer-logo {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, var(--blue2), var(--cyan));
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.footer-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text2);
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  color: var(--text3);
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────────────────── */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .page-header { padding: 20px 16px 16px; }
+  .page-header-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .page-title { font-size: 1.2rem; }
+  .site-footer { flex-direction: column; gap: 12px; text-align: center; padding: 20px 16px; }
+  .page-main { padding: 20px 16px 40px; }
+}
