@@ -120,18 +120,12 @@ def main():
     print(f"  Total     : {len(oases):,} oases")
     print("=" * 55)
 
-    # Cek apakah sudah pernah diimport
+    # Cek progress import sejauh ini
     result   = turso_execute([turso_stmt("SELECT COUNT(*) as cnt FROM oases WHERE server = ?", [server])])
     rows     = result.get("results", [{}])[0].get("response", {}).get("result", {}).get("rows", [])
     existing = int(rows[0][0]["value"]) if rows else 0
     if existing > 0:
-        print(f"⚠️  Sudah ada {existing:,} oases untuk server '{server}' di DB.")
-        confirm = input("Lanjut dan overwrite? (y/N): ").strip().lower()
-        if confirm != "y":
-            print("❌ Dibatalkan.")
-            sys.exit(0)
-        print("🗑️  Menghapus data lama...")
-        turso_execute([turso_stmt("DELETE FROM oases WHERE server = ?", [server])])
+        print(f"\n📊 Sudah ada {existing:,} oases di DB — melanjutkan import...")
 
     print(f"\n📤 Insert {len(oases):,} oases ke Turso...")
     stmts = [
