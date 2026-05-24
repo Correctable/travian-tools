@@ -1,0 +1,46 @@
+name: Travian Map Import
+
+on:
+  # Jalan otomatis setiap hari jam 06:00 WIB (23:00 UTC)
+  # Map.sql biasanya diperbarui server sekitar tengah malam
+  schedule:
+    - cron: "0 23 * * *"
+
+  # Bisa juga dijalankan manual dari tab Actions di GitHub
+  workflow_dispatch:
+
+jobs:
+  import:
+    name: Download & Import map.sql
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # 1. Checkout repo supaya bisa akses scripts/
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Python
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # 3. Tidak ada dependensi eksternal — script pakai stdlib saja (urllib, csv, re, json)
+
+      # 4. Jalankan import script
+      - name: Run import script
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN:   ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          python scripts/import_map.py
+
+      # 5. Tampilkan ringkasan di log Actions (opsional, memudahkan debugging)
+      - name: Done
+        if: success()
+        run: echo "✅ Import berhasil!"
+
+      - name: Failed
+        if: failure()
+        run: echo "❌ Import gagal — cek log di atas"
