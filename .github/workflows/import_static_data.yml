@@ -1,0 +1,53 @@
+name: Import Static Data (Oases & Village Tiles)
+
+on:
+  # Hanya manual — dijalankan sekali saat server baru
+  workflow_dispatch:
+    inputs:
+      oases_url:
+        description: "URL raw GitHub oases.json (kosongkan kalau skip)"
+        required: false
+        default: ""
+      villages_url:
+        description: "URL raw GitHub villages.json (kosongkan kalau skip)"
+        required: false
+        default: ""
+
+jobs:
+  import:
+    name: Import Oases & Village Tiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Import Oases
+        if: ${{ inputs.oases_url != '' }}
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN:   ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          python scripts/import_oases.py "${{ inputs.oases_url }}"
+
+      - name: Import Village Tiles
+        if: ${{ inputs.villages_url != '' }}
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_AUTH_TOKEN:   ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          python scripts/import_village_tiles.py "${{ inputs.villages_url }}"
+
+      - name: Done
+        if: success()
+        run: echo "✅ Import selesai!"
+
+      - name: Failed
+        if: failure()
+        run: echo "❌ Import gagal — cek log di atas"
