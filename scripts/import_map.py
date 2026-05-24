@@ -90,9 +90,9 @@ def turso_stmt(sql: str, params: list = None) -> dict:
             if v is None:
                 args.append({"type": "null", "value": None})
             elif isinstance(v, bool):
-                args.append({"type": "integer", "value": 1 if v else 0})
+                args.append({"type": "integer", "value": str(1 if v else 0)})
             elif isinstance(v, int):
-                args.append({"type": "integer", "value": v})
+                args.append({"type": "integer", "value": str(v)})
             else:
                 args.append({"type": "text", "value": str(v)})
         stmt["args"] = args
