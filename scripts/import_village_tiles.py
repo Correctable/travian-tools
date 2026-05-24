@@ -25,7 +25,7 @@ SERVER_CODE = os.environ.get("SERVER_CODE", "")
 
 # ── Turso HTTP API ─────────────────────────────────────────────────────────────
 
-def turso_execute(statements):
+def turso_execute(statements, timeout=120):
     if not TURSO_URL or not TURSO_TOKEN:
         raise RuntimeError("TURSO_DATABASE_URL atau TURSO_AUTH_TOKEN belum di-set!")
     api_url = TURSO_URL.replace("libsql://", "https://") + "/v2/pipeline"
@@ -40,7 +40,7 @@ def turso_execute(statements):
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
             return json.loads(resp.read().decode("utf-8"))
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="replace")
@@ -64,14 +64,14 @@ def turso_stmt(sql, params=None):
     return stmt
 
 
-def turso_batch(stmts, batch_size=100):
+def turso_batch(stmts, batch_size=500):
     total  = len(stmts)
     sent   = 0
     errors = 0
     for i in range(0, total, batch_size):
         chunk = stmts[i : i + batch_size]
         try:
-            result = turso_execute(chunk)
+            result = turso_execute(chunk, timeout=120)
             for r in result.get("results", []):
                 if r.get("type") == "error":
                     print(f"  ⚠️  Turso row error: {r.get('error', {}).get('message', '?')}")
@@ -93,7 +93,7 @@ def load_json(source):
             source = source.replace("github.com", "raw.githubusercontent.com").replace("/blob/", "/")
         print(f"🌐 Fetch dari URL: {source}")
         req = urllib.request.Request(source, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=60) as resp:
+        with urllib.request.urlopen(req, timeout=120) as resp:
             return json.loads(resp.read().decode("utf-8"))
     else:
         print(f"📖 Membaca file: {source}")
@@ -133,18 +133,14 @@ def main():
     existing = int(rows[0][0]["value"]) if rows else 0
     if existing > 0:
         print(f"\n⚠️  Sudah ada {existing:,} tiles untuk server '{server}' di DB.")
-        confirm = input("Lanjut dan overwrite? (y/N): ").strip().lower()
-        if confirm != "y":
-            print("❌ Dibatalkan.")
-            sys.exit(0)
         print("🗑️  Menghapus data lama...")
         turso_execute([turso_stmt("DELETE FROM village_tiles WHERE server = ?", [server])])
 
     known   = sum(1 for v in villages if v.get("fieldType"))
     unknown = len(villages) - known
-    print(f"\n  Known field type          : {known:,}")
+    print(f"\n  Known field type           : {known:,}")
     print(f"  Unknown (occupied at fetch): {unknown:,}")
-    print(f"\n📤 Insert {len(villages):,} tiles ke Turso...")
+    print(f"\n📤 Insert {len(villages):,} tiles ke Turso (batch 500)...")
 
     stmts = [
         turso_stmt(
@@ -162,7 +158,7 @@ def main():
         )
         for v in villages
     ]
-    errors = turso_batch(stmts, batch_size=150)
+    errors = turso_batch(stmts, batch_size=500)
 
     print("=" * 55)
     print(f"  {'✅ Import selesai!' if not errors else '⚠️  Selesai dengan error'}")
