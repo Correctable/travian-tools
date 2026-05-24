@@ -127,14 +127,12 @@ def main():
             bar = "█" * (count * 20 // max_count)
             print(f"  {label:10s} {bar:20s} {count:,}")
 
-    # Cek apakah sudah pernah diimport
+    # Cek progress import sejauh ini
     result   = turso_execute([turso_stmt("SELECT COUNT(*) as cnt FROM village_tiles WHERE server = ?", [server])])
     rows     = result.get("results", [{}])[0].get("response", {}).get("result", {}).get("rows", [])
     existing = int(rows[0][0]["value"]) if rows else 0
     if existing > 0:
-        print(f"\n⚠️  Sudah ada {existing:,} tiles untuk server '{server}' di DB.")
-        print("🗑️  Menghapus data lama...")
-        turso_execute([turso_stmt("DELETE FROM village_tiles WHERE server = ?", [server])])
+        print(f"\n📊 Sudah ada {existing:,} tiles di DB — melanjutkan import...")
 
     known   = sum(1 for v in villages if v.get("fieldType"))
     unknown = len(villages) - known
