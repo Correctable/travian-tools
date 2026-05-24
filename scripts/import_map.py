@@ -43,14 +43,16 @@ TRIBE_NAMES  = {
 
 def turso_execute(statements: list[dict]) -> dict:
     """
-    Kirim batch statements ke Turso via HTTP API.
-    statements = list of {"q": "SQL...", "params": [...]} atau {"q": "SQL..."}
+    Kirim batch statements ke Turso via HTTP API (v2 pipeline).
+    statements = list of dict hasil turso_stmt()
     """
     if not TURSO_URL or not TURSO_TOKEN:
         raise RuntimeError("TURSO_DATABASE_URL atau TURSO_AUTH_TOKEN belum di-set!")
 
+    # Turso API endpoint: ganti libsql:// → https://
     api_url = TURSO_URL.replace("libsql://", "https://") + "/v2/pipeline"
 
+    # Format resmi Turso v2 pipeline
     payload = {
         "requests": [
             {"type": "execute", "stmt": stmt} for stmt in statements
@@ -68,20 +70,32 @@ def turso_execute(statements: list[dict]) -> dict:
         method = "POST",
     )
 
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Turso HTTP {e.code}: {body[:300]}") from e
 
 
 def turso_stmt(sql: str, params: list = None) -> dict:
-    """Helper: buat statement dict untuk turso_execute."""
+    """
+    Buat statement dict sesuai format Turso v2.
+    Format args: [{"type": "text"|"integer"|"null", "value": ...}]
+    """
     stmt = {"sql": sql}
     if params:
-        stmt["args"] = [
-            {"type": "text",    "value": str(v)}  if isinstance(v, str)
-            else {"type": "integer", "value": v}  if isinstance(v, int)
-            else {"type": "null",    "value": None}
-            for v in params
-        ]
+        args = []
+        for v in params:
+            if v is None:
+                args.append({"type": "null", "value": None})
+            elif isinstance(v, bool):
+                args.append({"type": "integer", "value": 1 if v else 0})
+            elif isinstance(v, int):
+                args.append({"type": "integer", "value": v})
+            else:
+                args.append({"type": "text", "value": str(v)})
+        stmt["args"] = args
     return stmt
 
 
@@ -97,11 +111,14 @@ def turso_batch(stmts: list[dict], batch_size: int = 100):
             # Cek error di response
             for r in result.get("results", []):
                 if r.get("type") == "error":
-                    print(f"  ⚠️  Turso error: {r.get('error', {}).get('message', '?')}")
+                    msg = r.get("error", {}).get("message", "?")
+                    print(f"  ⚠️  Turso row error: {msg}")
                     errors += 1
-        except Exception as e:
+        except RuntimeError as e:
             print(f"  ❌ Batch error (chunk {i}–{i+batch_size}): {e}")
             errors += 1
+            # Hentikan jika error fatal (bukan row error)
+            break
         sent += len(chunk)
         pct   = sent * 100 // total
         print(f"  [{pct:3d}%] {sent}/{total} statements dikirim...", end="\r")
@@ -227,14 +244,21 @@ def aggregate(rows: list[dict], snap_date: str) -> tuple[dict, dict]:
 
 def check_already_imported(snap_date: str) -> bool:
     """Cek apakah snapshot hari ini sudah ada (anti-duplikat)."""
-    result = turso_execute([
-        turso_stmt(
-            "SELECT id FROM snapshots WHERE server = ? AND snap_date = ? LIMIT 1",
-            [SERVER_CODE, snap_date]
-        )
-    ])
-    rows = result["results"][0].get("response", {}).get("result", {}).get("rows", [])
-    return len(rows) > 0
+    try:
+        result = turso_execute([
+            turso_stmt(
+                "SELECT id FROM snapshots WHERE server = ? AND snap_date = ? LIMIT 1",
+                [SERVER_CODE, snap_date]
+            )
+        ])
+        rows = (result.get("results", [{}])[0]
+                      .get("response", {})
+                      .get("result", {})
+                      .get("rows", []))
+        return len(rows) > 0
+    except RuntimeError as e:
+        print(f"❌ Gagal koneksi ke Turso: {e}")
+        raise
 
 
 def push_to_turso(rows: list[dict], players: dict, alliances: dict, snap_date: str):
