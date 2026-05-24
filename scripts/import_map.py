@@ -363,10 +363,207 @@ def push_to_turso(rows: list[dict], players: dict, alliances: dict, snap_date: s
     print(f"   {'✅' if not errors else '⚠️ '} History selesai ({errors} error)")
 
 
+# ── Event Detection ────────────────────────────────────────────────────────────
+
+def fetch_current_villages() -> dict:
+    """Ambil desa dari tabel current (sebelum di-overwrite). Keyed by village_id."""
+    result = turso_execute([turso_stmt(
+        """SELECT village_id, village_name, x, y, player_id, player_name,
+                  alliance_id, alliance_tag, population, tribe
+           FROM villages WHERE server = ?""",
+        [SERVER_CODE]
+    )])
+    rows = (result.get("results", [{}])[0]
+                  .get("response", {}).get("result", {}).get("rows", []))
+    cols = (result.get("results", [{}])[0]
+                  .get("response", {}).get("result", {}).get("cols", []))
+    col_names = [c["name"] for c in cols]
+    out = {}
+    for row in rows:
+        obj = {col_names[i]: row[i]["value"] for i in range(len(col_names))}
+        out[int(obj["village_id"])] = obj
+    return out
+
+
+def fetch_current_players() -> dict:
+    """Ambil player dari tabel current (sebelum di-overwrite). Keyed by player_id."""
+    result = turso_execute([turso_stmt(
+        """SELECT player_id, player_name, tribe, alliance_id, alliance_tag,
+                  population, village_count
+           FROM players WHERE server = ?""",
+        [SERVER_CODE]
+    )])
+    rows = (result.get("results", [{}])[0]
+                  .get("response", {}).get("result", {}).get("rows", []))
+    cols = (result.get("results", [{}])[0]
+                  .get("response", {}).get("result", {}).get("cols", []))
+    col_names = [c["name"] for c in cols]
+    out = {}
+    for row in rows:
+        obj = {col_names[i]: row[i]["value"] for i in range(len(col_names))}
+        out[int(obj["player_id"])] = obj
+    return out
+
+
+def detect_village_events(today_rows: list, yesterday_villages: dict, snap_date: str) -> list:
+    events = []
+    today_by_id = {r["village_id"]: r for r in today_rows}
+
+    # Cek desa yang ada kemarin
+    for vid, prev in yesterday_villages.items():
+        curr = today_by_id.get(vid)
+        prev_pid = int(prev["player_id"]) if prev["player_id"] else 0
+
+        if curr is None:
+            # Desa hilang → destroyed
+            if prev_pid != 0:  # skip kalau kemarin sudah Natarian
+                events.append({
+                    "event_type":       "destroyed",
+                    "village_id":       vid,
+                    "village_name":     prev["village_name"],
+                    "x":                int(prev["x"]),
+                    "y":                int(prev["y"]),
+                    "population":       int(prev["population"]) if prev["population"] else 0,
+                    "old_player_id":    prev_pid,
+                    "old_player_name":  prev["player_name"],
+                    "old_alliance_id":  int(prev["alliance_id"]) if prev["alliance_id"] and int(prev["alliance_id"]) != 0 else None,
+                    "old_alliance_tag": prev["alliance_tag"] or None,
+                    "new_player_id":    None, "new_player_name":  None,
+                    "new_alliance_id":  None, "new_alliance_tag": None,
+                })
+        else:
+            curr_pid = curr["player_id"]
+            # Pemilik berubah → conquered / natared
+            if prev_pid != curr_pid and prev_pid != 0:
+                event_type = "natared" if curr_pid == 0 else "conquered"
+                events.append({
+                    "event_type":       event_type,
+                    "village_id":       vid,
+                    "village_name":     curr["village_name"],
+                    "x":                curr["x"],
+                    "y":                curr["y"],
+                    "population":       curr["population"],
+                    "old_player_id":    prev_pid,
+                    "old_player_name":  prev["player_name"],
+                    "old_alliance_id":  int(prev["alliance_id"]) if prev["alliance_id"] and int(prev["alliance_id"]) != 0 else None,
+                    "old_alliance_tag": prev["alliance_tag"] or None,
+                    "new_player_id":    curr_pid if curr_pid != 0 else None,
+                    "new_player_name":  curr["player_name"] if curr_pid != 0 else None,
+                    "new_alliance_id":  curr["alliance_id"] if curr["alliance_id"] != 0 else None,
+                    "new_alliance_tag": curr["alliance_tag"] or None,
+                })
+
+    # Desa baru → settled
+    for vid, curr in today_by_id.items():
+        if vid not in yesterday_villages and curr["player_id"] != 0:
+            events.append({
+                "event_type":       "settled",
+                "village_id":       vid,
+                "village_name":     curr["village_name"],
+                "x":                curr["x"],
+                "y":                curr["y"],
+                "population":       curr["population"],
+                "old_player_id":    None, "old_player_name":  None,
+                "old_alliance_id":  None, "old_alliance_tag": None,
+                "new_player_id":    curr["player_id"],
+                "new_player_name":  curr["player_name"],
+                "new_alliance_id":  curr["alliance_id"] if curr["alliance_id"] != 0 else None,
+                "new_alliance_tag": curr["alliance_tag"] or None,
+            })
+
+    return events
+
+
+def detect_alliance_events(today_players: dict, yesterday_players: dict, snap_date: str) -> list:
+    events = []
+
+    for pid, prev in yesterday_players.items():
+        curr = today_players.get(pid)
+        prev_aid  = int(prev["alliance_id"]) if prev["alliance_id"] else 0
+        prev_atag = prev["alliance_tag"] or ""
+
+        if curr is None:
+            # Player hilang → deleted
+            events.append({
+                "event_type":       "deleted",
+                "player_id":        pid,
+                "player_name":      prev["player_name"],
+                "tribe":            int(prev["tribe"]) if prev["tribe"] else 0,
+                "old_alliance_id":  prev_aid if prev_aid != 0 else None,
+                "old_alliance_tag": prev_atag or None,
+                "new_alliance_id":  None, "new_alliance_tag": None,
+                "population":       int(prev["population"]) if prev["population"] else 0,
+                "village_count":    int(prev["village_count"]) if prev["village_count"] else 0,
+            })
+            continue
+
+        curr_aid  = int(curr["alliance_id"]) if curr["alliance_id"] else 0
+        curr_atag = curr["alliance_tag"] or ""
+
+        if prev_aid == curr_aid:
+            continue  # tidak ada perubahan
+
+        if prev_aid == 0:
+            event_type = "joined"
+        elif curr_aid == 0:
+            event_type = "left"
+        else:
+            event_type = "switched"
+
+        events.append({
+            "event_type":       event_type,
+            "player_id":        pid,
+            "player_name":      curr["player_name"],
+            "tribe":            int(curr["tribe"]) if curr["tribe"] else 0,
+            "old_alliance_id":  prev_aid if prev_aid != 0 else None,
+            "old_alliance_tag": prev_atag or None,
+            "new_alliance_id":  curr_aid if curr_aid != 0 else None,
+            "new_alliance_tag": curr_atag or None,
+            "population":       int(curr["population"]) if curr["population"] else 0,
+            "village_count":    int(curr["village_count"]) if curr["village_count"] else 0,
+        })
+
+    return events
+
+
+def push_events(village_events: list, alliance_events: list, snap_date: str):
+    stmts = []
+    for e in village_events:
+        stmts.append(turso_stmt(
+            """INSERT OR IGNORE INTO village_events
+               (server, event_date, event_type, village_id, village_name, x, y, population,
+                old_player_id, old_player_name, old_alliance_id, old_alliance_tag,
+                new_player_id, new_player_name, new_alliance_id, new_alliance_tag)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+            [SERVER_CODE, snap_date, e["event_type"],
+             e["village_id"], e["village_name"], e["x"], e["y"], e["population"],
+             e["old_player_id"], e["old_player_name"], e["old_alliance_id"], e["old_alliance_tag"],
+             e["new_player_id"], e["new_player_name"], e["new_alliance_id"], e["new_alliance_tag"]]
+        ))
+    for e in alliance_events:
+        stmts.append(turso_stmt(
+            """INSERT OR IGNORE INTO alliance_events
+               (server, event_date, event_type, player_id, player_name, tribe,
+                old_alliance_id, old_alliance_tag, new_alliance_id, new_alliance_tag,
+                population, village_count)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?)""",
+            [SERVER_CODE, snap_date, e["event_type"],
+             e["player_id"], e["player_name"], e["tribe"],
+             e["old_alliance_id"], e["old_alliance_tag"],
+             e["new_alliance_id"], e["new_alliance_tag"],
+             e["population"], e["village_count"]]
+        ))
+    if stmts:
+        errors = turso_batch(stmts, batch_size=150)
+        print(f"   {'✅' if not errors else '⚠️ '} Events selesai ({errors} error)")
+    else:
+        print(f"   ℹ️  Tidak ada events hari ini")
+
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 def main():
-    snap_date = date.today().isoformat()  # 'YYYY-MM-DD'
+    snap_date = date.today().isoformat()
 
     print("=" * 55)
     print(f"  Travian Map Importer")
@@ -374,16 +571,41 @@ def main():
     print(f"  Tanggal: {snap_date}")
     print("=" * 55)
 
-    # Anti-duplikat: skip jika sudah diimport hari ini
     if check_already_imported(snap_date):
         print(f"⏭️  Snapshot {snap_date} sudah ada di database. Skip.")
         sys.exit(0)
 
+    # Ambil data SEBELUM overwrite — untuk deteksi events
+    print("\n🔍 Ambil data kemarin untuk deteksi events...")
+    yesterday_villages = fetch_current_villages()
+    yesterday_players  = fetch_current_players()
+    print(f"   Kemarin: {len(yesterday_villages):,} desa, {len(yesterday_players):,} players")
+
     # Pipeline utama
-    content          = download_map_sql()
-    rows             = parse_map_sql(content)
+    content = download_map_sql()
+    rows    = parse_map_sql(content)
     players, alliances = aggregate(rows, snap_date)
     push_to_turso(rows, players, alliances, snap_date)
+
+    # Deteksi events (hanya jika ada data kemarin)
+    if yesterday_villages and yesterday_players:
+        print("\n🔎 Deteksi events...")
+        village_evts  = detect_village_events(rows, yesterday_villages, snap_date)
+        alliance_evts = detect_alliance_events(players, yesterday_players, snap_date)
+
+        conquered = sum(1 for e in village_evts if e["event_type"] == "conquered")
+        destroyed = sum(1 for e in village_evts if e["event_type"] == "destroyed")
+        settled   = sum(1 for e in village_evts if e["event_type"] == "settled")
+        switched  = sum(1 for e in alliance_evts if e["event_type"] == "switched")
+        joined    = sum(1 for e in alliance_evts if e["event_type"] == "joined")
+        left      = sum(1 for e in alliance_evts if e["event_type"] == "left")
+        deleted   = sum(1 for e in alliance_evts if e["event_type"] == "deleted")
+
+        print(f"   Village  : {conquered} conquered, {destroyed} destroyed, {settled} settled")
+        print(f"   Alliance : {switched} switched, {joined} joined, {left} left, {deleted} deleted")
+        push_events(village_evts, alliance_evts, snap_date)
+    else:
+        print("\nℹ️  Tidak ada data kemarin — events dilewati (hari pertama import)")
 
     print("\n" + "=" * 55)
     print(f"  ✅ Import selesai!")

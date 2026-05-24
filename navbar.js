@@ -81,11 +81,11 @@
         label: "Statistics",
         dropdown: [
           {
-            icon: "🔭",
-            title: "Player Tracker",
+            icon: "📈",
+            title: "Server Statistics",
             desc: "Track player activity & growth",
-            badge: "SOON",
-            href: "#",
+            badge: "FREE",
+            href: "/statistics/",
           },
           {
             icon: "🏰",

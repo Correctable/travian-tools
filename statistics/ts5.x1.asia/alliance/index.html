@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alliance Profile — Travian Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Navbar di-handle oleh navbar.js */
+:root {
+  --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
+  --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);
+  --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
+  --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+  --green:#059669;--green-bg:rgba(5,150,105,0.08);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+  --red:#dc2626;--red-bg:rgba(220,38,38,0.08);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);min-height:100vh;}
+.bg-dot{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(37,99,235,0.07) 1px,transparent 1px);background-size:32px 32px;}
+.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(37,99,235,0.06) 0%,transparent 70%);}
+.page-wrap{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:32px 24px 80px;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text3);margin-bottom:20px;flex-wrap:wrap;}
+.breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s;}
+.breadcrumb a:hover{color:var(--blue2);}
+.breadcrumb span{color:var(--text2);font-weight:500;}
+.profile-header{background:white;border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+.profile-avatar{width:64px;height:64px;border-radius:16px;background:var(--blue-glow);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.75rem;flex-shrink:0;}
+.profile-info{flex:1;min-width:200px;}
+.profile-name{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--navy);letter-spacing:-0.02em;}
+.profile-meta{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap;}
+.meta-tag{font-size:0.775rem;font-weight:600;padding:3px 9px;border-radius:6px;background:var(--surface2);color:var(--text2);border:1px solid var(--border);}
+.profile-stats{display:flex;gap:32px;flex-wrap:wrap;margin-left:auto;}
+.ps-item{text-align:right;}
+.ps-item .psl{font-size:0.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+.ps-item .psv{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:var(--navy);}
+.psd{font-size:0.75rem;margin-top:1px;}
+.psd.up{color:var(--green);}
+.psd.dn{color:var(--red);}
+.psd.na{color:var(--text3);}
+.main-grid{display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start;}
+@media(max-width:860px){.main-grid{grid-template-columns:1fr;}}
+.card{background:white;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;}
+.card-title{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.card-title .ct-sub{font-size:0.75rem;font-weight:400;color:var(--text3);}
+.chart-wrap{position:relative;height:200px;width:100%;}
+.chart-tabs{display:flex;gap:4px;margin-bottom:14px;}
+.ct-btn{font-family:'DM Sans',sans-serif;font-size:0.775rem;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text3);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.ct-btn.active{background:var(--blue2);color:white;border-color:var(--blue2);}
+.ct-btn:not(.active):hover{background:var(--surface2);color:var(--text2);}
+.chart-empty{height:180px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:0.875rem;background:var(--surface2);border-radius:10px;}
+.data-table{width:100%;border-collapse:collapse;font-size:0.825rem;}
+.data-table thead th{background:var(--surface2);padding:8px 12px;font-size:0.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;text-align:left;border-bottom:1px solid var(--border);}
+.data-table thead th.r{text-align:right;}
+.data-table tbody tr{border-bottom:1px solid var(--border);transition:background 0.13s;}
+.data-table tbody tr:last-child{border-bottom:none;}
+.data-table tbody tr:hover{background:var(--surface2);}
+.data-table td{padding:8px 12px;vertical-align:middle;}
+.data-table td.r{text-align:right;}
+.rank{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--text3);font-size:0.75rem;}
+.rank.gold{color:#b7791f;}
+.rank.silver{color:#718096;}
+.rank.bronze{color:#c05621;}
+.pop-val{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--navy);}
+.growth{font-size:0.72rem;font-weight:600;}
+.growth.up{color:var(--green);}
+.growth.dn{color:var(--red);}
+.growth.na{color:var(--text3);}
+.tribe-bars{display:flex;flex-direction:column;gap:8px;}
+.tribe-row{display:flex;align-items:center;gap:8px;}
+.tribe-row .tl{font-size:0.775rem;color:var(--text2);width:72px;}
+.tribe-row .tbar-wrap{flex:1;background:var(--surface2);border-radius:100px;height:6px;overflow:hidden;}
+.tribe-row .tbar{height:100%;border-radius:100px;background:var(--blue2);transition:width 0.6s ease;}
+.tribe-row .tpct{font-size:0.72rem;font-weight:600;color:var(--text3);min-width:36px;text-align:right;}
+
+/* Event badges */
+.ev-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:100px;white-space:nowrap;}
+.ev-joined{background:var(--green-bg);color:var(--green);}
+.ev-left{background:var(--amber-bg);color:var(--amber);}
+.ev-switched{background:var(--blue-glow);color:var(--blue2);}
+.ev-deleted{background:rgba(113,128,150,0.1);color:#4a5568;}
+.ev-conquered{background:var(--red-bg);color:var(--red);}
+.ev-settled{background:var(--green-bg);color:var(--green);}
+
+/* Member changes timeline */
+.changes-list{display:flex;flex-direction:column;gap:0;}
+.change-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:0.8rem;align-items:flex-start;}
+.change-item:last-child{border-bottom:none;}
+.ci-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.ci-dot.joined{background:var(--green);}
+.ci-dot.left{background:var(--amber);}
+.ci-dot.switched{background:var(--blue2);}
+.ci-dot.deleted{background:#718096;}
+.ci-body{flex:1;}
+.ci-date{font-size:0.72rem;color:var(--text3);}
+.ci-name a{color:var(--blue2);text-decoration:none;font-weight:600;}
+.ci-name a:hover{text-decoration:underline;}
+.ci-detail{font-size:0.72rem;color:var(--text3);margin-top:1px;}
+.ci-detail a{color:var(--text2);text-decoration:none;}
+.ci-pop{font-size:0.72rem;color:var(--text3);white-space:nowrap;margin-left:auto;padding-left:8px;}
+
+.sidebar-card{background:white;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.sc-title{font-size:0.8rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px;}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);}
+.info-row:last-child{border-bottom:none;}
+.ir-label{font-size:0.8rem;color:var(--text2);}
+.ir-value{font-size:0.8rem;font-weight:600;color:var(--navy);}
+.hist-table{width:100%;font-size:0.775rem;border-collapse:collapse;}
+.hist-table tr{border-bottom:1px solid var(--border);}
+.hist-table tr:last-child{border-bottom:none;}
+.hist-table td{padding:6px 4px;color:var(--text2);}
+.hist-table td:last-child{text-align:right;font-weight:600;}
+.empty-state{padding:12px 0;color:var(--text3);font-size:0.825rem;text-align:center;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;}
+.not-found{text-align:center;padding:80px 24px;color:var(--text3);}
+.not-found h2{font-family:'Space Grotesk',sans-serif;font-size:1.25rem;color:var(--text2);margin-bottom:8px;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg-dot"></div>
+<div class="bg-glow"></div>
+<div id="navbar-root"></div>
+<div class="page-wrap">
+  <div class="breadcrumb">
+    <a href="/statistics">Statistics</a><span>›</span>
+    <a href="/statistics/ts5.x1.asia/">ts5.x1.asia</a><span>›</span>
+    <span id="bcName">Alliance</span>
+  </div>
+  <div id="content">
+    <div style="text-align:center;padding:80px 0;color:var(--text3);">
+      <span class="spinner"></span> Loading alliance data...
+    </div>
+  </div>
+</div>
+<script>
+const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
+const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
+const SERVER      = 'ts5';
+const SERVER_SLUG = 'ts5.x1.asia';
+const TRIBE_NAME  = {1:'Roman',2:'Teuton',3:'Gaul',4:'Nature',5:'Natar',6:'Egyptian',7:'Hun'};
+const TRIBE_ICON = {1:'<img src="/images/travian/roman_medium.png" alt="Roman">',2:'<img src="/images/travian/teuton_medium.png" alt="Teuton">',3:'<img src="/images/travian/gaul_medium.png" alt="Gaul">',4:'<img src="/images/travian/nature_medium.png" alt="Nature">',5:'<img src="/images/travian/natar_medium.png" alt="Natar">',6:'<img src="/images/travian/egyptian_medium.png" alt="Egyptian">',7:'<img src="/images/travian/hun_medium.png" alt="Hun">'};
+const TRIBE_COLOR = {1:'#1d4ed8',2:'#dc2626',3:'#059669',4:'#7c3aed',5:'#d97706',6:'#0891b2',7:'#b45309'};
+const params     = new URLSearchParams(location.search);
+const allianceId = params.get('id');
+let chartInstance=null, historyData=[];
+
+async function query(sql,args=[]) {
+  try {
+    const res=await fetch(`${TURSO_URL}/v2/pipeline`,{
+      method:'POST',
+      headers:{'Authorization':`Bearer ${TURSO_TOKEN}`,'Content-Type':'application/json'},
+      body:JSON.stringify({requests:[
+        {type:'execute',stmt:{sql,args:args.map(v=>
+          v===null?{type:'null',value:null}
+          :typeof v==='number'?{type:'integer',value:String(v)}
+          :{type:'text',value:String(v)}
+        )}},
+        {type:'close'}
+      ]})
+    });
+    const data=await res.json();
+    const result=data.results?.[0]?.response?.result;
+    if(!result)return[];
+    const cols=result.cols.map(c=>c.name);
+    return result.rows.map(row=>{const o={};row.forEach((c,i)=>o[cols[i]]=c.value);return o;});
+  } catch(e){console.error('Query error:',sql,e);return[];}
+}
+
+const fmt=n=>n!=null?Number(n).toLocaleString():'—';
+const rankCls=r=>r===1?'rank gold':r===2?'rank silver':r===3?'rank bronze':'rank';
+
+async function init() {
+  if(!allianceId){showNotFound();return;}
+  const [allianceRows,memberRows,histRows,memberChanges,villageEvents] = await Promise.all([
+    query(`SELECT * FROM alliances WHERE alliance_id=? AND server=?`,[allianceId,SERVER]),
+    query(`SELECT p.player_id,p.player_name,p.tribe,p.population,p.village_count,
+                  ph.population AS pop_prev
+           FROM players p
+           LEFT JOIN player_history ph ON ph.player_id=p.player_id AND ph.server=p.server
+             AND ph.snap_date=DATE(p.snap_date,'-1 days')
+           WHERE p.alliance_id=? AND p.server=?
+           ORDER BY p.population DESC`,[allianceId,SERVER]),
+    query(`SELECT snap_date,population,member_count,village_count FROM alliance_history
+           WHERE alliance_id=? AND server=? ORDER BY snap_date ASC`,[allianceId,SERVER]),
+    // Member changes: semua player yang pernah join/left/switch dari/ke alliance ini
+    query(`SELECT * FROM alliance_events
+           WHERE (old_alliance_id=? OR new_alliance_id=?) AND server=?
+           ORDER BY event_date DESC LIMIT 50`,[allianceId,allianceId,SERVER]),
+    // Village events terkait alliance ini
+    query(`SELECT * FROM village_events
+           WHERE (old_alliance_id=? OR new_alliance_id=?) AND server=?
+           ORDER BY event_date DESC LIMIT 30`,[allianceId,allianceId,SERVER]),
+  ]);
+
+  if(!allianceRows.length){showNotFound();return;}
+  const a=allianceRows[0];
+  historyData=histRows;
+  document.title=`[${a.alliance_tag}] — Travian Tools`;
+  document.getElementById('bcName').textContent=`[${a.alliance_tag}]`;
+
+  const prev=histRows.length>=2?Number(histRows[histRows.length-2].population):null;
+  const growthDay=prev!=null?Number(a.population)-prev:null;
+
+  // Tribe breakdown dari members
+  const tribeCounts={};
+  memberRows.forEach(m=>{tribeCounts[m.tribe]=(tribeCounts[m.tribe]||0)+1;});
+  const totalM=memberRows.length;
+  const tribeBars=Object.entries(tribeCounts).sort((x,y)=>y[1]-x[1]).map(([t,c])=>{
+    const pct=Math.round(c*100/totalM);
+    return `<div class="tribe-row">
+      <span class="tl">${TRIBE_ICON[t]||''} ${TRIBE_NAME[t]||'?'}</span>
+      <div class="tbar-wrap"><div class="tbar" style="width:${pct}%;background:${TRIBE_COLOR[t]||'var(--blue2)'}"></div></div>
+      <span class="tpct">${c} (${pct}%)</span>
+    </div>`;
+  }).join('');
+
+  // Categorize member changes
+  const joined = memberChanges.filter(e=>e.event_type==='joined'||( e.event_type==='switched'&&String(e.new_alliance_id)===String(allianceId)));
+  const left   = memberChanges.filter(e=>e.event_type==='left'||(e.event_type==='switched'&&String(e.old_alliance_id)===String(allianceId)&&String(e.new_alliance_id)!==String(allianceId)));
+
+  document.getElementById('content').innerHTML=`
+    <div class="profile-header" style="animation:fadeDown 0.4s ease both">
+      <div class="profile-avatar">🛡️</div>
+      <div class="profile-info">
+        <div class="profile-name">[${a.alliance_tag}]</div>
+        <div class="profile-meta">
+          <span class="meta-tag">ts5.x1.asia.travian.com</span>
+          <span class="meta-tag">${a.member_count} members</span>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="ps-item">
+          <div class="psl">Population</div>
+          <div class="psv">${fmt(a.population)}</div>
+          <span class="psd ${growthDay==null?'na':growthDay>0?'up':'dn'}">
+            ${growthDay==null?'—':(growthDay>0?'+':'')+fmt(growthDay)}
+          </span>
+        </div>
+        <div class="ps-item">
+          <div class="psl">Villages</div>
+          <div class="psv">${a.village_count}</div>
+          <span class="psd na">total</span>
+        </div>
+        <div class="ps-item">
+          <div class="psl">Pop/Member</div>
+          <div class="psv">${fmt(Math.round(Number(a.population)/Math.max(1,Number(a.member_count))))}</div>
+          <span class="psd na">average</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div>
+        <!-- Chart -->
+        <div class="card" style="animation:fadeUp 0.4s 0.05s ease both">
+          <div class="card-title">📈 Population History <span class="ct-sub" id="chartRange"></span></div>
+          <div class="chart-tabs">
+            <button class="ct-btn active" onclick="renderChart(7,this)">7d</button>
+            <button class="ct-btn" onclick="renderChart(14,this)">14d</button>
+            <button class="ct-btn" onclick="renderChart(30,this)">30d</button>
+            <button class="ct-btn" onclick="renderChart(0,this)">All</button>
+          </div>
+          <div class="chart-wrap">
+            ${histRows.length<2?'<div class="chart-empty">Not enough data yet — check back tomorrow</div>':'<canvas id="popChart"></canvas>'}
+          </div>
+        </div>
+
+        <!-- Members -->
+        <div class="card" style="animation:fadeUp 0.4s 0.1s ease both">
+          <div class="card-title">👥 Members <span class="ct-sub">${memberRows.length} active</span></div>
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Player</th><th class="r">Vil</th><th class="r">Population</th></tr></thead>
+            <tbody>
+              ${memberRows.map((m,i)=>{
+                const r=i+1;
+                const growth=m.pop_prev?Number(m.population)-Number(m.pop_prev):null;
+                return `<tr onclick="window.location='/statistics/${SERVER_SLUG}/player/?id=${m.player_id}'">
+                  <td class="${rankCls(r)}">${r}</td>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:6px">
+                    <span>${TRIBE_ICON[m.tribe]||'?'}</span><span style="font-weight:600;margin-left:5px">${m.player_name}</span></div>
+                  </td>
+                  <td class="r" style="color:var(--text2)">${m.village_count}</td>
+                  <td class="r">
+                    <div class="pop-val">${fmt(m.population)}</div>
+                    ${growth!=null?`<div class="growth ${growth>0?'up':growth<0?'dn':'na'}">${growth>0?'+':''}${fmt(growth)}</div>`:''}
+                  </td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Member changes -->
+        ${memberChanges.length?`
+        <div class="card" style="animation:fadeUp 0.4s 0.15s ease both">
+          <div class="card-title">🔄 Member Changes <span class="ct-sub">${memberChanges.length} events</span></div>
+          <div class="changes-list">
+            ${memberChanges.map(e=>{
+              let dotCls=e.event_type==='joined'?'joined':e.event_type==='left'?'left':e.event_type==='deleted'?'deleted':'switched';
+              // Untuk switched, tentukan arah dari perspektif alliance ini
+              if(e.event_type==='switched'){
+                dotCls=String(e.new_alliance_id)===String(allianceId)?'joined':'left';
+              }
+              let detail='';
+              if(e.event_type==='joined') detail=`Joined from no alliance`;
+              else if(e.event_type==='left') detail=`Left to no alliance`;
+              else if(e.event_type==='switched'){
+                if(String(e.new_alliance_id)===String(allianceId))
+                  detail=`Joined from <a href="/statistics/${SERVER_SLUG}/alliance/?id=${e.old_alliance_id}">[${e.old_alliance_tag}]</a>`;
+                else
+                  detail=`Left to <a href="/statistics/${SERVER_SLUG}/alliance/?id=${e.new_alliance_id}">[${e.new_alliance_tag}]</a>`;
+              }
+              else if(e.event_type==='deleted') detail=`Account deleted`;
+              return `<div class="change-item">
+                <div class="ci-dot ${dotCls}"></div>
+                <div class="ci-body">
+                  <div class="ci-date">${e.event_date}</div>
+                  <div class="ci-name"><a href="/statistics/${SERVER_SLUG}/player/?id=${e.player_id}">${e.player_name}</a></div>
+                  <div class="ci-detail">${detail}</div>
+                </div>
+                <div class="ci-pop">${fmt(e.population)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`:''}
+
+        <!-- Village events -->
+        ${villageEvents.length?`
+        <div class="card" style="animation:fadeUp 0.4s 0.2s ease both">
+          <div class="card-title">🏘️ Village Activity <span class="ct-sub">${villageEvents.length} events</span></div>
+          <table class="data-table">
+            <thead><tr><th>Date</th><th>Village</th><th>Event</th><th>Player</th><th class="r">Pop</th></tr></thead>
+            <tbody>
+              ${villageEvents.map(e=>{
+                const evLabels={conquered:'⚔️ Conquered',destroyed:'💥 Destroyed',settled:'🏘️ Settled',natared:'🌑 Natared'};
+                const isGain=String(e.new_alliance_id)===String(allianceId);
+                const playerInfo=isGain
+                  ?`<a href="/statistics/${SERVER_SLUG}/player/?id=${e.new_player_id}" style="color:var(--blue2);text-decoration:none">${e.new_player_name||'—'}</a>`
+                  :`<a href="/statistics/${SERVER_SLUG}/player/?id=${e.old_player_id}" style="color:var(--text2);text-decoration:none">${e.old_player_name||'—'}</a>`;
+                return `<tr>
+                  <td style="font-size:0.75rem;color:var(--text3);white-space:nowrap">${e.event_date}</td>
+                  <td style="font-weight:600;color:var(--navy)">${e.village_name}<br><span style="font-size:0.72rem;color:var(--text3)">(${e.x}|${e.y})</span></td>
+                  <td><span class="ev-badge ev-${e.event_type}">${evLabels[e.event_type]||e.event_type}</span><br>
+                    <span style="font-size:0.7rem;color:var(--text3)">${isGain?'gained':'lost'}</span></td>
+                  <td>${playerInfo}</td>
+                  <td class="r" style="color:var(--text2);font-size:0.8rem">${fmt(e.population)}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`:''}
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.08s ease both">
+          <div class="sc-title">Alliance Info</div>
+          <div class="info-row"><span class="ir-label">Tag</span><span class="ir-value">[${a.alliance_tag}]</span></div>
+          <div class="info-row"><span class="ir-label">Server</span><span class="ir-value">ts5.x1.asia</span></div>
+          <div class="info-row"><span class="ir-label">Members</span><span class="ir-value">${a.member_count}</span></div>
+          <div class="info-row"><span class="ir-label">Villages</span><span class="ir-value">${a.village_count}</span></div>
+          <div class="info-row"><span class="ir-label">Population</span><span class="ir-value">${fmt(a.population)}</span></div>
+          <div class="info-row"><span class="ir-label">Pop/Member</span><span class="ir-value">${fmt(Math.round(Number(a.population)/Math.max(1,Number(a.member_count))))}</span></div>
+          <div class="info-row"><span class="ir-label">Joined (tracked)</span><span class="ir-value" style="color:var(--green)">${joined.length}</span></div>
+          <div class="info-row"><span class="ir-label">Left (tracked)</span><span class="ir-value" style="color:var(--amber)">${left.length}</span></div>
+          <div class="info-row"><span class="ir-label">Last updated</span><span class="ir-value">${a.snap_date||'—'}</span></div>
+        </div>
+
+        <!-- Tribe breakdown -->
+        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.12s ease both">
+          <div class="sc-title">Tribe Composition</div>
+          <div class="tribe-bars">${tribeBars}</div>
+        </div>
+
+        <!-- Growth history -->
+        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.16s ease both">
+          <div class="sc-title">Daily Growth</div>
+          ${histRows.length<2?'<div class="empty-state">Not enough history yet</div>':`
+          <table class="hist-table"><tbody>
+            ${histRows.slice(-10).reverse().map((h,i,arr)=>{
+              const prev2=arr[i+1];
+              const d=prev2?Number(h.population)-Number(prev2.population):null;
+              return `<tr>
+                <td>${h.snap_date}</td>
+                <td style="text-align:right">${fmt(h.population)}</td>
+                <td style="text-align:right">${d!=null?`<span style="font-size:0.72rem;font-weight:600;color:${d>0?'var(--green)':d<0?'var(--red)':'var(--text3)'}">${d>0?'+':''}${fmt(d)}</span>`:'—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody></table>`}
+        </div>
+      </div>
+    </div>`;
+
+  if(histRows.length>=2){
+    loadChartJS().then(()=>renderChart(7,document.querySelector('.ct-btn.active')));
+  }
+}
+
+function showNotFound(){
+  document.getElementById('content').innerHTML=`
+    <div class="not-found"><h2>Alliance not found</h2>
+    <p>This alliance doesn't exist on ts5.x1.asia or may have been disbanded.</p>
+    <a href="/statistics/ts5.x1.asia/" style="color:var(--blue2);margin-top:16px;display:inline-block">← Back to rankings</a></div>`;
+}
+function loadChartJS(){
+  return new Promise(resolve=>{
+    if(window.Chart){resolve();return;}
+    const s=document.createElement('script');
+    s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload=resolve;document.head.appendChild(s);
+  });
+}
+function renderChart(days,btn){
+  if(btn){document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const data=days>0?historyData.slice(-days):historyData;
+  document.getElementById('chartRange').textContent=`${data.length} data points`;
+  const ctx=document.getElementById('popChart');
+  if(!ctx)return;
+  if(chartInstance)chartInstance.destroy();
+  chartInstance=new Chart(ctx,{
+    type:'line',
+    data:{labels:data.map(h=>h.snap_date.slice(5)),datasets:[{
+      data:data.map(h=>Number(h.population)),
+      borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.07)',
+      borderWidth:2,pointRadius:data.length<=14?4:2,pointBackgroundColor:'#2563eb',tension:0.3,fill:true
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11}}},
+              y:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11},callback:v=>v.toLocaleString()}}}}
+  });
+}
+init();
+</script>
+<script src="/navbar.js"></script>
+</body>
+</html>
