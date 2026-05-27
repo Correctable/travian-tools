@@ -1,0 +1,64 @@
+# =============================================================
+# TravianTools — Cloudflare Pages Redirects
+# travian.sonybukansoni.com
+# =============================================================
+# Urutan penting: rule lebih spesifik harus di atas rule umum.
+# Cloudflare Pages pakai rule pertama yang cocok (first-match).
+# =============================================================
+
+
+# -------------------------------------------------------------
+# 1. BATTLE REPORT — clean URL ke query param
+#    Menggantikan 404.html hack di GitHub Pages
+#    /r/ABC123  →  /r/?id=ABC123
+# -------------------------------------------------------------
+/r/:id    /r/?id=:id    302
+
+
+# -------------------------------------------------------------
+# 2. SERVER SELECTOR — redirect tool ke /s/ dengan hint
+#    Saat user klik menu server-based tapi belum pilih server
+#    /s/?redirect=statistics  →  /s/  (halaman pilih server)
+#    (ini sudah dihandle JS, tapi backup di sini kalau perlu)
+# -------------------------------------------------------------
+# /s/    /s/index.html    200   ← tidak perlu, sudah static
+
+
+# -------------------------------------------------------------
+# 3. TRAILING SLASH NORMALIZATION
+#    Cloudflare Pages sudah handle ini otomatis untuk folder/index.html
+#    Tapi kita eksplisitkan untuk path-path penting
+# -------------------------------------------------------------
+/login      /login/     301
+/register   /register/  301
+/s          /s/         301
+/tools      /tools/     301
+/simulators /simulators/ 301
+/reports    /reports/   301
+/account    /account/   301
+
+
+# -------------------------------------------------------------
+# 4. LEGACY / OLD URL PATTERNS → NEW
+#    Pola lama statistics/ts5.x1.asia/* sudah tidak dipakai
+#    Redirect ke struktur /s/ts5.x1.asia/* yang baru
+# -------------------------------------------------------------
+/statistics/ts5.x1.asia/*    /s/ts5.x1.asia/statistics/:splat    301
+/statistics/ts1.x1.asia/*    /s/ts1.x1.asia/statistics/:splat    301
+
+
+# -------------------------------------------------------------
+# 5. ACCOUNT SHORTCUTS
+#    /notes, /watchlist → ke /account/* yang benar
+# -------------------------------------------------------------
+/notes       /account/notes/       301
+/watchlist   /account/watchlist/   301
+/workspace   /account/workspace/   301
+
+
+# -------------------------------------------------------------
+# 6. SPA FALLBACK
+#    Untuk path yang tidak ada file statis-nya → 404 page
+#    (Cloudflare Pages otomatis serve 404.html kalau ada)
+# -------------------------------------------------------------
+# Tidak perlu rule khusus — CF Pages handle otomatis

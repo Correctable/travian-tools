@@ -1,0 +1,84 @@
+# =============================================================
+# TravianTools — Cloudflare Pages Headers
+# travian.sonybukansoni.com
+# =============================================================
+# Format: URL pattern, lalu header di bawahnya (indented)
+# =============================================================
+
+
+# -------------------------------------------------------------
+# GLOBAL — semua halaman
+# -------------------------------------------------------------
+/*
+  # Keamanan dasar
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+  # Paksa HTTPS
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+  # XSS protection (legacy browsers)
+  X-XSS-Protection: 1; mode=block
+
+  # Cache default untuk HTML — selalu fresh
+  Cache-Control: public, max-age=0, must-revalidate
+
+
+# -------------------------------------------------------------
+# ASET STATIS — cache agresif (fingerprint via filename)
+# -------------------------------------------------------------
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/data/*
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+# JS & CSS shared (navbar.js, shared.css, servers.js, supabase.js, troops.js)
+# Cache 5 menit — cukup lama untuk performa, cukup pendek untuk update cepat
+/navbar.js
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/shared.css
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/servers.js
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/supabase.js
+  Cache-Control: public, max-age=300, stale-while-revalidate=3600
+
+/data/troops.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/data/buildings.json
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+
+# -------------------------------------------------------------
+# AUTH PAGES — jangan di-cache sama sekali
+# -------------------------------------------------------------
+/login/*
+  Cache-Control: private, no-store
+
+/register/*
+  Cache-Control: private, no-store
+
+/account/*
+  Cache-Control: private, no-store
+
+
+# -------------------------------------------------------------
+# BATTLE REPORT VIEWER — private, no-cache
+# /r/ adalah shared report, tapi masing-masing unik per ID
+# -------------------------------------------------------------
+/r/*
+  Cache-Control: private, no-store
+
+
+# -------------------------------------------------------------
+# SERVER-BASED TOOLS — cache pendek (data update berkala)
+# -------------------------------------------------------------
+/s/*
+  Cache-Control: public, max-age=0, must-revalidate
