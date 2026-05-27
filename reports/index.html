@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Report — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
+      --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);--cyan:#0891b2;
+      --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
+      --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+      --green:#059669;--green-bg:rgba(5,150,105,0.08);
+      --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+      --red:#dc2626;--red-bg:rgba(220,38,38,0.08);
+      --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
+      --attacker-bg:rgba(220,38,38,0.04);
+      --defender-bg:rgba(37,99,235,0.04);
+    }
+    body { background:#fff; color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(37,99,235,0.055) 1px,transparent 1px); background-size:32px 32px; pointer-events:none; z-index:0; }
+
+    .page-wrap { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:40px 24px 80px; }
+
+    /* Breadcrumb */
+    .breadcrumb { display:flex; align-items:center; gap:6px; font-size:0.8rem; color:var(--text3); margin-bottom:20px; flex-wrap:wrap; }
+    .breadcrumb a { color:var(--text3); text-decoration:none; transition:color 0.15s; }
+    .breadcrumb a:hover { color:var(--blue2); }
+    .breadcrumb .sep { opacity:0.5; }
+    .breadcrumb .cur { color:var(--text2); font-weight:500; }
+
+    /* Page header */
+    .page-header { margin-bottom:32px; animation:fadeDown 0.35s ease both; }
+    .page-header-inner { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .page-title-group { display:flex; align-items:center; gap:14px; }
+    .page-icon { width:46px; height:46px; border-radius:12px; background:var(--red-bg); border:1px solid rgba(220,38,38,0.18); display:flex; align-items:center; justify-content:center; font-size:1.3rem; flex-shrink:0; }
+    .page-title { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:700; color:var(--navy); letter-spacing:-0.02em; }
+    .page-subtitle { font-size:0.875rem; color:var(--text2); margin-top:3px; line-height:1.5; }
+    .page-badges { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-top:4px; }
+    .page-badge { font-size:0.65rem; font-weight:700; letter-spacing:0.06em; padding:3px 10px; border-radius:100px; border:1px solid; }
+    .page-badge.free     { background:var(--green-bg); color:var(--green);      border-color:rgba(5,150,105,0.2); }
+    .page-badge.no-login { background:var(--blue-glow); color:var(--blue-light); border-color:rgba(59,130,246,0.2); }
+
+    /* Two-column layout */
+    .layout { display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
+
+    /* Paste area */
+    .paste-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:24px; animation:fadeUp 0.35s ease 0.05s both; }
+    .paste-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:10px; }
+    .paste-area {
+      width:100%; min-height:180px; max-height:300px;
+      font-family:'DM Sans',sans-serif; font-size:0.8rem; color:var(--text2);
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:10px; padding:14px; resize:vertical; outline:none;
+      transition:border-color 0.18s, box-shadow 0.18s; line-height:1.6;
+    }
+    .paste-area:focus { border-color:var(--blue2); box-shadow:0 0 0 3px rgba(37,99,235,0.08); }
+    .paste-area::placeholder { color:var(--text3); }
+    .paste-actions { display:flex; gap:10px; margin-top:12px; }
+    .btn-parse { font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600; background:var(--blue2); color:#fff; border:none; border-radius:9px; padding:10px 24px; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 14px rgba(37,99,235,0.28); flex:1; }
+    .btn-parse:hover { background:var(--blue); transform:translateY(-1px); }
+    .btn-clear { font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500; background:none; color:var(--text3); border:1px solid var(--border); border-radius:9px; padding:10px 18px; cursor:pointer; transition:all 0.15s; }
+    .btn-clear:hover { color:var(--text2); border-color:var(--border2); background:var(--surface2); }
+
+    /* Share card */
+    .share-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:20px; animation:fadeUp 0.35s ease 0.1s both; position:sticky; top:80px; }
+    .share-title { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:14px; }
+    .share-info { font-size:0.78rem; color:var(--text2); line-height:1.6; margin-bottom:16px; }
+    .share-ttl { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .share-ttl label { font-size:0.72rem; font-weight:600; color:var(--text2); }
+    .share-ttl select { font-family:'DM Sans',sans-serif; font-size:0.875rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:8px 11px; outline:none; transition:border-color 0.18s; }
+    .share-ttl select:focus { border-color:var(--blue2); }
+    .btn-share { width:100%; font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600; background:var(--green); color:#fff; border:none; border-radius:9px; padding:11px; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 14px rgba(5,150,105,0.25); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-share:hover { background:#047857; transform:translateY(-1px); }
+    .btn-share:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .share-result { margin-top:14px; display:none; }
+    .share-link-wrap { display:flex; gap:8px; align-items:center; }
+    .share-link-input { flex:1; font-family:'DM Sans',sans-serif; font-size:0.78rem; color:var(--text2); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 10px; outline:none; }
+    .btn-copy { font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; background:var(--blue2); color:#fff; border:none; border-radius:7px; padding:8px 12px; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+    .btn-copy:hover { background:var(--blue); }
+    .btn-copy.copied { background:var(--green); }
+    .share-note { font-size:0.72rem; color:var(--text3); margin-top:8px; line-height:1.5; }
+    .pro-note { background:var(--amber-bg); border:1px solid rgba(217,119,6,0.2); border-radius:8px; padding:10px 12px; font-size:0.75rem; color:var(--amber); line-height:1.5; margin-top:10px; }
+
+    /* Error box */
+    .parse-error { background:var(--red-bg); border:1px solid rgba(220,38,38,0.2); border-radius:10px; padding:12px 16px; font-size:0.825rem; color:var(--red); margin-top:14px; display:none; line-height:1.5; }
+
+    /* ── REPORT DISPLAY ── */
+    .report-display { margin-top:28px; animation:fadeUp 0.4s ease both; display:none; }
+
+    .report-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+
+    /* Report header */
+    .report-header { padding:20px 24px; border-bottom:1px solid var(--border); background:var(--surface2); }
+    .report-title { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:var(--navy); letter-spacing:-0.01em; margin-bottom:4px; }
+    .report-meta { font-size:0.8rem; color:var(--text3); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .report-meta-item { display:flex; align-items:center; gap:4px; }
+
+    /* Attacker / Defender sides — VERTICAL layout */
+    .report-sides { display:flex; flex-direction:column; }
+    .report-side { padding:16px 24px; }
+    .report-side + .report-side { border-top:1px solid var(--border); }
+    .report-side.attacker { background:var(--attacker-bg); }
+    .report-side.defender { background:var(--defender-bg); }
+
+    .side-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .side-badge { font-size:0.62rem; font-weight:700; letter-spacing:0.08em; padding:3px 9px; border-radius:100px; text-transform:uppercase; }
+    .side-badge.atk { background:var(--red-bg); color:var(--red); border:1px solid rgba(220,38,38,0.2); }
+    .side-badge.def { background:var(--blue-glow); color:var(--blue2); border:1px solid rgba(37,99,235,0.2); }
+    .side-player { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); }
+    .side-alliance { font-size:0.72rem; font-weight:700; background:var(--blue-glow); color:var(--blue2); padding:2px 7px; border-radius:4px; margin-right:4px; }
+    .reinforce-tag { font-size:0.65rem; font-weight:700; background:var(--amber-bg); color:var(--amber); border:1px solid rgba(217,119,6,0.2); border-radius:100px; padding:2px 8px; margin-right:6px; letter-spacing:0.04em; }
+    .reinforce-tag { font-size:0.65rem; font-weight:700; background:var(--amber-bg); color:var(--amber); border:1px solid rgba(217,119,6,0.2); border-radius:100px; padding:2px 8px; margin-right:6px; letter-spacing:0.04em; }
+    .side-village { font-size:0.78rem; color:var(--text2); margin-top:2px; }
+    .side-village a { color:var(--blue2); text-decoration:none; }
+    .player-link { color:var(--navy); font-weight:700; text-decoration:none; font-family:'Space Grotesk',sans-serif; }
+    .player-link:hover { color:var(--blue2); text-decoration:underline; }
+    .side-village a:hover { text-decoration:underline; }
+
+    /* Troop table — horizontal scroll for large armies */
+    .troop-scroll { overflow-x:auto; }
+    .troop-table { border-collapse:collapse; white-space:nowrap; }
+    .troop-col { text-align:center; padding:4px 6px; vertical-align:top; }
+    .troop-icon-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+    .troop-sprite { width:26px; height:26px; background-repeat:no-repeat; border-radius:3px; flex-shrink:0; }
+    .troop-name { font-size:0.55rem; color:var(--text3); text-align:center; line-height:1.2; width:44px; overflow:hidden; text-overflow:ellipsis; }
+    .troop-count { font-family:'Space Grotesk',sans-serif; font-size:0.875rem; font-weight:700; color:var(--navy); text-align:center; padding:3px 0 1px; min-width:44px; }
+    .troop-loss  { font-family:'Space Grotesk',sans-serif; font-size:0.75rem; color:var(--red); text-align:center; padding-bottom:2px; min-width:44px; }
+    .troop-loss.zero    { color:var(--text3); }
+    .troop-wounded      { font-family:'Space Grotesk',sans-serif; font-size:0.75rem; color:var(--green); text-align:center; padding-bottom:2px; min-width:44px; }
+    .troop-wounded.zero { color:var(--text3); }
+    .unknown            { color:var(--text3); font-style:italic; }
+    .row-label          { font-size:0.8rem; text-align:center; padding:4px 6px 4px 2px; vertical-align:middle; width:20px; opacity:0.7; }
+    .row-icons td       { padding-bottom:2px; }
+
+    /* Info block */
+    .side-info          { margin-top:10px; padding:10px 12px; background:rgba(37,99,235,0.04); border:1px solid rgba(37,99,235,0.1); border-radius:8px; }
+    .info-line          { font-size:0.78rem; color:var(--text2); line-height:1.65; }
+    .info-line + .info-line { margin-top:3px; }
+
+    /* Bounty */
+    .bounty-row { display:flex; align-items:center; gap:16px; padding:14px 0 4px; flex-wrap:wrap; }
+    .bounty-label { font-size:0.72rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.06em; }
+    .bounty-item { display:flex; align-items:center; gap:5px; font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); }
+    .res-icon { width:18px; height:18px; object-fit:contain; }
+    .bounty-carry { font-size:0.72rem; color:var(--text3); margin-left:4px; }
+
+    /* Statistics */
+    .report-stats { border-top:1px solid var(--border); padding:20px 24px; }
+    .stats-title { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:14px; }
+    .stats-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    .stats-table thead th { font-size:0.8rem; font-weight:700; color:var(--text2); padding:6px 14px 10px; text-align:right; display:table-cell; }
+    .stats-table thead th:first-child { text-align:left; }
+    .stats-table thead th { display:table-cell; vertical-align:middle; }
+    .stats-table tbody tr { border-top:1px solid var(--border); }
+    .stats-table tbody tr:hover { background:var(--surface2); }
+    .stat-row-label { font-size:0.8rem; color:var(--text2); padding:9px 14px; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+    .stat-val { font-family:'Space Grotesk',sans-serif; font-size:0.95rem; font-weight:700; color:var(--navy); padding:9px 14px; text-align:right; }
+    .stat-val.atk { color:var(--red); }
+    .stat-val.def { color:var(--blue2); }
+    .stat-icon    { width:20px; height:20px; object-fit:contain; vertical-align:middle; }
+    .stat-icon-sm { width:14px; height:14px; object-fit:contain; vertical-align:middle; }
+    .row-icon     { width:14px; height:14px; object-fit:contain; vertical-align:middle; display:block; margin:0 auto; }
+
+    /* Spinner */
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; }
+
+    /* Animations */
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+    @keyframes spin     { to{transform:rotate(360deg)} }
+
+    @media (max-width:900px) {
+      .layout { grid-template-columns:1fr; }
+      .share-card { position:static; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+    }
+    @media (max-width:600px) {
+      .stats-grid { grid-template-columns:1fr; }
+      .page-wrap { padding:20px 14px 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="navbar-root"></div>
+
+  <div class="page-wrap">
+
+    <div class="breadcrumb">
+      <a href="/">Home</a><span class="sep">›</span>
+      <span class="cur">Battle Report</span>
+    </div>
+
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="page-title-group">
+          <div class="page-icon">⚔️</div>
+          <div>
+            <div class="page-title">Battle Report</div>
+            <div class="page-subtitle">Paste a Travian battle report, get a clean shareable link.</div>
+          </div>
+        </div>
+        <div class="page-badges">
+          <span class="page-badge free">FREE</span>
+          <span class="page-badge no-login">No login required</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+
+      <!-- Left: paste area -->
+      <div>
+        <div class="paste-card">
+          <div class="paste-label">Paste your report (Ctrl+A → Ctrl+C from Travian)</div>
+          <textarea class="paste-area" id="reportInput" placeholder="Paste the full battle report text here…&#10;&#10;Select all (Ctrl+A) on the Travian report page, then copy (Ctrl+C) and paste here."></textarea>
+          <div class="parse-error" id="parseError"></div>
+          <div class="paste-actions">
+            <button class="btn-parse" onclick="parseAndRender()">⚔️ Parse Report</button>
+            <button class="btn-clear" onclick="clearAll()">Clear</button>
+          </div>
+        </div>
+
+        <!-- Report display -->
+        <div class="report-display" id="reportDisplay"></div>
+      </div>
+
+      <!-- Right: share card -->
+      <div>
+        <div class="share-card">
+          <div class="share-title">🔗 Share this report</div>
+          <div class="share-info">
+            Parse your report first, then generate a shareable link anyone can open — no account needed.
+          </div>
+          <div class="share-ttl">
+            <label>Link expires after</label>
+            <select id="ttlSelect">
+              <option value="7">7 days</option>
+              <option value="14" selected>14 days</option>
+              <option value="30">30 days</option>
+            </select>
+          </div>
+          <button class="btn-share" id="shareBtn" onclick="shareReport()" disabled>
+            🔗 Generate Share Link
+          </button>
+          <div class="share-result" id="shareResult">
+            <div class="share-link-wrap">
+              <input type="text" class="share-link-input" id="shareLinkInput" readonly>
+              <button class="btn-copy" id="copyBtn" onclick="copyLink()">Copy</button>
+            </div>
+            <div class="share-note" id="shareNote"></div>
+          </div>
+          <div class="pro-note">⭐ <b>Pro users</b> get permanent links + saved report history in their account.</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /page-wrap -->
+
+  <script>
+    /* CDN & icons via window.TT — loaded from /data/troops.js */
+
+    /* ── PARSER ── */
+    function parseReport(raw) {
+      const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+      const report = {
+        title: '', date: '',
+        attacker: { alliance:'', player:'', village:'', coords:'', troops:[], sent:[], casualties:[], wounded:[], info:[] },
+        defenders: [],
+        bounty: { wood:0, clay:0, iron:0, crop:0, carry:0, maxCarry:0 },
+        stats: { atkStrength:0, defStrength:0, atkSupplyBefore:0, defSupplyBefore:0, atkSupplyLost:0, defSupplyLost:0, atkResLost:0, defResLost:0 },
+      };
+
+      let i = 0;
+
+      /* ── Find report title (contains "raids" / "attacks" / "scouts") ── */
+      const reportKeywords = /\b(raids?|attacks?|scouts?|conquers?|reinforces?|returns?)\b/i;
+      for (i = 0; i < lines.length; i++) {
+        if (reportKeywords.test(lines[i])) {
+          report.title = lines[i];
+          break;
+        }
+      }
+
+      /* ── Date (DD.MM.YY, HH:MM:SS pattern) ── */
+      const dateRe = /\d{2}\.\d{2}\.\d{2,4},?\s+\d{2}:\d{2}:\d{2}/;
+      for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+        const m = lines[j].match(dateRe);
+        if (m) { report.date = m[0]; break; }
+      }
+
+      /* ── Server detection from report text ── */
+      // Look for server domain patterns like ts5.x1.asia.travian.com
+      const serverRe = /([a-z0-9]+\.x\d+\.[a-z]+\.travian\.com|ts\d+\.x\d+\.[a-z]+)/i;
+      for (let j = 0; j < Math.min(20, lines.length); j++) {
+        const sm = lines[j].match(serverRe);
+        if (sm) {
+          // Convert domain to slug: ts5.x1.asia.travian.com → ts5.x1.asia
+          window._reportServerSlug = sm[1].replace('.travian.com','').replace(/\.travian\.com$/,'');
+          break;
+        }
+      }
+      // Fallback: detect from URL if no server found in report
+      if (!window._reportServerSlug) {
+        const urlParts = window.location.pathname.split('/').filter(Boolean);
+        if (urlParts[0] === 's' && urlParts[1]) window._reportServerSlug = urlParts[1];
+      }
+
+      /* ── Find ATTACKER block ── */
+      let atkIdx = -1, defIdx = -1;
+      for (let j = 0; j < lines.length; j++) {
+        if (/^attacker$/i.test(lines[j])) { atkIdx = j; break; }
+      }
+      for (let j = 0; j < lines.length; j++) {
+        if (/^defender$/i.test(lines[j])) { defIdx = j; break; }
+      }
+
+      if (atkIdx !== -1) parseSide(lines, atkIdx + 1, report.attacker);
+
+      /* Parse ALL defender blocks (main defender + reinforcements) */
+      // Find all "Defender" keyword positions
+      const defPositions = [];
+      for (let j = 0; j < lines.length; j++) {
+        if (/^defender$/i.test(lines[j])) defPositions.push(j);
+      }
+      for (const dPos of defPositions) {
+        const def = { alliance:'', player:'', village:'', coords:'', troops:[], sent:[], casualties:[], wounded:[], info:[], isReinforcement: false };
+        // Check if next line is "Reinforcement"
+        if (lines[dPos + 1] && /^reinforcement$/i.test(lines[dPos + 1])) {
+          def.isReinforcement = true;
+          parseSide(lines, dPos + 2, def);
+        } else {
+          parseSide(lines, dPos + 1, def);
+        }
+        if (def.troops.length || def.player) report.defenders.push(def);
+      }
+
+      /* ── Bounty ── */
+      const bountyIdx = lines.findIndex(l => /^bounty$/i.test(l));
+      if (bountyIdx !== -1) {
+        // Collect up to 10 lines after Bounty looking for numbers
+        const nums = [];
+        for (let j = bountyIdx + 1; j < Math.min(bountyIdx + 15, lines.length); j++) {
+          const n = lines[j].replace(/[^0-9\/]/g, '');
+          if (!n) continue;
+          // carry format: 280/280
+          if (n.includes('/')) {
+            const [c, m] = n.split('/');
+            report.bounty.carry    = parseInt(c) || 0;
+            report.bounty.maxCarry = parseInt(m) || 0;
+          } else {
+            nums.push(parseInt(n) || 0);
+          }
+          if (nums.length >= 4 && report.bounty.carry) break;
+        }
+        if (nums.length >= 1) report.bounty.wood = nums[0];
+        if (nums.length >= 2) report.bounty.clay = nums[1];
+        if (nums.length >= 3) report.bounty.iron = nums[2];
+        if (nums.length >= 4) report.bounty.crop = nums[3];
+      }
+
+      /* ── Statistics ── */
+      const statsIdx = lines.findIndex(l => /^statistics$/i.test(l));
+      if (statsIdx !== -1) {
+        for (let j = statsIdx + 1; j < Math.min(statsIdx + 20, lines.length); j++) {
+          const l = lines[j].toLowerCase();
+          const nums = extractAllNums(lines, j);
+          if (/combat strength/.test(l) && nums.length >= 2) {
+            report.stats.atkStrength = nums[0];
+            report.stats.defStrength = nums[1];
+          }
+          if (/supply before/.test(l) && nums.length >= 2) {
+            report.stats.atkSupplyBefore = nums[0];
+            report.stats.defSupplyBefore = nums[1];
+          }
+          if (/supply lost/.test(l) && nums.length >= 2) {
+            report.stats.atkSupplyLost = nums[0];
+            report.stats.defSupplyLost = nums[1];
+          }
+          if (/resources lost/.test(l) && nums.length >= 2) {
+            report.stats.atkResLost = nums[0];
+            report.stats.defResLost = nums[1];
+          }
+        }
+      }
+
+      return report;
+    }
+
+    /* Parse a single side (attacker/defender) starting at lineIdx */
+    function parseSide(lines, startIdx, side) {
+      const fromRe = /^(?:\[([^\]]+)\]\s+)?(.+?)\s+from village\s+(.+)$/i;
+
+      for (let i = startIdx; i < Math.min(startIdx + 5, lines.length); i++) {
+        const m = lines[i].match(fromRe);
+        if (m) {
+          side.alliance = m[1] || '';
+          side.player   = m[2].trim();
+          const villageRaw = m[3].trim();
+          const coordM = villageRaw.match(/\(([^)]+)\)\s*$/);
+          if (coordM) {
+            side.coords  = coordM[0];
+            side.village = villageRaw.slice(0, villageRaw.lastIndexOf(coordM[0])).trim();
+          } else {
+            side.village = villageRaw;
+          }
+          startIdx = i + 1;
+          break;
+        }
+      }
+
+      /* Find troop header row */
+      const knownTroops = Object.keys(window.TT?.troopByName || {});
+      let troopHeaderIdx = -1;
+      for (let i = startIdx; i < Math.min(startIdx + 10, lines.length); i++) {
+        const low = lines[i].toLowerCase();
+        if (knownTroops.filter(t => low.includes(t)).length >= 3) {
+          troopHeaderIdx = i; break;
+        }
+      }
+
+      if (troopHeaderIdx === -1) return;
+
+      const troopNames = lines[troopHeaderIdx].split(/\t|\s{2,}/).map(s => s.trim()).filter(Boolean);
+      side.troops = troopNames;
+
+      /* Parse up to 3 data rows: sent, casualties, wounded */
+      /* Each row is either all numbers OR all "?" (unknown) */
+      const isDataRow = (line) => {
+        const parts = line.split(/\t|\s+/).map(s => s.trim()).filter(Boolean);
+        if (!parts.length) return false;
+        return parts.every(p => /^\d+$/.test(p) || p === '?');
+      };
+
+      let numRows = 0;
+      for (let i = troopHeaderIdx + 1; i < Math.min(troopHeaderIdx + 6, lines.length); i++) {
+        if (!isDataRow(lines[i])) break;
+        const parts = lines[i].split(/\t|\s+/).map(s => s.trim()).filter(Boolean);
+        // Parse as number or null (for "?")
+        const vals = parts.map(p => p === '?' ? null : Number(p));
+        if (vals.length < Math.max(1, troopNames.length - 3)) break;
+        if (numRows === 0) side.sent     = vals;
+        if (numRows === 1) side.casualties = vals;
+        if (numRows === 2) side.wounded  = vals;
+        numRows++;
+        if (numRows >= 3) break;
+      }
+
+      /* Parse Information block: lines after troop rows until Bounty/Defender/end */
+      const afterTroops = troopHeaderIdx + 1 + numRows;
+      const stopWords = /^(bounty|defender|attacker|statistics)$/i;
+      const infoLines = [];
+      for (let i = afterTroops; i < Math.min(afterTroops + 15, lines.length); i++) {
+        if (stopWords.test(lines[i])) break;
+        // Skip lines that look like timestamps or carry (e.g. "280/280", "14h")
+        if (/^\d+h$/.test(lines[i])) break;
+        if (/^\d+\/\d+$/.test(lines[i].replace(/[^0-9\/]/g,''))) continue;
+        if (lines[i].length > 0) infoLines.push(lines[i]);
+      }
+      if (infoLines.length) side.info = infoLines;
+    }
+
+    function extractAllNums(lines, lineIdx) {
+      // Look at lineIdx and next 2 lines to collect numbers
+      const nums = [];
+      for (let j = lineIdx; j < Math.min(lineIdx + 3, lines.length); j++) {
+        const parts = lines[j].split(/[\t\s]+/);
+        for (const p of parts) {
+          const n = parseInt(p.replace(/[^0-9]/g,''));
+          if (!isNaN(n) && p.replace(/[^0-9]/g,'').length > 0) nums.push(n);
+        }
+        if (nums.length >= 2) break;
+      }
+      return nums;
+    }
+
+    /* ── SPRITE HELPERS — delegate to window.TT (troops.js) ── */
+    function getSpriteStyle(name, tribeHint) {
+      return window.TT?.getSpriteStyleByName(name, tribeHint) || null;
+    }
+
+    /* Guess tribe from troop list */
+
+    function guessTribe(troops) {
+      if (!window.TT) return 'roman';
+      const score = {};
+      for (const t of (troops || [])) {
+        const info = window.TT.troopByName[t.toLowerCase().trim()];
+        if (info) score[info.tribe] = (score[info.tribe] || 0) + 1;
+      }
+      if (!Object.keys(score).length) return 'roman';
+      return Object.entries(score).sort((a,b) => b[1]-a[1])[0][0];
+    }
+
+    /* ── RENDER REPORT ── */
+    function renderReport(r) {
+      const atkTribe = guessTribe(r.attacker.troops);
+      const defTribe = guessTribe((r.defenders?.[0]?.troops) || []);
+
+      const renderSide = (side, tribe, cls) => {
+        const isAtk = cls === 'attacker';
+        const badge = isAtk
+          ? `<span class="side-badge atk">⚔️ Attacker</span>`
+          : `<span class="side-badge def">🛡️ Defender</span>`;
+        const alliHtml = side.alliance
+          ? `<span class="side-alliance">[${esc(side.alliance)}]</span>` : '';
+        const coordUrl = side.coords ? coordToUrl(side.coords) : '#';
+        const serverSlug = window._reportServerSlug || 'ts5.x1.asia';
+        const playerHref = side.player
+          ? `/s/${serverSlug}/statistics/player/?name=${encodeURIComponent(side.player)}`
+          : '#';
+
+        const troops     = side.troops      || [];
+        const sent       = side.sent        || [];
+        const casualties = side.casualties  || [];
+        const wounded    = side.wounded     || [];
+        const hasWounded = wounded.some(v => v !== null && v > 0);
+
+        /* Helper: format a cell value (null = unknown "?") */
+        const fmtSent = v => v === null
+          ? `<td class="troop-count unknown">?</td>`
+          : `<td class="troop-count">${v.toLocaleString()}</td>`;
+
+        const fmtCas = v => v === null
+          ? `<td class="troop-loss unknown">?</td>`
+          : `<td class="troop-loss ${v===0?'zero':''}">${v > 0 ? '-'+v.toLocaleString() : '0'}</td>`;
+
+        const fmtWnd = v => v === null
+          ? `<td class="troop-wounded unknown">?</td>`
+          : `<td class="troop-wounded ${v===0?'zero':''}">${v > 0 ? v.toLocaleString() : '0'}</td>`;
+
+        const iconCols = troops.map((name) => {
+          const style = window.TT?.getSpriteStyleByName(name, tribe) || null;
+          const spriteHtml = style
+            ? `<div class="troop-sprite" style="${style}"></div>`
+            : `<div style="width:26px;height:26px;background:var(--surface2);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--text3)">?</div>`;
+          return `<td class="troop-col"><div class="troop-icon-wrap">${spriteHtml}<div class="troop-name">${esc(name)}</div></div></td>`;
+        }).join('');
+
+        const sentRow  = sent.length       ? `<tr class="row-sent">${sent.map(fmtSent).join('')}</tr>` : '';
+        const casRow   = casualties.length ? `<tr class="row-cas">${casualties.map(fmtCas).join('')}</tr>` : '';
+        const wndRow   = hasWounded        ? `<tr class="row-wnd">${wounded.map(fmtWnd).join('')}</tr>` : '';
+
+        /* Row labels column */
+        const labelCol = (icon, title, cls) =>
+          `<td class="row-label" title="${title}">${icon}</td>`;
+
+        /* Info block */
+        const infoHtml = (side.info && side.info.length) ? `
+          <div class="side-info">
+            ${side.info.map(l => `<div class="info-line">${esc(l)}</div>`).join('')}
+          </div>` : '';
+
+        const reinforcementTag = side.isReinforcement
+          ? `<span class="reinforce-tag">Reinforcement</span>` : '';
+
+        return `<div class="report-side ${cls}">
+          <div class="side-header">
+            ${badge}
+            <div>
+              <div class="side-player">${reinforcementTag}${alliHtml}<a class="player-link" href="${playerHref}">${esc(side.player || '—')}</a></div>
+              ${side.village ? `<div class="side-village">from <a href="${coordUrl}" target="_blank">${esc(side.village)} ${esc(side.coords)}</a></div>` : ''}
+            </div>
+          </div>
+          ${troops.length ? `
+          <div class="troop-scroll">
+            <table class="troop-table">
+              <thead><tr class="row-icons"><td class="row-label"></td>${iconCols}</tr></thead>
+              <tbody>
+                ${sentRow ? `<tr class="row-sent"><td class="row-label" title="Troops sent"><img src="${window.TT?.ICONS.sent}" class="row-icon"></td>${sent.map(fmtSent).join('')}</tr>` : ''}
+                ${casualties.length ? `<tr class="row-cas"><td class="row-label" title="Casualties"><img src="${window.TT?.ICONS.dead}" class="row-icon"></td>${casualties.map(fmtCas).join('')}</tr>` : ''}
+                ${hasWounded ? `<tr class="row-wnd"><td class="row-label" title="Wounded (revivable)"><img src="${window.TT?.ICONS.wounded}" class="row-icon"></td>${wounded.map(fmtWnd).join('')}</tr>` : ''}
+              </tbody>
+            </table>
+          </div>
+          ${infoHtml}` : '<div style="font-size:0.8rem;color:var(--text3);padding:8px 0">No troop data detected.</div>'}
+        </div>`;
+      };
+
+      const bounty = r.bounty;
+      const hasBounty = bounty.wood || bounty.clay || bounty.iron || bounty.crop;
+      const bountyHtml = hasBounty ? `
+        <div style="border-top:1px solid var(--border);padding:12px 24px;background:var(--surface2)">
+          <div class="bounty-row">
+            <span class="bounty-label">Bounty</span>
+            ${bounty.wood ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.wood}"> ${bounty.wood.toLocaleString()}</span>` : ''}
+            ${bounty.clay ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.clay}"> ${bounty.clay.toLocaleString()}</span>` : ''}
+            ${bounty.iron ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.iron}"> ${bounty.iron.toLocaleString()}</span>` : ''}
+            ${bounty.crop ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.crop}"> ${bounty.crop.toLocaleString()}</span>` : ''}
+            ${bounty.carry ? `<span class="bounty-carry">(${bounty.carry.toLocaleString()}/${bounty.maxCarry.toLocaleString()})</span>` : ''}
+          </div>
+        </div>` : '';
+
+      const s = r.stats;
+      const statsHtml = `
+        <div class="report-stats">
+          <div class="stats-title">Statistics</div>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th><img src="${window.TT?.ICONS.offence}" class="stat-icon"> Attacker</th>
+                <th><img src="${window.TT?.ICONS.defence}" class="stat-icon"> Defender</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="stat-row-label">Combat Strength</td>
+                <td class="stat-val atk">${s.atkStrength.toLocaleString()}</td>
+                <td class="stat-val def">${s.defStrength.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td class="stat-row-label"><img src="${window.TT?.ICONS.freeCrop}" class="stat-icon-sm"> Supply before</td>
+                <td class="stat-val">${s.atkSupplyBefore.toLocaleString()}</td>
+                <td class="stat-val">${s.defSupplyBefore.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td class="stat-row-label"><img src="${window.TT?.ICONS.freeCrop}" class="stat-icon-sm"> Supply lost</td>
+                <td class="stat-val">${s.atkSupplyLost.toLocaleString()}</td>
+                <td class="stat-val">${s.defSupplyLost.toLocaleString()}</td>
+              </tr>
+              <tr>
+                <td class="stat-row-label"><img src="${window.TT?.ICONS.resources}" class="stat-icon-sm"> Resources lost</td>
+                <td class="stat-val">${s.atkResLost.toLocaleString()}</td>
+                <td class="stat-val">${s.defResLost.toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`;
+
+      /* Render all defenders */
+      const defsSideHtml = (r.defenders || []).map(def => {
+        const dt = guessTribe(def.troops);
+        return renderSide(def, dt, 'defender');
+      }).join('');
+
+      return `
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-title">${esc(r.title) || 'Battle Report'}</div>
+            <div class="report-meta">
+              <span class="report-meta-item">🕐 ${esc(r.date)}</span>
+              ${window._reportServerSlug ? `<span class="report-meta-item">🌐 <a href="/s/${window._reportServerSlug}/statistics/" style="color:var(--blue2);text-decoration:none;">${window._reportServerSlug}</a></span>` : ''}
+            </div>
+          </div>
+          <div class="report-sides">
+            ${renderSide(r.attacker, atkTribe, 'attacker')}
+            ${defsSideHtml}
+          </div>
+          ${bountyHtml}
+          ${statsHtml}
+        </div>`;
+    }
+
+        /* ── COORD → URL ── */
+    function coordToUrl(coords) {
+      const m = coords.match(/[−\-]?\d+/g);
+      if (!m || m.length < 2) return '#';
+      const x = m[0].replace('−','-');
+      const y = m[1].replace('−','-');
+      return `https://ts5.x1.asia.travian.com/position_details.php?x=${x}&y=${y}`;
+    }
+
+    /* ── MAIN ACTIONS ── */
+    let parsedReport = null;
+
+    function parseAndRender() {
+      const raw = document.getElementById('reportInput').value.trim();
+      const errEl = document.getElementById('parseError');
+      errEl.style.display = 'none';
+
+      if (!raw) {
+        errEl.textContent = 'Please paste a battle report first.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      try {
+        parsedReport = parseReport(raw);
+
+        if (!parsedReport.attacker.player && !parsedReport.defender.player) {
+          throw new Error('Could not detect attacker/defender. Make sure you copy the full report page (Ctrl+A → Ctrl+C).');
+        }
+
+        const display = document.getElementById('reportDisplay');
+        display.innerHTML = renderReport(parsedReport);
+        display.style.display = 'block';
+
+        document.getElementById('shareBtn').disabled = false;
+        document.getElementById('shareResult').style.display = 'none';
+
+        display.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch(e) {
+        errEl.textContent = '⚠️ ' + e.message;
+        errEl.style.display = 'block';
+        parsedReport = null;
+        document.getElementById('shareBtn').disabled = true;
+      }
+    }
+
+    function clearAll() {
+      document.getElementById('reportInput').value = '';
+      document.getElementById('reportDisplay').style.display = 'none';
+      document.getElementById('reportDisplay').innerHTML = '';
+      document.getElementById('parseError').style.display = 'none';
+      document.getElementById('shareBtn').disabled = true;
+      document.getElementById('shareResult').style.display = 'none';
+      parsedReport = null;
+    }
+
+    /* ── SHARE ── */
+    async function shareReport() {
+      if (!parsedReport) return;
+      if (typeof window._supabase === 'undefined') {
+        alert('Supabase not loaded. Please refresh and try again.');
+        return;
+      }
+
+      const btn = document.getElementById('shareBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving…';
+
+      try {
+        const ttlDays = parseInt(document.getElementById('ttlSelect').value) || 14;
+        const expiresAt = new Date(Date.now() + ttlDays * 86400 * 1000).toISOString();
+        const id = nanoid(10);
+
+        const raw = document.getElementById('reportInput').value.trim();
+        const { error } = await window._supabase
+          .from('shared_reports')
+          .insert({
+            id,
+            content: raw,
+            user_id: (await window.getSession())?.user?.id || null,
+            expires_at: expiresAt,
+          });
+
+        if (error) throw error;
+
+        const link = `${window.location.origin}/r/${id}`;
+        document.getElementById('shareLinkInput').value = link;
+        document.getElementById('shareNote').textContent =
+          `Expires in ${ttlDays} days. Upgrade to Pro for permanent links.`;
+        document.getElementById('shareResult').style.display = 'block';
+
+      } catch(e) {
+        alert('Failed to save report: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔗 Generate Share Link';
+      }
+    }
+
+    function copyLink() {
+      const input = document.getElementById('shareLinkInput');
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    /* ── NANO ID (lightweight, no dependency) ── */
+    function nanoid(size = 10) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let id = '';
+      const arr = crypto.getRandomValues(new Uint8Array(size));
+      arr.forEach(b => id += chars[b % chars.length]);
+      return id;
+    }
+
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+
+  <script src="/data/troops.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+  <script src="/servers.js"></script>
+  <script src="/navbar.js"></script>
+</body>
+</html>

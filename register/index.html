@@ -417,16 +417,20 @@
     <a href="/">travian.sonybukansoni.com</a> &nbsp;·&nbsp; Travian Tools
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
   <script>
+
+    /* ── UI HELPERS ── */
     function togglePw(id, btn) {
       const input = document.getElementById(id);
       const isHidden = input.type === 'password';
       input.type = isHidden ? 'text' : 'password';
-      btn.textContent = isHidden ? '🙈' : '👁';
+      btn.textContent = isHidden ? '\u{1F648}' : '\u{1F441}';
     }
 
     function checkStrength(pw) {
-      const segs = [document.getElementById('s1'), document.getElementById('s2'), document.getElementById('s3'), document.getElementById('s4')];
+      const segs = ['s1','s2','s3','s4'].map(id => document.getElementById(id));
       const colors = ['#dc2626', '#d97706', '#2563eb', '#059669'];
       let score = 0;
       if (pw.length >= 8) score++;
@@ -438,22 +442,123 @@
       });
     }
 
-    function checkUsername(val) {
-      // basic client-side hint — server validates
+    function showError(msg) {
+      let el = document.getElementById('formError');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'formError';
+        el.style.cssText = [
+          'background:var(--red-bg)',
+          'border:1px solid rgba(220,38,38,0.25)',
+          'color:var(--red)',
+          'border-radius:10px',
+          'padding:10px 14px',
+          'font-size:0.825rem',
+          'margin-bottom:16px',
+          'line-height:1.5'
+        ].join(';');
+        document.getElementById('registerForm').prepend(el);
+      }
+      el.textContent = msg;
+      el.style.display = 'block';
     }
 
-    function handleRegister(e) {
+    function hideError() {
+      const el = document.getElementById('formError');
+      if (el) el.style.display = 'none';
+    }
+
+    function showSuccess(email) {
+      const card = document.querySelector('.auth-card');
+      card.innerHTML = `
+        <div style="text-align:center;padding:16px 0 8px;">
+          <div style="font-size:2.8rem;margin-bottom:18px;">\u2705</div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin-bottom:10px;">Check your email!</h2>
+          <p style="font-size:0.875rem;color:var(--text2);line-height:1.65;">
+            We sent a confirmation link to<br>
+            <strong style="color:var(--text)">${email}</strong>
+          </p>
+          <p style="font-size:0.8rem;color:var(--text3);margin-top:20px;">
+            Didn&#39;t get it? Check your spam folder or
+            <a href="/register/" style="color:var(--blue2);text-decoration:none;font-weight:600;">try again</a>.
+          </p>
+          <a href="/login/" style="display:inline-block;margin-top:22px;padding:10px 28px;background:var(--blue2);color:#fff;border-radius:8px;font-size:0.875rem;font-weight:600;text-decoration:none;font-family:'DM Sans',sans-serif;">
+            Go to Log In
+          </a>
+        </div>
+      `;
+    }
+
+    /* ── REGISTER HANDLER ── */
+    async function handleRegister(e) {
       e.preventDefault();
-      const btn = e.target.querySelector('.btn-submit');
-      btn.textContent = 'Creating account…';
+      hideError();
+
+      const email    = document.getElementById('email').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = e.target.querySelector('.btn-submit');
+
+      /* Basic client-side validation */
+      if (!email || !username || !password) {
+        showError('Please fill in all fields.');
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) {
+        showError('Username must be 3\u201320 characters: letters, numbers, and underscores only.');
+        return;
+      }
+
+      if (password.length < 8) {
+        showError('Password must be at least 8 characters.');
+        return;
+      }
+
+      /* Loading state */
       btn.disabled = true;
-      // TODO: wire up to backend
-      setTimeout(() => {
-        btn.textContent = '✓ Account created!';
-        btn.style.background = 'var(--green)';
-      }, 1200);
+      btn.innerHTML = '<span style="opacity:0.7;font-size:0.875rem;">Creating account…</span>';
+
+      try {
+        const { data, error } = await window._supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username },
+            emailRedirectTo: window.location.origin + '/',
+          },
+        });
+
+        if (error) {
+          let msg = error.message;
+          if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('already been registered')) {
+            msg = 'This email is already registered. Try logging in instead.';
+          } else if (msg.toLowerCase().includes('password')) {
+            msg = 'Password is too weak. Please choose a stronger one.';
+          } else if (msg.toLowerCase().includes('invalid email')) {
+            msg = 'Please enter a valid email address.';
+          }
+          showError(msg);
+          btn.disabled = false;
+          btn.innerHTML = 'Create account \u2192';
+          return;
+        }
+
+        /* Supabase returns session immediately if email confirmation is OFF */
+        if (data.session) {
+          window.location.replace('/');
+        } else {
+          showSuccess(email);
+        }
+
+      } catch (err) {
+        showError('Something went wrong. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = 'Create account \u2192';
+      }
     }
   </script>
+  <script src="/servers.js"></script>
   <script src="/navbar.js"></script>
 
 </body>

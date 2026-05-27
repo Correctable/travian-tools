@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Select Server — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+    }
+
+    body {
+      background: #ffffff;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── PAGE LAYOUT ── */
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 64px 24px 80px;
+    }
+
+    /* ── HEADER ── */
+    .page-intro {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeDown 0.4s ease both;
+    }
+
+    .page-intro-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue2);
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      padding: 4px 12px;
+      border-radius: 100px;
+      margin-bottom: 16px;
+    }
+
+    .page-intro h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      margin-bottom: 10px;
+    }
+
+    .page-intro p {
+      font-size: 0.95rem;
+      color: var(--text2);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.65;
+    }
+
+    /* Redirect context pill */
+    .redirect-context {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 16px;
+      font-size: 0.8rem;
+      color: var(--text3);
+    }
+    .redirect-context.show { display: flex; }
+    .redirect-tool-pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--amber);
+      background: var(--amber-bg);
+      border: 1px solid rgba(217,119,6,0.2);
+      padding: 2px 10px;
+      border-radius: 100px;
+    }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.4s 0.08s ease both;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 14px;
+      flex: 1;
+      min-width: 200px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .search-box:focus-within {
+      border-color: var(--blue-light);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+    .search-box input {
+      border: none;
+      outline: none;
+      font-size: 0.875rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      background: transparent;
+      flex: 1;
+    }
+    .search-box input::placeholder { color: var(--text3); }
+    .search-icon { font-size: 14px; opacity: 0.5; flex-shrink: 0; }
+
+    .filter-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+    }
+    .filter-tab {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text2);
+      padding: 6px 14px;
+      border-radius: 7px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .filter-tab:hover { color: var(--navy); background: rgba(255,255,255,0.7); }
+    .filter-tab.active { background: #fff; color: var(--blue2); box-shadow: 0 1px 4px rgba(15,33,83,0.08); }
+
+    /* ── SERVER COUNT ── */
+    .server-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      animation: fadeUp 0.4s 0.12s ease both;
+    }
+    .server-count {
+      font-size: 0.78rem;
+      color: var(--text3);
+      font-weight: 500;
+    }
+    .server-count strong { color: var(--text2); }
+
+    /* ── SERVER GRID ── */
+    .server-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── SERVER CARD ── */
+    .server-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      transition: all 0.18s;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .server-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--blue2);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.22s ease;
+    }
+
+    .server-card:hover {
+      border-color: var(--border2);
+      box-shadow: 0 8px 32px rgba(15,33,83,0.09);
+      transform: translateY(-3px);
+    }
+
+    .server-card:hover::before { transform: scaleX(1); }
+
+    .server-card.soon {
+      opacity: 0.6;
+      cursor: default;
+      pointer-events: none;
+    }
+
+    /* Card header */
+    .sc-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sc-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .sc-badge {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 3px 8px;
+      border-radius: 100px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sc-badge.active { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .sc-badge.soon   { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+    .sc-badge.new    { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+
+    .sc-label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 2px;
+    }
+
+    .sc-domain {
+      font-size: 0.72rem;
+      color: var(--text3);
+      font-weight: 400;
+    }
+
+    /* Card stats row */
+    .sc-stats {
+      display: flex;
+      gap: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .sc-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sc-stat-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .sc-stat-value {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text2);
+    }
+
+    /* Snap date */
+    .sc-snap {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 10px;
+      font-size: 0.7rem;
+      color: var(--text3);
+    }
+    .sc-snap-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      flex-shrink: 0;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Coming soon overlay */
+    .sc-soon-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: var(--text3);
+      font-weight: 500;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text3);
+    }
+    .empty-state.show { display: block; }
+    .empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.875rem; }
+
+    /* ── LOADING ── */
+    .loading-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 48px;
+      color: var(--text3);
+      font-size: 0.875rem;
+    }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--blue2);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-wrap { padding: 36px 16px 56px; }
+      .page-intro h1 { font-size: 1.5rem; }
+      .server-grid { grid-template-columns: 1fr; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-tabs { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-root"></div>
+
+  <div class="page-wrap">
+
+    <!-- Header -->
+    <div class="page-intro">
+      <div class="page-intro-eyebrow">🌐 Server Selection</div>
+      <h1>Choose a Server</h1>
+      <p>Select a Travian server to access server-specific tools like Statistics, Oasis Data, and Map.</p>
+      <div class="redirect-context" id="redirect-context">
+        <span>You'll be taken to</span>
+        <span class="redirect-tool-pill" id="redirect-tool-pill">—</span>
+        <span>after selecting a server.</span>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" placeholder="Search servers…" autocomplete="off">
+      </div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" data-filter="all">All</button>
+        <button class="filter-tab" data-filter="active">Active</button>
+        <button class="filter-tab" data-filter="soon">Coming Soon</button>
+      </div>
+    </div>
+
+    <!-- Meta row -->
+    <div class="server-meta">
+      <div class="server-count" id="server-count">Loading servers…</div>
+    </div>
+
+    <!-- Grid -->
+    <div class="server-grid" id="server-grid">
+      <div class="loading-strip">
+        <div class="spinner"></div>
+        Loading servers…
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <p>No servers match your search.</p>
+    </div>
+
+  </div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────
+// SERVERS array diambil dari /servers.js
+// Fallback kalau servers.js belum ada
+const SERVER_LIST = (typeof SERVERS !== 'undefined') ? SERVERS : [
+  {
+    slug:    'ts5.x1.asia',
+    label:   'TS5 Asia',
+    domain:  'ts5.x1.asia.travian.com',
+    speed:   5,
+    active:  true,
+    isNew:   false,
+  },
+];
+
+// Tool labels untuk redirect context
+const TOOL_LABELS = {
+  'statistics': 'Server Statistics',
+  'oasis-data': 'Oasis Data',
+  'map':        'Map',
+};
+
+// ── STATE ───────────────────────────────────────────────────
+let currentFilter = 'all';
+let searchQuery   = '';
+let redirectTo    = null; // tool slug dari ?redirect=
+let snapData      = {};   // { slug: { snap_date, total_players, total_villages, total_population } }
+
+// ── INIT ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Baca redirect param
+  const params = new URLSearchParams(location.search);
+  redirectTo = params.get('redirect') || null;
+
+  if (redirectTo && TOOL_LABELS[redirectTo]) {
+    const ctx = document.getElementById('redirect-context');
+    document.getElementById('redirect-tool-pill').textContent = TOOL_LABELS[redirectTo];
+    ctx.classList.add('show');
+  }
+
+  // Bind filter tabs
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.filter;
+      renderGrid();
+    });
+  });
+
+  // Bind search
+  document.getElementById('search-input').addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase();
+    renderGrid();
+  });
+
+  // Fetch snapshot data untuk server aktif
+  fetchSnapData().then(() => renderGrid());
+});
+
+// ── FETCH SNAP DATA ─────────────────────────────────────────
+async function fetchSnapData() {
+  const activeServers = SERVER_LIST.filter(s => s.active);
+  if (!activeServers.length) return;
+
+  const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
+  const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
+
+  const slugList = activeServers.map(s => `'${s.slug}'`).join(',');
+
+  try {
+    const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${TURSO_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        requests: [{
+          type: 'execute',
+          stmt: {
+            sql: `SELECT server, snap_date, total_players, total_villages, total_population
+                  FROM snapshots
+                  WHERE server IN (${slugList})
+                  AND id IN (
+                    SELECT MAX(id) FROM snapshots WHERE server IN (${slugList}) GROUP BY server
+                  )`
+          }
+        }, { type: 'close' }]
+      })
+    });
+
+    const data = await res.json();
+    const rows = data?.results?.[0]?.response?.result?.rows || [];
+
+    rows.forEach(row => {
+      const server = row[0]?.value;
+      if (server) {
+        snapData[server] = {
+          snap_date:        row[1]?.value || null,
+          total_players:    row[2]?.value || null,
+          total_villages:   row[3]?.value || null,
+          total_population: row[4]?.value || null,
+        };
+      }
+    });
+  } catch (e) {
+    console.warn('Could not fetch snap data:', e);
+  }
+}
+
+// ── RENDER ──────────────────────────────────────────────────
+function renderGrid() {
+  const grid  = document.getElementById('server-grid');
+  const empty = document.getElementById('empty-state');
+  const count = document.getElementById('server-count');
+
+  // Filter
+  let list = SERVER_LIST.filter(s => {
+    if (currentFilter === 'active' && !s.active) return false;
+    if (currentFilter === 'soon' && s.active) return false;
+    if (searchQuery) {
+      const q = searchQuery;
+      if (!s.label.toLowerCase().includes(q) && !s.slug.includes(q) && !s.domain.includes(q)) return false;
+    }
+    return true;
+  });
+
+  // Empty state
+  if (list.length === 0) {
+    grid.innerHTML = '';
+    empty.classList.add('show');
+    count.innerHTML = '<strong>0</strong> servers found';
+    return;
+  }
+  empty.classList.remove('show');
+
+  const activeCount = list.filter(s => s.active).length;
+  const totalCount  = list.length;
+  count.innerHTML = `<strong>${totalCount}</strong> server${totalCount !== 1 ? 's' : ''} — <strong>${activeCount}</strong> active`;
+
+  grid.innerHTML = list.map((s, i) => buildCard(s, i)).join('');
+}
+
+function buildCard(s, idx) {
+  const snap = snapData[s.slug] || null;
+  const delay = (idx * 0.06).toFixed(2);
+
+  const href = s.active
+    ? `/s/${s.slug}/${redirectTo || 'statistics'}/`
+    : '#';
+
+  const badgeHtml = s.isNew
+    ? `<span class="sc-badge new">NEW</span>`
+    : s.active
+      ? `<span class="sc-badge active">ACTIVE</span>`
+      : `<span class="sc-badge soon">SOON</span>`;
+
+  const statsHtml = s.active ? `
+    <div class="sc-stats">
+      <div class="sc-stat">
+        <div class="sc-stat-label">Speed</div>
+        <div class="sc-stat-value">${s.speed}×</div>
+      </div>
+      ${snap?.total_players ? `
+      <div class="sc-stat">
+        <div class="sc-stat-label">Players</div>
+        <div class="sc-stat-value">${Number(snap.total_players).toLocaleString()}</div>
+      </div>` : ''}
+      ${snap?.total_villages ? `
+      <div class="sc-stat">
+        <div class="sc-stat-label">Villages</div>
+        <div class="sc-stat-value">${Number(snap.total_villages).toLocaleString()}</div>
+      </div>` : ''}
+      ${snap?.total_population ? `
+      <div class="sc-stat">
+        <div class="sc-stat-label">Population</div>
+        <div class="sc-stat-value">${Number(snap.total_population).toLocaleString()}</div>
+      </div>` : ''}
+    </div>
+    ${snap?.snap_date ? `
+    <div class="sc-snap">
+      <div class="sc-snap-dot"></div>
+      Data updated ${formatDate(snap.snap_date)}
+    </div>` : ''}
+  ` : `
+    <div class="sc-soon-label">⏳ Coming soon — data not yet available</div>
+  `;
+
+  return `
+    <a href="${href}" class="server-card${s.active ? '' : ' soon'}" style="animation-delay: ${delay}s">
+      <div class="sc-head">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="sc-icon">🌐</div>
+          <div style="min-width:0">
+            <div class="sc-label">${s.label}</div>
+            <div class="sc-domain">${s.domain}</div>
+          </div>
+        </div>
+        ${badgeHtml}
+      </div>
+      ${statsHtml}
+    </a>`;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch { return dateStr; }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+</body>
+</html>

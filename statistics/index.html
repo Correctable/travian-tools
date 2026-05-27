@@ -3,100 +3,500 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Statistics — Travian Tools</title>
+<title>Best Villages for Oasis — Travian Tools</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
-  --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);
-  --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
-  --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
-  --green:#059669;--green-bg:rgba(5,150,105,0.08);
-  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+  --navy:       #0f2153;
+  --navy2:      #1a3068;
+  --navy3:      #0b1a3d;
+  --blue:       #1d4ed8;
+  --blue2:      #2563eb;
+  --blue-light: #3b82f6;
+  --blue-glow:  rgba(59,130,246,0.10);
+  --cyan:       #0891b2;
+  --surface:    #ffffff;
+  --surface2:   #f8faff;
+  --border:     #e2e8f3;
+  --border2:    rgba(37,99,235,0.25);
+  --text:       #0f2153;
+  --text2:      #3d5a8a;
+  --text3:      #7a93bc;
+  --green:      #059669;
+  --green-bg:   rgba(5,150,105,0.08);
+  --amber:      #d97706;
+  --amber-bg:   rgba(217,119,6,0.08);
+  --red:        #dc2626;
+  --red-bg:     rgba(220,38,38,0.08);
 }
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);min-height:100vh;}
-.bg-dot{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(37,99,235,0.07) 1px,transparent 1px);background-size:32px 32px;}
-.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(37,99,235,0.06) 0%,transparent 70%);}
 
-/* Navbar di-handle oleh navbar.js */
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-
-.btn-ghost{font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:500;color:var(--text2);border:1px solid var(--border);background:transparent;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;display:inline-flex;align-items:center;}
-.btn-ghost:hover{border-color:var(--border2);color:var(--navy);background:var(--surface2);}
-.btn-primary{font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;color:#fff;background:var(--blue2);border:none;padding:7px 16px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(37,99,235,0.25);}
-.btn-primary:hover{background:var(--blue);box-shadow:0 4px 16px rgba(37,99,235,0.35);}
-
-.page-wrap{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:64px 24px 80px;}
-.page-header{text-align:center;margin-bottom:48px;animation:fadeDown 0.4s ease both;}
-.page-header h1{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;letter-spacing:-0.02em;color:var(--navy);}
-.page-header p{color:var(--text2);margin-top:8px;font-size:0.975rem;}
-
-.servers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
-.server-card{
-  background:white;border:1.5px solid var(--border);border-radius:16px;
-  padding:24px;cursor:pointer;text-decoration:none;color:inherit;
-  transition:all 0.2s;display:block;
-  animation:fadeUp 0.4s ease both;
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #ffffff;
+  color: var(--text);
+  min-height: 100vh;
 }
-.server-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(15,33,83,0.10);}
-.server-card:hover .sc-arrow{opacity:1;transform:translateX(0);}
-.sc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;}
-.sc-icon{width:44px;height:44px;background:var(--blue-glow);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;}
-.sc-status{display:flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:700;color:var(--green);}
-.sc-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
-.sc-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1rem;color:var(--navy);margin-bottom:4px;}
-.sc-full{font-size:0.775rem;color:var(--text3);margin-bottom:16px;}
-.sc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
-.sc-stat{background:var(--surface2);border-radius:8px;padding:10px 12px;}
-.sc-stat .sl{font-size:0.68rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;}
-.sc-stat .sv{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin-top:2px;}
-.sc-footer{display:flex;align-items:center;justify-content:space-between;}
-.sc-updated{font-size:0.72rem;color:var(--text3);}
-.sc-arrow{font-size:0.875rem;color:var(--blue2);font-weight:700;opacity:0;transform:translateX(-6px);transition:all 0.2s;}
 
-.add-server{
-  background:var(--surface2);border:1.5px dashed var(--border);border-radius:16px;
-  padding:24px;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:8px;color:var(--text3);
-  min-height:160px;font-size:0.875rem;
-  animation:fadeUp 0.4s 0.1s ease both;
+/* Background decorations */
+.bg-dot {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(37,99,235,0.055) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-.add-server svg{opacity:0.4;}
+.bg-glow {
+  position: fixed; top: -200px; left: 50%; transform: translateX(-50%);
+  width: 800px; height: 500px; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(59,130,246,0.07) 0%, transparent 70%);
+}
 
-@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+/* Navbar */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  height: 64px; padding: 0 40px;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(37,99,235,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 1.1rem;
+  color: var(--navy); text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-back {
+  font-size: 0.875rem; color: var(--text2);
+  text-decoration: none; display: flex; align-items: center; gap: 6px;
+  transition: color 0.18s;
+}
+.nav-back:hover { color: var(--blue2); }
+
+/* Main layout */
+main {
+  position: relative; z-index: 1;
+  max-width: 1060px; margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: 32px;
+  animation: fadeDown 0.35s ease both;
+}
+.page-header-top {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+}
+.page-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: var(--green-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.badge-free {
+  background: var(--green-bg); color: var(--green);
+  font-size: 0.6rem; font-weight: 700; border-radius: 100px;
+  padding: 3px 8px; letter-spacing: 0.04em;
+}
+.page-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.75rem; font-weight: 700;
+  color: var(--navy); letter-spacing: -0.02em;
+}
+.page-header p {
+  color: var(--text2); font-size: 0.9375rem; line-height: 1.65;
+}
+
+/* Filter panel */
+.filter-panel {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+  animation: fadeUp 0.35s ease 0.05s both;
+}
+.filter-group {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.filter-group label {
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.filter-group select, .filter-group input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 8px; padding: 8px 12px;
+  outline: none; cursor: pointer;
+  transition: border-color 0.18s;
+  min-width: 160px;
+}
+.filter-group select:focus, .filter-group input:focus {
+  border-color: var(--blue-light);
+}
+.filter-group input[type="text"] { min-width: 200px; }
+
+.btn-search {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem; font-weight: 600;
+  background: var(--blue2); color: #fff;
+  border: none; border-radius: 8px;
+  padding: 9px 20px; cursor: pointer;
+  transition: background 0.18s, transform 0.1s;
+  white-space: nowrap; align-self: flex-end;
+}
+.btn-search:hover { background: var(--blue); }
+.btn-search:active { transform: scale(0.98); }
+.btn-search:disabled { background: var(--text3); cursor: not-allowed; }
+
+/* Stats bar */
+.stats-bar {
+  display: flex; gap: 24px; margin-bottom: 20px;
+  animation: fadeIn 0.4s ease 0.15s both;
+  flex-wrap: wrap;
+}
+.stat-item {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.stat-label { font-size: 0.75rem; color: var(--text3); }
+.stat-value { font-size: 1.125rem; font-weight: 600; color: var(--navy); font-family: 'Space Grotesk', sans-serif; }
+
+/* Table wrapper */
+.table-wrapper {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  animation: fadeUp 0.4s ease 0.1s both;
+}
+
+table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.875rem;
+}
+thead th {
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.7rem; font-weight: 700;
+  color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em;
+  text-align: left; white-space: nowrap;
+  cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--text2); }
+thead th.sorted { color: var(--blue2); }
+thead th .sort-arrow { margin-left: 4px; opacity: 0.5; }
+thead th.sorted .sort-arrow { opacity: 1; }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  cursor: pointer;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody tr.expanded { background: var(--blue-glow); }
+
+td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+td.rank {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; color: var(--text3); font-size: 0.8rem;
+  width: 48px;
+}
+td.rank.top3 { color: var(--amber); }
+
+.village-name {
+  font-weight: 600; color: var(--navy);
+  display: block; margin-bottom: 2px;
+}
+.village-coords {
+  font-size: 0.75rem; color: var(--text3);
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.alliance-tag {
+  display: inline-block;
+  background: var(--blue-glow); color: var(--blue2);
+  font-size: 0.7rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 4px;
+  letter-spacing: 0.03em;
+}
+.no-alliance {
+  color: var(--text3); font-size: 0.75rem; font-style: italic;
+}
+
+/* Oasis count + score cells */
+.oasis-count {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700; font-size: 1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.oasis-dots { display: flex; gap: 3px; }
+.oasis-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green);
+  opacity: 0.4;
+}
+.oasis-dot.active { opacity: 1; }
+
+.score-bar-wrap {
+  display: flex; align-items: center; gap: 8px;
+}
+.score-bar {
+  height: 6px; border-radius: 100px;
+  background: var(--border); flex: 1; min-width: 60px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%; border-radius: 100px;
+  background: linear-gradient(90deg, var(--blue-light), var(--green));
+  transition: width 0.3s ease;
+}
+.score-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; font-size: 0.8rem;
+  color: var(--text2); min-width: 28px;
+  text-align: right;
+}
+
+/* Expanded detail row */
+.detail-row td {
+  padding: 0;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.detail-inner {
+  padding: 16px 20px;
+}
+.detail-title {
+  font-size: 0.7rem; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 10px;
+}
+.oasis-list {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.oasis-chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 130px;
+}
+.oasis-chip-coords {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.7rem; font-weight: 600; color: var(--text2);
+}
+.oasis-chip-bonus {
+  font-size: 0.75rem; color: var(--green); font-weight: 600;
+}
+.oasis-chip-dist {
+  font-size: 0.7rem; color: var(--text3);
+}
+
+/* Empty / loading / error states */
+.state-box {
+  padding: 60px 24px;
+  text-align: center;
+}
+.state-box .state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.state-box h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600; color: var(--navy); margin-bottom: 6px;
+}
+.state-box p { color: var(--text2); font-size: 0.875rem; line-height: 1.65; }
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue2);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+@keyframes fadeDown { from { opacity:0; transform:translateY(-14px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(18px);  } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+@keyframes spin     { to { transform:rotate(360deg); } }
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 16px;
+  border-top: 1px solid var(--border);
+}
+.page-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem; font-weight: 500;
+  background: none; border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 10px;
+  cursor: pointer; color: var(--text2);
+  transition: all 0.15s;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--blue-light); color: var(--blue2); }
+.page-btn.active { background: var(--blue2); color: #fff; border-color: var(--blue2); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Info note */
+.info-note {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: var(--blue-glow);
+  border: 1px solid rgba(37,99,235,0.12);
+  border-radius: 10px;
+  font-size: 0.8125rem; color: var(--text2); line-height: 1.6;
+}
+
+@media (max-width: 700px) {
+  nav { padding: 0 16px; }
+  main { padding: 24px 16px 60px; }
+  .filter-panel { flex-direction: column; }
+  .filter-group select, .filter-group input { min-width: unset; width: 100%; }
+  .btn-search { width: 100%; padding: 11px; }
+  .hide-mobile { display: none; }
+}
 </style>
 </head>
 <body>
+
 <div class="bg-dot"></div>
 <div class="bg-glow"></div>
 
-<!-- NAVBAR -->
-<div id="navbar-root"></div>
+<!-- Navbar -->
+<nav>
+  <a href="/" class="nav-logo">⚔️ TravianTools</a>
+  <a href="/oasis-finder" class="nav-back">
+    ← Back to Oasis Tools
+  </a>
+</nav>
 
-<div class="page-wrap">
+<main>
+  <!-- Page Header -->
   <div class="page-header">
-    <h1>📊 Server Statistics</h1>
-    <p>Choose a server to view player rankings, alliance stats, and growth history.</p>
+    <div class="page-header-top">
+      <div class="page-icon">🌿</div>
+      <span class="badge-free">FREE</span>
+    </div>
+    <h1>Best Villages for Oasis</h1>
+    <p>Rank every village by how many oases are claimable nearby (Chebyshev radius ≤ 3 tiles).</p>
   </div>
 
-  <div class="servers-grid" id="serversGrid">
-    <!-- Diisi JS -->
+  <!-- Filter Panel -->
+  <div class="filter-panel">
+    <div class="filter-group">
+      <label>Server</label>
+      <select id="serverSelect">
+        <option value="ts5.x1.asia">ts5.x1.asia</option>
+        <option value="ts1">ts1</option>
+        <option value="ts2">ts2</option>
+        <option value="ts3">ts3</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Radius (tiles)</label>
+      <select id="radiusSelect">
+        <option value="3" selected>3 tiles (claimable)</option>
+        <option value="2">2 tiles</option>
+        <option value="1">1 tile</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Min oasis count</label>
+      <select id="minOasisSelect">
+        <option value="1">≥ 1 oasis</option>
+        <option value="2">≥ 2 oases</option>
+        <option value="3" selected>≥ 3 oases</option>
+      </select>
+    </div>
+    <div class="filter-group hide-mobile">
+      <label>Alliance filter</label>
+      <input type="text" id="allianceFilter" placeholder="e.g. -TAG- or leave blank">
+    </div>
+    <button class="btn-search" id="searchBtn" onclick="runSearch()">
+      Search Villages
+    </button>
   </div>
-</div>
+
+  <!-- Stats bar (hidden until results) -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-item">
+      <span class="stat-label">Villages found</span>
+      <span class="stat-value" id="statVillages">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Total oases indexed</span>
+      <span class="stat-value" id="statOases">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Max score</span>
+      <span class="stat-value" id="statMaxScore">—</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Avg oases / village</span>
+      <span class="stat-value" id="statAvg">—</span>
+    </div>
+  </div>
+
+  <!-- Results table -->
+  <div class="table-wrapper" id="tableWrapper">
+    <div class="state-box" id="emptyState">
+      <div class="state-icon">🌿</div>
+      <h3>Ready to search</h3>
+      <p>Select a server and click Search Villages.<br>Data is fetched directly from Turso — no middleman.</p>
+    </div>
+    <table id="resultsTable" style="display:none">
+      <thead>
+        <tr>
+          <th style="width:48px">#</th>
+          <th onclick="sortBy('village_name')">Village <span class="sort-arrow" id="arr-village_name"></span></th>
+          <th onclick="sortBy('player_name')" class="hide-mobile">Player <span class="sort-arrow" id="arr-player_name"></span></th>
+          <th onclick="sortBy('alliance_tag')" class="hide-mobile">Alliance <span class="sort-arrow" id="arr-alliance_tag"></span></th>
+          <th onclick="sortBy('oasis_count')">Oases <span class="sort-arrow" id="arr-oasis_count"></span></th>
+          <th onclick="sortBy('score')">Score <span class="sort-arrow" id="arr-score"></span></th>
+        </tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+    <div id="paginationWrap" class="pagination" style="display:none"></div>
+  </div>
+
+  <div class="info-note" id="infoNote" style="display:none">
+    💡 <strong>Score</strong> = number of claimable oases within the selected radius using Chebyshev distance
+    (max(|Δx|, |Δy|) ≤ radius). Click any row to see which oases are nearby.
+    Oasis occupied status is not real-time.
+  </div>
+</main>
 
 <script>
-const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
+// ═══════════════════════════════════════════════════════════
+// CONFIG — replace with your actual Turso credentials
+// ═══════════════════════════════════════════════════════════
+const TURSO_URL   = 'https://travian-stats-correctable.turso.io';   // e.g. https://travian-ts5-yourname.turso.io
+const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';        // read-only token
 
-// Daftar server yang tersedia — tambah di sini kalau ada server baru
-const SERVERS = [
-  { code: 'ts5', slug: 'ts5.x1.asia', full: 'ts5.x1.asia.travian.com', label: 'Asia 5', flag: '🌏' },
-];
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let allResults   = [];
+let sortKey      = 'score';
+let sortDir      = -1;          // -1 = desc, 1 = asc
+let currentPage  = 1;
+const PAGE_SIZE  = 50;
+let expandedRow  = null;        // village_id of expanded detail row
 
-async function query(sql, args = []) {
+// ═══════════════════════════════════════════════════════════
+// TURSO HTTP API
+// ═══════════════════════════════════════════════════════════
+async function tursoQuery(sql, args = []) {
   const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${TURSO_TOKEN}`, 'Content-Type': 'application/json' },
@@ -110,58 +510,324 @@ async function query(sql, args = []) {
       ]
     })
   });
+  if (!res.ok) throw new Error(`Turso error: ${res.status} ${res.statusText}`);
   const data = await res.json();
   const result = data.results?.[0]?.response?.result;
   if (!result) return [];
   const cols = result.cols.map(c => c.name);
-  return result.rows.map(row => { const o={}; row.forEach((c,i)=>o[cols[i]]=c.value); return o; });
+  return result.rows.map(row => { const o={}; row.forEach((c,i) => o[cols[i]] = c.value); return o; });
 }
 
-function fmtNum(n) { return n ? Number(n).toLocaleString() : '—'; }
+// ═══════════════════════════════════════════════════════════
+// MAIN SEARCH
+// ═══════════════════════════════════════════════════════════
+async function runSearch() {
+  const server      = document.getElementById('serverSelect').value;
+  const radius      = parseInt(document.getElementById('radiusSelect').value);
+  const minOasis    = parseInt(document.getElementById('minOasisSelect').value);
+  const allianceF   = document.getElementById('allianceFilter').value.trim().toLowerCase();
+  const btn         = document.getElementById('searchBtn');
 
-async function loadServers() {
-  const grid = document.getElementById('serversGrid');
-  for (let i = 0; i < SERVERS.length; i++) {
-    const s = SERVERS[i];
-    const snap = await query(
-      'SELECT * FROM snapshots WHERE server = ? ORDER BY snap_date DESC LIMIT 1',
-      [s.code]
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Loading…';
+  setEmptyState('loading');
+
+  try {
+    // 2 queries — economical!
+    const [oases, villages] = await Promise.all([
+      tursoQuery(
+        `SELECT x, y, bonus_str, max_bonus FROM oases WHERE server = ?`,
+        [server]
+      ),
+      tursoQuery(
+        `SELECT village_id, x, y, village_name, player_name, alliance_tag, population
+         FROM villages WHERE server = ?`,
+        [server]
+      )
+    ]);
+
+    // Score each village in JS
+    const scored = scoreVillages(villages, oases, radius);
+
+    // Apply filters
+    let filtered = scored.filter(v => v.oasis_count >= minOasis);
+    if (allianceF) {
+      filtered = filtered.filter(v =>
+        (v.alliance_tag || '').toLowerCase().includes(allianceF)
+      );
+    }
+
+    allResults = filtered;
+    currentPage = 1;
+    sortKey = 'score';
+    sortDir = -1;
+
+    // Stats
+    const maxScore = filtered.length ? filtered[0].score : 0;
+    const avgOases = filtered.length
+      ? (filtered.reduce((s,v) => s + v.oasis_count, 0) / filtered.length).toFixed(1)
+      : 0;
+    document.getElementById('statVillages').textContent  = filtered.length.toLocaleString();
+    document.getElementById('statOases').textContent     = oases.length.toLocaleString();
+    document.getElementById('statMaxScore').textContent  = maxScore;
+    document.getElementById('statAvg').textContent       = avgOases;
+    document.getElementById('statsBar').style.display    = 'flex';
+    document.getElementById('infoNote').style.display    = 'block';
+
+    renderTable();
+
+  } catch (err) {
+    setEmptyState('error', err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Search Villages';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// SCORING — Chebyshev distance ≤ radius
+// ═══════════════════════════════════════════════════════════
+function scoreVillages(villages, oases, radius) {
+  const oasisArr = oases.map(o => ({
+    x: Number(o.x), y: Number(o.y),
+    bonus_str: o.bonus_str || '',
+    max_bonus: Number(o.max_bonus) || 0
+  }));
+
+  return villages.map(v => {
+    const vx = Number(v.x), vy = Number(v.y);
+    const nearby = oasisArr.filter(o =>
+      Math.max(Math.abs(o.x - vx), Math.abs(o.y - vy)) <= radius
     );
-    const d = snap[0] || {};
-    const card = document.createElement('a');
-    card.href  = `/statistics/${s.slug}/`;
-    card.className = 'server-card';
-    card.style.animationDelay = `${i * 0.08}s`;
-    card.innerHTML = `
-      <div class="sc-top">
-        <div class="sc-icon">${s.flag}</div>
-        <div class="sc-status">LIVE</div>
-      </div>
-      <div class="sc-name">${s.label}</div>
-      <div class="sc-full">${s.full}</div>
-      <div class="sc-stats">
-        <div class="sc-stat"><div class="sl">Players</div><div class="sv">${fmtNum(d.total_players)}</div></div>
-        <div class="sc-stat"><div class="sl">Villages</div><div class="sv">${fmtNum(d.total_villages)}</div></div>
-        <div class="sc-stat"><div class="sl">Alliances</div><div class="sv">${fmtNum(d.total_alliances)}</div></div>
-        <div class="sc-stat"><div class="sl">Population</div><div class="sv">${fmtNum(d.total_population)}</div></div>
-      </div>
-      <div class="sc-footer">
-        <span class="sc-updated">Updated: ${d.snap_date || '—'}</span>
-        <span class="sc-arrow">View →</span>
-      </div>`;
-    grid.appendChild(card);
+    return {
+      ...v,
+      oasis_count: nearby.length,
+      score: nearby.length,       // simple: count only (expandable later)
+      nearby_oases: nearby
+    };
+  }).sort((a, b) => b.score - a.score);
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER TABLE
+// ═══════════════════════════════════════════════════════════
+function renderTable() {
+  const sorted = [...allResults].sort((a, b) => {
+    const av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'number') return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+  currentPage = Math.min(currentPage, totalPages);
+  const pageData = sorted.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+  const maxScore = sorted[0]?.score || 1;
+
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+
+  if (sorted.length === 0) {
+    setEmptyState('no-results');
+    return;
   }
 
-  // Tombol "Coming soon"
-  const add = document.createElement('div');
-  add.className = 'add-server';
-  add.innerHTML = `<svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>More servers coming soon</span>`;
-  grid.appendChild(add);
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('resultsTable').style.display = 'table';
+
+  pageData.forEach((v, idx) => {
+    const rank = (currentPage-1)*PAGE_SIZE + idx + 1;
+    const pct  = Math.round((v.score / maxScore) * 100);
+
+    // Main row
+    const tr = document.createElement('tr');
+    if (expandedRow === v.village_id) tr.classList.add('expanded');
+    tr.dataset.vid = v.village_id;
+    tr.innerHTML = `
+      <td class="rank${rank <= 3 ? ' top3' : ''}">${rank}</td>
+      <td>
+        <span class="village-name">${escHtml(v.village_name)}</span>
+        <span class="village-coords">(${v.x}|${v.y})</span>
+      </td>
+      <td class="hide-mobile">${escHtml(v.player_name || '—')}</td>
+      <td class="hide-mobile">
+        ${v.alliance_tag
+          ? `<span class="alliance-tag">${escHtml(v.alliance_tag)}</span>`
+          : `<span class="no-alliance">no alliance</span>`}
+      </td>
+      <td>
+        <div class="oasis-count">
+          ${v.oasis_count}
+          <div class="oasis-dots">
+            ${[1,2,3].map(n =>
+              `<div class="oasis-dot${v.oasis_count >= n ? ' active' : ''}"></div>`
+            ).join('')}
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar">
+            <div class="score-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <span class="score-val">${v.score}</span>
+        </div>
+      </td>
+    `;
+    tr.addEventListener('click', () => toggleDetail(v, tr));
+    tbody.appendChild(tr);
+
+    // Detail row (collapsed by default)
+    const detailTr = document.createElement('tr');
+    detailTr.classList.add('detail-row');
+    detailTr.id = `detail-${v.village_id}`;
+    detailTr.style.display = expandedRow === v.village_id ? '' : 'none';
+    detailTr.innerHTML = `<td colspan="6">${buildDetailHTML(v)}</td>`;
+    tbody.appendChild(detailTr);
+  });
+
+  renderPagination(totalPages);
+  updateSortArrows();
 }
 
-loadServers();
-</script>
-<script src="/navbar.js"></script>
+function toggleDetail(v, tr) {
+  const detailTr = document.getElementById(`detail-${v.village_id}`);
+  if (expandedRow === v.village_id) {
+    expandedRow = null;
+    detailTr.style.display = 'none';
+    tr.classList.remove('expanded');
+  } else {
+    // Close previous
+    if (expandedRow !== null) {
+      const old = document.getElementById(`detail-${expandedRow}`);
+      if (old) old.style.display = 'none';
+      document.querySelector(`tr[data-vid="${expandedRow}"]`)?.classList.remove('expanded');
+    }
+    expandedRow = v.village_id;
+    detailTr.style.display = '';
+    tr.classList.add('expanded');
+  }
+}
 
+function buildDetailHTML(v) {
+  const chips = v.nearby_oases.map(o => {
+    const dist = Math.max(Math.abs(o.x - Number(v.x)), Math.abs(o.y - Number(v.y)));
+    return `<div class="oasis-chip">
+      <span class="oasis-chip-coords">(${o.x}|${o.y})</span>
+      <span class="oasis-chip-bonus">${escHtml(o.bonus_str || '?')}</span>
+      <span class="oasis-chip-dist">${dist} tile${dist !== 1 ? 's' : ''} away</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="detail-inner">
+    <div class="detail-title">Nearby oases for ${escHtml(v.village_name)} (${v.x}|${v.y})</div>
+    <div class="oasis-list">${chips || '<span style="color:var(--text3);font-size:.8rem">No oases found</span>'}</div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// SORT
+// ═══════════════════════════════════════════════════════════
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  expandedRow = null;
+  renderTable();
+}
+
+function updateSortArrows() {
+  ['village_name','player_name','alliance_tag','oasis_count','score'].forEach(k => {
+    const el = document.getElementById(`arr-${k}`);
+    if (!el) return;
+    const th = el.closest('th');
+    if (k === sortKey) {
+      el.textContent = sortDir === -1 ? '↓' : '↑';
+      th.classList.add('sorted');
+    } else {
+      el.textContent = '↕';
+      th.classList.remove('sorted');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGINATION
+// ═══════════════════════════════════════════════════════════
+function renderPagination(totalPages) {
+  const wrap = document.getElementById('paginationWrap');
+  if (totalPages <= 1) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'flex';
+  wrap.innerHTML = '';
+
+  const mkBtn = (label, page, active, disabled) => {
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (active ? ' active' : '');
+    b.textContent = label;
+    b.disabled = disabled;
+    if (!disabled && !active) b.onclick = () => { currentPage = page; expandedRow = null; renderTable(); };
+    return b;
+  };
+
+  wrap.appendChild(mkBtn('←', currentPage-1, false, currentPage === 1));
+
+  // Show max 7 page buttons
+  const range = pageRange(currentPage, totalPages);
+  range.forEach(p => {
+    if (p === '…') {
+      const s = document.createElement('span');
+      s.textContent = '…'; s.style.cssText = 'padding:4px 6px;color:var(--text3)';
+      wrap.appendChild(s);
+    } else {
+      wrap.appendChild(mkBtn(p, p, p === currentPage, false));
+    }
+  });
+
+  wrap.appendChild(mkBtn('→', currentPage+1, false, currentPage === totalPages));
+}
+
+function pageRange(cur, total) {
+  if (total <= 7) return Array.from({length: total}, (_,i) => i+1);
+  if (cur <= 4) return [1,2,3,4,5,'…',total];
+  if (cur >= total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
+  return [1,'…',cur-1,cur,cur+1,'…',total];
+}
+
+// ═══════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════
+function setEmptyState(type, msg) {
+  document.getElementById('resultsTable').style.display = 'none';
+  document.getElementById('paginationWrap').style.display = 'none';
+  const el = document.getElementById('emptyState');
+  el.style.display = 'block';
+
+  const icons = { loading: '⏳', error: '⚠️', 'no-results': '🔍', default: '🌿' };
+  const titles = {
+    loading: 'Fetching data…',
+    error: 'Connection error',
+    'no-results': 'No villages found',
+    default: 'Ready to search'
+  };
+  const descs = {
+    loading: 'Querying oases and villages from Turso…',
+    error: msg || 'Could not connect to Turso. Check your TURSO_URL and TURSO_TOKEN.',
+    'no-results': 'Try lowering the minimum oasis count or clearing the alliance filter.',
+    default: 'Select a server and click Search Villages.'
+  };
+
+  el.innerHTML = `
+    <div class="state-icon">${icons[type] || icons.default}</div>
+    <h3>${titles[type] || titles.default}</h3>
+    <p>${descs[type] || descs.default}</p>
+  `;
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Allow pressing Enter in alliance filter
+document.getElementById('allianceFilter')
+  .addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+</script>
 </body>
 </html>

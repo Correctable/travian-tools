@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TravianTools</title>
+  <script>
+    // GitHub Pages 404 redirect trick
+    // Redirect /r/ABC123 → /r/?id=ABC123
+    // Redirect anything else → /
+    (function() {
+      const path = window.location.pathname;
+      const search = window.location.search;
+
+      // Match /r/{id}
+      const rMatch = path.match(/^\/r\/([A-Za-z0-9]+)\/?$/);
+      if (rMatch) {
+        window.location.replace('/r/?id=' + rMatch[1]);
+        return;
+      }
+
+      // Everything else → home
+      window.location.replace('/');
+    })();
+  </script>
+</head>
+<body></body>
+</html>

@@ -63,9 +63,6 @@
       z-index: 0;
     }
 
-    /* Navbar di-handle oleh navbar.js */
-
-    /* ── MAIN LAYOUT ── */
     .page-wrap {
       position: relative;
       z-index: 1;
@@ -82,7 +79,6 @@
       animation: fadeUp 0.4s ease both;
     }
 
-    /* ── CARD ── */
     .auth-card {
       background: #ffffff;
       border: 1px solid var(--border);
@@ -124,7 +120,7 @@
       line-height: 1.6;
     }
 
-    /* ── ERROR / SUCCESS ALERT ── */
+    /* Alert */
     .alert {
       display: none;
       padding: 12px 16px;
@@ -133,18 +129,21 @@
       font-weight: 500;
       margin-bottom: 20px;
       border: 1px solid transparent;
+      line-height: 1.5;
     }
-
     .alert-error {
       background: var(--red-bg);
       border-color: rgba(220,38,38,0.2);
       color: var(--red);
     }
-
-    /* ── FORM ── */
-    .form-group {
-      margin-bottom: 18px;
+    .alert-success {
+      background: var(--green-bg);
+      border-color: rgba(5,150,105,0.2);
+      color: var(--green);
     }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
 
     .form-label-row {
       display: flex;
@@ -170,9 +169,7 @@
     }
     .forgot-link:hover { color: var(--blue-light); }
 
-    .input-wrap {
-      position: relative;
-    }
+    .input-wrap { position: relative; }
 
     .input-icon {
       position: absolute;
@@ -184,7 +181,6 @@
       opacity: 0.45;
     }
 
-    input[type="text"],
     input[type="email"],
     input[type="password"] {
       width: 100%;
@@ -235,7 +231,6 @@
     }
     .toggle-pw:hover { color: var(--text2); }
 
-    /* Remember me */
     .form-check {
       display: flex;
       align-items: center;
@@ -279,16 +274,35 @@
       letter-spacing: 0.01em;
     }
 
-    .btn-submit:hover {
+    .btn-submit:hover:not(:disabled) {
       background: var(--blue-light);
       box-shadow: 0 6px 28px rgba(59,130,246,0.4);
       transform: translateY(-1px);
     }
 
-    .btn-submit:active { transform: translateY(0); }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
     .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
-    /* Divider */
+    .btn-submit.success {
+      background: var(--green) !important;
+      box-shadow: 0 4px 20px rgba(5,150,105,0.3) !important;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-label { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     .divider-text {
       display: flex;
       align-items: center;
@@ -304,7 +318,6 @@
       background: var(--border);
     }
 
-    /* Footer link */
     .auth-switch {
       text-align: center;
       margin-top: 24px;
@@ -320,7 +333,6 @@
     }
     .auth-switch a:hover { color: var(--blue-light); }
 
-    /* Perks */
     .auth-perks {
       display: flex;
       justify-content: center;
@@ -345,7 +357,6 @@
       flex-shrink: 0;
     }
 
-    /* ── FOOTER ── */
     footer {
       position: relative;
       z-index: 1;
@@ -357,20 +368,15 @@
       color: var(--text3);
     }
 
-    footer a {
-      color: var(--text3);
-      text-decoration: none;
-    }
+    footer a { color: var(--text3); text-decoration: none; }
     footer a:hover { color: var(--text2); }
 
-    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 480px) {
-      nav { padding: 0 16px; }
       .auth-card { padding: 28px 20px; }
       .auth-perks { gap: 14px; }
     }
@@ -378,10 +384,8 @@
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <div id="navbar-root"></div>
 
-  <!-- MAIN -->
   <div class="page-wrap">
     <div class="auth-container">
       <div class="auth-card">
@@ -392,35 +396,29 @@
           <p class="auth-subtitle">Log in to access your tools and saved data.</p>
         </div>
 
-        <!-- Error alert (hidden by default) -->
-        <div class="alert alert-error" id="alertBox">
-          Incorrect username/email or password. Please try again.
-        </div>
+        <div class="alert" id="alertBox"></div>
 
-        <form id="loginForm" onsubmit="handleLogin(event)" novalidate>
+        <form id="loginForm" novalidate>
 
-          <!-- Username or Email -->
           <div class="form-group">
-            <label for="identifier">Username or Email</label>
+            <label for="email">Email</label>
             <div class="input-wrap">
               <span class="input-icon">🛡️</span>
               <input
-                type="text"
-                id="identifier"
-                name="identifier"
-                placeholder="Username or email address"
-                autocomplete="username"
+                type="email"
+                id="email"
+                name="email"
+                placeholder="your@email.com"
+                autocomplete="email"
                 required
               >
             </div>
-            <span class="input-hint">You can log in with either your username or email.</span>
           </div>
 
-          <!-- Password -->
           <div class="form-group">
             <div class="form-label-row">
               <label for="password">Password</label>
-              <a href="#" class="forgot-link">Forgot password?</a>
+              <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
             </div>
             <div class="input-wrap">
               <span class="input-icon">🔒</span>
@@ -436,14 +434,14 @@
             </div>
           </div>
 
-          <!-- Remember me -->
           <label class="form-check">
             <input type="checkbox" id="remember" name="remember">
             Keep me logged in
           </label>
 
           <button type="submit" class="btn-submit" id="submitBtn">
-            Log in →
+            <div class="spinner"></div>
+            <span class="btn-label">Log in →</span>
           </button>
 
         </form>
@@ -470,7 +468,29 @@
     <a href="/">travian.sonybukansoni.com</a> &nbsp;·&nbsp; Travian Tools
   </footer>
 
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+  <script src="/servers.js"></script>
+  <script src="/navbar.js"></script>
+
   <script>
+    // Kalau sudah login, redirect ke home
+    (async () => {
+      const session = await window.getSession();
+      if (session) window.location.replace('/');
+    })();
+
+    // Ambil redirect target dari query param ?next=
+    function getRedirectTarget() {
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get('next');
+      // Validasi: hanya path internal (diawali /)
+      if (next && next.startsWith('/') && !next.startsWith('//')) return next;
+      return '/';
+    }
+
+    // Toggle show/hide password
     function togglePw(id, btn) {
       const input = document.getElementById(id);
       const isHidden = input.type === 'password';
@@ -478,32 +498,104 @@
       btn.textContent = isHidden ? '🙈' : '👁';
     }
 
-    function handleLogin(e) {
-      e.preventDefault();
-      const btn = document.getElementById('submitBtn');
-      const alert = document.getElementById('alertBox');
-      const identifier = document.getElementById('identifier').value.trim();
-      const password = document.getElementById('password').value;
+    // Show alert
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alertBox');
+      box.textContent = msg;
+      box.className = `alert alert-${type}`;
+      box.style.display = 'block';
+    }
 
-      if (!identifier || !password) {
-        alert.style.display = 'block';
-        alert.textContent = 'Please fill in all fields.';
+    function hideAlert() {
+      const box = document.getElementById('alertBox');
+      box.style.display = 'none';
+    }
+
+    // Set button state
+    function setLoading(loading) {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = loading;
+      btn.classList.toggle('loading', loading);
+    }
+
+    // Forgot password
+    document.getElementById('forgotLink').addEventListener('click', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+
+      if (!email) {
+        showAlert('Enter your email address first, then click "Forgot password?".');
         return;
       }
 
-      alert.style.display = 'none';
-      btn.textContent = 'Logging in…';
-      btn.disabled = true;
+      const { error } = await window._supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://travian.sonybukansoni.com/account/reset-password/',
+      });
 
-      // TODO: wire up to backend
+      if (error) {
+        showAlert('Failed to send reset email. Please try again.');
+      } else {
+        showAlert('Password reset link sent! Check your email inbox.', 'success');
+      }
+    });
+
+    // Login form submit
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showAlert('Please fill in all fields.');
+        return;
+      }
+
+      setLoading(true);
+
+      const { data, error } = await window._supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      setLoading(false);
+
+      if (error) {
+        // Pesan error Supabase → terjemahkan ke pesan user-friendly
+        let msg = 'Incorrect email or password. Please try again.';
+        if (error.message.includes('Email not confirmed')) {
+          msg = 'Please confirm your email address before logging in. Check your inbox.';
+        } else if (error.message.includes('Invalid login')) {
+          msg = 'Incorrect email or password. Please try again.';
+        } else if (error.message.includes('rate limit') || error.status === 429) {
+          msg = 'Too many login attempts. Please wait a moment before trying again.';
+        }
+        showAlert(msg);
+
+        document.getElementById('email').classList.add('input-error');
+        document.getElementById('password').classList.add('input-error');
+        return;
+      }
+
+      // Sukses
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('success');
+      btn.innerHTML = '<span class="btn-label">✓ Logged in!</span>';
+
       setTimeout(() => {
-        btn.textContent = '✓ Logged in!';
-        btn.style.background = 'var(--green)';
-        btn.style.boxShadow = '0 4px 20px rgba(5,150,105,0.3)';
-      }, 1200);
-    }
+        window.location.replace(getRedirectTarget());
+      }, 700);
+    });
+
+    // Hapus error state saat user mulai ketik
+    ['email', 'password'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        document.getElementById(id).classList.remove('input-error');
+        hideAlert();
+      });
+    });
   </script>
-  <script src="/navbar.js"></script>
-  
+
 </body>
 </html>

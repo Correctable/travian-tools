@@ -185,7 +185,7 @@ function evBadge(type) {
 
 async function init() {
   if(!playerId){showNotFound();return;}
-  const [playerRows, villageRows, histRows, villageEvents, allianceEvents] = await Promise.all([
+  const [playerRows, villageRows, histRows, villageEvents, allianceEvents, villageHistRows] = await Promise.all([
     query(`SELECT p.*, a.alliance_id as aid FROM players p
            LEFT JOIN alliances a ON a.alliance_tag=p.alliance_tag AND a.server=p.server
            WHERE p.player_id=? AND p.server=?`,[playerId,SERVER]),
@@ -193,11 +193,20 @@ async function init() {
     query(`SELECT snap_date,population,village_count FROM player_history WHERE player_id=? AND server=? ORDER BY snap_date ASC`,[playerId,SERVER]),
     query(`SELECT * FROM village_events WHERE (old_player_id=? OR new_player_id=?) AND server=? ORDER BY event_date DESC LIMIT 50`,[playerId,playerId,SERVER]),
     query(`SELECT * FROM alliance_events WHERE player_id=? AND server=? ORDER BY event_date DESC LIMIT 30`,[playerId,SERVER]),
+    // Ambil populasi desa kemarin untuk growth per desa
+    query(`SELECT village_id, population FROM village_history
+           WHERE player_id=? AND server=?
+           AND snap_date=(SELECT MAX(snap_date) FROM village_history WHERE player_id=? AND server=? AND snap_date < DATE('now'))
+           `,[playerId,SERVER,playerId,SERVER]),
   ]);
 
   if(!playerRows.length){showNotFound();return;}
   const p = playerRows[0];
   historyData = histRows;
+
+  // Buat lookup: village_id → populasi kemarin
+  const prevPopByVillage = {};
+  villageHistRows.forEach(h => { prevPopByVillage[h.village_id] = Number(h.population); });
   document.title = `${p.player_name} — Travian Tools`;
   document.getElementById('bcName').textContent = p.player_name;
 
@@ -254,18 +263,35 @@ async function init() {
         <div class="card" style="animation:fadeUp 0.4s 0.1s ease both">
           <div class="card-title">🏘️ Villages <span class="ct-sub">${villageRows.length} active</span></div>
           <table class="data-table">
-            <thead><tr><th>Village</th><th>Coords</th><th class="r">Population</th></tr></thead>
+            <thead><tr><th>Village</th><th>Coords</th><th class="r">Population</th><th class="r">+/- (1d)</th></tr></thead>
             <tbody>
-              ${villageRows.map(v=>`<tr>
-                <td>
-                  <div style="display:flex;align-items:center;gap:6px">
-                  <span>${TRIBE_ICON[v.tribe]||''}</span>
-                  <a href="http://ts5.x1.asia.travian.com/karte.php?x=${v.x}&y=${v.y}" target="_blank" style="font-weight:600;color:var(--navy);text-decoration:none" onmouseover="this.style.color='var(--blue2)'" onmouseout="this.style.color='var(--navy)'">${v.village_name}</a>
-                  ${v.is_capital=='1'||v.is_capital===1?'<span class="capital-badge">CAPITAL</span>':''}
-                </td>
-                <td class="coords">(${v.x}|${v.y})</td>
-                <td class="r pop-val">${fmt(v.population)}</td>
-              </tr>`).join('')}
+              ${villageRows.map(v=>{
+                const prevPop = prevPopByVillage[v.village_id];
+                const delta   = prevPop != null ? Number(v.population) - prevPop : null;
+                return `<tr>
+                  <td>
+                    <div style="display:flex;align-items:center;gap:6px">
+                      <span style="font-size:1rem;line-height:1">${TRIBE_ICON[v.tribe]||''}</span>
+                      <a href="http://ts5.x1.asia.travian.com/karte.php?x=${v.x}&y=${v.y}"
+                         target="_blank"
+                         style="font-weight:600;color:var(--navy);text-decoration:none"
+                         onmouseover="this.style.color='var(--blue2)'"
+                         onmouseout="this.style.color='var(--navy)'">${v.village_name}</a>
+                      ${v.is_capital=='1'||v.is_capital===1?'<span class="capital-badge">CAPITAL</span>':''}
+                    </div>
+                  </td>
+                  <td class="coords">(${v.x}|${v.y})</td>
+                  <td class="r pop-val">${fmt(v.population)}</td>
+                  <td class="r">
+                    ${delta==null
+                      ? '<span style="color:var(--text3);font-size:0.75rem">—</span>'
+                      : delta===0
+                        ? '<span style="color:var(--text3);font-size:0.75rem;font-weight:600">±0</span>'
+                        : `<span style="font-size:0.75rem;font-weight:600;color:${delta>0?'var(--green)':'var(--red)'}">${delta>0?'+':''}${fmt(delta)}</span>`
+                    }
+                  </td>
+                </tr>`;
+              }).join('')}
             </tbody>
           </table>
         </div>
