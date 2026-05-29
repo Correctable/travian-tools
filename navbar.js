@@ -109,7 +109,7 @@
     ],
 
     allianceItems: [
-      { icon: '🏰', title: 'Workspace',       desc: 'Alliance dashboard & overview',      badge: 'FREE', href: '/account/workspace/'           },
+      { icon: '🏰', title: 'Workspace',       desc: 'Alliance dashboard & overview',      badge: 'FREE', href: '/alliance/workspace/'           },
       { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PRO',  href: '/account/workspace/troops/'    },
       { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'PRO',  href: '/account/workspace/attack/'    },
       { icon: '🛡️', title: 'Defense Plan',    desc: 'Organize defensive assignments',     badge: 'PRO',  href: '/account/workspace/defense/'   },
