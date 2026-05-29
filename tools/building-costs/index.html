@@ -383,9 +383,7 @@ let sidebarBuilt = false;
 function fmtTime(s) {
   if (!s && s !== 0) return '—';
   const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-  return h > 0
-    ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
-    : `${m}:${String(sec).padStart(2,'0')}`;
+  return `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 function fmtN(n) { return n == null ? '—' : n.toLocaleString('en-US'); }
 function adjTime(sec, overrideMB) {
@@ -655,7 +653,7 @@ function renderHeader() {
           ${Array.from({length:21},(_,i)=>i).map(l=>'<option value="'+l+'" '+( l===mbLevel?'selected':'')+'>Level '+l+'</option>').join('')}
         </select>` : `
         <div class="ctrl-divider"></div>
-        <span class="ctrl-label" style="color:var(--text3);font-size:0.75rem">Each row uses its own level as MB factor</span>`}
+        <span class="ctrl-label" style="color:var(--text3);font-size:0.75rem">Build time is fixed (not affected by MB level)</span>`}
       </div>
     </div>
     <div class="table-scroll"><table id="bld-table"></table></div>`;
@@ -770,14 +768,15 @@ function renderRows(c, hasBonus, getBonusVal) {
   }
 
   tbody.innerHTML = '';
-  // Main Building (gid 15): tiap row pakai level-1 sebagai MB factor (formula resmi Travian)
+  // Main Building (gid 15): time di JSON sudah final (tidak pakai adjTime)
+  // hanya dibagi server speed
   const isMB = b.gid === 15;
   b.levels.forEach(lvl => {
     const isSel   = isLvlSel(lvl.level);
     const isAnch  = sel && sel.range === null && lvl.level === sel.anchor;
     const total   = lvl.cost.reduce((a,x)=>a+x,0);
     const bonus   = hasBonus ? getBonusVal(lvl) : null;
-    const t       = isMB ? adjTime(lvl.time, lvl.level - 1) : adjTime(lvl.time);
+    const t       = isMB ? Math.round(lvl.time / speed) : adjTime(lvl.time);
     const tr = document.createElement('tr');
     tr.className = isAnch ? 'row-anchor' : (isSel ? 'row-sel' : '');
     tr.onclick = () => handleLvlClick(lvl.level);
@@ -801,7 +800,7 @@ function renderRows(c, hasBonus, getBonusVal) {
   const totals  = selRows.reduce((acc,l)=>{
     acc[0]+=l.cost[0];acc[1]+=l.cost[1];acc[2]+=l.cost[2];acc[3]+=l.cost[3];
     acc.pop+=l.pop;acc.cp+=l.cp;
-    acc.time += isMB ? adjTime(l.time, l.level - 1) : adjTime(l.time);
+    acc.time += isMB ? Math.round(l.time / speed) : adjTime(l.time);
     return acc;
   },{0:0,1:0,2:0,3:0,pop:0,cp:0,time:0});
 
