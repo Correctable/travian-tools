@@ -134,11 +134,10 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface
   </div>
 </div>
 <script>
-const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
 const SERVER      = 'ts5';
 const SERVER_SLUG = 'ts5.x1.asia';
 const BASE_PATH   = `/s/${SERVER_SLUG}/statistics`;
+const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
 const TRIBE_NAME  = {1:'Roman',2:'Teuton',3:'Gaul',4:'Nature',5:'Natar',6:'Egyptian',7:'Hun'};
 const TRIBE_ICON  = {1:'<img src="/images/travian/roman_medium.png" alt="Roman" style="width:20px;height:20px;object-fit:contain">',2:'<img src="/images/travian/teuton_medium.png" alt="Teuton" style="width:20px;height:20px;object-fit:contain">',3:'<img src="/images/travian/gaul_medium.png" alt="Gaul" style="width:20px;height:20px;object-fit:contain">',4:'<img src="/images/travian/nature_medium.png" alt="Nature" style="width:20px;height:20px;object-fit:contain">',5:'<img src="/images/travian/natar_medium.png" alt="Natar" style="width:20px;height:20px;object-fit:contain">',6:'<img src="/images/travian/egyptian_medium.png" alt="Egyptian" style="width:20px;height:20px;object-fit:contain">',7:'<img src="/images/travian/hun_medium.png" alt="Hun" style="width:20px;height:20px;object-fit:contain">'};
 const TRIBE_COLOR = {1:'#1d4ed8',2:'#dc2626',3:'#059669',4:'#7c3aed',5:'#d97706',6:'#0891b2',7:'#b45309'};
@@ -146,26 +145,14 @@ const params      = new URLSearchParams(location.search);
 const allianceId  = params.get('id');
 let chartInstance = null, historyData = [];
 
-async function query(sql, args=[]) {
-  try {
-    const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
-      method:'POST',
-      headers:{'Authorization':`Bearer ${TURSO_TOKEN}`,'Content-Type':'application/json'},
-      body: JSON.stringify({requests:[
-        {type:'execute',stmt:{sql,args:args.map(v=>
-          v===null?{type:'null',value:null}
-          :typeof v==='number'?{type:'integer',value:String(v)}
-          :{type:'text',value:String(v)}
-        )}},
-        {type:'close'}
-      ]})
-    });
-    const data = await res.json();
-    const result = data.results?.[0]?.response?.result;
-    if(!result) return [];
-    const cols = result.cols.map(c=>c.name);
-    return result.rows.map(row=>{const o={};row.forEach((c,i)=>o[cols[i]]=c.value);return o;});
-  } catch(e){console.error('Query error:',sql,e);return[];}
+async function apiGet(endpoint, params={}) {
+  const url = new URL(`${API_BASE}/api/${endpoint}`);
+  Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
+  const res = await fetch(url.toString());
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'API error');
+  return json;
 }
 
 const fmt = n => n!=null ? Number(n).toLocaleString() : '—';
@@ -173,33 +160,22 @@ const rankCls = r => r===1?'rank gold':r===2?'rank silver':r===3?'rank bronze':'
 
 async function init() {
   if(!allianceId){showNotFound();return;}
-  const [allianceRows,memberRows,histRows,memberChanges,villageEvents] = await Promise.all([
-    query(`SELECT * FROM alliances WHERE alliance_id=? AND server=?`,[allianceId,SERVER]),
-    query(`SELECT p.player_id,p.player_name,p.tribe,p.population,p.village_count,
-                  ph.population AS pop_prev
-           FROM players p
-           LEFT JOIN player_history ph ON ph.player_id=p.player_id AND ph.server=p.server
-             AND ph.snap_date=DATE(p.snap_date,'-1 days')
-           WHERE p.alliance_id=? AND p.server=?
-           ORDER BY p.population DESC`,[allianceId,SERVER]),
-    query(`SELECT snap_date,population,member_count,village_count FROM alliance_history
-           WHERE alliance_id=? AND server=? ORDER BY snap_date ASC`,[allianceId,SERVER]),
-    query(`SELECT * FROM alliance_events
-           WHERE (old_alliance_id=? OR new_alliance_id=?) AND server=?
-           ORDER BY event_date DESC LIMIT 50`,[allianceId,allianceId,SERVER]),
-    query(`SELECT * FROM village_events
-           WHERE (old_alliance_id=? OR new_alliance_id=?) AND server=?
-           ORDER BY event_date DESC LIMIT 30`,[allianceId,allianceId,SERVER]),
-  ]);
+  try {
+    const data = await apiGet('alliance', { server: SERVER, id: allianceId });
 
-  if(!allianceRows.length){showNotFound();return;}
-  const a = allianceRows[0];
-  historyData = histRows;
-  document.title = `[${a.alliance_tag}] — TravianTools`;
-  document.getElementById('bcName').textContent = `[${a.alliance_tag}]`;
+    const a             = data.alliance;
+    const memberRows    = data.members  || [];
+    const histRows      = data.history  || [];
+    const memberChanges = data.events   || [];
+    const villageEvents = [];  // not in alliance endpoint, can add later
 
-  const prev = histRows.length>=2 ? Number(histRows[histRows.length-2].population) : null;
-  const growthDay = prev!=null ? Number(a.population)-prev : null;
+    if(!a){showNotFound();return;}
+    historyData = histRows;
+    document.title = `[${a.alliance_tag}] — TravianTools`;
+    document.getElementById('bcName').textContent = `[${a.alliance_tag}]`;
+
+    const prev = histRows.length>=2 ? Number(histRows[histRows.length-2].population) : null;
+    const growthDay = prev!=null ? Number(a.population)-prev : null;
 
   const tribeCounts = {};
   memberRows.forEach(m=>{tribeCounts[m.tribe]=(tribeCounts[m.tribe]||0)+1;});
@@ -343,96 +319,4 @@ async function init() {
                   <td style="font-size:0.75rem;color:var(--text3);white-space:nowrap">${e.event_date}</td>
                   <td style="font-weight:600;color:var(--navy)">${e.village_name}<br><span style="font-size:0.72rem;color:var(--text3)">(${e.x}|${e.y})</span></td>
                   <td><span class="ev-badge ev-${e.event_type}">${evLabels[e.event_type]||e.event_type}</span><br>
-                    <span style="font-size:0.7rem;color:var(--text3)">${isGain?'gained':'lost'}</span></td>
-                  <td>${playerInfo}</td>
-                  <td class="r" style="color:var(--text2);font-size:0.8rem">${fmt(e.population)}</td>
-                </tr>`;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>`:''}
-      </div>
-
-      <div>
-        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.08s ease both">
-          <div class="sc-title">Alliance Info</div>
-          <div class="info-row"><span class="ir-label">Tag</span><span class="ir-value">[${a.alliance_tag}]</span></div>
-          <div class="info-row"><span class="ir-label">Server</span><span class="ir-value">${SERVER_SLUG}</span></div>
-          <div class="info-row"><span class="ir-label">Members</span><span class="ir-value">${a.member_count}</span></div>
-          <div class="info-row"><span class="ir-label">Villages</span><span class="ir-value">${a.village_count}</span></div>
-          <div class="info-row"><span class="ir-label">Population</span><span class="ir-value">${fmt(a.population)}</span></div>
-          <div class="info-row"><span class="ir-label">Pop/Member</span><span class="ir-value">${fmt(Math.round(Number(a.population)/Math.max(1,Number(a.member_count))))}</span></div>
-          <div class="info-row"><span class="ir-label">Joined (tracked)</span><span class="ir-value" style="color:var(--green)">${joined.length}</span></div>
-          <div class="info-row"><span class="ir-label">Left (tracked)</span><span class="ir-value" style="color:var(--amber)">${left.length}</span></div>
-          <div class="info-row"><span class="ir-label">Last updated</span><span class="ir-value">${a.snap_date||'—'}</span></div>
-        </div>
-
-        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.12s ease both">
-          <div class="sc-title">Tribe Composition</div>
-          <div class="tribe-bars">${tribeBars}</div>
-        </div>
-
-        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.16s ease both">
-          <div class="sc-title">Daily Growth</div>
-          ${histRows.length<2?'<div class="empty-state">Not enough history yet</div>':`
-          <table class="hist-table"><tbody>
-            ${histRows.slice(-10).reverse().map((h,i,arr)=>{
-              const prev2 = arr[i+1];
-              const d = prev2 ? Number(h.population)-Number(prev2.population) : null;
-              return `<tr>
-                <td>${h.snap_date}</td>
-                <td style="text-align:right">${fmt(h.population)}</td>
-                <td style="text-align:right">${d!=null?`<span style="font-size:0.72rem;font-weight:600;color:${d>0?'var(--green)':d<0?'var(--red)':'var(--text3)'}">${d>0?'+':''}${fmt(d)}</span>`:'—'}</td>
-              </tr>`;
-            }).join('')}
-          </tbody></table>`}
-        </div>
-      </div>
-    </div>`;
-
-  if(histRows.length>=2){
-    loadChartJS().then(()=>renderChart(7,document.querySelector('.ct-btn.active')));
-  }
-}
-
-function showNotFound(){
-  document.getElementById('content').innerHTML=`
-    <div class="not-found"><h2>Alliance not found</h2>
-    <p>This alliance doesn't exist on ${SERVER_SLUG} or may have been disbanded.</p>
-    <a href="/s/${SERVER_SLUG}/statistics/" style="color:var(--blue2);margin-top:16px;display:inline-block">← Back to rankings</a></div>`;
-}
-function loadChartJS(){
-  return new Promise(resolve=>{
-    if(window.Chart){resolve();return;}
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-    s.onload=resolve;document.head.appendChild(s);
-  });
-}
-function renderChart(days,btn){
-  if(btn){document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-  const data = days>0 ? historyData.slice(-days) : historyData;
-  document.getElementById('chartRange').textContent=`${data.length} data points`;
-  const ctx = document.getElementById('popChart');
-  if(!ctx) return;
-  if(chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx,{
-    type:'line',
-    data:{labels:data.map(h=>h.snap_date.slice(5)),datasets:[{
-      data:data.map(h=>Number(h.population)),
-      borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.07)',
-      borderWidth:2,pointRadius:data.length<=14?4:2,pointBackgroundColor:'#2563eb',tension:0.3,fill:true
-    }]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11}}},
-              y:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11},callback:v=>v.toLocaleString()}}}}
-  });
-}
-init();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
-<script src="/navbar.js"></script>
-</body>
-</html>
+                    <span style="font-size:0.7re</html>
