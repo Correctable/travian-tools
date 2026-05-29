@@ -595,6 +595,30 @@
       cursor: not-allowed;
       opacity: 0.7;
       position: relative;
+      transition: all 0.18s;
+    }
+
+    .btn-save.active {
+      background: var(--blue2);
+      color: #fff;
+      border-color: var(--blue2);
+      cursor: pointer;
+      opacity: 1;
+    }
+    .btn-save.active:hover {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .btn-save.saving {
+      opacity: 0.7;
+      cursor: wait;
+    }
+    .btn-save.saved {
+      background: var(--green-bg);
+      color: var(--green);
+      border-color: rgba(5,150,105,0.3);
+      cursor: default;
+      opacity: 1;
     }
 
     .btn-save-badge {
@@ -613,6 +637,90 @@
       font-size: 0.75rem;
       color: var(--text3);
     }
+
+    /* ── INTEL MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15,33,83,0.35);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 0.15s ease;
+    }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: 0 24px 64px rgba(15,33,83,0.15);
+      animation: fadeUp 0.2s ease;
+    }
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .modal-sub {
+      font-size: 0.78rem; color: var(--text3); margin-bottom: 20px;
+    }
+    .modal-field { margin-bottom: 14px; }
+    .modal-label {
+      font-size: 0.75rem; font-weight: 600;
+      color: var(--text2); margin-bottom: 6px; display: block;
+    }
+    .modal-summary {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.8rem; color: var(--text2);
+      line-height: 1.7;
+    }
+    .modal-summary strong { color: var(--text); }
+    .modal-textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem;
+      color: var(--text);
+      resize: vertical;
+      min-height: 80px;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    .modal-textarea:focus { border-color: var(--blue2); }
+    .modal-textarea::placeholder { color: var(--text3); }
+    .modal-actions {
+      display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;
+    }
+    .modal-btn-cancel {
+      height: 38px; padding: 0 18px;
+      background: none; border: 1.5px solid var(--border);
+      border-radius: 9px; color: var(--text2);
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .modal-btn-cancel:hover { border-color: var(--text3); }
+    .modal-btn-save {
+      height: 38px; padding: 0 20px;
+      background: var(--blue2); border: none;
+      border-radius: 9px; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .modal-btn-save:hover { background: var(--blue); }
+    .modal-btn-save:disabled { opacity: 0.6; cursor: wait; }
+    .modal-login-prompt {
+      text-align: center; padding: 8px 0 4px;
+      font-size: 0.8rem; color: var(--text3);
+    }
+    .modal-login-prompt a { color: var(--blue2); text-decoration: none; font-weight: 600; }
+    .modal-login-prompt a:hover { text-decoration: underline; }
 
     /* ── FOOTER ── */
     footer {
@@ -1014,11 +1122,10 @@
           </div>
         </div>
         <div class="save-wrap">
-          <button class="btn-save" disabled title="Coming soon — requires account">
-            🔖 Save Report
-            <span class="btn-save-badge">Coming Soon</span>
+          <button class="btn-save" id="btn-save-intel" onclick="openSaveModal()">
+            🔖 Save to Intelligence
           </button>
-          <span class="save-note">Save & track enemy production over time — requires account</span>
+          <span class="save-note" id="save-note-text">Save & track enemy production — requires account</span>
         </div>`;
 
       // Animate bars after render
@@ -1028,6 +1135,167 @@
           bar.style.width = target + '%';
         });
       });
+
+      // Store result for save modal
+      window._lastIntelResult = { prod, total, cranny, defender, lateTs };
+
+      // Update save button state after render
+      setTimeout(() => updateSaveBtn(), 50);
+    }
+
+    // ── SAVE TO INTELLIGENCE ──────────────────────────────────────────
+
+    async function updateSaveBtn() {
+      const btn = document.getElementById('btn-save-intel');
+      const note = document.getElementById('save-note-text');
+      if (!btn) return;
+
+      const user = await window.getUser();
+      if (!user) {
+        btn.className = 'btn-save';
+        btn.disabled = true;
+        btn.innerHTML = '🔖 Save to Intelligence';
+        if (note) note.innerHTML = 'Requires account — <a href="/login/" style="color:var(--blue2);font-weight:600;">Log in</a> or <a href="/register/" style="color:var(--blue2);font-weight:600;">Sign up free</a>';
+        return;
+      }
+
+      btn.className = 'btn-save active';
+      btn.disabled = false;
+      btn.innerHTML = '🔖 Save to Intelligence';
+      if (note) note.textContent = 'Save enemy production data to your Intelligence hub';
+    }
+
+    function openSaveModal() {
+      const result = window._lastIntelResult;
+      if (!result) return;
+
+      const { prod, total, cranny, defender, lateTs } = result;
+
+      const targetName = defender ? defender.name : 'Unknown Target';
+      const villageName = defender ? defender.village : '—';
+      const fmtTs = (d) => {
+        if (!d) return '—';
+        const pad = n => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(-2)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      };
+
+      const summaryHTML = `
+        <strong>${targetName}</strong> · ${villageName}<br>
+        🌲 ${prod.wood}/hr &nbsp; 🧱 ${prod.clay}/hr &nbsp; ⚙️ ${prod.iron}/hr &nbsp; 🌾 ${prod.crop}/hr<br>
+        Total: <strong>${total} res/hr</strong>${cranny ? ` &nbsp;·&nbsp; Cranny: ${cranny}` : ''}<br>
+        Scanned: ${fmtTs(lateTs)}
+      `;
+
+      // Build server options from SERVERS config (servers.js)
+      const activeServers = (window.SERVERS || []).filter(s => s.active);
+      const serverOptions = activeServers.length > 0
+        ? activeServers.map(s =>
+            `<option value="${s.slug}">${s.label} (${s.slug})</option>`
+          ).join('')
+        : `<option value="ts5.x1.asia">TS5 Asia (ts5.x1.asia)</option>`;
+
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.id = 'intel-modal';
+      modal.innerHTML = `
+        <div class="modal-box">
+          <div class="modal-title">🕵️ Save to Intelligence</div>
+          <div class="modal-sub">Data will be saved to your Intelligence hub under this target's dossier.</div>
+          <div class="modal-field">
+            <label class="modal-label">SCAN SUMMARY</label>
+            <div class="modal-summary">${summaryHTML}</div>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">SERVER</label>
+            <select class="modal-input" id="intel-server-select" style="cursor:pointer">
+              ${serverOptions}
+            </select>
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">NOTES (optional)</label>
+            <textarea class="modal-textarea" id="intel-notes-input" placeholder="e.g. Active at night, low defenses..."></textarea>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn-save" id="modal-save-btn" onclick="confirmSaveIntel()">Save</button>
+          </div>
+        </div>
+      `;
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      document.body.appendChild(modal);
+      setTimeout(() => document.getElementById('intel-notes-input')?.focus(), 100);
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('intel-modal');
+      if (modal) modal.remove();
+    }
+
+    async function confirmSaveIntel() {
+      const result = window._lastIntelResult;
+      if (!result) return;
+
+      const btn = document.getElementById('modal-save-btn');
+      const notes = document.getElementById('intel-notes-input')?.value?.trim() || '';
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const { prod, cranny, defender, lateTs } = result;
+      const user = await window.getUser();
+      if (!user) { closeModal(); return; }
+
+      // Get server from dropdown (populated from SERVERS config)
+      const serverSlug = document.getElementById('intel-server-select')?.value || 'ts5.x1.asia';
+      const serverObj = (window.SERVERS || []).find(s => s.slug === serverSlug);
+      const serverKey = serverObj?.slug?.split('.')[0] || 'ts5'; // 'ts5.x1.asia' → 'ts5'
+
+      const entry = {
+        user_id:     user.id,
+        server:      serverKey,
+        target_type: 'player',
+        target_id:   defender?.name?.toLowerCase().replace(/\s+/g, '_') || 'unknown',
+        target_name: defender?.name || 'Unknown',
+        source_type: 'spy_report',
+        data: {
+          wood:       prod.wood,
+          clay:       prod.clay,
+          iron:       prod.iron,
+          crop:       prod.crop,
+          cranny:     cranny ?? null,
+          village:    defender?.village || null,
+          alliance:   defender?.alliance || null,
+          scanned_at: lateTs ? lateTs.toISOString() : null,
+          server_slug: serverSlug,
+        },
+        content: notes,
+      };
+
+      try {
+        const { error } = await window._supabase
+          .from('intelligence_entries')
+          .insert(entry);
+
+        if (error) throw error;
+
+        closeModal();
+
+        // Update button to saved state
+        const saveBtn = document.getElementById('btn-save-intel');
+        const saveNote = document.getElementById('save-note-text');
+        if (saveBtn) {
+          saveBtn.className = 'btn-save saved';
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = '✅ Saved to Intelligence';
+        }
+        if (saveNote) {
+          saveNote.innerHTML = 'View in <a href="/account/intelligence/" style="color:var(--blue2);font-weight:600;">Intelligence Hub →</a>';
+        }
+      } catch (err) {
+        console.error('Save failed:', err);
+        btn.disabled = false;
+        btn.textContent = 'Save';
+        alert('Failed to save. Please try again.');
+      }
     }
 
     function resRow(icon, cls, label, value, barWidth) {
