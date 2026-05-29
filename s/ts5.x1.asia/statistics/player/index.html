@@ -132,37 +132,24 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface
   </div>
 </div>
 <script>
-const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
 const SERVER      = 'ts5';
 const SERVER_SLUG = 'ts5.x1.asia';
 const BASE_PATH   = `/s/${SERVER_SLUG}/statistics`;
+const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
 const TRIBE_NAME  = {1:'Roman',2:'Teuton',3:'Gaul',4:'Nature',5:'Natar',6:'Egyptian',7:'Hun'};
 const TRIBE_ICON  = {1:'<img src="/images/travian/roman_medium.png" alt="Roman">',2:'<img src="/images/travian/teuton_medium.png" alt="Teuton">',3:'<img src="/images/travian/gaul_medium.png" alt="Gaul">',4:'<img src="/images/travian/nature_medium.png" alt="Nature">',5:'<img src="/images/travian/natar_medium.png" alt="Natar">',6:'<img src="/images/travian/egyptian_medium.png" alt="Egyptian">',7:'<img src="/images/travian/hun_medium.png" alt="Hun">'};
 const params   = new URLSearchParams(location.search);
 const playerId = params.get('id');
 let chartInstance = null, historyData = [];
 
-async function query(sql, args=[]) {
-  try {
-    const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
-      method:'POST',
-      headers:{'Authorization':`Bearer ${TURSO_TOKEN}`,'Content-Type':'application/json'},
-      body: JSON.stringify({requests:[
-        {type:'execute',stmt:{sql,args:args.map(v=>
-          v===null?{type:'null',value:null}
-          :typeof v==='number'?{type:'integer',value:String(v)}
-          :{type:'text',value:String(v)}
-        )}},
-        {type:'close'}
-      ]})
-    });
-    const data = await res.json();
-    const result = data.results?.[0]?.response?.result;
-    if(!result) return [];
-    const cols = result.cols.map(c=>c.name);
-    return result.rows.map(row=>{const o={};row.forEach((c,i)=>o[cols[i]]=c.value);return o;});
-  } catch(e){ console.error('Query error:', sql, e); return []; }
+async function apiGet(endpoint, params={}) {
+  const url = new URL(`${API_BASE}/api/${endpoint}`);
+  Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
+  const res = await fetch(url.toString());
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'API error');
+  return json;
 }
 
 const fmt = n => n!=null ? Number(n).toLocaleString() : '—';
@@ -179,34 +166,30 @@ function evBadge(type) {
 
 async function init() {
   if(!playerId){showNotFound();return;}
-  const [playerRows, villageRows, histRows, villageEvents, allianceEvents, villageHistRows] = await Promise.all([
-    query(`SELECT p.*, a.alliance_id as aid FROM players p
-           LEFT JOIN alliances a ON a.alliance_tag=p.alliance_tag AND a.server=p.server
-           WHERE p.player_id=? AND p.server=?`,[playerId,SERVER]),
-    query(`SELECT * FROM villages WHERE player_id=? AND server=? ORDER BY is_capital DESC, population DESC`,[playerId,SERVER]),
-    query(`SELECT snap_date,population,village_count FROM player_history WHERE player_id=? AND server=? ORDER BY snap_date ASC`,[playerId,SERVER]),
-    query(`SELECT * FROM village_events WHERE (old_player_id=? OR new_player_id=?) AND server=? ORDER BY event_date DESC LIMIT 50`,[playerId,playerId,SERVER]),
-    query(`SELECT * FROM alliance_events WHERE player_id=? AND server=? ORDER BY event_date DESC LIMIT 30`,[playerId,SERVER]),
-    query(`SELECT village_id, population FROM village_history
-           WHERE player_id=? AND server=?
-           AND snap_date=(SELECT MAX(snap_date) FROM village_history WHERE player_id=? AND server=? AND snap_date < DATE('now'))
-           `,[playerId,SERVER,playerId,SERVER]),
-  ]);
+  try {
+    const data = await apiGet('player', { server: SERVER, id: playerId });
 
-  if(!playerRows.length){showNotFound();return;}
-  const p = playerRows[0];
-  historyData = histRows;
+    const p              = data.player;
+    const villageRows    = data.villages       || [];
+    const histRows       = data.history        || [];
+    const villageEvents  = data.villageEvents  || [];
+    const allianceEvents = data.allianceEvents || [];
+    const villageHistory = data.villageHistory || [];
 
-  const prevPopByVillage = {};
-  villageHistRows.forEach(h=>{prevPopByVillage[h.village_id]=Number(h.population);});
-  document.title = `${p.player_name} — TravianTools`;
-  document.getElementById('bcName').textContent = p.player_name;
+    if(!p){showNotFound();return;}
+    historyData = histRows;
 
-  const prev = histRows.length>=2 ? Number(histRows[histRows.length-2].population) : null;
-  const growthDay = prev!=null ? Number(p.population)-prev : null;
+    const prevPopByVillage = {};
+    villageHistory.forEach(h => { prevPopByVillage[h.village_id] = Number(h.population); });
 
-  const lostVillages   = villageEvents.filter(e=>['conquered','destroyed','natared'].includes(e.event_type)&&String(e.old_player_id)===String(playerId));
-  const gainedVillages = villageEvents.filter(e=>e.event_type==='conquered'&&String(e.new_player_id)===String(playerId));
+    document.title = `${p.player_name} — TravianTools`;
+    document.getElementById('bcName').textContent = p.player_name;
+
+    const prev = histRows.length>=2 ? Number(histRows[histRows.length-2].population) : null;
+    const growthDay = prev!=null ? Number(p.population)-prev : null;
+
+    const lostVillages   = villageEvents.filter(e=>['conquered','destroyed','natared'].includes(e.event_type)&&String(e.old_player_id)===String(playerId));
+    const gainedVillages = villageEvents.filter(e=>e.event_type==='conquered'&&String(e.new_player_id)===String(playerId));
 
   document.getElementById('content').innerHTML = `
     <div class="profile-header" style="animation:fadeDown 0.4s ease both">
@@ -345,88 +328,4 @@ async function init() {
           <div class="info-row"><span class="ir-label">Last updated</span><span class="ir-value">${p.snap_date||'—'}</span></div>
         </div>
 
-        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.12s ease both">
-          <div class="sc-title">Daily Growth</div>
-          ${histRows.length<2?'<div class="empty-state">Not enough history yet</div>':`
-          <table class="hist-table"><tbody>
-            ${histRows.slice(-10).reverse().map((h,i,arr)=>{
-              const prev2 = arr[i+1];
-              const d = prev2 ? Number(h.population)-Number(prev2.population) : null;
-              return `<tr>
-                <td>${h.snap_date}</td>
-                <td style="text-align:right">${fmt(h.population)}</td>
-                <td style="text-align:right">${d!=null?`<span style="font-size:0.72rem;font-weight:600;color:${d>0?'var(--green)':d<0?'var(--red)':'var(--text3)'}">${d>0?'+':''}${fmt(d)}</span>`:'—'}</td>
-              </tr>`;
-            }).join('')}
-          </tbody></table>`}
-        </div>
-
-        <div class="sidebar-card" style="animation:fadeUp 0.4s 0.16s ease both">
-          <div class="sc-title">Alliance History</div>
-          ${!allianceEvents.length?'<div class="empty-state">No alliance changes detected yet</div>':`
-          <div class="alliance-timeline">
-            ${allianceEvents.map(e=>{
-              let desc='';
-              if(e.event_type==='joined') desc=`Joined <a href="${BASE_PATH}/alliance/?id=${e.new_alliance_id}">[${e.new_alliance_tag}]</a>`;
-              else if(e.event_type==='left') desc=`Left <a href="${BASE_PATH}/alliance/?id=${e.old_alliance_id}">[${e.old_alliance_tag}]</a>`;
-              else if(e.event_type==='switched') desc=`<a href="${BASE_PATH}/alliance/?id=${e.old_alliance_id}">[${e.old_alliance_tag}]</a> → <a href="${BASE_PATH}/alliance/?id=${e.new_alliance_id}">[${e.new_alliance_tag}]</a>`;
-              else if(e.event_type==='deleted') desc='Account deleted';
-              return `<div class="at-item">
-                <div class="at-dot ${e.event_type}"></div>
-                <div class="at-body">
-                  <div class="at-date">${e.event_date}</div>
-                  <div class="at-desc">${desc}</div>
-                </div>
-              </div>`;
-            }).join('')}
-          </div>`}
-        </div>
-      </div>
-    </div>`;
-
-  if(histRows.length>=2){
-    loadChartJS().then(()=>renderChart(7,document.querySelector('.ct-btn.active')));
-  }
-}
-
-function showNotFound(){
-  document.getElementById('content').innerHTML=`
-    <div class="not-found"><h2>Player not found</h2>
-    <p>This player doesn't exist on ${SERVER_SLUG} or may have been deleted.</p>
-    <a href="/s/${SERVER_SLUG}/statistics/" style="color:var(--blue2);margin-top:16px;display:inline-block">← Back to rankings</a></div>`;
-}
-function loadChartJS(){
-  return new Promise(resolve=>{
-    if(window.Chart){resolve();return;}
-    const s=document.createElement('script');
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-    s.onload=resolve;document.head.appendChild(s);
-  });
-}
-function renderChart(days,btn){
-  if(btn){document.querySelectorAll('.ct-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-  const data = days>0 ? historyData.slice(-days) : historyData;
-  document.getElementById('chartRange').textContent=`${data.length} data points`;
-  const ctx = document.getElementById('popChart');
-  if(!ctx) return;
-  if(chartInstance) chartInstance.destroy();
-  chartInstance = new Chart(ctx,{
-    type:'line',
-    data:{labels:data.map(h=>h.snap_date.slice(5)),datasets:[{
-      data:data.map(h=>Number(h.population)),
-      borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.07)',
-      borderWidth:2,pointRadius:data.length<=14?4:2,pointBackgroundColor:'#2563eb',tension:0.3,fill:true
-    }]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11}}},
-              y:{grid:{color:'rgba(226,232,243,0.8)'},ticks:{color:'#7a93bc',font:{size:11},callback:v=>v.toLocaleString()}}}}
-  });
-}
-init();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
-<script src="/navbar.js"></script>
-</body>
-</html>
+        <
