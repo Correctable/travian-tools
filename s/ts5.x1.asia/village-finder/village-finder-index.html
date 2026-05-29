@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Village Finder — Travian Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
+  --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);
+  --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
+  --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+  --green:#059669;--green-bg:rgba(5,150,105,0.08);--green-light:#d1fae5;
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+  --red:#dc2626;--red-bg:rgba(220,38,38,0.08);
+  --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);min-height:100vh;}
+.bg-dot{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(37,99,235,0.055) 1px,transparent 1px);background-size:32px 32px;}
+.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:500px;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(59,130,246,0.07) 0%,transparent 70%);}
+
+
+main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 24px 80px;}
+
+.page-header{margin-bottom:28px;animation:fadeDown 0.35s ease both;}
+.page-header-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.page-icon{width:38px;height:38px;border-radius:10px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:18px;}
+.badge-free{background:var(--green-bg);color:var(--green);font-size:0.6rem;font-weight:700;border-radius:100px;padding:3px 8px;letter-spacing:0.04em;}
+.page-header h1{font-family:'Space Grotesk',sans-serif;font-size:1.65rem;font-weight:700;color:var(--navy);letter-spacing:-0.02em;}
+.page-header p{color:var(--text2);font-size:0.9rem;line-height:1.6;}
+
+/* ── Filter panel ── */
+.filter-panel{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;animation:fadeUp 0.35s ease 0.05s both;}
+.filter-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:5px;}
+.fg label{font-size:0.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
+.fg select,.fg input[type=number],.fg input[type=text]{font-family:'DM Sans',sans-serif;font-size:0.875rem;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 11px;outline:none;transition:border-color 0.18s;}
+.fg select:focus,.fg input:focus{border-color:var(--blue-light);}
+.fg input[type=number]{width:80px;}
+.fg .xy-wrap{display:flex;gap:6px;align-items:center;}
+.fg .xy-wrap span{font-size:0.8rem;color:var(--text3);}
+.fg input.coord{width:72px;}
+
+/* crop checkboxes */
+.crop-checks{display:flex;gap:6px;flex-wrap:wrap;}
+.crop-check{display:none;}
+.crop-label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text2);transition:all 0.15s;background:var(--surface);user-select:none;}
+.crop-label:hover{border-color:var(--green);color:var(--green);}
+.crop-check:checked + .crop-label{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+
+/* oasis type checkboxes */
+.oasis-checks{display:flex;gap:6px;flex-wrap:wrap;}
+.oasis-check{display:none;}
+.oasis-label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text2);transition:all 0.15s;background:var(--surface);user-select:none;}
+.oasis-label:hover{border-color:var(--amber);color:var(--amber);}
+.oasis-check:checked + .oasis-label{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
+
+/* status radio */
+.status-radios{display:flex;gap:6px;flex-wrap:wrap;}
+.status-radio{display:none;}
+.status-label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text2);transition:all 0.15s;background:var(--surface);user-select:none;}
+.status-radio:checked + .status-label{background:var(--blue-glow);border-color:var(--blue-light);color:var(--blue2);}
+
+.filter-divider{width:100%;height:1px;background:var(--border);margin:14px 0;}
+
+.btn-search{font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;background:var(--blue2);color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;transition:background 0.18s,transform 0.1s;white-space:nowrap;align-self:flex-end;}
+.btn-search:hover{background:var(--blue);}
+.btn-search:active{transform:scale(0.98);}
+.btn-search:disabled{background:var(--text3);cursor:not-allowed;}
+
+/* ── Stats bar ── */
+.stats-bar{display:flex;gap:20px;margin-bottom:16px;flex-wrap:wrap;animation:fadeIn 0.4s ease 0.15s both;}
+.stat-item .stat-label{font-size:0.72rem;color:var(--text3);}
+.stat-item .stat-value{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);}
+
+/* ── Table ── */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;animation:fadeUp 0.4s ease 0.1s both;}
+
+table{width:100%;border-collapse:collapse;font-size:0.845rem;}
+thead th{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:0.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.07em;text-align:left;white-space:nowrap;cursor:pointer;user-select:none;}
+thead th:hover{color:var(--text2);}
+thead th.sorted{color:var(--blue2);}
+thead th .arr{margin-left:3px;opacity:0.5;}
+thead th.sorted .arr{opacity:1;}
+
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:var(--surface2);}
+td{padding:10px 14px;vertical-align:middle;}
+
+/* coord link */
+.coord-link{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:0.875rem;color:var(--blue2);text-decoration:none;white-space:nowrap;}
+.coord-link:hover{text-decoration:underline;}
+
+/* land badge */
+.land-badge{display:inline-flex;align-items:center;gap:5px;}
+.crop-pill{font-family:'Space Grotesk',sans-serif;font-size:0.7rem;font-weight:700;padding:2px 7px;border-radius:5px;background:var(--green-bg);color:var(--green);}
+.crop-pill.c15{background:#d1fae5;color:#065f46;}
+.crop-pill.c9{background:var(--green-bg);color:var(--green);}
+.crop-pill.c7{background:var(--amber-bg);color:var(--amber);}
+.crop-pill.c6{background:rgba(220,38,38,0.07);color:var(--red);}
+
+/* status dot */
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.status-dot.free{background:var(--green);}
+.status-dot.occupied{background:var(--red);}
+.status-text{font-size:0.75rem;}
+.status-text.free{color:var(--green);}
+.status-text.occupied{color:var(--red);}
+
+/* oasis count bubbles */
+.oasis-bubbles{display:flex;gap:4px;align-items:center;flex-wrap:wrap;}
+.ob{font-size:0.68rem;font-weight:700;padding:2px 6px;border-radius:5px;white-space:nowrap;}
+.ob-crop{background:#d1fae5;color:#065f46;}
+.ob-wood{background:#fef3c7;color:#92400e;}
+.ob-clay{background:#fee2e2;color:#991b1b;}
+.ob-iron{background:#ede9fe;color:#5b21b6;}
+.ob-total{background:var(--blue-glow);color:var(--blue2);font-size:0.75rem;font-weight:700;}
+
+.dist-val{font-family:'Space Grotesk',sans-serif;font-size:0.8rem;color:var(--text2);}
+.pop-val{font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:600;color:var(--navy);}
+.player-name{font-weight:600;color:var(--navy);font-size:0.85rem;}
+.alliance-tag{display:inline-block;background:var(--blue-glow);color:var(--blue2);font-size:0.68rem;font-weight:700;padding:1px 6px;border-radius:4px;}
+.no-data{color:var(--text3);font-size:0.8rem;}
+
+/* State box */
+.state-box{padding:56px 24px;text-align:center;}
+.state-box .si{font-size:2.2rem;margin-bottom:10px;}
+.state-box h3{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--navy);margin-bottom:5px;}
+.state-box p{color:var(--text2);font-size:0.875rem;line-height:1.65;}
+
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px;}
+
+/* pagination */
+.pager{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px;border-top:1px solid var(--border);flex-wrap:wrap;}
+.pg-btn{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;background:white;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:6px;cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;justify-content:center;}
+.pg-btn:hover:not(:disabled){background:var(--surface2);border-color:var(--border2);}
+.pg-btn.active{background:var(--blue2);border-color:var(--blue2);color:white;}
+.pg-btn:disabled{opacity:0.35;cursor:not-allowed;}
+
+.info-note{margin-top:14px;padding:11px 15px;background:var(--blue-glow);border:1px solid rgba(37,99,235,0.12);border-radius:10px;font-size:0.8rem;color:var(--text2);line-height:1.6;}
+
+/* Field type — step 1: count buttons */
+.ft-counts{display:flex;gap:6px;flex-wrap:wrap;}
+.ft-count-btn{font-family:'Space Grotesk',sans-serif;font-size:0.85rem;font-weight:700;padding:7px 16px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;background:var(--surface);color:var(--text2);transition:all 0.15s;}
+.ft-count-btn:hover{border-color:var(--blue-light);color:var(--navy);}
+.ft-count-btn.active.c18{background:var(--purple-bg);border-color:var(--purple);color:var(--purple);}
+.ft-count-btn.active.c15{background:#d1fae5;border-color:#059669;color:#065f46;}
+.ft-count-btn.active.c9{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.ft-count-btn.active.c7{background:var(--amber-bg);border-color:var(--amber);color:var(--amber);}
+.ft-count-btn.active.c6{background:var(--red-bg);border-color:var(--red);color:var(--red);}
+/* Step 2: variant picker */
+.ft-variants{margin-top:12px;display:flex;flex-direction:column;gap:10px;}
+.ft-variant-group{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.ft-variant-label{font-size:0.68rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;width:100%;margin-bottom:2px;}
+.ft-check{display:none;}
+.ft-label{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;background:var(--surface);user-select:none;min-width:64px;}
+.ft-label:hover{border-color:var(--blue-light);}
+.ft-crop{font-family:'Space Grotesk',sans-serif;font-size:0.8rem;font-weight:700;}
+.ft-dist{font-size:0.65rem;color:var(--text3);font-family:'Space Grotesk',sans-serif;}
+/* color variants */
+.ft-label.c18{border-color:rgba(124,58,237,0.3);}
+.ft-label.c18 .ft-crop{color:var(--purple);}
+.ft-label.c15{border-color:rgba(5,150,105,0.3);}
+.ft-label.c15 .ft-crop{color:#065f46;}
+.ft-label.c9{border-color:rgba(5,150,105,0.25);}
+.ft-label.c9 .ft-crop{color:var(--green);}
+.ft-label.c7{border-color:rgba(217,119,6,0.25);}
+.ft-label.c7 .ft-crop{color:var(--amber);}
+.ft-label.c6{border-color:rgba(220,38,38,0.2);}
+.ft-label.c6 .ft-crop{color:var(--red);}
+/* checked states */
+.ft-check:checked + .ft-label.c18{background:var(--purple-bg);border-color:var(--purple);}
+.ft-check:checked + .ft-label.c15{background:#d1fae5;border-color:#059669;}
+.ft-check:checked + .ft-label.c9{background:var(--green-bg);border-color:var(--green);}
+.ft-check:checked + .ft-label.c7{background:var(--amber-bg);border-color:var(--amber);}
+.ft-check:checked + .ft-label.c6{background:var(--red-bg);border-color:var(--red);}
+.ft-check:checked + .ft-label .ft-dist{color:inherit;opacity:0.7;}
+
+/* quick buttons */
+.btn-quick{font-family:'DM Sans',sans-serif;font-size:0.75rem;font-weight:500;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;color:var(--text2);transition:all 0.15s;}
+.btn-quick:hover{background:var(--surface2);border-color:var(--border2);color:var(--navy);}
+
+/* Oasis icon bubbles */
+.oasis-icons-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.icon-bubble{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 7px;}
+.oasis-icon{width:20px;height:20px;object-fit:contain;display:block;}
+.icon-count{font-family:'Space Grotesk',sans-serif;font-size:0.72rem;font-weight:700;color:var(--text2);}
+
+/* Player / alliance links */
+.player-link{font-weight:600;color:var(--navy);text-decoration:none;font-size:0.85rem;}
+.player-link:hover{color:var(--blue2);text-decoration:underline;}
+.alliance-link{text-decoration:none;}
+.alliance-link:hover .alliance-tag{background:var(--blue2);color:#fff;}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:700px){
+  nav{padding:0 16px;}
+  main{padding:20px 14px 60px;}
+  .filter-row{flex-direction:column;}
+  .hide-m{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="bg-dot"></div>
+<div class="bg-glow"></div>
+
+<div id="navbar-root"></div>
+
+<main>
+  <div class="page-header">
+    <div class="page-header-top">
+      <div class="page-icon">🌾</div>
+      <span class="badge-free">FREE</span>
+    </div>
+    <h1>Village Finder</h1>
+    <p>Cari desa berdasarkan crop field, status kosong/terisi, dan jumlah oasis dalam 5×5.</p>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="filter-panel">
+
+    <!-- Row 1: Server + XY + Status -->
+    <div class="filter-row" style="margin-bottom:14px">
+      <div class="fg">
+        <label>Server</label>
+        <select id="serverSel">
+          <option value="ts5" data-tiles="ts5.x1.asia.travian.com">ts5.x1.asia</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Center X, Y</label>
+        <div class="xy-wrap">
+          <input type="number" class="coord" id="cx" value="0" placeholder="X">
+          <span>|</span>
+          <input type="number" class="coord" id="cy" value="0" placeholder="Y">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Status Tile</label>
+        <div class="status-radios">
+          <input type="radio" class="status-radio" name="status" id="sAll" value="all" checked>
+          <label class="status-label" for="sAll">All</label>
+          <input type="radio" class="status-radio" name="status" id="sFree" value="free">
+          <label class="status-label" for="sFree">Free</label>
+          <input type="radio" class="status-radio" name="status" id="sOcc" value="occupied">
+          <label class="status-label" for="sOcc">Occupied</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-divider"></div>
+
+    <!-- Row 2: Field type selector -->
+    <div style="margin-bottom:14px">
+      <div class="fg" style="width:100%">
+        <label>Field Type</label>
+        <!-- Step 1: pick crop count -->
+        <div class="ft-counts" id="ftCounts">
+          <button class="ft-count-btn" data-crop="18" onclick="toggleCropCount(this)">18c</button>
+          <button class="ft-count-btn" data-crop="15" onclick="toggleCropCount(this)">15c</button>
+          <button class="ft-count-btn" data-crop="9"  onclick="toggleCropCount(this)">9c</button>
+          <button class="ft-count-btn" data-crop="7"  onclick="toggleCropCount(this)">7c</button>
+          <button class="ft-count-btn" data-crop="6"  onclick="toggleCropCount(this)">6c</button>
+        </div>
+
+        <!-- Step 2: variant picker — shown only when 7c or 6c active -->
+        <div class="ft-variants" id="ftVariants" style="display:none">
+          <div class="ft-variant-group" id="ftvg7" style="display:none">
+            <span class="ft-variant-label">7c variants</span>
+            <input type="checkbox" class="ft-check" id="ft7a" data-crop="7" data-label="4-4-3-7">
+            <label class="ft-label c7" for="ft7a"><span class="ft-crop">7c</span><span class="ft-dist">4-4-3-7</span></label>
+            <input type="checkbox" class="ft-check" id="ft7b" data-crop="7" data-label="3-4-4-7">
+            <label class="ft-label c7" for="ft7b"><span class="ft-crop">7c</span><span class="ft-dist">3-4-4-7</span></label>
+            <input type="checkbox" class="ft-check" id="ft7c" data-crop="7" data-label="4-3-4-7">
+            <label class="ft-label c7" for="ft7c"><span class="ft-crop">7c</span><span class="ft-dist">4-3-4-7</span></label>
+            <button class="btn-quick" onclick="selectCropFT(7)">All 7c</button>
+          </div>
+          <div class="ft-variant-group" id="ftvg6" style="display:none">
+            <span class="ft-variant-label">6c variants</span>
+            <input type="checkbox" class="ft-check" id="ft6a" data-crop="6" data-label="3-4-5-6">
+            <label class="ft-label c6" for="ft6a"><span class="ft-crop">6c</span><span class="ft-dist">3-4-5-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6b" data-crop="6" data-label="4-4-4-6">
+            <label class="ft-label c6" for="ft6b"><span class="ft-crop">6c</span><span class="ft-dist">4-4-4-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6c" data-crop="6" data-label="4-5-3-6">
+            <label class="ft-label c6" for="ft6c"><span class="ft-crop">6c</span><span class="ft-dist">4-5-3-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6d" data-crop="6" data-label="5-3-4-6">
+            <label class="ft-label c6" for="ft6d"><span class="ft-crop">6c</span><span class="ft-dist">5-3-4-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6e" data-crop="6" data-label="3-5-4-6">
+            <label class="ft-label c6" for="ft6e"><span class="ft-crop">6c</span><span class="ft-dist">3-5-4-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6f" data-crop="6" data-label="4-3-5-6">
+            <label class="ft-label c6" for="ft6f"><span class="ft-crop">6c</span><span class="ft-dist">4-3-5-6</span></label>
+            <input type="checkbox" class="ft-check" id="ft6g" data-crop="6" data-label="5-4-3-6">
+            <label class="ft-label c6" for="ft6g"><span class="ft-crop">6c</span><span class="ft-dist">5-4-3-6</span></label>
+            <button class="btn-quick" onclick="selectCropFT(6)">All 6c</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-divider"></div>
+
+    <!-- Row 3: Oasis filter + search -->
+    <div class="filter-row">
+      <div class="fg">
+        <label>Oasis Type (7×7)</label>
+        <div class="oasis-checks">
+          <input type="checkbox" class="oasis-check" id="oCrop" value="crop">
+          <label class="oasis-label" for="oCrop">🌾 Crop</label>
+          <input type="checkbox" class="oasis-check" id="oWood" value="wood">
+          <label class="oasis-label" for="oWood">🌲 Wood</label>
+          <input type="checkbox" class="oasis-check" id="oClay" value="clay">
+          <label class="oasis-label" for="oClay">🧱 Clay</label>
+          <input type="checkbox" class="oasis-check" id="oIron" value="iron">
+          <label class="oasis-label" for="oIron">⛏️ Iron</label>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Min Bonus % ≥</label>
+        <select id="minBonus">
+          <option value="0">Any</option>
+          <option value="25">25%+</option>
+          <option value="50">50%+</option>
+          <option value="75">75%+</option>
+          <option value="100">100%+</option>
+          <option value="150">150%</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Min Claimable Oasis ≥</label>
+        <input type="number" id="minOasis" value="1" min="0" max="9">
+      </div>
+      <button class="btn-search" id="searchBtn" onclick="runSearch()">🔍 Search</button>
+    </div>
+
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-item"><div class="stat-label">Results</div><div class="stat-value" id="stTotal">—</div></div>
+    <div class="stat-item"><div class="stat-label">Free tiles</div><div class="stat-value" id="stFree">—</div></div>
+    <div class="stat-item"><div class="stat-label">Occupied</div><div class="stat-value" id="stOcc">—</div></div>
+    <div class="stat-item"><div class="stat-label">Max oasis 5×5</div><div class="stat-value" id="stMax">—</div></div>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <div class="state-box" id="stateBox">
+      <div class="si">🌾</div>
+      <h3>Ready to search</h3>
+      <p>Pilih crop type, oasis filter, lalu klik Search.</p>
+    </div>
+    <table id="mainTable" style="display:none">
+      <thead>
+        <tr>
+          <th onclick="sortBy('dist')">X, Y <span class="arr" id="arr-dist"></span></th>
+          <th onclick="sortBy('crop')">Land <span class="arr" id="arr-crop"></span></th>
+          <th onclick="sortBy('oasisCount')">Claimable Oasis <span class="arr" id="arr-oasisCount"></span></th>
+          <th onclick="sortBy('pop')" class="hide-m">Population <span class="arr" id="arr-pop"></span></th>
+          <th onclick="sortBy('dist')">Distance <span class="arr" id="arr-dist2"></span></th>
+          <th class="hide-m">Player</th>
+          <th class="hide-m">Alliance</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="pager" id="pager" style="display:none"></div>
+  </div>
+
+  <div class="info-note" id="infoNote" style="display:none">
+    💡 <b>Claimable Oasis</b> = jumlah oasis dalam grid 5×5 di sekitar tile (Chebyshev distance ≤ 2).
+    Status <b>Free</b> = tile kosong di map.sql. Distance dihitung dari titik X,Y yang kamu masukkan.
+  </div>
+</main>
+
+<script>
+const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+
+// state
+let results = [], sortKey = 'oasisCount', sortDir = -1, page = 1;
+const PG = 50;
+
+async function apiGet(endpoint, params={}) {
+  const url = new URL(`${API_BASE}/api/${endpoint}`);
+  Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
+  const res = await fetch(url.toString());
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'API error');
+  return json;
+}
+
+async function runSearch() {
+  const serverSel   = document.getElementById('serverSel');
+  const server      = serverSel.value;
+  const serverTiles = serverSel.selectedOptions[0].dataset.tiles || server;
+  const cx       = parseInt(document.getElementById('cx').value) || 0;
+  const cy       = parseInt(document.getElementById('cy').value) || 0;
+  const minOasis = parseInt(document.getElementById('minOasis').value) || 0;
+  const status   = document.querySelector('input[name=status]:checked').value;
+
+  // selected crops
+  // collect active crops + their labels
+  if (!activeCrops.size) { alert('Select at least one field type.'); return; }
+
+  // for single-variant crops (18/15/9), label is their data-label
+  // for 7c/6c, user must pick at least one variant
+  const selectedFTs = [...document.querySelectorAll('.ft-check:checked')];
+  const selectedLabels = selectedFTs.map(el => el.dataset.label);
+
+  // add single-variant crops that have no checkbox (auto-selected)
+  const singleVariants = {18:'0-0-0-18', 15:'1-1-1-15', 9:'3-3-3-9'};
+  for (const [c, lbl] of Object.entries(singleVariants)) {
+    if (activeCrops.has(Number(c)) && !selectedLabels.includes(lbl)) selectedLabels.push(lbl);
+  }
+
+  if (!selectedLabels.length) { alert('Select at least one field type variant.'); return; }
+  const crops = [...activeCrops];
+
+  // selected oasis types — empty means "don't filter by oasis type"
+  const oasisTypes = [...document.querySelectorAll('.oasis-check:checked')].map(el=>el.value);
+  const filterByOasis = oasisTypes.length > 0;
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Searching…';
+  setState('loading');
+
+  try {
+    // Single Worker API call — returns tiles, villages, oases
+    const data = await apiGet('villages', {
+      server: server,
+      crops:  crops.join(','),
+      page:   1,
+    });
+
+    const tiles    = data.tiles    || [];
+    const villages = data.villages || [];
+    const oases    = data.oases    || [];
+
+    if (data.is_preview) {
+      console.info(`Village finder: preview mode — showing ${tiles.length} of ${data.total} tiles`);
+    }
+
+    // Build lookup: koordinat desa → data desa
+    const villageMap = {};
+    for (const v of villages) {
+      villageMap[`${v.x},${v.y}`] = v;
+    }
+
+    // Build oasis array, filter by minBonus
+    const minBonus = parseInt(document.getElementById('minBonus').value) || 0;
+    const oasisArr = oases
+      .filter(o => Number(o.max_bonus) >= minBonus)
+      .map(o => {
+        const res = parseResources(o.resources, o.bonus_str);
+        const isDouble = Number(o.max_bonus) >= 50 && (o.type_name||'').indexOf('+') === -1;
+        return {
+          x: Number(o.x), y: Number(o.y),
+          maxBonus: Number(o.max_bonus),
+          typeName: o.type_name || '',
+          isDouble,
+          iconUrl: oasisIconUrl(o.type_name || 'crop', isDouble),
+          ...res
+        };
+      });
+
+    // Score tiap tile
+    const scored = tiles.map(t => {
+      const tx = Number(t.x), ty = Number(t.y);
+      const key = `${tx},${ty}`;
+      const village = villageMap[key] || null;
+      const isOccupied = !!village;
+
+      // hitung oasis dalam 5x5 (chebyshev ≤ 2)
+      const nearby = oasisArr.filter(o =>
+        Math.max(Math.abs(o.x - tx), Math.abs(o.y - ty)) <= 3
+      );
+
+      // Group by iconUrl for display (opsi B: icon + count)
+      const iconGroups = {};
+      for (const o of nearby) {
+        const key = o.iconUrl;
+        if (!iconGroups[key]) iconGroups[key] = { iconUrl: o.iconUrl, typeName: o.typeName, count: 0 };
+        iconGroups[key].count++;
+      }
+
+      const oasisCount = {
+        crop: nearby.filter(o=>o.hasCrop).length,
+        wood: nearby.filter(o=>o.hasWood).length,
+        clay: nearby.filter(o=>o.hasClay).length,
+        iron: nearby.filter(o=>o.hasIron).length,
+        total: nearby.length,
+      };
+
+      // hitung berdasarkan tipe yang dipilih user (kalau kosong = total semua)
+      const selectedCount = filterByOasis
+        ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
+        : oasisCount.total;
+
+      // euclidean distance dari center
+      const dist = Math.sqrt((tx-cx)**2 + (ty-cy)**2);
+
+      return {
+        x: tx, y: ty,
+        crop: Number(t.crop),
+        field_label: t.field_label || '',
+        isOccupied,
+        village,
+        oasisCount,
+        iconGroups: Object.values(iconGroups),
+        selectedCount,
+        oasisCountDisplay: oasisTypes.length === 1
+          ? oasisCount[oasisTypes[0]]
+          : selectedCount,
+        dist: Math.round(dist * 100) / 100,
+        pop: village ? Number(village.population) : 0,
+        player_id: village?.player_id || '',
+        player_name: village?.player_name || '',
+        alliance_id: village?.alliance_id || '',
+        alliance_tag: village?.alliance_tag || '',
+      };
+    });
+
+    // Apply filters
+    let filtered = scored.filter(t => {
+      // field_label must match one of selected labels
+      if (!selectedLabels.includes(t.field_label)) return false;
+      if (filterByOasis && t.selectedCount < minOasis) return false;
+      if (status === 'free' && t.isOccupied) return false;
+      if (status === 'occupied' && !t.isOccupied) return false;
+      return true;
+    });
+
+
+
+    results = filtered;
+    page = 1;
+    sortKey = 'oasisCountDisplay';
+    sortDir = -1;
+
+    // Stats
+    const free = filtered.filter(t=>!t.isOccupied).length;
+    const maxO = filtered.length ? Math.max(...filtered.map(t=>t.oasisCount.total)) : 0;
+    document.getElementById('stTotal').textContent = filtered.length.toLocaleString();
+    document.getElementById('stFree').textContent  = free.toLocaleString();
+    document.getElementById('stOcc').textContent   = (filtered.length - free).toLocaleString();
+    document.getElementById('stMax').textContent   = maxO;
+    document.getElementById('statsBar').style.display = 'flex';
+    document.getElementById('infoNote').style.display = 'block';
+
+    render();
+
+  } catch(err) {
+    setState('error', err.message);
+    console.error(err);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Search';
+  }
+}
+
+// Resource name → CDN key
+const RES_KEY = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
+const CDN = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/';
+
+// typeName → icon URL
+// e.g. "Wood" → lumber_tiny.png (25%), "Wood" with isDouble → lumber-lumber_medium.png
+// "Clay+Crop" → clay-crop_medium.png
+function oasisIconUrl(typeName, isDouble) {
+  const parts = typeName.toLowerCase().split('+').map(s => s.trim());
+  const keys = parts.map(p => {
+    if (p === 'wood' || p === 'lumber') return 'lumber';
+    if (p === 'clay' || p === 'earth') return 'clay';
+    if (p === 'iron' || p === 'metal') return 'iron';
+    if (p === 'crop' || p === 'grain' || p === 'wheat') return 'crop';
+    return p;
+  });
+  if (keys.length === 1 && !isDouble) return `${CDN}${keys[0]}_tiny.png`;
+  if (keys.length === 1 && isDouble)  return `${CDN}${keys[0]}-${keys[0]}_medium.png`;
+  return `${CDN}${keys[0]}-${keys[1]}_medium.png`;
+}
+
+// Parse resources array for type detection
+function parseResources(resources, bonusStr) {
+  let arr = [];
+  try { arr = JSON.parse(resources || '[]'); } catch(e) {}
+  if (!arr.length && bonusStr) {
+    const s = bonusStr.toLowerCase();
+    if (s.includes('crop') || s.includes('grain')) arr.push('crop');
+    if (s.includes('wood') || s.includes('lumber')) arr.push('wood');
+    if (s.includes('clay')) arr.push('clay');
+    if (s.includes('iron')) arr.push('iron');
+  }
+  return {
+    hasCrop: arr.includes('crop'),
+    hasWood: arr.includes('wood'),
+    hasClay: arr.includes('clay'),
+    hasIron: arr.includes('iron'),
+  };
+}
+
+function render() {
+  const sorted = [...results].sort((a,b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'number') return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+
+  const total = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(total / PG));
+  page = Math.min(page, totalPages);
+  const pageData = sorted.slice((page-1)*PG, page*PG);
+
+  if (!total) { setState('no-results'); return; }
+
+  document.getElementById('stateBox').style.display = 'none';
+  document.getElementById('mainTable').style.display = 'table';
+
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = pageData.map(t => {
+    const cropClass = t.crop >= 15 ? 'c15' : t.crop >= 9 ? 'c9' : t.crop >= 7 ? 'c7' : 'c6';
+    const travelLink = `https://ts5.x1.asia.travian.com/position_details.php?x=${t.x}&y=${t.y}`;
+
+    // build oasis icon bubbles (opsi B: icon + count, grouped)
+    const serverSlug = document.getElementById('serverSel').selectedOptions[0].dataset.tiles
+      .replace('.travian.com','');
+    const iconBubbles = t.iconGroups.length
+      ? t.iconGroups.map(g =>
+          `<span class="icon-bubble" title="${esc(g.typeName)}">
+            <img src="${g.iconUrl}" alt="${esc(g.typeName)}" class="oasis-icon">
+            <span class="icon-count">×${g.count}</span>
+          </span>`
+        ).join('')
+        + `<span class="ob ob-total">${t.oasisCount.total} total</span>`
+      : '<span class="no-data">—</span>';
+
+    const playerLink = t.player_id
+      ? `<a class="player-link" href="/statistics/${serverSlug}/player/?id=${t.player_id}">${esc(t.player_name)}</a>`
+      : '<span class="no-data">—</span>';
+
+    const allianceLink = t.alliance_id && t.alliance_tag
+      ? `<a class="alliance-link" href="/statistics/${serverSlug}/alliance/?id=${t.alliance_id}"><span class="alliance-tag">${esc(t.alliance_tag)}</span></a>`
+      : '<span class="no-data">—</span>';
+
+    return `<tr>
+      <td>
+        <a class="coord-link" href="${travelLink}" target="_blank">(${t.x}|${t.y})</a>
+      </td>
+      <td>
+        <div class="land-badge">
+          <span class="crop-pill ${cropClass}">${t.crop}c</span>
+          <span class="status-dot ${t.isOccupied?'occupied':'free'}"></span>
+          <span class="status-text ${t.isOccupied?'occupied':'free'}">${t.isOccupied?'Occupied':'Free'}</span>
+        </div>
+      </td>
+      <td>
+        <div class="oasis-icons-row">
+          ${iconBubbles}
+        </div>
+      </td>
+      <td class="hide-m">
+        ${t.isOccupied ? `<span class="pop-val">${Number(t.pop).toLocaleString()}</span>` : '<span class="no-data">—</span>'}
+      </td>
+      <td><span class="dist-val">${t.dist.toFixed(2)}</span></td>
+      <td class="hide-m">${playerLink}</td>
+      <td class="hide-m">${allianceLink}</td>
+    </tr>`;
+  }).join('');
+
+  renderPager(totalPages);
+  updateArrows();
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  page = 1;
+  render();
+}
+
+function updateArrows() {
+  ['dist','crop','oasisCount','pop','oasisCountDisplay'].forEach(k => {
+    const el = document.getElementById(`arr-${k}`);
+    if (!el) return;
+    const th = el.closest('th');
+    if (k === sortKey) { el.textContent = sortDir===-1?'↓':'↑'; th?.classList.add('sorted'); }
+    else { el.textContent = '↕'; th?.classList.remove('sorted'); }
+  });
+}
+
+function renderPager(totalPages) {
+  const wrap = document.getElementById('pager');
+  if (totalPages <= 1) { wrap.style.display='none'; return; }
+  wrap.style.display = 'flex';
+  const mk = (label, pg, active, disabled) => {
+    const b = document.createElement('button');
+    b.className = 'pg-btn' + (active?' active':'');
+    b.textContent = label; b.disabled = disabled;
+    if (!disabled && !active) b.onclick = () => { page=pg; render(); };
+    return b;
+  };
+  wrap.innerHTML = '';
+  wrap.appendChild(mk('←', page-1, false, page===1));
+  pageRange(page, totalPages).forEach(p => {
+    if (p==='…') { const s=document.createElement('span'); s.textContent='…'; s.style.cssText='padding:4px 4px;color:var(--text3)'; wrap.appendChild(s); }
+    else wrap.appendChild(mk(p, p, p===page, false));
+  });
+  wrap.appendChild(mk('→', page+1, false, page===totalPages));
+}
+
+function pageRange(cur, total) {
+  if (total<=7) return Array.from({length:total},(_,i)=>i+1);
+  if (cur<=4) return [1,2,3,4,5,'…',total];
+  if (cur>=total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
+  return [1,'…',cur-1,cur,cur+1,'…',total];
+}
+
+function setState(type, msg) {
+  document.getElementById('mainTable').style.display = 'none';
+  document.getElementById('pager').style.display = 'none';
+  const el = document.getElementById('stateBox');
+  el.style.display = 'block';
+  const cfg = {
+    loading: ['⏳','Fetching data…','Mengambil tiles, villages, dan oases dari Turso…'],
+    error:   ['⚠️','Connection error', msg||'Could not connect to server. Please try again.'],
+    'no-results': ['🔍','Tidak ada hasil','Coba ubah filter crop, oasis, atau status.'],
+    default: ['🌾','Ready to search','Pilih crop type, oasis filter, lalu klik Search.'],
+  };
+  const [si,h3,p] = cfg[type]||cfg.default;
+  el.innerHTML = `<div class="si">${si}</div><h3>${h3}</h3><p>${p}</p>`;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+document.getElementById('cx').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
+document.getElementById('cy').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
+
+// active crop counts set
+const activeCrops = new Set();
+
+function toggleCropCount(btn) {
+  const crop = parseInt(btn.dataset.crop);
+  const colorMap = {18:'c18',15:'c15',9:'c9',7:'c7',6:'c6'};
+  if (activeCrops.has(crop)) {
+    activeCrops.delete(crop);
+    btn.classList.remove('active', colorMap[crop]);
+    // uncheck all variants of this crop
+    document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = false);
+  } else {
+    activeCrops.add(crop);
+    btn.classList.add('active', colorMap[crop]);
+    // for 9c/15c/18c auto-check the single variant
+    if (crop !== 7 && crop !== 6) {
+      document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = true);
+    }
+  }
+  updateVariantVisibility();
+}
+
+function updateVariantVisibility() {
+  const has7 = activeCrops.has(7);
+  const has6 = activeCrops.has(6);
+  const showVariants = has7 || has6;
+  document.getElementById('ftVariants').style.display = showVariants ? 'block' : 'none';
+  document.getElementById('ftvg7').style.display = has7 ? 'flex' : 'none';
+  document.getElementById('ftvg6').style.display = has6 ? 'flex' : 'none';
+}
+
+function selectAllFT() {
+  document.querySelectorAll('.ft-count-btn').forEach(btn => {
+    if (!btn.classList.contains('active')) toggleCropCount(btn);
+  });
+  document.querySelectorAll('.ft-check').forEach(el => el.checked = true);
+}
+function clearAllFT() {
+  activeCrops.clear();
+  document.querySelectorAll('.ft-count-btn').forEach(btn => {
+    btn.className = 'ft-count-btn';
+  });
+  document.querySelectorAll('.ft-check').forEach(el => el.checked = false);
+  updateVariantVisibility();
+}
+function selectCropFT(crop) {
+  document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = true);
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>>
+</body>
+</html>
