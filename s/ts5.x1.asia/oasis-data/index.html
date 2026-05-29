@@ -715,9 +715,8 @@
 </footer>
 
 <script>
-  const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
-  const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
   const PREVIEW_CAP = 1000;
+  const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
   const CDN         = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/';
 
   const RES_KEY = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
@@ -789,32 +788,17 @@
   let sortKey     = 'distance';
   let sortDir     = 'asc';
 
-  // ── TURSO QUERY ───────────────────────────────────────────────────
-  async function tursoQuery(sql, args = []) {
-    const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${TURSO_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ requests: [
-        { type: 'execute', stmt: { sql, args: args.map(v =>
-          v === null          ? { type: 'null',    value: null }
-          : typeof v === 'number' ? { type: 'integer', value: String(v) }
-          : { type: 'text', value: String(v) }
-        )}},
-        { type: 'close' }
-      ]})
+  // ── API HELPER ────────────────────────────────────────────────────
+  async function apiGet(endpoint, params = {}) {
+    const url = new URL(`${API_BASE}/api/${endpoint}`);
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== null && v !== undefined) url.searchParams.set(k, v);
     });
-    const data = await res.json();
-    const result = data.results?.[0]?.response?.result;
-    if (!result) return [];
-    const cols = result.cols.map(c => c.name);
-    return result.rows.map(row => {
-      const o = {};
-      row.forEach((c, i) => o[cols[i]] = c.value);
-      return o;
-    });
+    const res = await fetch(url.toString());
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error || 'API error');
+    return json;
   }
 
   // ── SERVER SELECTOR ───────────────────────────────────────────────
@@ -845,10 +829,11 @@
     document.getElementById('table-section').style.display = 'none';
 
     try {
-      const rows = await tursoQuery(
-        `SELECT x, y, type_name, bonus_str, resources, max_bonus FROM oases WHERE server=?`,
-        [server]
-      );
+      const data = await apiGet('oasis', { server, page: 1 });
+      const rows = data.rows || [];
+
+      const total = data.total || rows.length;
+      const isCapped = data.is_preview && total > PREVIEW_CAP;
 
       allOases = rows.map(o => {
         let resources = [];
@@ -872,7 +857,9 @@
         };
       });
 
-      document.getElementById('stat-total').textContent    = allOases.length.toLocaleString();
+      document.getElementById('stat-total').textContent = isCapped
+        ? `${allOases.length.toLocaleString()} (preview of ${total.toLocaleString()})`
+        : allOases.length.toLocaleString();
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('controls').style.display    = 'grid';
       document.getElementById('stats-bar').style.display   = 'flex';
