@@ -25,32 +25,49 @@ body{background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-heig
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(37,99,235,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-/* Navbar di-handle oleh navbar.js */
+/* ── NAVBAR ── */
+nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(37,99,235,0.06);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:32px}
+.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
+.nav-brand-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 16px rgba(37,99,235,0.4)}
+.nav-brand-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-0.01em}
+.nav-brand-name span{color:var(--blue-light)}
+.nav-menu{display:flex;align-items:center;gap:4px;flex:1;justify-content:center}
+.nav-item{position:relative}
+.nav-link{display:flex;align-items:center;gap:5px;font-size:0.875rem;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 14px;border-radius:8px;transition:all 0.18s;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.nav-link:hover,.nav-item:hover>.nav-link{color:var(--navy);background:var(--surface2)}
+.nav-link .chevron{font-size:0.6rem;opacity:0.6;transition:transform 0.2s}
+.nav-item:hover>.nav-link .chevron{transform:rotate(180deg)}
+.dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:1px solid var(--border);border-radius:14px;padding:8px;min-width:240px;opacity:0;visibility:hidden;transition:all 0.2s ease;box-shadow:0 20px 60px rgba(15,33,83,0.12),0 4px 16px rgba(37,99,235,0.06)}
+.nav-item:hover .dropdown{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.dropdown-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;text-decoration:none;transition:background 0.15s}
+.dropdown-item:hover{background:var(--surface2)}
+.dropdown-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0}
+.dropdown-text strong{display:block;font-size:0.825rem;font-weight:600;color:var(--text);margin-bottom:1px}
+.dropdown-text span{font-size:0.72rem;color:var(--text3)}
+.dropdown-badge{margin-left:auto;font-size:0.6rem;font-weight:600;letter-spacing:0.05em;padding:2px 7px;border-radius:100px}
+.badge-free{background:var(--green-bg);color:var(--green)}
+.badge-soon{background:rgba(0,0,0,0.04);color:var(--text3)}
+.badge-new{background:var(--amber-bg);color:var(--amber)}
+.dropdown-divider{height:1px;background:var(--border);margin:6px 0}
+.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.btn-ghost{font-size:0.825rem;font-weight:500;color:var(--text2);background:none;border:1px solid var(--border);padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;font-family:'DM Sans',sans-serif}
+.btn-ghost:hover{border-color:var(--border2);color:var(--navy)}
+.btn-primary{font-size:0.825rem;font-weight:600;color:#fff;background:var(--blue2);border:none;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+.btn-primary:hover{background:var(--blue);box-shadow:0 4px 16px rgba(37,99,235,0.35)}
 
 /* ── PAGE WRAPPER ── */
 .page-wrap{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:40px 24px 80px}
 
 /* ── PAGE HEADER ── */
-.page-header {
-  position: relative; z-index: 1;
-  border-bottom: 1px solid var(--border);
-  background: var(--surface);
-  padding: 28px 40px 24px;
-}
-.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; }
-.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
-.breadcrumb a:hover { color: var(--blue2); }
-.breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
-.breadcrumb-current { color: var(--text2); font-weight: 500; }
-.page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.page-title-group { display: flex; align-items: center; gap: 14px; }
-.page-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-.page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-.page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
-.page-badges { display: flex; align-items: center; gap: 8px; }
-.page-badge { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 100px; }
-.page-badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
-.page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+.page-header{margin-bottom:32px}
+.page-breadcrumb{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text3);margin-bottom:16px}
+.page-breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s}
+.page-breadcrumb a:hover{color:var(--text2)}
+.page-breadcrumb .sep{opacity:0.5}
+.page-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;color:var(--navy);line-height:1.2}
+.page-desc{font-size:0.9rem;color:var(--text2);margin-top:8px;line-height:1.6;max-width:560px}
+.page-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-bg);color:var(--green);font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:0.04em;flex-shrink:0;margin-top:4px}
 
 /* ── MENU VIEW ── */
 .menu-search-bar{display:flex;align-items:center;gap:10px;margin-bottom:28px}
@@ -174,34 +191,104 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
 <body>
 
 <!-- ── NAVBAR ── -->
-<div id="navbar-root"></div>
-
-<!-- Page header -->
-<div class="page-header">
-  <div class="breadcrumb">
-    <a href="/">Home</a>
-    <span class="breadcrumb-sep">›</span>
-    <a href="/tools/">Tools</a>
-    <span class="breadcrumb-sep">›</span>
-    <span class="breadcrumb-current">Building Costs</span>
-  </div>
-  <div class="page-header-inner">
-    <div class="page-title-group">
-      <div class="page-icon">🏗️</div>
-      <div>
-        <div class="page-title">Building Costs</div>
-        <div class="page-subtitle">Construction cost and build time for every building in Travian: Legends, per level.</div>
+<nav>
+  <a href="/" class="nav-brand">
+    <div class="nav-brand-logo">⚔️</div>
+    <span class="nav-brand-name">Travian<span>Tools</span></span>
+  </a>
+  <div class="nav-menu">
+    <div class="nav-item">
+      <button class="nav-link">Tools <span class="chevron">▼</span></button>
+      <div class="dropdown">
+        <a href="/tools/oasis_finder/" class="dropdown-item">
+          <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
+          <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+        <a href="/tools/spy-on-productivity/" class="dropdown-item">
+          <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
+          <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+        <a href="/tools/attack-planner/" class="dropdown-item">
+          <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
+          <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+        <a href="/tools/village-tree/" class="dropdown-item">
+          <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
+          <div class="dropdown-text"><strong>Village Tree</strong><span>Plan your building queue</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+        <a href="/tools/building-costs/" class="dropdown-item" style="background:var(--surface2)">
+          <div class="dropdown-icon" style="background:var(--amber-bg)">🏗️</div>
+          <div class="dropdown-text"><strong>Building Costs</strong><span>Cost & time per building level</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+        <div class="dropdown-divider"></div>
+        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+          <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
+          <div class="dropdown-text"><strong>Troop Simulator</strong><span>Simulate battles</span></div>
+          <span class="dropdown-badge badge-soon">SOON</span>
+        </a>
       </div>
     </div>
-    <div class="page-badges">
-      <span class="page-badge free">FREE</span>
-      <span class="page-badge no-login">No login required</span>
+    <div class="nav-item">
+      <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
+      <div class="dropdown">
+        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+          <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
+          <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
+          <span class="dropdown-badge badge-soon">SOON</span>
+        </a>
+        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+          <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
+          <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
+          <span class="dropdown-badge badge-soon">SOON</span>
+        </a>
+        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
+          <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
+          <div class="dropdown-text"><strong>Alliance Stats</strong><span>Compare alliance performance</span></div>
+          <span class="dropdown-badge badge-soon">SOON</span>
+        </a>
+      </div>
     </div>
+    <div class="nav-item">
+      <button class="nav-link">Simulators <span class="chevron">▼</span></button>
+      <div class="dropdown">
+        <a href="/simulators/field-production/" class="dropdown-item">
+          <div class="dropdown-icon" style="background:var(--green-bg)">🌾</div>
+          <div class="dropdown-text"><strong>Field Production</strong><span>Simulate resource output/hr</span></div>
+          <span class="dropdown-badge badge-free">FREE</span>
+        </a>
+      </div>
+    </div>
+    <a href="#" class="nav-link">Changelog</a>
   </div>
-</div>
+  <div class="nav-actions">
+    <a href="/login/" class="btn-ghost">Log In</a>
+    <a href="/register/" class="btn-primary">Sign Up Free</a>
+  </div>
+</nav>
 
 <!-- ── PAGE ── -->
 <div class="page-wrap">
+
+  <!-- Page header -->
+  <div class="page-header fade-up">
+    <div class="page-breadcrumb">
+      <a href="/">Home</a><span class="sep">›</span>
+      <a href="#">Tools</a><span class="sep">›</span>
+      <span>Building Costs</span>
+    </div>
+    <div class="page-title-row">
+      <div>
+        <h1 class="page-title">🏗️ Building Costs</h1>
+        <p class="page-desc">Construction cost and build time for every building in Travian: Legends, per level. Click any building to explore its full upgrade path.</p>
+      </div>
+      <span class="page-badge">✓ FREE — No account needed</span>
+    </div>
+  </div>
 
   <!-- MENU VIEW -->
   <div id="menu-view" class="fade-up" style="animation-delay:0.07s">
@@ -270,18 +357,13 @@ const CAT_COLOR = {
 };
 
 // ── HARDCODE MENU LIST (no fetch needed for menu state) ───────────────────
-const MENU_LIST = [{"gid":1,"name":"Woodcutter","category":"resource"},{"gid":2,"name":"Clay Pit","category":"resource"},{"gid":3,"name":"Iron Mine","category":"resource"},{"gid":4,"name":"Cropland","category":"resource"},{"gid":5,"name":"Sawmill","category":"resource"},{"gid":6,"name":"Brickyard","category":"resource"},{"gid":7,"name":"Iron Foundry","category":"resource"},{"gid":8,"name":"Grain Mill","category":"resource"},{"gid":9,"name":"Bakery","category":"resource"},{"gid":10,"name":"Warehouse","category":"infrastructure"},{"gid":11,"name":"Granary","category":"infrastructure"},{"gid":13,"name":"Smithy","category":"military"},{"gid":14,"name":"Tournament Square","category":"military"},{"gid":15,"name":"Main Building","category":"infrastructure"},{"gid":16,"name":"Rally Point","category":"military"},{"gid":17,"name":"Marketplace","category":"infrastructure"},{"gid":18,"name":"Embassy","category":"infrastructure"},{"gid":19,"name":"Barracks","category":"military"},{"gid":20,"name":"Stable","category":"military"},{"gid":21,"name":"Workshop","category":"military"},{"gid":22,"name":"Academy","category":"military"},{"gid":23,"name":"Cranny","category":"infrastructure"},{"gid":24,"name":"Town Hall","category":"infrastructure"},{"gid":25,"name":"Residence","category":"infrastructure"},{"gid":26,"name":"Palace","category":"infrastructure"},{"gid":27,"name":"Treasury","category":"infrastructure"},{"gid":28,"name":"Trade Office","category":"infrastructure"},{"gid":29,"name":"Great Barracks","category":"military","nonCapitalOnly":true},{"gid":30,"name":"Great Stable","category":"military","nonCapitalOnly":true},{"gid":31,"name":"City Wall","category":"military","tribes":["roman"]},{"gid":32,"name":"Earth Wall","category":"military","tribes":["teuton"]},{"gid":33,"name":"Palisade","category":"military","tribes":["gaul"]},{"gid":34,"name":"Stonemason","category":"infrastructure","capitalOnly":true},{"gid":35,"name":"Brewery","category":"military","tribes":["teuton"],"capitalOnly":true},{"gid":36,"name":"Trapper","category":"military","tribes":["gaul"]},{"gid":37,"name":"Hero's Mansion","category":"infrastructure"},{"gid":38,"name":"Great Warehouse","category":"infrastructure","capitalOnly":true},{"gid":39,"name":"Great Granary","category":"infrastructure","capitalOnly":true},{"gid":40,"name":"Wonder of the World","category":"infrastructure","capitalOnly":false},{"gid":41,"name":"Horse Drinking Trough","category":"military","tribes":["roman"]},{"gid":42,"name":"Stone Wall","category":"military","tribes":["egyptian"]},{"gid":43,"name":"Makeshift Wall","category":"military","tribes":["hun"]},{"gid":44,"name":"Command Center","category":"military","tribes":["hun"]},{"gid":45,"name":"Waterworks","category":"infrastructure","tribes":["egyptian"]},{"gid":46,"name":"Hospital","category":"military"}];
+const MENU_LIST = [{"gid":1,"name":"Woodcutter","category":"resource"},{"gid":2,"name":"Clay Pit","category":"resource"},{"gid":3,"name":"Iron Mine","category":"resource"},{"gid":4,"name":"Cropland","category":"resource"},{"gid":5,"name":"Sawmill","category":"resource"},{"gid":6,"name":"Brickyard","category":"resource"},{"gid":7,"name":"Iron Foundry","category":"resource"},{"gid":8,"name":"Grain Mill","category":"resource"},{"gid":9,"name":"Bakery","category":"resource"},{"gid":10,"name":"Warehouse","category":"infrastructure"},{"gid":11,"name":"Granary","category":"infrastructure"},{"gid":13,"name":"Smithy","category":"military"},{"gid":14,"name":"Tournament Square","category":"military"},{"gid":15,"name":"Main Building","category":"infrastructure"},{"gid":16,"name":"Rally Point","category":"military"},{"gid":17,"name":"Marketplace","category":"infrastructure"},{"gid":18,"name":"Embassy","category":"infrastructure"},{"gid":19,"name":"Barracks","category":"military"},{"gid":20,"name":"Stable","category":"military"},{"gid":21,"name":"Workshop","category":"military"},{"gid":22,"name":"Academy","category":"military"},{"gid":23,"name":"Cranny","category":"infrastructure"},{"gid":24,"name":"Town Hall","category":"infrastructure"},{"gid":25,"name":"Residence","category":"infrastructure"},{"gid":26,"name":"Palace","category":"infrastructure"},{"gid":27,"name":"Treasury","category":"infrastructure"},{"gid":28,"name":"Trade Office","category":"infrastructure"},{"gid":29,"name":"Great Barracks","category":"military","nonCapitalOnly":true},{"gid":30,"name":"Great Stable","category":"military","nonCapitalOnly":true},{"gid":31,"name":"City Wall","category":"military","tribes":["roman"]},{"gid":32,"name":"Earth Wall","category":"military","tribes":["teuton"]},{"gid":33,"name":"Palisade","category":"military","tribes":["gaul"]},{"gid":34,"name":"Stonemason","category":"infrastructure","capitalOnly":true},{"gid":35,"name":"Brewery","category":"military","tribes":["teuton"],"capitalOnly":true},{"gid":36,"name":"Trapper","category":"military","tribes":["gaul"]},{"gid":37,"name":"Hero's Mansion","category":"infrastructure"},{"gid":38,"name":"Great Warehouse","category":"infrastructure","capitalOnly":true},{"gid":39,"name":"Great Granary","category":"infrastructure","capitalOnly":true},{"gid":40,"name":"Wonder of the World","category":"infrastructure","capitalOnly":true},{"gid":41,"name":"Horse Drinking Trough","category":"military","tribes":["roman"]},{"gid":42,"name":"Stone Wall","category":"military","tribes":["egyptian"]},{"gid":43,"name":"Makeshift Wall","category":"military","tribes":["hun"]},{"gid":44,"name":"Command Center","category":"military","tribes":["hun"]},{"gid":45,"name":"Waterworks","category":"infrastructure","tribes":["egyptian"]},{"gid":46,"name":"Hospital","category":"military"}];
 
-// MB build_speed lookup
-// Time di JSON = raw base (MB lv0/destroyed)
-// MB lv1 = 5x lebih cepat dari raw, lv2+ makin cepat sesuai build_speed
-const MB_SPEED = {
-  0: 1.0,
-  1: 5.0,   2: 5.2,   3: 5.4,   4: 5.6,   5: 5.8,
-  6: 6.0,   7: 6.25,  8: 6.45,  9: 6.7,   10: 6.95,
-  11: 7.2,  12: 7.5,  13: 7.75, 14: 8.05, 15: 8.35,
-  16: 8.65, 17: 9.0,  18: 9.35, 19: 9.65, 20: 10.05
-};
+// Formula resmi Travian (dari knowledgebase.legends.travian.com main.js):
+// buildingTime = 10 * Math.round(baseTime * factor / 10)
+// factor = (mbLevel === 0 ? 5 : 0.964^(mbLevel-1)) / speed
+// Data di JSON kita = raw MB lv0 = baseTime * 5
+// Maka: base = sec / 5, lalu terapkan factor
 const TRIBE_ICON = {roman:'🏛',gaul:'🌿',teuton:'⚔️',egyptian:'🔺',hun:'🏹'};
 const GID_NAME = {};
 MENU_LIST.forEach(b => GID_NAME[b.gid] = b.name);
@@ -306,7 +388,15 @@ function fmtTime(s) {
     : `${m}:${String(sec).padStart(2,'0')}`;
 }
 function fmtN(n) { return n == null ? '—' : n.toLocaleString('en-US'); }
-function adjTime(sec) { return Math.round(sec / speed / (MB_SPEED[mbLevel] || 1.0)); }
+function adjTime(sec, overrideMB) {
+  // sec = raw MB lv0 time dari JSON kita
+  // base = time di MB lv1 equivalent (data Travian resmi)
+  // overrideMB: untuk Main Building (gid 15), tiap row pakai level-1 sebagai factor
+  const base = sec / 5;
+  const mb = overrideMB !== undefined ? overrideMB : mbLevel;
+  const mbFactor = mb === 0 ? 5 : Math.pow(0.964, mb - 1);
+  return 10 * Math.round(base * mbFactor / speed / 10);
+}
 function tribeInfo(b) {
   if (!b.tribes || b.tribes === 'all') return null;
   const arr = Array.isArray(b.tribes) ? b.tribes : [b.tribes];
@@ -558,11 +648,14 @@ function renderHeader() {
       <div class="detail-controls">
         <span class="ctrl-label">Server</span>
         <div class="speed-group" id="speed-btns"></div>
+        ${b.gid !== 15 ? `
         <div class="ctrl-divider"></div>
         <span class="ctrl-label">Main Building</span>
         <select class="mb-select" id="mb-select" onchange="onMBChange(this.value)">
           ${Array.from({length:21},(_,i)=>i).map(l=>'<option value="'+l+'" '+( l===mbLevel?'selected':'')+'>Level '+l+'</option>').join('')}
-        </select>
+        </select>` : `
+        <div class="ctrl-divider"></div>
+        <span class="ctrl-label" style="color:var(--text3);font-size:0.75rem">Each row uses its own level as MB factor</span>`}
       </div>
     </div>
     <div class="table-scroll"><table id="bld-table"></table></div>`;
@@ -677,11 +770,14 @@ function renderRows(c, hasBonus, getBonusVal) {
   }
 
   tbody.innerHTML = '';
+  // Main Building (gid 15): tiap row pakai level-1 sebagai MB factor (formula resmi Travian)
+  const isMB = b.gid === 15;
   b.levels.forEach(lvl => {
     const isSel   = isLvlSel(lvl.level);
     const isAnch  = sel && sel.range === null && lvl.level === sel.anchor;
     const total   = lvl.cost.reduce((a,x)=>a+x,0);
     const bonus   = hasBonus ? getBonusVal(lvl) : null;
+    const t       = isMB ? adjTime(lvl.time, lvl.level - 1) : adjTime(lvl.time);
     const tr = document.createElement('tr');
     tr.className = isAnch ? 'row-anchor' : (isSel ? 'row-sel' : '');
     tr.onclick = () => handleLvlClick(lvl.level);
@@ -693,7 +789,7 @@ function renderRows(c, hasBonus, getBonusVal) {
       <td class="c-iron">${fmtN(lvl.cost[2])}</td>
       <td class="c-crop">${fmtN(lvl.cost[3])}</td>
       <td class="c-total">${fmtN(total)}</td>
-      <td class="c-dim">${fmtTime(adjTime(lvl.time))}</td>
+      <td class="c-dim">${fmtTime(t)}</td>
       <td class="c-dim">${lvl.pop}</td>
       <td class="c-dim">${lvl.cp}</td>
       ${hasBonus ? '<td class="c-bonus">' + (bonus!=null?fmtN(bonus):'—') + '</td>' : ''}`;
@@ -704,7 +800,8 @@ function renderRows(c, hasBonus, getBonusVal) {
   const selRows = sel ? b.levels.filter(l => isLvlSel(l.level)) : b.levels;
   const totals  = selRows.reduce((acc,l)=>{
     acc[0]+=l.cost[0];acc[1]+=l.cost[1];acc[2]+=l.cost[2];acc[3]+=l.cost[3];
-    acc.pop+=l.pop;acc.cp+=l.cp;acc.time+=adjTime(l.time);
+    acc.pop+=l.pop;acc.cp+=l.cp;
+    acc.time += isMB ? adjTime(l.time, l.level - 1) : adjTime(l.time);
     return acc;
   },{0:0,1:0,2:0,3:0,pop:0,cp:0,time:0});
 
@@ -740,9 +837,5 @@ function renderRows(c, hasBonus, getBonusVal) {
 renderMenuGrid();
 document.getElementById('menu-search').addEventListener('input', e => renderMenuGrid(e.target.value));
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
-<script src="/navbar.js"></script>
 </body>
 </html>
