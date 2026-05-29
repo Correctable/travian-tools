@@ -1,829 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spy Productivity — Travian Tools</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battle Report — TravianTools</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --navy:       #0f2153;
-      --navy2:      #1a3068;
-      --navy3:      #0b1a3d;
-      --blue:       #1d4ed8;
-      --blue2:      #2563eb;
-      --blue-light: #3b82f6;
-      --blue-glow:  rgba(59,130,246,0.10);
-      --cyan:       #0891b2;
-      --surface:    #ffffff;
-      --surface2:   #f8faff;
-      --border:     #e2e8f3;
-      --border2:    rgba(37,99,235,0.25);
-      --text:       #0f2153;
-      --text2:      #3d5a8a;
-      --text3:      #7a93bc;
-      --green:      #059669;
-      --green-bg:   rgba(5,150,105,0.08);
-      --amber:      #d97706;
-      --amber-bg:   rgba(217,119,6,0.08);
-      --red:        #dc2626;
-      --red-bg:     rgba(220,38,38,0.08);
-      --purple:     #7c3aed;
-      --purple-bg:  rgba(124,58,237,0.08);
-      --wood:       #16a34a;
-      --wood-bg:    rgba(22,163,74,0.08);
-      --clay:       #ea580c;
-      --clay-bg:    rgba(234,88,12,0.08);
-      --iron:       #0891b2;
-      --iron-bg:    rgba(8,145,178,0.08);
-      --crop:       #ca8a04;
-      --crop-bg:    rgba(202,138,4,0.08);
+      --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
+      --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);--cyan:#0891b2;
+      --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
+      --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+      --green:#059669;--green-bg:rgba(5,150,105,0.08);
+      --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+      --red:#dc2626;--red-bg:rgba(220,38,38,0.08);
+      --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
+      --attacker-bg:rgba(220,38,38,0.04);
+      --defender-bg:rgba(37,99,235,0.04);
     }
+    body { background:#fff; color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+    body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(37,99,235,0.055) 1px,transparent 1px); background-size:32px 32px; pointer-events:none; z-index:0; }
 
-    body {
-      background: #ffffff;
-      color: var(--text);
-      font-family: 'DM Sans', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    body::after {
-      content: '';
-      position: fixed;
-      top: -180px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 900px;
-      height: 500px;
-      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* Navbar di-handle oleh navbar.js */
-
-    /* ── PAGE ── */
-    .page-wrap {
-      position: relative;
-      z-index: 1;
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 56px 24px 80px;
-    }
-
-    /* Page header */
+    /* ── PAGE HEADER (canonical pattern) ── */
     .page-header {
-      position: relative; z-index: 1;
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 28px 40px 24px;
-    }
-    .breadcrumb {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
-    }
-    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
-    .breadcrumb a:hover { color: var(--blue2); }
-    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
-    .breadcrumb-current { color: var(--text2); font-weight: 500; }
-    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .page-title-group { display: flex; align-items: center; gap: 14px; }
-    .page-icon {
-      width: 44px; height: 44px; border-radius: 12px;
-      background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2);
-      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-    }
-    .page-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
-    }
-    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
-    .page-badges { display: flex; align-items: center; gap: 8px; }
-    .page-badge {
-      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
-      padding: 4px 10px; border-radius: 100px;
-    }
-    .page-badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
-    .page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
-
-    /* ── HOW TO ── */
-    .howto {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 36px;
-      animation: fadeUp 0.4s 0.05s ease both;
-    }
-
-    .howto-step {
-      flex: 1;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-
-    .howto-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--blue2);
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .howto-text {
-      font-size: 0.8rem;
-      color: var(--text2);
-      line-height: 1.55;
-    }
-
-    .howto-text strong {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 2px;
-    }
-
-    /* ── INPUT GRID ── */
-    .reports-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-      animation: fadeUp 0.4s 0.1s ease both;
-    }
-
-    .report-card {
-      background: #ffffff;
-      border: 1.5px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    .report-card:focus-within {
-      border-color: var(--blue2);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
-    }
-
-    .report-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 16px;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .report-num {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      background: var(--blue2);
-      color: #fff;
-      font-size: 0.65rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .report-label-text {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .report-label-sub {
-      font-size: 0.72rem;
-      color: var(--text3);
-      margin-left: auto;
-    }
-
-    textarea {
-      width: 100%;
-      height: 200px;
-      background: transparent;
-      border: none;
-      outline: none;
-      resize: vertical;
-      padding: 14px 16px;
-      font-family: 'DM Sans', monospace;
-      font-size: 0.78rem;
-      color: var(--text);
-      line-height: 1.65;
-    }
-
-    textarea::placeholder {
-      color: var(--text3);
-      font-style: italic;
-    }
-
-    /* ── ANALYZE BUTTON ── */
-    .btn-analyze {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      height: 52px;
-      background: var(--blue2);
-      color: #fff;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 20px rgba(37,99,235,0.3);
-      letter-spacing: 0.01em;
-      margin-bottom: 36px;
-      animation: fadeUp 0.4s 0.15s ease both;
-    }
-
-    .btn-analyze:hover {
-      background: var(--blue-light);
-      box-shadow: 0 6px 28px rgba(59,130,246,0.4);
-      transform: translateY(-1px);
-    }
-
-    .btn-analyze:active { transform: translateY(0); }
-
-    /* ── RESULT ── */
-    #result { animation: fadeUp 0.35s ease both; }
-
-    /* Enemy card */
-    .enemy-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 12px rgba(15,33,83,0.05);
-    }
-
-    .enemy-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .enemy-header-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text3);
-    }
-
-    .enemy-time {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.78rem;
-      color: var(--text3);
-    }
-
-    .enemy-body {
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .enemy-avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: var(--red-bg);
-      border: 1px solid rgba(220,38,38,0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-
-    .enemy-info { flex: 1; min-width: 180px; }
-
-    .enemy-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.01em;
-      margin-bottom: 3px;
-    }
-
-    .enemy-alliance {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--blue2);
-      background: var(--blue-glow);
-      border: 1px solid rgba(37,99,235,0.15);
-      padding: 2px 8px;
-      border-radius: 100px;
-      margin-bottom: 5px;
-    }
-
-    .enemy-village {
-      font-size: 0.825rem;
-      color: var(--text2);
-    }
-
-    .enemy-village strong { color: var(--text); font-weight: 600; }
-
-    .enemy-meta {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .meta-pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.775rem;
-      color: var(--text2);
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      padding: 6px 12px;
-      border-radius: 8px;
-    }
-
-    .meta-pill .meta-icon { font-size: 0.9rem; }
-    .meta-pill strong { color: var(--text); font-weight: 600; }
-
-    /* Production card */
-    .production-card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 2px 12px rgba(15,33,83,0.05);
-    }
-
-    .production-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      background: var(--surface2);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .production-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.01em;
-    }
-
-    .scan-gap {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.775rem;
-      color: var(--text3);
-      background: var(--blue-glow);
-      border: 1px solid rgba(59,130,246,0.15);
-      padding: 4px 10px;
-      border-radius: 100px;
-    }
-
-    .production-body { padding: 24px 20px; }
-
-    /* Resource bars */
-    .resource-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .resource-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .res-icon-wrap {
-      width: 36px;
-      height: 36px;
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      flex-shrink: 0;
-    }
-
-    .res-icon-wrap.wood { background: var(--wood-bg); border: 1px solid rgba(22,163,74,0.2); }
-    .res-icon-wrap.clay { background: var(--clay-bg); border: 1px solid rgba(234,88,12,0.2); }
-    .res-icon-wrap.iron { background: var(--iron-bg); border: 1px solid rgba(8,145,178,0.2); }
-    .res-icon-wrap.crop { background: var(--crop-bg); border: 1px solid rgba(202,138,4,0.2); }
-
-    .res-label {
-      width: 48px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--text2);
-      flex-shrink: 0;
-    }
-
-    .res-bar-wrap {
-      flex: 1;
-      height: 6px;
-      background: var(--surface2);
-      border-radius: 100px;
-      overflow: hidden;
-    }
-
-    .res-bar {
-      height: 100%;
-      border-radius: 100px;
-      transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .res-bar.wood { background: var(--wood); }
-    .res-bar.clay { background: var(--clay); }
-    .res-bar.iron { background: var(--iron); }
-    .res-bar.crop { background: var(--crop); }
-
-    .res-value {
-      width: 90px;
-      text-align: right;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text);
-      flex-shrink: 0;
-    }
-
-    .res-unit {
-      width: 52px;
-      font-size: 0.68rem;
-      color: var(--text3);
-      flex-shrink: 0;
-    }
-
-    /* Total row */
-    .total-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 16px;
-      background: linear-gradient(135deg, var(--blue-glow), rgba(37,99,235,0.04));
-      border: 1px solid rgba(37,99,235,0.15);
-      border-radius: 10px;
-    }
-
-    .total-label {
-      font-size: 0.825rem;
-      font-weight: 600;
-      color: var(--text2);
-    }
-
-    .total-value {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--blue2);
-      letter-spacing: -0.02em;
-    }
-
-    /* Cranny section */
-    .cranny-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 14px;
-      padding: 12px 16px;
-      background: var(--amber-bg);
-      border: 1px solid rgba(217,119,6,0.15);
-      border-radius: 10px;
-    }
-
-    .cranny-icon { font-size: 1.1rem; }
-
-    .cranny-info { flex: 1; }
-
-    .cranny-label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--amber);
-      margin-bottom: 2px;
-    }
-
-    .cranny-values {
-      font-size: 0.825rem;
-      color: var(--text2);
-    }
-
-    .cranny-values strong { color: var(--text); font-weight: 600; }
-
-    /* Error */
-    .error-box {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      padding: 16px 20px;
-      background: var(--red-bg);
-      border: 1px solid rgba(220,38,38,0.2);
-      border-radius: 12px;
-      color: var(--red);
-      font-size: 0.875rem;
-      line-height: 1.6;
-    }
-
-    .error-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-
-    /* ── SAVE BUTTON ── */
-    .save-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .btn-save {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      height: 44px;
-      padding: 0 22px;
-      background: var(--surface2);
-      color: var(--text3);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 600;
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      cursor: not-allowed;
-      opacity: 0.7;
-      position: relative;
-      transition: all 0.18s;
-    }
-
-    .btn-save.active {
-      background: var(--blue2);
-      color: #fff;
-      border-color: var(--blue2);
-      cursor: pointer;
-      opacity: 1;
-    }
-    .btn-save.active:hover {
-      background: var(--blue);
-      border-color: var(--blue);
-    }
-    .btn-save.saving {
-      opacity: 0.7;
-      cursor: wait;
-    }
-    .btn-save.saved {
-      background: var(--green-bg);
-      color: var(--green);
-      border-color: rgba(5,150,105,0.3);
-      cursor: default;
-      opacity: 1;
-    }
-
-    .btn-save-badge {
-      font-size: 0.6rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      background: var(--amber-bg);
-      color: var(--amber);
-      border: 1px solid rgba(217,119,6,0.2);
-      padding: 2px 7px;
-      border-radius: 100px;
-    }
-
-    .save-note {
-      font-size: 0.75rem;
-      color: var(--text3);
-    }
-
-    /* ── INTEL MODAL ── */
-    .modal-backdrop {
-      position: fixed; inset: 0;
-      background: rgba(15,33,83,0.35);
-      backdrop-filter: blur(4px);
-      z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
-      animation: fadeIn 0.15s ease;
-    }
-    .modal-box {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 28px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: 0 24px 64px rgba(15,33,83,0.15);
-      animation: fadeUp 0.2s ease;
-    }
-    .modal-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.1rem; font-weight: 700;
-      color: var(--text); margin-bottom: 4px;
-    }
-    .modal-sub {
-      font-size: 0.78rem; color: var(--text3); margin-bottom: 20px;
-    }
-    .modal-field { margin-bottom: 14px; }
-    .modal-label {
-      font-size: 0.75rem; font-weight: 600;
-      color: var(--text2); margin-bottom: 6px; display: block;
-    }
-    .modal-summary {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 0.8rem; color: var(--text2);
-      line-height: 1.7;
-    }
-    .modal-summary strong { color: var(--text); }
-    .modal-textarea {
-      width: 100%;
-      background: var(--surface2);
-      border: 1.5px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 12px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.83rem;
-      color: var(--text);
-      resize: vertical;
-      min-height: 80px;
-      transition: border-color 0.15s;
-      outline: none;
-    }
-    .modal-textarea:focus { border-color: var(--blue2); }
-    .modal-textarea::placeholder { color: var(--text3); }
-    .modal-actions {
-      display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;
-    }
-    .modal-btn-cancel {
-      height: 38px; padding: 0 18px;
-      background: none; border: 1.5px solid var(--border);
-      border-radius: 9px; color: var(--text2);
-      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
-      cursor: pointer; transition: all 0.15s;
-    }
-    .modal-btn-cancel:hover { border-color: var(--text3); }
-    .modal-btn-save {
-      height: 38px; padding: 0 20px;
-      background: var(--blue2); border: none;
-      border-radius: 9px; color: #fff;
-      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
-      cursor: pointer; transition: background 0.15s;
-    }
-    .modal-btn-save:hover { background: var(--blue); }
-    .modal-btn-save:disabled { opacity: 0.6; cursor: wait; }
-    .modal-login-prompt {
-      text-align: center; padding: 8px 0 4px;
-      font-size: 0.8rem; color: var(--text3);
-    }
-    .modal-login-prompt a { color: var(--blue2); text-decoration: none; font-weight: 600; }
-    .modal-login-prompt a:hover { text-decoration: underline; }
-
-    /* ── FOOTER ── */
-    footer {
-      position: relative;
-      z-index: 1;
-      border-top: 1px solid var(--border);
-      background: var(--surface2);
-      padding: 32px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .footer-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
-    .footer-logo {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-    }
-
-    .footer-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text2);
-    }
-
-    .footer-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .footer-link {
-      font-size: 0.775rem;
-      color: var(--text3);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
-    .footer-link:hover { color: var(--text2); }
-
-    .footer-copy { font-size: 0.75rem; color: var(--text3); }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 768px) {
-      nav { padding: 0 16px; }
-      .nav-menu { display: none; }
-      footer { flex-direction: column; gap: 20px; text-align: center; padding: 24px 16px; }
-    }
-
-    @media (max-width: 600px) {
-      .reports-grid { grid-template-columns: 1fr; }
-      .howto { flex-direction: column; }
-      .enemy-body { flex-direction: column; align-items: flex-start; }
-      .page-wrap { padding: 32px 16px 60px; }
-    }
+      position:relative; z-index:1;
+      border-bottom:1px solid var(--border);
+      background:var(--surface);
+      padding:28px 40px 24px;
+    }
+    .breadcrumb { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text3); margin-bottom:10px; }
+    .breadcrumb a { color:var(--text3); text-decoration:none; transition:color 0.15s; }
+    .breadcrumb a:hover { color:var(--blue2); }
+    .breadcrumb-sep { font-size:0.65rem; opacity:0.5; }
+    .breadcrumb-current { color:var(--text2); font-weight:500; }
+    .page-header-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+    .page-title-group { display:flex; align-items:center; gap:14px; }
+    .page-icon { width:44px; height:44px; border-radius:12px; background:var(--red-bg); border:1px solid rgba(220,38,38,0.18); display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+    .page-title { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; color:var(--text); letter-spacing:-0.02em; }
+    .page-subtitle { font-size:0.8rem; color:var(--text3); margin-top:2px; }
+    .page-badges { display:flex; align-items:center; gap:8px; }
+    .page-badge { font-size:0.7rem; font-weight:600; letter-spacing:0.05em; padding:4px 10px; border-radius:100px; }
+    .page-badge.free     { background:var(--green-bg); color:var(--green); border:1px solid rgba(5,150,105,0.2); }
+    .page-badge.no-login { background:var(--blue-glow); color:var(--blue-light); border:1px solid rgba(59,130,246,0.2); }
+
+    .page-wrap { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:40px 24px 80px; }
+
+    /* Two-column layout */
+    .layout { display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
+
+    /* Paste area */
+    .paste-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:24px; animation:fadeUp 0.35s ease 0.05s both; }
+    .paste-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:10px; }
+    .paste-area {
+      width:100%; min-height:180px; max-height:300px;
+      font-family:'DM Sans',sans-serif; font-size:0.8rem; color:var(--text2);
+      background:var(--surface); border:1.5px solid var(--border);
+      border-radius:10px; padding:14px; resize:vertical; outline:none;
+      transition:border-color 0.18s, box-shadow 0.18s; line-height:1.6;
+    }
+    .paste-area:focus { border-color:var(--blue2); box-shadow:0 0 0 3px rgba(37,99,235,0.08); }
+    .paste-area::placeholder { color:var(--text3); }
+    .paste-actions { display:flex; gap:10px; margin-top:12px; }
+    .btn-parse { font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600; background:var(--blue2); color:#fff; border:none; border-radius:9px; padding:10px 24px; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 14px rgba(37,99,235,0.28); flex:1; }
+    .btn-parse:hover { background:var(--blue); transform:translateY(-1px); }
+    .btn-clear { font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500; background:none; color:var(--text3); border:1px solid var(--border); border-radius:9px; padding:10px 18px; cursor:pointer; transition:all 0.15s; }
+    .btn-clear:hover { color:var(--text2); border-color:var(--border2); background:var(--surface2); }
+
+    /* Strip notice */
+    .strip-notice {
+      margin-top:10px; padding:8px 12px;
+      background:var(--green-bg); border:1px solid rgba(5,150,105,0.2);
+      border-radius:8px; font-size:0.75rem; color:var(--green);
+      display:none;
+    }
+
+    /* Share card */
+    .share-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:20px; animation:fadeUp 0.35s ease 0.1s both; position:sticky; top:80px; }
+    .share-title { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:14px; }
+    .share-info { font-size:0.78rem; color:var(--text2); line-height:1.6; margin-bottom:16px; }
+    .share-ttl { display:flex; flex-direction:column; gap:5px; margin-bottom:14px; }
+    .share-ttl label { font-size:0.72rem; font-weight:600; color:var(--text2); }
+    .share-ttl select { font-family:'DM Sans',sans-serif; font-size:0.875rem; color:var(--text); background:var(--surface); border:1.5px solid var(--border); border-radius:8px; padding:8px 11px; outline:none; transition:border-color 0.18s; }
+    .share-ttl select:focus { border-color:var(--blue2); }
+    .btn-share { width:100%; font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600; background:var(--green); color:#fff; border:none; border-radius:9px; padding:11px; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 14px rgba(5,150,105,0.25); display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-share:hover { background:#047857; transform:translateY(-1px); }
+    .btn-share:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+    .share-result { margin-top:14px; display:none; }
+    .share-link-wrap { display:flex; gap:8px; align-items:center; }
+    .share-link-input { flex:1; font-family:'DM Sans',sans-serif; font-size:0.78rem; color:var(--text2); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:8px 10px; outline:none; }
+    .btn-copy { font-family:'DM Sans',sans-serif; font-size:0.75rem; font-weight:600; background:var(--blue2); color:#fff; border:none; border-radius:7px; padding:8px 12px; cursor:pointer; white-space:nowrap; transition:background 0.15s; }
+    .btn-copy:hover { background:var(--blue); }
+    .btn-copy.copied { background:var(--green); }
+    .share-note { font-size:0.72rem; color:var(--text3); margin-top:8px; line-height:1.5; }
+    .pro-note { background:var(--amber-bg); border:1px solid rgba(217,119,6,0.2); border-radius:8px; padding:10px 12px; font-size:0.75rem; color:var(--amber); line-height:1.5; margin-top:10px; }
+
+    /* Save Intel button in share card */
+    .intel-divider { border:none; border-top:1px solid var(--border); margin:14px 0; }
+    .btn-save-intel {
+      width:100%; font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600;
+      background:var(--surface2); color:var(--text3);
+      border:1.5px solid var(--border); border-radius:9px;
+      padding:11px; cursor:not-allowed; opacity:0.7;
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      transition:all 0.18s; margin-top:10px;
+    }
+    .btn-save-intel.active {
+      background:var(--purple-bg); color:var(--purple);
+      border-color:rgba(124,58,237,0.3); cursor:pointer; opacity:1;
+    }
+    .btn-save-intel.active:hover { background:rgba(124,58,237,0.14); }
+    .btn-save-intel.saved {
+      background:var(--green-bg); color:var(--green);
+      border-color:rgba(5,150,105,0.3); cursor:default; opacity:1;
+    }
+    .intel-note { font-size:0.72rem; color:var(--text3); margin-top:6px; line-height:1.5; text-align:center; }
+    .intel-note a { color:var(--blue2); text-decoration:none; font-weight:600; }
+
+    /* Error box */
+    .parse-error { background:var(--red-bg); border:1px solid rgba(220,38,38,0.2); border-radius:10px; padding:12px 16px; font-size:0.825rem; color:var(--red); margin-top:14px; display:none; line-height:1.5; }
+
+    /* ── REPORT DISPLAY ── */
+    .report-display { margin-top:28px; animation:fadeUp 0.4s ease both; display:none; }
+    .report-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+    .report-header { padding:20px 24px; border-bottom:1px solid var(--border); background:var(--surface2); }
+    .report-title { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:var(--navy); letter-spacing:-0.01em; margin-bottom:4px; }
+    .report-meta { font-size:0.8rem; color:var(--text3); display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .report-meta-item { display:flex; align-items:center; gap:4px; }
+    .report-sides { display:flex; flex-direction:column; }
+    .report-side { padding:16px 24px; }
+    .report-side + .report-side { border-top:1px solid var(--border); }
+    .report-side.attacker { background:var(--attacker-bg); }
+    .report-side.defender { background:var(--defender-bg); }
+    .side-header { display:flex; align-items:center; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    .side-badge { font-size:0.62rem; font-weight:700; letter-spacing:0.08em; padding:3px 9px; border-radius:100px; text-transform:uppercase; }
+    .side-badge.atk { background:var(--red-bg); color:var(--red); border:1px solid rgba(220,38,38,0.2); }
+    .side-badge.def { background:var(--blue-glow); color:var(--blue2); border:1px solid rgba(37,99,235,0.2); }
+    .side-player { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); }
+    .side-alliance { font-size:0.72rem; font-weight:700; background:var(--blue-glow); color:var(--blue2); padding:2px 7px; border-radius:4px; margin-right:4px; }
+    .reinforce-tag { font-size:0.65rem; font-weight:700; background:var(--amber-bg); color:var(--amber); border:1px solid rgba(217,119,6,0.2); border-radius:100px; padding:2px 8px; margin-right:6px; letter-spacing:0.04em; }
+    .side-village { font-size:0.78rem; color:var(--text2); margin-top:2px; }
+    .side-village a { color:var(--blue2); text-decoration:none; }
+    .player-link { color:var(--navy); font-weight:700; text-decoration:none; font-family:'Space Grotesk',sans-serif; }
+    .player-link:hover { color:var(--blue2); text-decoration:underline; }
+    .side-village a:hover { text-decoration:underline; }
+    .troop-scroll { overflow-x:auto; }
+    .troop-table { border-collapse:collapse; white-space:nowrap; }
+    .troop-col { text-align:center; padding:4px 6px; vertical-align:top; }
+    .troop-icon-wrap { display:flex; flex-direction:column; align-items:center; gap:3px; }
+    .troop-sprite { width:26px; height:26px; background-repeat:no-repeat; border-radius:3px; flex-shrink:0; }
+    .troop-name { font-size:0.55rem; color:var(--text3); text-align:center; line-height:1.2; width:44px; overflow:hidden; text-overflow:ellipsis; }
+    .troop-count { font-family:'Space Grotesk',sans-serif; font-size:0.875rem; font-weight:700; color:var(--navy); text-align:center; padding:3px 0 1px; min-width:44px; }
+    .troop-loss  { font-family:'Space Grotesk',sans-serif; font-size:0.75rem; color:var(--red); text-align:center; padding-bottom:2px; min-width:44px; }
+    .troop-loss.zero { color:var(--text3); }
+    .troop-wounded { font-family:'Space Grotesk',sans-serif; font-size:0.75rem; color:var(--green); text-align:center; padding-bottom:2px; min-width:44px; }
+    .troop-wounded.zero { color:var(--text3); }
+    .unknown { color:var(--text3); font-style:italic; }
+    .row-label { font-size:0.8rem; text-align:center; padding:4px 6px 4px 2px; vertical-align:middle; width:20px; opacity:0.7; }
+    .side-info { margin-top:10px; padding:10px 12px; background:rgba(37,99,235,0.04); border:1px solid rgba(37,99,235,0.1); border-radius:8px; }
+    .info-line { font-size:0.78rem; color:var(--text2); line-height:1.65; }
+    .info-line + .info-line { margin-top:3px; }
+    .bounty-row { display:flex; align-items:center; gap:16px; padding:14px 0 4px; flex-wrap:wrap; }
+    .bounty-label { font-size:0.72rem; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.06em; }
+    .bounty-item { display:flex; align-items:center; gap:5px; font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); }
+    .res-icon { width:18px; height:18px; object-fit:contain; }
+    .bounty-carry { font-size:0.72rem; color:var(--text3); margin-left:4px; }
+    .report-stats { border-top:1px solid var(--border); padding:20px 24px; }
+    .stats-title { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:14px; }
+    .stats-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    .stats-table thead th { font-size:0.8rem; font-weight:700; color:var(--text2); padding:6px 14px 10px; text-align:right; }
+    .stats-table thead th:first-child { text-align:left; }
+    .stats-table tbody tr { border-top:1px solid var(--border); }
+    .stats-table tbody tr:hover { background:var(--surface2); }
+    .stat-row-label { font-size:0.8rem; color:var(--text2); padding:9px 14px; display:flex; align-items:center; gap:6px; white-space:nowrap; }
+    .stat-val { font-family:'Space Grotesk',sans-serif; font-size:0.95rem; font-weight:700; color:var(--navy); padding:9px 14px; text-align:right; }
+    .stat-val.atk { color:var(--red); }
+    .stat-val.def { color:var(--blue2); }
+    .stat-icon { width:20px; height:20px; object-fit:contain; vertical-align:middle; }
+    .stat-icon-sm { width:14px; height:14px; object-fit:contain; vertical-align:middle; }
+    .row-icon { width:14px; height:14px; object-fit:contain; vertical-align:middle; display:block; margin:0 auto; }
+
+    /* ── MODAL ── */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(15,33,83,0.35); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.15s ease; }
+    .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; width:100%; max-width:460px; box-shadow:0 24px 64px rgba(15,33,83,0.15); animation:fadeUp 0.2s ease; }
+    .modal-title { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .modal-sub { font-size:0.78rem; color:var(--text3); margin-bottom:20px; }
+    .modal-field { margin-bottom:14px; }
+    .modal-label { font-size:0.75rem; font-weight:600; color:var(--text2); margin-bottom:6px; display:block; }
+    .modal-summary { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 14px; font-size:0.8rem; color:var(--text2); line-height:1.7; }
+    .modal-summary strong { color:var(--text); }
+    .modal-input, .modal-textarea { width:100%; background:var(--surface2); border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:0.83rem; color:var(--text); outline:none; transition:border-color 0.15s; }
+    .modal-input:focus, .modal-textarea:focus { border-color:var(--blue2); }
+    .modal-input::placeholder, .modal-textarea::placeholder { color:var(--text3); }
+    .modal-textarea { resize:vertical; min-height:80px; }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+    .modal-btn-cancel { height:38px; padding:0 18px; background:none; border:1.5px solid var(--border); border-radius:9px; color:var(--text2); font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
+    .modal-btn-cancel:hover { border-color:var(--text3); }
+    .modal-btn-save { height:38px; padding:0 20px; background:var(--purple); border:none; border-radius:9px; color:#fff; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:600; cursor:pointer; transition:background 0.15s; }
+    .modal-btn-save:hover { background:#6d28d9; }
+    .modal-btn-save:disabled { opacity:0.6; cursor:wait; }
+
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.35); border-top-color:#fff; border-radius:50%; animation:spin 0.6s linear infinite; }
+    @keyframes fadeDown { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeUp   { from{opacity:0;transform:translateY(18px)}  to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+    @keyframes spin     { to{transform:rotate(360deg)} }
+
+    @media (max-width:900px) { .layout { grid-template-columns:1fr; } .share-card { position:static; } }
+    @media (max-width:600px) { .page-wrap { padding:20px 14px 60px; } .page-header { padding:20px 16px 16px; } }
   </style>
 </head>
 <body>
-
-  <!-- ── NAVBAR ── -->
   <div id="navbar-root"></div>
 
-  <!-- Header -->
   <div class="page-header">
     <div class="breadcrumb">
       <a href="/">Home</a>
       <span class="breadcrumb-sep">›</span>
-      <a href="/tools/">Tools</a>
-      <span class="breadcrumb-sep">›</span>
-      <span class="breadcrumb-current">Spy Productivity</span>
+      <span class="breadcrumb-current">Battle Report</span>
     </div>
     <div class="page-header-inner">
       <div class="page-title-group">
-        <div class="page-icon">🕵️</div>
+        <div class="page-icon">⚔️</div>
         <div>
-          <div class="page-title">Spy Productivity</div>
-          <div class="page-subtitle">Paste two scout reports to calculate enemy resource production per hour.</div>
+          <div class="page-title">Battle Report</div>
+          <div class="page-subtitle">Paste a Travian battle report, get a clean shareable link.</div>
         </div>
       </div>
       <div class="page-badges">
@@ -833,498 +234,676 @@
     </div>
   </div>
 
-  <!-- ── PAGE ── -->
   <div class="page-wrap">
+    <div class="layout">
 
-    <div class="howto">
-      <div class="howto-step">
-        <div class="howto-num">1</div>
-        <div class="howto-text">
-          <strong>Open first report</strong>
-          Press Ctrl+A then Ctrl+C inside the report window, paste below.
+      <!-- Left: paste area -->
+      <div>
+        <div class="paste-card">
+          <div class="paste-label">Paste your report (Ctrl+A → Ctrl+C from Travian)</div>
+          <textarea class="paste-area" id="reportInput"
+            placeholder="Paste the full battle report text here…&#10;&#10;Works with both clean report paste and full page paste (Ctrl+A from any Travian page)."></textarea>
+          <div class="strip-notice" id="stripNotice">✓ Noise stripped — extracted report from full page paste</div>
+          <div class="parse-error" id="parseError"></div>
+          <div class="paste-actions">
+            <button class="btn-parse" onclick="parseAndRender()">⚔️ Parse Report</button>
+            <button class="btn-clear" onclick="clearAll()">Clear</button>
+          </div>
+        </div>
+        <div class="report-display" id="reportDisplay"></div>
+      </div>
+
+      <!-- Right: share + intel card -->
+      <div>
+        <div class="share-card">
+          <div class="share-title">🔗 Share this report</div>
+          <div class="share-info">Parse your report first, then generate a shareable link anyone can open — no account needed.</div>
+          <div class="share-ttl">
+            <label>Link expires after</label>
+            <select id="ttlSelect">
+              <option value="7">7 days</option>
+              <option value="14" selected>14 days</option>
+              <option value="30">30 days</option>
+            </select>
+          </div>
+          <button class="btn-share" id="shareBtn" onclick="shareReport()" disabled>
+            🔗 Generate Share Link
+          </button>
+          <div class="share-result" id="shareResult">
+            <div class="share-link-wrap">
+              <input type="text" class="share-link-input" id="shareLinkInput" readonly>
+              <button class="btn-copy" id="copyBtn" onclick="copyLink()">Copy</button>
+            </div>
+            <div class="share-note" id="shareNote"></div>
+          </div>
+          <div class="pro-note">⭐ <b>Pro users</b> get permanent links + saved report history in their account.</div>
+
+          <hr class="intel-divider">
+
+          <button class="btn-save-intel" id="btnSaveIntel" onclick="openIntelModal()" disabled>
+            🕵️ Save Intel
+          </button>
+          <div class="intel-note" id="intelNote">Save troop data to your Intelligence Hub</div>
         </div>
       </div>
-      <div class="howto-step">
-        <div class="howto-num">2</div>
-        <div class="howto-text">
-          <strong>Open second report</strong>
-          Do the same for the later report. Any time gap works — longer = more accurate.
-        </div>
-      </div>
-      <div class="howto-step">
-        <div class="howto-num">3</div>
-        <div class="howto-text">
-          <strong>Analyze</strong>
-          Hit the button. Both reports can be from the same or different scouts.
-        </div>
-      </div>
+
     </div>
-
-    <div class="reports-grid">
-      <div class="report-card">
-        <div class="report-label">
-          <div class="report-num">1</div>
-          <span class="report-label-text">First Report</span>
-          <span class="report-label-sub">Earlier scan</span>
-        </div>
-        <textarea id="report1" placeholder="Paste scout report #1 here...&#10;&#10;Ctrl+A → Ctrl+C inside the&#10;report window, then paste."></textarea>
-      </div>
-      <div class="report-card">
-        <div class="report-label">
-          <div class="report-num">2</div>
-          <span class="report-label-text">Second Report</span>
-          <span class="report-label-sub">Later scan</span>
-        </div>
-        <textarea id="report2" placeholder="Paste scout report #2 here...&#10;&#10;The longer the gap between&#10;scans, the more accurate."></textarea>
-      </div>
-    </div>
-
-    <button class="btn-analyze" onclick="analyzeReports()">
-      🔍 Analyze Production
-    </button>
-
-    <div id="result"></div>
-
   </div>
 
-  <!-- ── FOOTER ── -->
-  <footer>
-    <a href="index.html" class="footer-brand">
-      <div class="footer-logo">⚔️</div>
-      <span class="footer-name">TravianTools · sonybukansoni.com</span>
-    </a>
-    <div class="footer-links">
-      <a href="#" class="footer-link">Tools</a>
-      <a href="#" class="footer-link">Guides</a>
-      <a href="#" class="footer-link">Changelog</a>
-      <a href="#" class="footer-link">Contact</a>
-    </div>
-    <span class="footer-copy">© 2025 sonybukansoni.com</span>
-  </footer>
-
   <script>
-    // ── PARSERS ──────────────────────────────────────────────────────
+    // ── PRE-PROCESSOR: strip full-page noise ──────────────────────────
+    function stripNoise(raw) {
+      const lines = raw.split('\n');
 
-    function cleanNum(str) {
-      return parseInt(str.replace(/[^\d]/g, ''), 10);
+      // End markers — everything from here is footer noise
+      const endMarkers = [
+        /^task overview$/i,
+        /^homepage\s+discord/i,
+        /^©\s*200[0-9]/i,
+        /^village groups/i,
+      ];
+
+      // Find report start: line containing action keywords (title line)
+      const titleRe = /\b(raids?|attacks?|scouts?|conquers?|reinforces?|returns?)\b/i;
+      let startIdx = -1;
+      for (let i = 0; i < lines.length; i++) {
+        if (titleRe.test(lines[i].trim())) { startIdx = i; break; }
+      }
+
+      // Find report end
+      let endIdx = lines.length;
+      for (let i = (startIdx > -1 ? startIdx : 0); i < lines.length; i++) {
+        if (endMarkers.some(re => re.test(lines[i].trim()))) { endIdx = i; break; }
+      }
+
+      if (startIdx === -1) return { text: raw, stripped: false };
+
+      const extracted = lines.slice(startIdx, endIdx).join('\n');
+      const stripped = startIdx > 0 || endIdx < lines.length;
+      return { text: extracted, stripped };
     }
 
-    /**
-     * Extract timestamp: "17.05.26, 22:11:11"
-     */
-    function extractTimestamp(text) {
-      const m = text.match(/(\d{2}\.\d{2}\.\d{2}),\s*(\d{2}:\d{2}:\d{2})/);
-      if (!m) return null;
-      const [d, mo, y] = m[1].split('.').map(Number);
-      const [h, mi, s] = m[2].split(':').map(Number);
-      return new Date(2000 + y, mo - 1, d, h, mi, s);
-    }
+    // ── PARSER ────────────────────────────────────────────────────────
+    function parseReport(raw) {
+      // Pre-process: strip noise
+      const { text, stripped } = stripNoise(raw);
+      window._lastStripped = stripped;
 
-    /**
-     * Extract resources from spy report:
-     * "Resources  13812  11521  10730  10576  3390  33079"
-     * positions: wood clay iron crop cranny warehouse
-     */
-    function extractResources(text) {
-      // Match "Resources" followed by 4–6 numbers (with possible commas/spaces)
-      const m = text.match(/Resources\s+([\d,\s]+)/i);
-      if (!m) return null;
-
-      const nums = m[1].trim().split(/\s+/).map(cleanNum).filter(n => !isNaN(n));
-      if (nums.length < 4) return null;
-
-      return {
-        wood:      nums[0],
-        clay:      nums[1],
-        iron:      nums[2],
-        crop:      nums[3],
-        cranny:    nums.length >= 5 ? nums[4] : null,
-      };
-    }
-
-    /**
-     * Extract defender info from text:
-     * "[-FGO-] DontknowDOwhat from village Wah"
-     * Alliance tag is optional: "[TAG] Name" or just "Name"
-     */
-    function extractDefender(text) {
-      // Try with alliance tag first
-      const withAlliance = text.match(/Defender\s*\n+\s*\[([^\]]+)\]\s+(\S+)\s+from village\s+(.+)/i);
-      if (withAlliance) {
-        return {
-          alliance: withAlliance[1].trim(),
-          name:     withAlliance[2].trim(),
-          village:  withAlliance[3].trim().split('\n')[0].trim(),
-        };
-      }
-
-      // Without alliance tag
-      const noAlliance = text.match(/Defender\s*\n+\s*(\S+)\s+from village\s+(.+)/i);
-      if (noAlliance) {
-        return {
-          alliance: null,
-          name:     noAlliance[1].trim(),
-          village:  noAlliance[2].trim().split('\n')[0].trim(),
-        };
-      }
-
-      return null;
-    }
-
-    /**
-     * Format delta hours/minutes nicely
-     */
-    function formatGap(hours) {
-      const h = Math.floor(hours);
-      const m = Math.round((hours - h) * 60);
-      if (h === 0) return `${m}m gap`;
-      if (m === 0) return `${h}h gap`;
-      return `${h}h ${m}m gap`;
-    }
-
-    function fmtNum(n) {
-      return n.toLocaleString();
-    }
-
-    // ── MAIN ──────────────────────────────────────────────────────────
-
-    function analyzeReports() {
-      const t1 = document.getElementById('report1').value.trim();
-      const t2 = document.getElementById('report2').value.trim();
-      const out = document.getElementById('result');
-
-      if (!t1 || !t2) {
-        out.innerHTML = errorBox('Please paste both scout reports before analyzing.');
-        return;
-      }
-
-      const r1 = extractResources(t1);
-      const r2 = extractResources(t2);
-      const ts1 = extractTimestamp(t1);
-      const ts2 = extractTimestamp(t2);
-
-      if (!r1 || !r2) {
-        out.innerHTML = errorBox('Could not find a <strong>Resources</strong> line in one or both reports. Make sure you\'re pasting spy (scouting) reports, not battle reports.');
-        return;
-      }
-
-      if (!ts1 || !ts2) {
-        out.innerHTML = errorBox('Could not read the timestamp from one or both reports. Expected format: <strong>DD.MM.YY, HH:MM:SS</strong>');
-        return;
-      }
-
-      if (Math.abs(ts1 - ts2) < 1000) {
-        out.innerHTML = errorBox('Both reports appear to be from the same moment. Please use two reports with different timestamps.');
-        return;
-      }
-
-      // Sort chronologically
-      let early, late, earlyTs, lateTs;
-      if (ts1 <= ts2) {
-        early = r1; late = r2; earlyTs = ts1; lateTs = ts2;
-      } else {
-        early = r2; late = r1; earlyTs = ts2; lateTs = ts1;
-      }
-
-      const deltaH = (lateTs - earlyTs) / 3600000;
-
-      const prod = {
-        wood: Math.round((late.wood - early.wood) / deltaH),
-        clay: Math.round((late.clay - early.clay) / deltaH),
-        iron: Math.round((late.iron - early.iron) / deltaH),
-        crop: Math.round((late.crop - early.crop) / deltaH),
+      const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+      const report = {
+        title: '', date: '',
+        attacker: { alliance:'', player:'', village:'', coords:'', troops:[], sent:[], casualties:[], wounded:[], info:[] },
+        defenders: [],
+        bounty: { wood:0, clay:0, iron:0, crop:0, carry:0, maxCarry:0 },
+        stats: { atkStrength:0, defStrength:0, atkSupplyBefore:0, defSupplyBefore:0, atkSupplyLost:0, defSupplyLost:0, atkResLost:0, defResLost:0 },
       };
 
-      const total = prod.wood + prod.clay + prod.iron + prod.crop;
+      let i = 0;
+      const reportKeywords = /\b(raids?|attacks?|scouts?|conquers?|reinforces?|returns?)\b/i;
+      for (i = 0; i < lines.length; i++) {
+        if (reportKeywords.test(lines[i])) { report.title = lines[i]; break; }
+      }
 
-      // Use cranny from LATER report (more current)
-      const cranny = late.cranny ?? early.cranny;
+      const dateRe = /\d{2}\.\d{2}\.\d{2,4},?\s+\d{2}:\d{2}:\d{2}/;
+      for (let j = i; j < Math.min(i + 10, lines.length); j++) {
+        const m = lines[j].match(dateRe);
+        if (m) { report.date = m[0]; break; }
+      }
 
-      // Defender info — try to get from either report (same village)
-      const defender = extractDefender(t1) || extractDefender(t2);
+      // Server detection
+      const serverRe = /([a-z0-9]+\.x\d+\.[a-z]+\.travian\.com|ts\d+\.x\d+\.[a-z]+)/i;
+      for (let j = 0; j < Math.min(20, lines.length); j++) {
+        const sm = lines[j].match(serverRe);
+        if (sm) {
+          window._reportServerSlug = sm[1].replace(/\.travian\.com$/, '');
+          break;
+        }
+      }
+      if (!window._reportServerSlug) {
+        const urlParts = window.location.pathname.split('/').filter(Boolean);
+        if (urlParts[0] === 's' && urlParts[1]) window._reportServerSlug = urlParts[1];
+      }
 
-      // Format timestamps for display
-      const fmtTs = (d) => {
-        const pad = n => String(n).padStart(2, '0');
-        return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(-2)}, ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      // Find Attacker block
+      let atkIdx = -1;
+      for (let j = 0; j < lines.length; j++) {
+        if (/^attacker$/i.test(lines[j])) { atkIdx = j; break; }
+      }
+      if (atkIdx !== -1) parseSide(lines, atkIdx + 1, report.attacker);
+
+      // Find ALL Defender blocks
+      const defPositions = [];
+      for (let j = 0; j < lines.length; j++) {
+        if (/^defender$/i.test(lines[j])) defPositions.push(j);
+      }
+      for (const dPos of defPositions) {
+        const def = { alliance:'', player:'', village:'', coords:'', troops:[], sent:[], casualties:[], wounded:[], info:[], isReinforcement: false };
+        if (lines[dPos + 1] && /^reinforcement$/i.test(lines[dPos + 1])) {
+          def.isReinforcement = true;
+          parseSide(lines, dPos + 2, def);
+        } else {
+          parseSide(lines, dPos + 1, def);
+        }
+        if (def.troops.length || def.player) report.defenders.push(def);
+      }
+
+      // Bounty
+      const bountyIdx = lines.findIndex(l => /^bounty$/i.test(l));
+      if (bountyIdx !== -1) {
+        const nums = [];
+        for (let j = bountyIdx + 1; j < Math.min(bountyIdx + 15, lines.length); j++) {
+          const n = lines[j].replace(/[^0-9\/]/g, '');
+          if (!n) continue;
+          if (n.includes('/')) {
+            const [c, m] = n.split('/');
+            report.bounty.carry    = parseInt(c) || 0;
+            report.bounty.maxCarry = parseInt(m) || 0;
+          } else {
+            nums.push(parseInt(n) || 0);
+          }
+          if (nums.length >= 4 && report.bounty.carry) break;
+        }
+        if (nums.length >= 1) report.bounty.wood = nums[0];
+        if (nums.length >= 2) report.bounty.clay = nums[1];
+        if (nums.length >= 3) report.bounty.iron = nums[2];
+        if (nums.length >= 4) report.bounty.crop = nums[3];
+      }
+
+      // Statistics
+      const statsIdx = lines.findIndex(l => /^statistics$/i.test(l));
+      if (statsIdx !== -1) {
+        for (let j = statsIdx + 1; j < Math.min(statsIdx + 20, lines.length); j++) {
+          const l = lines[j].toLowerCase();
+          const nums = extractAllNums(lines, j);
+          if (/combat strength/.test(l) && nums.length >= 2) { report.stats.atkStrength = nums[0]; report.stats.defStrength = nums[1]; }
+          if (/supply before/.test(l) && nums.length >= 2)   { report.stats.atkSupplyBefore = nums[0]; report.stats.defSupplyBefore = nums[1]; }
+          if (/supply lost/.test(l) && nums.length >= 2)     { report.stats.atkSupplyLost = nums[0]; report.stats.defSupplyLost = nums[1]; }
+          if (/resources lost/.test(l) && nums.length >= 2)  { report.stats.atkResLost = nums[0]; report.stats.defResLost = nums[1]; }
+        }
+      }
+
+      return report;
+    }
+
+    function parseSide(lines, startIdx, side) {
+      const fromRe = /^(?:\[([^\]]+)\]\s+)?(.+?)\s+from village\s+(.+)$/i;
+      for (let i = startIdx; i < Math.min(startIdx + 5, lines.length); i++) {
+        const m = lines[i].match(fromRe);
+        if (m) {
+          side.alliance = m[1] || '';
+          side.player   = m[2].trim();
+          const villageRaw = m[3].trim();
+          const coordM = villageRaw.match(/\(([^)]+)\)\s*$/);
+          if (coordM) {
+            side.coords  = coordM[0];
+            side.village = villageRaw.slice(0, villageRaw.lastIndexOf(coordM[0])).trim();
+          } else {
+            side.village = villageRaw;
+          }
+          startIdx = i + 1;
+          break;
+        }
+      }
+
+      const knownTroops = Object.keys(window.TT?.troopByName || {});
+      let troopHeaderIdx = -1;
+      for (let i = startIdx; i < Math.min(startIdx + 10, lines.length); i++) {
+        const low = lines[i].toLowerCase();
+        if (knownTroops.filter(t => low.includes(t)).length >= 3) { troopHeaderIdx = i; break; }
+      }
+      if (troopHeaderIdx === -1) return;
+
+      const troopNames = lines[troopHeaderIdx].split(/\t|\s{2,}/).map(s => s.trim()).filter(Boolean);
+      side.troops = troopNames;
+
+      const isDataRow = (line) => {
+        const parts = line.split(/\t|\s+/).map(s => s.trim()).filter(Boolean);
+        return parts.length > 0 && parts.every(p => /^\d+$/.test(p) || p === '?');
       };
 
-      // Bar widths relative to max
-      const maxProd = Math.max(prod.wood, prod.clay, prod.iron, prod.crop, 1);
-      const barW = v => Math.max(4, Math.round((Math.max(v, 0) / maxProd) * 100));
-
-      // Cranny section HTML
-      let crannyHTML = '';
-      if (cranny !== null) {
-        crannyHTML = `
-          <div class="cranny-row">
-            <span class="cranny-icon">🏚️</span>
-            <div class="cranny-info">
-              <div class="cranny-label">Cranny</div>
-              <div class="cranny-values"><strong>${fmtNum(cranny)}</strong> resources hidden</div>
-            </div>
-          </div>`;
+      let numRows = 0;
+      for (let i = troopHeaderIdx + 1; i < Math.min(troopHeaderIdx + 6, lines.length); i++) {
+        if (!isDataRow(lines[i])) break;
+        const vals = lines[i].split(/\t|\s+/).map(s => s.trim()).filter(Boolean).map(p => p === '?' ? null : Number(p));
+        if (vals.length < Math.max(1, troopNames.length - 3)) break;
+        if (numRows === 0) side.sent       = vals;
+        if (numRows === 1) side.casualties = vals;
+        if (numRows === 2) side.wounded    = vals;
+        numRows++;
+        if (numRows >= 3) break;
       }
 
-      // Enemy card HTML
-      let enemyHTML = '';
-      if (defender) {
-        const alliancePill = defender.alliance
-          ? `<span class="enemy-alliance">[${defender.alliance}]</span>`
-          : '';
-        enemyHTML = `
-          <div class="enemy-card">
-            <div class="enemy-header">
-              <span class="enemy-header-label">🎯 Target Intelligence</span>
-              <span class="enemy-time">📅 ${fmtTs(lateTs)}</span>
-            </div>
-            <div class="enemy-body">
-              <div class="enemy-avatar">🏴</div>
-              <div class="enemy-info">
-                <div class="enemy-name">${defender.name}</div>
-                ${alliancePill}
-                <div class="enemy-village">Village: <strong>${defender.village}</strong></div>
-              </div>
-              <div class="enemy-meta">
-                <div class="meta-pill">
-                  <span class="meta-icon">⏱️</span>
-                  <span>Scanned over <strong>${formatGap(deltaH)}</strong></span>
-                </div>
-                <div class="meta-pill">
-                  <span class="meta-icon">📊</span>
-                  <span>Total <strong>${fmtNum(total)}</strong> res/hr</span>
-                </div>
-                ${cranny !== null ? `<div class="meta-pill"><span class="meta-icon">🏚️</span><span>Cranny <strong>${fmtNum(cranny)}</strong></span></div>` : ''}
-              </div>
-            </div>
-          </div>`;
+      // Info lines — stop at known section headers OR at village-list patterns
+      const afterTroops = troopHeaderIdx + 1 + numRows;
+      const stopWords = /^(bounty|defender|attacker|statistics|population:|loyalty:|villages\s+\d|village groups|task overview)$/i;
+      const infoLines = [];
+      for (let i = afterTroops; i < Math.min(afterTroops + 15, lines.length); i++) {
+        if (stopWords.test(lines[i])) break;
+        if (/^\d+h$/.test(lines[i])) break;
+        if (/^\d{3}\s+\w/.test(lines[i])) break; // village list pattern "001 Shift"
+        if (lines[i].length > 0) infoLines.push(lines[i]);
       }
+      if (infoLines.length) side.info = infoLines;
+    }
 
-      out.innerHTML = `
-        ${enemyHTML}
-        <div class="production-card">
-          <div class="production-header">
-            <span class="production-title">Production Estimate</span>
-            <span class="scan-gap">🕒 ${formatGap(deltaH)}</span>
+    function extractAllNums(lines, lineIdx) {
+      const nums = [];
+      for (let j = lineIdx; j < Math.min(lineIdx + 3, lines.length); j++) {
+        const parts = lines[j].split(/[\t\s]+/);
+        for (const p of parts) {
+          const n = parseInt(p.replace(/[^0-9]/g,''));
+          if (!isNaN(n) && p.replace(/[^0-9]/g,'').length > 0) nums.push(n);
+        }
+        if (nums.length >= 2) break;
+      }
+      return nums;
+    }
+
+    // ── RENDER ────────────────────────────────────────────────────────
+    function guessTribe(troops) {
+      if (!window.TT) return 'roman';
+      const score = {};
+      for (const t of (troops || [])) {
+        const info = window.TT.troopByName[t.toLowerCase().trim()];
+        if (info) score[info.tribe] = (score[info.tribe] || 0) + 1;
+      }
+      if (!Object.keys(score).length) return 'roman';
+      return Object.entries(score).sort((a,b) => b[1]-a[1])[0][0];
+    }
+
+    function renderReport(r) {
+      const atkTribe = guessTribe(r.attacker.troops);
+
+      const renderSide = (side, tribe, cls) => {
+        const isAtk = cls === 'attacker';
+        const badge = isAtk ? `<span class="side-badge atk">⚔️ Attacker</span>` : `<span class="side-badge def">🛡️ Defender</span>`;
+        const alliHtml = side.alliance ? `<span class="side-alliance">[${esc(side.alliance)}]</span>` : '';
+        const coordUrl = side.coords ? coordToUrl(side.coords) : '#';
+        const serverSlug = window._reportServerSlug || 'ts5.x1.asia';
+        const playerHref = side.player ? `/s/${serverSlug}/statistics/player/?name=${encodeURIComponent(side.player)}` : '#';
+        const troops = side.troops || [], sent = side.sent || [], casualties = side.casualties || [], wounded = side.wounded || [];
+        const hasWounded = wounded.some(v => v !== null && v > 0);
+
+        const fmtSent = v => v === null ? `<td class="troop-count unknown">?</td>` : `<td class="troop-count">${v.toLocaleString()}</td>`;
+        const fmtCas  = v => v === null ? `<td class="troop-loss unknown">?</td>` : `<td class="troop-loss ${v===0?'zero':''}">${v > 0 ? '-'+v.toLocaleString() : '0'}</td>`;
+        const fmtWnd  = v => v === null ? `<td class="troop-wounded unknown">?</td>` : `<td class="troop-wounded ${v===0?'zero':''}">${v > 0 ? v.toLocaleString() : '0'}</td>`;
+
+        const iconCols = troops.map(name => {
+          const style = window.TT?.getSpriteStyleByName(name, tribe) || null;
+          const spriteHtml = style ? `<div class="troop-sprite" style="${style}"></div>` : `<div style="width:26px;height:26px;background:var(--surface2);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--text3)">?</div>`;
+          return `<td class="troop-col"><div class="troop-icon-wrap">${spriteHtml}<div class="troop-name">${esc(name)}</div></div></td>`;
+        }).join('');
+
+        const infoHtml = (side.info && side.info.length) ? `<div class="side-info">${side.info.map(l => `<div class="info-line">${esc(l)}</div>`).join('')}</div>` : '';
+        const reinforcementTag = side.isReinforcement ? `<span class="reinforce-tag">Reinforcement</span>` : '';
+
+        return `<div class="report-side ${cls}">
+          <div class="side-header">
+            ${badge}
+            <div>
+              <div class="side-player">${reinforcementTag}${alliHtml}<a class="player-link" href="${playerHref}">${esc(side.player || '—')}</a></div>
+              ${side.village ? `<div class="side-village">from <a href="${coordUrl}" target="_blank">${esc(side.village)} ${esc(side.coords)}</a></div>` : ''}
+            </div>
           </div>
-          <div class="production-body">
-            <div class="resource-rows">
-              ${resRow('🌲', 'wood', 'Wood', prod.wood, barW(prod.wood))}
-              ${resRow('🧱', 'clay', 'Clay', prod.clay, barW(prod.clay))}
-              ${resRow('⚙️', 'iron', 'Iron', prod.iron, barW(prod.iron))}
-              ${resRow('🌾', 'crop', 'Crop', prod.crop, barW(prod.crop))}
-            </div>
-            <div class="total-row">
-              <span class="total-label">Total production / hour</span>
-              <span class="total-value">${fmtNum(total)} res/hr</span>
-            </div>
-            ${crannyHTML}
+          ${troops.length ? `
+          <div class="troop-scroll">
+            <table class="troop-table">
+              <thead><tr><td class="row-label"></td>${iconCols}</tr></thead>
+              <tbody>
+                ${sent.length ? `<tr><td class="row-label" title="Troops sent"><img src="${window.TT?.ICONS.sent}" class="row-icon"></td>${sent.map(fmtSent).join('')}</tr>` : ''}
+                ${casualties.length ? `<tr><td class="row-label" title="Casualties"><img src="${window.TT?.ICONS.dead}" class="row-icon"></td>${casualties.map(fmtCas).join('')}</tr>` : ''}
+                ${hasWounded ? `<tr><td class="row-label" title="Wounded"><img src="${window.TT?.ICONS.wounded}" class="row-icon"></td>${wounded.map(fmtWnd).join('')}</tr>` : ''}
+              </tbody>
+            </table>
+          </div>${infoHtml}` : '<div style="font-size:0.8rem;color:var(--text3);padding:8px 0">No troop data detected.</div>'}
+        </div>`;
+      };
+
+      const bounty = r.bounty;
+      const hasBounty = bounty.wood || bounty.clay || bounty.iron || bounty.crop;
+      const bountyHtml = hasBounty ? `
+        <div style="border-top:1px solid var(--border);padding:12px 24px;background:var(--surface2)">
+          <div class="bounty-row">
+            <span class="bounty-label">Bounty</span>
+            ${bounty.wood ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.wood}"> ${bounty.wood.toLocaleString()}</span>` : ''}
+            ${bounty.clay ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.clay}"> ${bounty.clay.toLocaleString()}</span>` : ''}
+            ${bounty.iron ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.iron}"> ${bounty.iron.toLocaleString()}</span>` : ''}
+            ${bounty.crop ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.crop}"> ${bounty.crop.toLocaleString()}</span>` : ''}
+            ${bounty.carry ? `<span class="bounty-carry">(${bounty.carry.toLocaleString()}/${bounty.maxCarry.toLocaleString()})</span>` : ''}
           </div>
-        </div>
-        <div class="save-wrap">
-          <button class="btn-save" id="btn-save-intel" onclick="openSaveModal()">
-            🔖 Save to Intelligence
-          </button>
-          <span class="save-note" id="save-note-text">Save & track enemy production — requires account</span>
+        </div>` : '';
+
+      const s = r.stats;
+      const statsHtml = `
+        <div class="report-stats">
+          <div class="stats-title">Statistics</div>
+          <table class="stats-table">
+            <thead><tr><th></th><th><img src="${window.TT?.ICONS.offence}" class="stat-icon"> Attacker</th><th><img src="${window.TT?.ICONS.defence}" class="stat-icon"> Defender</th></tr></thead>
+            <tbody>
+              <tr><td class="stat-row-label">Combat Strength</td><td class="stat-val atk">${s.atkStrength.toLocaleString()}</td><td class="stat-val def">${s.defStrength.toLocaleString()}</td></tr>
+              <tr><td class="stat-row-label"><img src="${window.TT?.ICONS.freeCrop}" class="stat-icon-sm"> Supply before</td><td class="stat-val">${s.atkSupplyBefore.toLocaleString()}</td><td class="stat-val">${s.defSupplyBefore.toLocaleString()}</td></tr>
+              <tr><td class="stat-row-label"><img src="${window.TT?.ICONS.freeCrop}" class="stat-icon-sm"> Supply lost</td><td class="stat-val">${s.atkSupplyLost.toLocaleString()}</td><td class="stat-val">${s.defSupplyLost.toLocaleString()}</td></tr>
+              <tr><td class="stat-row-label"><img src="${window.TT?.ICONS.resources}" class="stat-icon-sm"> Resources lost</td><td class="stat-val">${s.atkResLost.toLocaleString()}</td><td class="stat-val">${s.defResLost.toLocaleString()}</td></tr>
+            </tbody>
+          </table>
         </div>`;
 
-      // Animate bars after render
-      requestAnimationFrame(() => {
-        document.querySelectorAll('.res-bar').forEach(bar => {
-          const target = bar.dataset.width;
-          bar.style.width = target + '%';
-        });
-      });
+      const defsSideHtml = (r.defenders || []).map(def => renderSide(def, guessTribe(def.troops), 'defender')).join('');
 
-      // Store result for save modal
-      window._lastIntelResult = { prod, total, cranny, defender, lateTs };
-
-      // Update save button state after render
-      setTimeout(() => updateSaveBtn(), 50);
+      return `
+        <div class="report-card">
+          <div class="report-header">
+            <div class="report-title">${esc(r.title) || 'Battle Report'}</div>
+            <div class="report-meta">
+              <span class="report-meta-item">🕐 ${esc(r.date)}</span>
+              ${window._reportServerSlug ? `<span class="report-meta-item">🌐 <a href="/s/${window._reportServerSlug}/statistics/" style="color:var(--blue2);text-decoration:none;">${window._reportServerSlug}</a></span>` : ''}
+            </div>
+          </div>
+          <div class="report-sides">
+            ${renderSide(r.attacker, atkTribe, 'attacker')}
+            ${defsSideHtml}
+          </div>
+          ${bountyHtml}
+          ${statsHtml}
+        </div>`;
     }
 
-    // ── SAVE TO INTELLIGENCE ──────────────────────────────────────────
+    function coordToUrl(coords) {
+      const m = coords.match(/[−\-]?\d+/g);
+      if (!m || m.length < 2) return '#';
+      const x = m[0].replace('−','-'), y = m[1].replace('−','-');
+      return `https://ts5.x1.asia.travian.com/position_details.php?x=${x}&y=${y}`;
+    }
 
-    async function updateSaveBtn() {
-      const btn = document.getElementById('btn-save-intel');
-      const note = document.getElementById('save-note-text');
-      if (!btn) return;
+    // ── MAIN ACTIONS ─────────────────────────────────────────────────
+    let parsedReport = null;
 
-      const user = await window.getUser();
-      if (!user) {
-        btn.className = 'btn-save';
-        btn.disabled = true;
-        btn.innerHTML = '🔖 Save to Intelligence';
-        if (note) note.innerHTML = 'Requires account — <a href="/login/" style="color:var(--blue2);font-weight:600;">Log in</a> or <a href="/register/" style="color:var(--blue2);font-weight:600;">Sign up free</a>';
+    function parseAndRender() {
+      const raw = document.getElementById('reportInput').value.trim();
+      const errEl = document.getElementById('parseError');
+      const stripNotice = document.getElementById('stripNotice');
+      errEl.style.display = 'none';
+      stripNotice.style.display = 'none';
+
+      if (!raw) {
+        errEl.textContent = 'Please paste a battle report first.';
+        errEl.style.display = 'block';
         return;
       }
 
-      btn.className = 'btn-save active';
-      btn.disabled = false;
-      btn.innerHTML = '🔖 Save to Intelligence';
-      if (note) note.textContent = 'Save enemy production data to your Intelligence hub';
+      try {
+        parsedReport = parseReport(raw);
+
+        if (!parsedReport.attacker.player && !parsedReport.defenders?.length) {
+          throw new Error('Could not detect attacker/defender. Make sure you copy the full report page (Ctrl+A → Ctrl+C).');
+        }
+
+        const display = document.getElementById('reportDisplay');
+        display.innerHTML = renderReport(parsedReport);
+        display.style.display = 'block';
+
+        document.getElementById('shareBtn').disabled = false;
+        document.getElementById('shareResult').style.display = 'none';
+
+        // Show strip notice if noise was removed
+        if (window._lastStripped) stripNotice.style.display = 'block';
+
+        // Update Save Intel button state
+        updateIntelBtn();
+
+        display.scrollIntoView({ behavior:'smooth', block:'start' });
+      } catch(e) {
+        errEl.textContent = '⚠️ ' + e.message;
+        errEl.style.display = 'block';
+        parsedReport = null;
+        document.getElementById('shareBtn').disabled = true;
+        resetIntelBtn();
+      }
     }
 
-    function openSaveModal() {
-      const result = window._lastIntelResult;
-      if (!result) return;
+    function clearAll() {
+      document.getElementById('reportInput').value = '';
+      document.getElementById('reportDisplay').style.display = 'none';
+      document.getElementById('reportDisplay').innerHTML = '';
+      document.getElementById('parseError').style.display = 'none';
+      document.getElementById('stripNotice').style.display = 'none';
+      document.getElementById('shareBtn').disabled = true;
+      document.getElementById('shareResult').style.display = 'none';
+      parsedReport = null;
+      resetIntelBtn();
+    }
 
-      const { prod, total, cranny, defender, lateTs } = result;
+    // ── INTEL BUTTON ─────────────────────────────────────────────────
+    async function updateIntelBtn() {
+      const btn = document.getElementById('btnSaveIntel');
+      const note = document.getElementById('intelNote');
+      const user = await window.getUser();
+      if (!user) {
+        btn.disabled = true;
+        btn.className = 'btn-save-intel';
+        if (note) note.innerHTML = 'Requires account — <a href="/login/">Log in</a> or <a href="/register/">Sign up free</a>';
+        return;
+      }
+      btn.disabled = false;
+      btn.className = 'btn-save-intel active';
+      if (note) note.textContent = 'Save troop data to your Intelligence Hub';
+    }
 
-      const targetName = defender ? defender.name : 'Unknown Target';
-      const villageName = defender ? defender.village : '—';
-      const fmtTs = (d) => {
-        if (!d) return '—';
-        const pad = n => String(n).padStart(2, '0');
-        return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(-2)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-      };
+    function resetIntelBtn() {
+      const btn = document.getElementById('btnSaveIntel');
+      const note = document.getElementById('intelNote');
+      btn.disabled = true;
+      btn.className = 'btn-save-intel';
+      btn.innerHTML = '🕵️ Save Intel';
+      if (note) note.textContent = 'Save troop data to your Intelligence Hub';
+    }
 
-      const summaryHTML = `
-        <strong>${targetName}</strong> · ${villageName}<br>
-        🌲 ${prod.wood}/hr &nbsp; 🧱 ${prod.clay}/hr &nbsp; ⚙️ ${prod.iron}/hr &nbsp; 🌾 ${prod.crop}/hr<br>
-        Total: <strong>${total} res/hr</strong>${cranny ? ` &nbsp;·&nbsp; Cranny: ${cranny}` : ''}<br>
-        Scanned: ${fmtTs(lateTs)}
-      `;
+    // ── INTEL MODAL ───────────────────────────────────────────────────
+    function openIntelModal() {
+      if (!parsedReport) return;
+      const r = parsedReport;
 
-      // Build server options from SERVERS config (servers.js)
+      // Build target list from defender(s) — skip reinforcement NPCs
+      const targets = r.defenders
+        .filter(d => d.player && !d.isReinforcement)
+        .map(d => ({ name: d.player, alliance: d.alliance, village: d.village, coords: d.coords, troops: d.sent || [], casualties: d.casualties || [] }));
+
+      if (!targets.length && r.attacker.player) {
+        targets.push({ name: r.attacker.player, alliance: r.attacker.alliance, village: r.attacker.village, troops: r.attacker.sent || [], casualties: r.attacker.casualties || [] });
+      }
+
+      // Build server options
       const activeServers = (window.SERVERS || []).filter(s => s.active);
       const serverOptions = activeServers.length > 0
-        ? activeServers.map(s =>
-            `<option value="${s.slug}">${s.label} (${s.slug})</option>`
-          ).join('')
+        ? activeServers.map(s => `<option value="${s.slug}">${s.label} (${s.slug})</option>`).join('')
         : `<option value="ts5.x1.asia">TS5 Asia (ts5.x1.asia)</option>`;
+
+      // Build target options
+      const targetOptions = targets.map((t, i) =>
+        `<option value="${i}">${t.name}${t.alliance ? ' ['+t.alliance+']' : ''}${t.village ? ' · '+t.village : ''}</option>`
+      ).join('');
+
+      // Summary
+      const mainDef = targets[0];
+      const totalTroops = mainDef ? (mainDef.troops.reduce((a,b) => a+(b||0), 0)) : 0;
+      const totalCas    = mainDef ? (mainDef.casualties.reduce((a,b) => a+(b||0), 0)) : 0;
+      const bounty = r.bounty;
+      const totalBounty = bounty.wood + bounty.clay + bounty.iron + bounty.crop;
+
+      const summaryHTML = mainDef ? `
+        <strong>${esc(mainDef.name)}</strong>${mainDef.alliance ? ` [${esc(mainDef.alliance)}]` : ''}<br>
+        ${mainDef.village ? `Village: ${esc(mainDef.village)} ${esc(mainDef.coords||'')}<br>` : ''}
+        Troops detected: <strong>${totalTroops.toLocaleString()}</strong>
+        ${totalCas ? ` · Losses: <strong>${totalCas.toLocaleString()}</strong>` : ''}<br>
+        ${totalBounty ? `Bounty: <strong>${totalBounty.toLocaleString()} res</strong>` : ''}
+      ` : `<em>Report: ${esc(r.title)}</em>`;
 
       const modal = document.createElement('div');
       modal.className = 'modal-backdrop';
       modal.id = 'intel-modal';
       modal.innerHTML = `
         <div class="modal-box">
-          <div class="modal-title">🕵️ Save to Intelligence</div>
-          <div class="modal-sub">Data will be saved to your Intelligence hub under this target's dossier.</div>
+          <div class="modal-title">🕵️ Save Intel</div>
+          <div class="modal-sub">Battle data will be saved to your Intelligence Hub.</div>
+          ${targets.length > 1 ? `
           <div class="modal-field">
-            <label class="modal-label">SCAN SUMMARY</label>
+            <label class="modal-label">SAVE INTEL FOR</label>
+            <select class="modal-input" id="intel-target-select">${targetOptions}</select>
+          </div>` : ''}
+          <div class="modal-field">
+            <label class="modal-label">SUMMARY</label>
             <div class="modal-summary">${summaryHTML}</div>
           </div>
           <div class="modal-field">
             <label class="modal-label">SERVER</label>
-            <select class="modal-input" id="intel-server-select" style="cursor:pointer">
-              ${serverOptions}
-            </select>
+            <select class="modal-input" id="intel-server-select" style="cursor:pointer">${serverOptions}</select>
           </div>
           <div class="modal-field">
             <label class="modal-label">NOTES (optional)</label>
-            <textarea class="modal-textarea" id="intel-notes-input" placeholder="e.g. Active at night, low defenses..."></textarea>
+            <textarea class="modal-textarea" id="intel-notes-input" placeholder="e.g. Heavy def player, avoid attacking…"></textarea>
           </div>
           <div class="modal-actions">
-            <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
-            <button class="modal-btn-save" id="modal-save-btn" onclick="confirmSaveIntel()">Save</button>
+            <button class="modal-btn-cancel" onclick="closeIntelModal()">Cancel</button>
+            <button class="modal-btn-save" id="intel-save-btn" onclick="confirmSaveIntel()">Save</button>
           </div>
-        </div>
-      `;
-      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+        </div>`;
+      modal.addEventListener('click', e => { if (e.target === modal) closeIntelModal(); });
       document.body.appendChild(modal);
+      window._intelTargets = targets;
       setTimeout(() => document.getElementById('intel-notes-input')?.focus(), 100);
     }
 
-    function closeModal() {
-      const modal = document.getElementById('intel-modal');
-      if (modal) modal.remove();
+    function closeIntelModal() {
+      document.getElementById('intel-modal')?.remove();
     }
 
     async function confirmSaveIntel() {
-      const result = window._lastIntelResult;
-      if (!result) return;
-
-      const btn = document.getElementById('modal-save-btn');
-      const notes = document.getElementById('intel-notes-input')?.value?.trim() || '';
+      const btn = document.getElementById('intel-save-btn');
       btn.disabled = true;
       btn.textContent = 'Saving…';
 
-      const { prod, cranny, defender, lateTs } = result;
       const user = await window.getUser();
-      if (!user) { closeModal(); return; }
+      if (!user) { closeIntelModal(); return; }
 
-      // Get server from dropdown (populated from SERVERS config)
+      const targetIdx = parseInt(document.getElementById('intel-target-select')?.value || '0');
+      const target = (window._intelTargets || [])[targetIdx] || window._intelTargets?.[0];
       const serverSlug = document.getElementById('intel-server-select')?.value || 'ts5.x1.asia';
-      const serverObj = (window.SERVERS || []).find(s => s.slug === serverSlug);
-      const serverKey = serverObj?.slug?.split('.')[0] || 'ts5'; // 'ts5.x1.asia' → 'ts5'
+      const serverObj  = (window.SERVERS || []).find(s => s.slug === serverSlug);
+      const serverKey  = serverObj?.slug?.split('.')[0] || 'ts5';
+      const notes      = document.getElementById('intel-notes-input')?.value?.trim() || '';
+      const r = parsedReport;
 
+      if (!target) { closeIntelModal(); return; }
+
+      // Build troop data object: { troopName: count }
+      const troopData = {};
+      if (target.troops && r.defenders) {
+        const defSide = r.defenders.find(d => d.player === target.name);
+        if (defSide) {
+          defSide.troops.forEach((name, i) => {
+            const sent = defSide.sent?.[i] ?? null;
+            if (sent !== null && sent > 0) troopData[name] = sent;
+          });
+        }
+      }
+
+      const bounty = r.bounty;
       const entry = {
         user_id:     user.id,
         server:      serverKey,
         target_type: 'player',
-        target_id:   defender?.name?.toLowerCase().replace(/\s+/g, '_') || 'unknown',
-        target_name: defender?.name || 'Unknown',
-        source_type: 'spy_report',
+        target_id:   target.name.toLowerCase().replace(/\s+/g,'_'),
+        target_name: target.name,
+        source_type: 'battle_report',
         data: {
-          wood:       prod.wood,
-          clay:       prod.clay,
-          iron:       prod.iron,
-          crop:       prod.crop,
-          cranny:     cranny ?? null,
-          village:    defender?.village || null,
-          alliance:   defender?.alliance || null,
-          scanned_at: lateTs ? lateTs.toISOString() : null,
-          server_slug: serverSlug,
+          report_title:  r.title,
+          report_date:   r.date,
+          attacker:      { name: r.attacker.player, alliance: r.attacker.alliance },
+          defender:      { name: target.name, alliance: target.alliance, village: target.village, coords: target.coords },
+          defender_troops: troopData,
+          bounty:        { wood: bounty.wood, clay: bounty.clay, iron: bounty.iron, crop: bounty.crop },
+          total_bounty:  bounty.wood + bounty.clay + bounty.iron + bounty.crop,
+          server_slug:   serverSlug,
         },
         content: notes,
       };
 
-      try {
-        const { error } = await window._supabase
-          .from('intelligence_entries')
-          .insert(entry);
+      // If report was already shared, link it
+      const sharedId = document.getElementById('shareLinkInput')?.value?.split('/r/').pop()?.split('?')[0];
+      if (sharedId) entry.report_id = sharedId;
 
+      try {
+        const { error } = await window._supabase.from('intelligence_entries').insert(entry);
         if (error) throw error;
 
-        closeModal();
-
-        // Update button to saved state
-        const saveBtn = document.getElementById('btn-save-intel');
-        const saveNote = document.getElementById('save-note-text');
-        if (saveBtn) {
-          saveBtn.className = 'btn-save saved';
-          saveBtn.disabled = true;
-          saveBtn.innerHTML = '✅ Saved to Intelligence';
-        }
-        if (saveNote) {
-          saveNote.innerHTML = 'View in <a href="/account/intelligence/" style="color:var(--blue2);font-weight:600;">Intelligence Hub →</a>';
-        }
-      } catch (err) {
-        console.error('Save failed:', err);
+        closeIntelModal();
+        const btn2 = document.getElementById('btnSaveIntel');
+        const note = document.getElementById('intelNote');
+        if (btn2) { btn2.className = 'btn-save-intel saved'; btn2.disabled = true; btn2.innerHTML = '✅ Intel Saved'; }
+        if (note) note.innerHTML = 'View in <a href="/account/intelligence/">Intelligence Hub →</a>';
+      } catch(err) {
         btn.disabled = false;
         btn.textContent = 'Save';
-        alert('Failed to save. Please try again.');
+        alert('Failed to save: ' + err.message);
       }
     }
 
-    function resRow(icon, cls, label, value, barWidth) {
-      const display = value < 0
-        ? `<span style="color:var(--text3)">${fmtNum(value)}</span>`
-        : fmtNum(value);
-      return `
-        <div class="resource-row">
-          <div class="res-icon-wrap ${cls}">${icon}</div>
-          <span class="res-label">${label}</span>
-          <div class="res-bar-wrap">
-            <div class="res-bar ${cls}" data-width="${barWidth}" style="width:0%"></div>
-          </div>
-          <span class="res-value">${display}</span>
-          <span class="res-unit">/ hr</span>
-        </div>`;
+    // ── SHARE ─────────────────────────────────────────────────────────
+    async function shareReport() {
+      if (!parsedReport) return;
+      const btn = document.getElementById('shareBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving…';
+      try {
+        const ttlDays  = parseInt(document.getElementById('ttlSelect').value) || 14;
+        const expiresAt = new Date(Date.now() + ttlDays * 86400 * 1000).toISOString();
+        const id = nanoid(10);
+        const raw = document.getElementById('reportInput').value.trim();
+        const { error } = await window._supabase.from('shared_reports').insert({
+          id, content: raw,
+          user_id: (await window.getSession())?.user?.id || null,
+          expires_at: expiresAt,
+        });
+        if (error) throw error;
+        const link = `${window.location.origin}/r/${id}`;
+        document.getElementById('shareLinkInput').value = link;
+        document.getElementById('shareNote').textContent = `Expires in ${ttlDays} days. Upgrade to Pro for permanent links.`;
+        document.getElementById('shareResult').style.display = 'block';
+      } catch(e) {
+        alert('Failed to save report: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '🔗 Generate Share Link';
+      }
     }
 
-    function errorBox(msg) {
-      return `
-        <div class="error-box">
-          <span class="error-icon">⚠️</span>
-          <span>${msg}</span>
-        </div>`;
+    function copyLink() {
+      const input = document.getElementById('shareLinkInput');
+      navigator.clipboard.writeText(input.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.textContent = '✓ Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    function nanoid(size = 10) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let id = '';
+      const arr = crypto.getRandomValues(new Uint8Array(size));
+      arr.forEach(b => id += chars[b % chars.length]);
+      return id;
+    }
+
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
   </script>
+
+  <script src="/data/troops.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
-<script src="/navbar.js"></script>
+  <script src="/supabase.js"></script>
+  <script src="/servers.js"></script>
+  <script src="/navbar.js"></script>
 </body>
 </html>
