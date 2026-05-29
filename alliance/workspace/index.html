@@ -731,9 +731,9 @@
       const data = await res.json();
 
       allAlliances = (data.rows || []).map(a => ({
-        id:         String(a.id   || a.alliance_id   || ''),
-        name:       String(a.name || a.alliance_name || ''),
-        members:    Number(a.members || a.member_count || 0),
+        id:         String(a.alliance_id  || ''),
+        name:       String(a.alliance_tag || ''),
+        members:    Number(a.member_count || 0),
         serverKey,
       }));
 
@@ -766,17 +766,18 @@
     validateForm();
 
     try {
-      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&alliance_id=${id}&page=1`);
+      // Query player hanya dari aliansi yang dipilih via alliance_id
+      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&alliance_id=${id}`);
       const data = await res.json();
 
       allPlayers = (data.rows || []).map(p => ({
-        id:         String(p.id   || p.player_id   || ''),
-        name:       String(p.name || p.player_name || ''),
-        population: Number(p.population || p.pop   || 0),
+        id:         String(p.player_id   || ''),
+        name:       String(p.player_name || p.name || ''),
+        population: Number(p.population  || p.pop  || 0),
       }));
 
       setDropTrigger('acct', {
-        text: allPlayers.length ? 'Search your account…' : 'No members found',
+        text:     allPlayers.length ? 'Search your account…' : 'No members found',
         disabled: !allPlayers.length,
         hasValue: false,
       });
