@@ -544,7 +544,7 @@
             </div>
           </div>
         </div>
-        <div class="field-hint">Pilih aliansimu di server tersebut.</div>
+        <div class="field-hint">Select your alliance on this server.</div>
       </div>
 
       <div class="field-divider"></div>
@@ -556,12 +556,12 @@
         </label>
         <input
           type="text" id="allianceName" class="field-input"
-          placeholder="Pilih aliansi dulu…"
+          placeholder="Select an alliance first…"
           maxlength="60" autocomplete="off"
           oninput="validateForm()"
           disabled
         />
-        <div class="field-hint">Otomatis terisi dari nama aliansi — bisa diubah sesuka kamu.</div>
+        <div class="field-hint">Auto-filled from alliance name — you can rename it freely.</div>
       </div>
 
       <div class="field-divider"></div>
@@ -592,7 +592,7 @@
             </div>
           </div>
         </div>
-        <div class="field-hint">Akunmu akan tertaut ke semua aktivitas workspace — troop input, rally point, dll.</div>
+        <div class="field-hint">Your account will be linked to all workspace activity — troop input, rally point, etc.</div>
       </div>
 
       <!-- Actions -->
@@ -766,15 +766,19 @@
     validateForm();
 
     try {
-      // Query player hanya dari aliansi yang dipilih via alliance_id
-      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&alliance_id=${id}`);
+      // Fetch all players, then filter client-side by alliance_tag
+      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&page=1&limit=10000`);
       const data = await res.json();
 
-      allPlayers = (data.rows || []).map(p => ({
-        id:         String(p.player_id   || ''),
-        name:       String(p.player_name || p.name || ''),
-        population: Number(p.population  || p.pop  || 0),
+      const allRows = (data.rows || []).map(p => ({
+        id:           String(p.player_id    || p.id   || ''),
+        name:         String(p.player_name  || p.name || ''),
+        population:   Number(p.population   || p.pop  || 0),
+        allianceTag:  String(p.alliance_tag || ''),
       }));
+
+      // Filter by selected alliance tag
+      allPlayers = allRows.filter(p => p.allianceTag === name);
 
       setDropTrigger('acct', {
         text:     allPlayers.length ? 'Search your account…' : 'No members found',
@@ -784,7 +788,7 @@
 
     } catch (err) {
       console.error(err);
-      setDropTrigger('acct', { text: 'Failed to load members', disabled: false });
+      setDropTrigger('acct', { text: 'Failed to load — try again', disabled: false });
       toast('Could not load member list.', 'error');
     }
   }
@@ -793,7 +797,7 @@
     const el = document.getElementById('allianceName');
     if (!el) return;
     el.disabled = disabled;
-    if (disabled) { el.value = ''; el.placeholder = 'Pilih aliansi dulu…'; }
+    if (disabled) { el.value = ''; el.placeholder = 'Select an alliance first…'; }
   }
 
   // ─────────────────────────────────────────────
