@@ -766,19 +766,16 @@
     validateForm();
 
     try {
-      // Fetch all players, then filter client-side by alliance_tag
-      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&page=1&limit=10000`);
+      // Fetch alliance detail — includes members list
+      const res  = await fetch(`${API_BASE}/api/alliance?server=${serverKey}&name=${encodeURIComponent(name)}`);
       const data = await res.json();
 
-      const allRows = (data.rows || []).map(p => ({
-        id:           String(p.player_id    || p.id   || ''),
-        name:         String(p.player_name  || p.name || ''),
-        population:   Number(p.population   || p.pop  || 0),
-        allianceTag:  String(p.alliance_tag || ''),
+      // data.members = array of players in this alliance
+      allPlayers = (data.members || []).map(p => ({
+        id:         String(p.player_id   || p.id   || ''),
+        name:       String(p.player_name || p.name || ''),
+        population: Number(p.population  || p.pop  || 0),
       }));
-
-      // Filter by selected alliance tag
-      allPlayers = allRows.filter(p => p.allianceTag === name);
 
       setDropTrigger('acct', {
         text:     allPlayers.length ? 'Search your account…' : 'No members found',
