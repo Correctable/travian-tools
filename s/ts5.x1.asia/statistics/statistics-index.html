@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ts5.x1.asia Statistics — TravianTools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;
+  --blue-light:#3b82f6;--blue-glow:rgba(59,130,246,0.10);
+  --surface:#ffffff;--surface2:#f8faff;--border:#e2e8f3;
+  --border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+  --green:#059669;--green-bg:rgba(5,150,105,0.08);
+  --amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+  --red:#dc2626;--red-bg:rgba(220,38,38,0.08);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);min-height:100vh;}
+.bg-dot{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:radial-gradient(circle,rgba(37,99,235,0.07) 1px,transparent 1px);background-size:32px 32px;}
+.bg-glow{position:fixed;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:600px;z-index:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(37,99,235,0.06) 0%,transparent 70%);}
+
+.page-wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:32px 24px 80px;}
+
+/* Breadcrumb */
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text3);margin-bottom:20px;animation:fadeDown 0.3s ease both;}
+.breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s;}
+.breadcrumb a:hover{color:var(--blue2);}
+.breadcrumb span{color:var(--text2);font-weight:500;}
+
+/* Page header */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:28px;animation:fadeDown 0.4s ease both;}
+.ph-left h1{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:-0.02em;color:var(--navy);display:flex;align-items:center;gap:10px;}
+.ph-left p{color:var(--text2);margin-top:4px;font-size:0.875rem;}
+.live-badge{display:inline-flex;align-items:center;gap:5px;font-size:0.7rem;font-weight:700;color:var(--green);background:var(--green-bg);padding:3px 9px;border-radius:100px;}
+.live-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite;}
+
+/* Search */
+.search-section{margin-bottom:28px;animation:fadeUp 0.4s 0.05s ease both;}
+.search-box{display:flex;gap:0;background:white;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.18s,box-shadow 0.18s;max-width:600px;}
+.search-box:focus-within{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,0.08);}
+.search-type{font-family:'DM Sans',sans-serif;font-size:0.825rem;font-weight:500;background:var(--surface2);border:none;border-right:1px solid var(--border);color:var(--text2);padding:0 14px;cursor:pointer;outline:none;min-width:110px;}
+.search-input{font-family:'DM Sans',sans-serif;font-size:0.9rem;flex:1;border:none;outline:none;padding:12px 16px;color:var(--navy);background:transparent;}
+.search-input::placeholder{color:var(--text3);}
+.search-btn{font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;background:var(--blue2);color:white;border:none;padding:0 20px;cursor:pointer;transition:background 0.18s;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.search-btn:hover{background:var(--blue);}
+.search-results{margin-top:6px;background:white;border:1px solid var(--border);border-radius:10px;overflow:hidden;display:none;box-shadow:0 8px 32px rgba(15,33,83,0.10);max-width:600px;}
+.search-results.show{display:block;}
+.search-result-item{display:flex;align-items:center;gap:12px;padding:11px 16px;cursor:pointer;transition:background 0.15s;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;}
+.search-result-item:last-child{border-bottom:none;}
+.search-result-item:hover{background:var(--surface2);}
+.sri-icon{font-size:1rem;width:28px;text-align:center;}
+.sri-name{font-weight:600;font-size:0.875rem;color:var(--navy);}
+.sri-sub{font-size:0.75rem;color:var(--text3);margin-top:1px;}
+.sri-pop{margin-left:auto;font-size:0.825rem;font-weight:600;color:var(--blue2);white-space:nowrap;}
+.search-empty{padding:20px;text-align:center;color:var(--text3);font-size:0.875rem;}
+
+/* Stats strip */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;animation:fadeUp 0.4s 0.1s ease both;}
+@media(max-width:700px){.stats-strip{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px 20px;}
+.stat-card .label{font-size:0.72rem;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+.stat-card .value{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;color:var(--navy);margin-top:4px;}
+.stat-card .sub{font-size:0.75rem;color:var(--text3);margin-top:2px;}
+
+/* Tables */
+.tables-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;animation:fadeUp 0.4s 0.15s ease both;}
+@media(max-width:920px){.tables-grid{grid-template-columns:1fr;}}
+.table-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.table-title{font-family:'Space Grotesk',sans-serif;font-size:0.975rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+.table-title .badge{font-size:0.65rem;font-weight:700;color:var(--blue2);background:var(--blue-glow);padding:2px 7px;border-radius:100px;}
+.table-tabs{display:flex;gap:4px;}
+.tab-btn{font-family:'DM Sans',sans-serif;font-size:0.775rem;font-weight:500;border:1px solid var(--border);background:transparent;color:var(--text3);padding:4px 10px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+.tab-btn.active{background:var(--blue2);color:white;border-color:var(--blue2);}
+.tab-btn:not(.active):hover{background:var(--surface2);color:var(--text2);}
+
+.data-table{width:100%;border-collapse:collapse;background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;font-size:0.825rem;}
+.data-table thead th{background:var(--surface2);padding:9px 12px;font-size:0.7rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;text-align:left;border-bottom:1px solid var(--border);}
+.data-table thead th.r{text-align:right;}
+.data-table tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.13s;}
+.data-table tbody tr:last-child{border-bottom:none;}
+.data-table tbody tr:hover{background:var(--surface2);}
+.data-table td{padding:8px 12px;vertical-align:middle;}
+.data-table td.r{text-align:right;}
+
+.rank{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--text3);font-size:0.75rem;min-width:20px;}
+.rank.gold{color:#b7791f;}
+.rank.silver{color:#718096;}
+.rank.bronze{color:#c05621;}
+.pname{font-weight:600;color:var(--navy);font-size:0.85rem;line-height:1.2;}
+.atag{font-size:0.68rem;font-weight:700;color:var(--blue2);background:var(--blue-glow);padding:1px 6px;border-radius:4px;display:inline-block;}
+.player-cell{display:flex;align-items:center;gap:10px;}
+.tribe-avatar{width:32px;height:32px;object-fit:contain;flex-shrink:0;display:block;}
+.player-info{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.pop-val{font-family:'Space Grotesk',sans-serif;font-weight:600;color:var(--navy);font-size:0.85rem;}
+.growth{font-size:0.7rem;font-weight:600;}
+.growth.up{color:var(--green);}
+.growth.dn{color:var(--red);}
+.growth.na{color:var(--text3);}
+.vcnt{color:var(--text2);font-size:0.8rem;}
+
+.loading-row td{text-align:center;padding:32px;color:var(--text3);font-size:0.875rem;}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px;vertical-align:middle;}
+
+.pagination{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.pg-btn{font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:500;background:white;border:1px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:6px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;}
+.pg-btn:hover{background:var(--surface2);border-color:var(--border2);}
+.pg-btn.active{background:var(--blue2);border-color:var(--blue2);color:white;}
+
+.last-updated{margin-top:32px;text-align:center;font-size:0.775rem;color:var(--text3);}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+</style>
+</head>
+<body>
+<div class="bg-dot"></div>
+<div class="bg-glow"></div>
+
+<!-- Navbar (shared component) -->
+<div id="navbar-root"></div>
+
+<div class="page-wrap">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span>›</span>
+    <a href="/s/">Servers</a>
+    <span>›</span>
+    <a href="/s/ts5.x1.asia/">ts5.x1.asia</a>
+    <span>›</span>
+    <span>Statistics</span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="ph-left">
+      <h1>🌏 ts5.x1.asia <span class="live-badge">LIVE</span></h1>
+      <p>ts5.x1.asia.travian.com · Round 2026 · Asia Server 5</p>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div class="search-section">
+    <div class="search-box">
+      <select class="search-type" id="searchType">
+        <option value="player">Player</option>
+        <option value="alliance">Alliance</option>
+      </select>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search player or alliance...">
+      <button class="search-btn" onclick="doSearch()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Search
+      </button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-card"><div class="label">Players</div><div class="value" id="sPlayers">—</div><div class="sub">active accounts</div></div>
+    <div class="stat-card"><div class="label">Villages</div><div class="value" id="sVillages">—</div><div class="sub">on the map</div></div>
+    <div class="stat-card"><div class="label">Alliances</div><div class="value" id="sAlliances">—</div><div class="sub">active groups</div></div>
+    <div class="stat-card"><div class="label">Population</div><div class="value" id="sPop">—</div><div class="sub">total across map</div></div>
+  </div>
+
+  <!-- Tables -->
+  <div class="tables-grid">
+    <!-- Players -->
+    <div>
+      <div class="table-header">
+        <div class="table-title">🏆 Players <span class="badge">TOP 50</span></div>
+        <div class="table-tabs">
+          <button class="tab-btn active" onclick="setPlayerSort('population',this)">Population</button>
+          <button class="tab-btn" onclick="setPlayerSort('growth',this)">Growth</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Player</th><th class="r">Vil</th><th class="r">Population</th></tr></thead>
+        <tbody id="playersTbody"><tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr></tbody>
+      </table>
+      <div class="pagination" id="playerPager"></div>
+    </div>
+
+    <!-- Alliances -->
+    <div>
+      <div class="table-header">
+        <div class="table-title">🛡️ Alliances <span class="badge">TOP 50</span></div>
+        <div class="table-tabs">
+          <button class="tab-btn active" onclick="setAllianceSort('population',this)">Population</button>
+          <button class="tab-btn" onclick="setAllianceSort('growth',this)">Growth</button>
+        </div>
+      </div>
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Alliance</th><th class="r">Mem</th><th class="r">Population</th></tr></thead>
+        <tbody id="alliancesTbody"><tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr></tbody>
+      </table>
+      <div class="pagination" id="alliancePager"></div>
+    </div>
+  </div>
+
+  <div class="last-updated" id="lastUpdated"></div>
+</div>
+
+<script>
+// ── SERVER CONFIG ─────────────────────────────────────────
+const SERVER      = 'ts5';
+const SERVER_SLUG = 'ts5.x1.asia';
+const BASE_PATH   = `/s/${SERVER_SLUG}`;
+const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
+
+const TRIBE = {
+  1:'/images/travian/roman_medium.png',
+  2:'/images/travian/teuton_medium.png',
+  3:'/images/travian/gaul_medium.png',
+  4:'/images/travian/nature_medium.png',
+  5:'/images/travian/natar_medium.png',
+  6:'/images/travian/egyptian_medium.png',
+  7:'/images/travian/hun_medium.png',
+};
+const TRIBE_NAME = {1:'Roman',2:'Teuton',3:'Gaul',4:'Nature',5:'Natar',6:'Egyptian',7:'Hun'};
+
+let playerSort = 'population', allianceSort = 'population';
+let playerPage = 1, alliancePage = 1;
+const PG = 25;
+let allPlayers = [], allAlliances = [];
+
+async function apiGet(endpoint, params={}) {
+  const url = new URL(`${API_BASE}/api/${endpoint}`);
+  Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
+  const res = await fetch(url.toString());
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'API error');
+  return json;
+}
+
+const fmt = n => n ? Number(n).toLocaleString() : '—';
+const rankCls = r => r===1?'rank gold':r===2?'rank silver':r===3?'rank bronze':'rank';
+
+function growthHtml(pop, prev) {
+  if (!prev) return '<span class="growth na">—</span>';
+  const d = Number(pop) - Number(prev);
+  if (d===0) return '<span class="growth na">±0</span>';
+  return `<span class="growth ${d>0?'up':'dn'}">${d>0?'+':''}${fmt(d)}</span>`;
+}
+
+async function loadSnap() {
+  try {
+    const data = await apiGet('snapshot', { server: SERVER });
+    const s = data.snapshot;
+    if (!s) return;
+    document.getElementById('sPlayers').textContent   = fmt(s.total_players);
+    document.getElementById('sVillages').textContent  = fmt(s.total_villages);
+    document.getElementById('sAlliances').textContent = fmt(s.total_alliances);
+    document.getElementById('sPop').textContent       = fmt(s.total_population);
+    document.getElementById('lastUpdated').textContent = `Data updated: ${s.snap_date} · Next update: daily at 06:00 WIB`;
+  } catch(e) { console.error(e); }
+}
+
+async function loadPlayers() {
+  document.getElementById('playersTbody').innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr>';
+  try {
+    const data = await apiGet('statistics', { server: SERVER, type: 'players', page: 1 });
+    allPlayers = (data.rows || []).map(p => ({
+      player_id:    p.player_id,
+      player_name:  p.player_name,
+      tribe:        p.tribe,
+      alliance_tag: p.alliance_tag,
+      population:   p.population,
+      village_count: p.village_count,
+      pop_prev:     p.pop_7d_ago,
+      growth_7d:    p.growth_7d,
+      rank:         p.rank,
+    }));
+    playerPage = 1;
+    renderPlayers();
+  } catch(e) {
+    document.getElementById('playersTbody').innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:20px;text-align:center">Error: ${e.message}</td></tr>`;
+  }
+}
+
+async function loadAlliances() {
+  document.getElementById('alliancesTbody').innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr>';
+  try {
+    const data = await apiGet('statistics', { server: SERVER, type: 'alliances', page: 1 });
+    allAlliances = (data.rows || []).map(a => ({
+      alliance_id:   a.alliance_id,
+      alliance_tag:  a.alliance_tag,
+      member_count:  a.member_count,
+      village_count: a.village_count,
+      population:    a.population,
+      pop_prev:      a.pop_7d_ago,
+      growth_7d:     a.growth_7d,
+      rank:          a.rank,
+    }));
+    alliancePage = 1;
+    renderAlliances();
+  } catch(e) {
+    document.getElementById('alliancesTbody').innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:20px;text-align:center">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function renderPlayers() {
+  const page = allPlayers.slice((playerPage-1)*PG, playerPage*PG);
+  const offset = (playerPage-1)*PG;
+  document.getElementById('playersTbody').innerHTML = page.length ? page.map((p,i)=>{
+    const r = offset+i+1;
+    const tribeImg = TRIBE[p.tribe]
+      ? `<img class="tribe-avatar" src="${TRIBE[p.tribe]}" alt="${TRIBE_NAME[p.tribe]||''}">`
+      : `<span style="font-size:1.2rem">👤</span>`;
+    return `<tr onclick="window.location='${BASE_PATH}/statistics/player/?id=${p.player_id}'">
+      <td class="${rankCls(r)}">${r}</td>
+      <td>
+        <div class="player-cell">
+          ${tribeImg}
+          <div class="player-info">
+            <span class="pname">${p.player_name}</span>
+            ${p.alliance_tag?`<span class="atag">[${p.alliance_tag}]</span>`:''}
+          </div>
+        </div>
+      </td>
+      <td class="r vcnt">${p.village_count}</td>
+      <td class="r">
+        <div class="pop-val">${fmt(p.population)}</div>
+        <div>${growthHtml(p.population,p.pop_prev)}</div>
+      </td>
+    </tr>`;
+  }).join('') : '<tr class="loading-row"><td colspan="4">No data</td></tr>';
+  renderPager('playerPager', allPlayers.length, playerPage, n=>{playerPage=n;renderPlayers();});
+}
+
+function renderAlliances() {
+  const page = allAlliances.slice((alliancePage-1)*PG, alliancePage*PG);
+  const offset = (alliancePage-1)*PG;
+  document.getElementById('alliancesTbody').innerHTML = page.length ? page.map((a,i)=>{
+    const r = offset+i+1;
+    return `<tr onclick="window.location='${BASE_PATH}/statistics/alliance/?id=${a.alliance_id}'">
+      <td class="${rankCls(r)}">${r}</td>
+      <td>
+        <span class="pname">[${a.alliance_tag}]</span>
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:1px">${a.village_count} villages</div>
+      </td>
+      <td class="r vcnt">${a.member_count}</td>
+      <td class="r">
+        <div class="pop-val">${fmt(a.population)}</div>
+        <div>${growthHtml(a.population,a.pop_prev)}</div>
+      </td>
+    </tr>`;
+  }).join('') : '<tr class="loading-row"><td colspan="4">No data</td></tr>';
+  renderPager('alliancePager', allAlliances.length, alliancePage, n=>{alliancePage=n;renderAlliances();});
+}
+
+function renderPager(id, total, cur, cb) {
+  const pages = Math.ceil(total/PG);
+  if (pages<=1){document.getElementById(id).innerHTML='';return;}
+  document.getElementById(id).innerHTML = Array.from({length:pages},(_,i)=>i+1)
+    .map(n=>`<button class="pg-btn ${n===cur?'active':''}" onclick="(${cb.toString()})(${n})">${n}</button>`)
+    .join('');
+}
+
+function setPlayerSort(sort,btn){
+  playerSort=sort;
+  btn.closest('.table-tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadPlayers();
+}
+function setAllianceSort(sort,btn){
+  allianceSort=sort;
+  btn.closest('.table-tabs').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  loadAlliances();
+}
+
+// Search
+let searchTimer;
+document.getElementById('searchInput').addEventListener('input',function(){
+  clearTimeout(searchTimer);
+  if(this.value.trim().length<2){hideSearch();return;}
+  searchTimer=setTimeout(doSearch,350);
+});
+document.getElementById('searchInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){clearTimeout(searchTimer);doSearch();}
+  if(e.key==='Escape')hideSearch();
+});
+document.addEventListener('click',e=>{if(!e.target.closest('.search-section'))hideSearch();});
+
+async function doSearch(){
+  const type = document.getElementById('searchType').value;
+  const q    = document.getElementById('searchInput').value.trim();
+  const box  = document.getElementById('searchResults');
+  if(!q||q.length<2){hideSearch();return;}
+  box.innerHTML='<div class="search-empty"><span class="spinner"></span> Searching...</div>';
+  box.classList.add('show');
+
+  try {
+    const data = await apiGet('search', { server: SERVER, q, type });
+    const rows = data.rows || [];
+
+    if(type==='player'){
+      box.innerHTML = rows.length ? rows.map(p=>`
+        <a class="search-result-item" href="${BASE_PATH}/statistics/player/?id=${p.player_id}">
+          <span class="sri-icon">${TRIBE[p.tribe]?`<img src="${TRIBE[p.tribe]}" style="width:22px;height:22px;object-fit:contain">`:'👤'}</span>
+          <div>
+            <div class="sri-name">${p.player_name}</div>
+            <div class="sri-sub">${TRIBE_NAME[p.tribe]||''} · ${p.alliance_tag?'['+p.alliance_tag+']':'No alliance'} · ${p.village_count} villages</div>
+          </div>
+          <div class="sri-pop">${fmt(p.population)}</div>
+        </a>`).join('')
+      : `<div class="search-empty">No players found for "<b>${q}</b>"</div>`;
+    } else {
+      box.innerHTML = rows.length ? rows.map(a=>`
+        <a class="search-result-item" href="${BASE_PATH}/statistics/alliance/?id=${a.alliance_id}">
+          <span class="sri-icon">🛡️</span>
+          <div>
+            <div class="sri-name">[${a.alliance_tag}]</div>
+            <div class="sri-sub">${a.member_count} members · ${a.village_count} villages</div>
+          </div>
+          <div class="sri-pop">${fmt(a.population)}</div>
+        </a>`).join('')
+      : `<div class="search-empty">No alliances found for "<b>${q}</b>"</div>`;
+    }
+  } catch(e) {
+    box.innerHTML = `<div class="search-empty" style="color:var(--red)">Error: ${e.message}</div>`;
+  }
+}
+function hideSearch(){document.getElementById('searchResults').classList.remove('show');}
+
+// Init
+loadSnap();
+loadPlayers();
+loadAlliances();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+</body>
+</html>
