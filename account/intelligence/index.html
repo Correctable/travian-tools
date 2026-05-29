@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Intelligence Hub — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
+
+    body {
+      background: #ffffff;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none; z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px; left: 50%;
+      transform: translateX(-50%);
+      width: 900px; height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+    }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-badges { display: flex; align-items: center; gap: 8px; }
+    .page-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .page-badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 40px 24px 72px;
+    }
+
+    /* ── FILTERS ── */
+    .filters-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .filter-btn {
+      height: 34px; padding: 0 14px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text2);
+      font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--blue2); color: var(--blue2); }
+    .filter-btn.active {
+      background: var(--blue-glow); border-color: var(--blue2);
+      color: var(--blue2);
+    }
+    .filter-sep { width: 1px; height: 20px; background: var(--border); }
+    .search-box {
+      flex: 1; min-width: 180px; max-width: 280px;
+      height: 34px; padding: 0 12px;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+      outline: none; transition: border-color 0.15s;
+    }
+    .search-box:focus { border-color: var(--blue2); }
+    .search-box::placeholder { color: var(--text3); }
+    .entries-count {
+      margin-left: auto;
+      font-size: 0.78rem; color: var(--text3);
+    }
+
+    /* ── EMPTY / LOADING / AUTH STATES ── */
+    .state-box {
+      text-align: center;
+      padding: 64px 24px;
+      animation: fadeUp 0.4s ease both;
+    }
+    .state-icon { font-size: 2.8rem; margin-bottom: 16px; }
+    .state-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--text);
+      margin-bottom: 8px;
+    }
+    .state-sub { font-size: 0.85rem; color: var(--text3); line-height: 1.6; max-width: 340px; margin: 0 auto 20px; }
+    .state-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 40px; padding: 0 20px;
+      background: var(--blue2); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+      text-decoration: none; cursor: pointer; transition: background 0.15s;
+    }
+    .state-btn:hover { background: var(--blue); }
+    .state-btn.ghost {
+      background: none; color: var(--blue2);
+      border: 1.5px solid var(--blue2);
+    }
+    .state-btn.ghost:hover { background: var(--blue-glow); }
+
+    /* ── TARGET CARD (accordion) ── */
+    .target-group { margin-bottom: 10px; animation: fadeUp 0.35s ease both; }
+
+    .target-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .target-card:hover { border-color: var(--border2); }
+    .target-card.open {
+      border-color: var(--border2);
+      box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+    }
+
+    .target-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .target-avatar {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    .target-info { flex: 1; min-width: 0; }
+    .target-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .target-meta {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 3px; flex-wrap: wrap;
+    }
+    .target-tag {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 2px 8px; border-radius: 100px;
+    }
+    .tag-player   { background: var(--blue-glow);   color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+    .tag-alliance { background: var(--green-bg);     color: var(--green);      border: 1px solid rgba(5,150,105,0.2); }
+    .tag-village  { background: var(--amber-bg);     color: var(--amber);      border: 1px solid rgba(217,119,6,0.2); }
+    .target-server { font-size: 0.72rem; color: var(--text3); }
+
+    .target-right {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .target-sources {
+      display: flex; gap: 4px;
+    }
+    .source-pip {
+      font-size: 0.7rem; padding: 2px 8px; border-radius: 100px;
+      font-weight: 600;
+    }
+    .pip-spy      { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(124,58,237,0.2); }
+    .pip-battle   { background: var(--red-bg);    color: var(--red);    border: 1px solid rgba(220,38,38,0.2); }
+    .pip-artifact { background: var(--amber-bg);  color: var(--amber);  border: 1px solid rgba(217,119,6,0.2); }
+    .pip-manual   { background: var(--surface2);  color: var(--text2);  border: 1px solid var(--border); }
+
+    .target-count {
+      font-size: 0.78rem; color: var(--text3); white-space: nowrap;
+    }
+    .chevron {
+      font-size: 0.7rem; color: var(--text3);
+      transition: transform 0.2s;
+    }
+    .target-card.open .chevron { transform: rotate(180deg); }
+
+    /* ── DOSSIER (entries list) ── */
+    .dossier {
+      border-top: 1px solid var(--border);
+      display: none;
+    }
+    .target-card.open .dossier { display: block; }
+
+    .dossier-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 20px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+    }
+    .dossier-toolbar-left { font-size: 0.75rem; color: var(--text3); }
+    .dossier-add-btn {
+      height: 30px; padding: 0 14px;
+      background: var(--blue2); color: #fff; border: none;
+      border-radius: 7px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .dossier-add-btn:hover { background: var(--blue); }
+
+    .entry-list { padding: 8px 12px 12px; }
+
+    .entry-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 10px;
+      border-radius: 10px;
+      transition: background 0.12s;
+    }
+    .entry-item:hover { background: var(--surface2); }
+    .entry-item + .entry-item { border-top: 1px solid var(--border); }
+
+    .entry-source-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0; margin-top: 1px;
+    }
+    .icon-spy      { background: var(--purple-bg); }
+    .icon-battle   { background: var(--red-bg); }
+    .icon-artifact { background: var(--amber-bg); }
+    .icon-manual   { background: var(--surface2); border: 1px solid var(--border); }
+
+    .entry-body { flex: 1; min-width: 0; }
+    .entry-header-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 4px;
+    }
+    .entry-source-label {
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+      text-transform: uppercase; color: var(--text3);
+    }
+    .entry-date { font-size: 0.72rem; color: var(--text3); margin-left: auto; }
+
+    .entry-data {
+      font-size: 0.82rem; color: var(--text2); line-height: 1.6;
+    }
+    .entry-data strong { color: var(--text); }
+    .entry-res-row {
+      display: flex; gap: 14px; flex-wrap: wrap; margin-top: 2px;
+    }
+    .entry-res {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.8rem; color: var(--text2);
+    }
+    .entry-notes {
+      margin-top: 6px;
+      font-size: 0.78rem; color: var(--text3);
+      font-style: italic;
+      background: var(--surface2); border-left: 2px solid var(--border2);
+      padding: 4px 8px; border-radius: 0 6px 6px 0;
+    }
+
+    .entry-actions { flex-shrink: 0; }
+    .entry-delete-btn {
+      width: 28px; height: 28px;
+      background: none; border: none;
+      border-radius: 6px; cursor: pointer;
+      color: var(--text3); font-size: 0.85rem;
+      transition: all 0.15s; display: flex;
+      align-items: center; justify-content: center;
+    }
+    .entry-delete-btn:hover { background: var(--red-bg); color: var(--red); }
+
+    /* ── MANUAL ENTRY MODAL ── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15,33,83,0.35);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+      animation: fadeIn 0.15s ease;
+    }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px;
+      width: 100%; max-width: 440px;
+      box-shadow: 0 24px 64px rgba(15,33,83,0.15);
+      animation: fadeUp 0.2s ease;
+    }
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 4px;
+    }
+    .modal-sub { font-size: 0.78rem; color: var(--text3); margin-bottom: 20px; }
+    .modal-field { margin-bottom: 14px; }
+    .modal-label { font-size: 0.75rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; display: block; }
+    .modal-input, .modal-textarea {
+      width: 100%; background: var(--surface2);
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.83rem; color: var(--text);
+      outline: none; transition: border-color 0.15s;
+    }
+    .modal-input:focus, .modal-textarea:focus { border-color: var(--blue2); }
+    .modal-input::placeholder, .modal-textarea::placeholder { color: var(--text3); }
+    .modal-textarea { resize: vertical; min-height: 90px; }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-btn-cancel {
+      height: 38px; padding: 0 18px;
+      background: none; border: 1.5px solid var(--border);
+      border-radius: 9px; color: var(--text2);
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .modal-btn-cancel:hover { border-color: var(--text3); }
+    .modal-btn-save {
+      height: 38px; padding: 0 20px;
+      background: var(--blue2); border: none;
+      border-radius: 9px; color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .modal-btn-save:hover { background: var(--blue); }
+    .modal-btn-save:disabled { opacity: 0.6; cursor: wait; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      padding: 32px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .footer-logo {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+    }
+    .footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.875rem; font-weight: 600; color: var(--text2); }
+    .footer-links { display: flex; align-items: center; gap: 24px; }
+    .footer-link { font-size: 0.775rem; color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .footer-link:hover { color: var(--text2); }
+    .footer-copy { font-size: 0.75rem; color: var(--text3); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+
+    @media (max-width: 768px) {
+      .page-header { padding: 20px 16px 16px; }
+      .page-wrap { padding: 28px 16px 48px; }
+      footer { flex-direction: column; gap: 20px; text-align: center; padding: 24px 16px; }
+      .target-sources { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-root"></div>
+
+  <div class="page-header">
+    <div class="breadcrumb">
+      <a href="/">Home</a>
+      <span class="breadcrumb-sep">›</span>
+      <a href="/account/">Account</a>
+      <span class="breadcrumb-sep">›</span>
+      <span class="breadcrumb-current">Intelligence</span>
+    </div>
+    <div class="page-header-inner">
+      <div class="page-title-group">
+        <div class="page-icon">🕵️</div>
+        <div>
+          <div class="page-title">Intelligence Hub</div>
+          <div class="page-subtitle">Enemy dossiers — spy data, battle intel, and manual notes per target.</div>
+        </div>
+      </div>
+      <div class="page-badges">
+        <span class="page-badge free">FREE</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div id="main-content">
+      <!-- Diisi oleh JS -->
+    </div>
+  </div>
+
+  <footer>
+    <a href="/" class="footer-brand">
+      <div class="footer-logo">⚔️</div>
+      <span class="footer-name">TravianTools · sonybukansoni.com</span>
+    </a>
+    <div class="footer-links">
+      <a href="/tools/" class="footer-link">Tools</a>
+      <a href="#" class="footer-link">Guides</a>
+      <a href="#" class="footer-link">Changelog</a>
+      <a href="#" class="footer-link">Contact</a>
+    </div>
+    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+  <script src="/servers.js"></script>
+  <script src="/navbar.js"></script>
+  <script>
+    // ── STATE ──────────────────────────────────────────────────────────
+    let allEntries = [];
+    let activeFilter = 'all';   // 'all' | 'player' | 'alliance' | 'village'
+    let searchQuery = '';
+
+    // ── INIT ──────────────────────────────────────────────────────────
+    async function init() {
+      const content = document.getElementById('main-content');
+
+      const user = await window.getUser();
+      if (!user) {
+        content.innerHTML = `
+          <div class="state-box">
+            <div class="state-icon">🔒</div>
+            <div class="state-title">Login required</div>
+            <div class="state-sub">Your Intelligence Hub is private. Log in to view your dossiers.</div>
+            <div style="display:flex;gap:10px;justify-content:center">
+              <a href="/login/" class="state-btn">Log In</a>
+              <a href="/register/" class="state-btn ghost">Sign Up Free</a>
+            </div>
+          </div>`;
+        return;
+      }
+
+      content.innerHTML = `<div class="state-box"><div class="state-icon" style="animation:fadeIn 0.4s ease both">⏳</div><div class="state-title">Loading intelligence…</div></div>`;
+
+      await loadEntries(user);
+    }
+
+    // ── LOAD DATA ─────────────────────────────────────────────────────
+    async function loadEntries(user) {
+      try {
+        const { data, error } = await window._supabase
+          .from('intelligence_entries')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        allEntries = data || [];
+        renderPage();
+      } catch (err) {
+        console.error(err);
+        document.getElementById('main-content').innerHTML = `
+          <div class="state-box">
+            <div class="state-icon">⚠️</div>
+            <div class="state-title">Failed to load</div>
+            <div class="state-sub">${err.message}</div>
+          </div>`;
+      }
+    }
+
+    // ── RENDER ────────────────────────────────────────────────────────
+    function renderPage() {
+      const content = document.getElementById('main-content');
+
+      if (allEntries.length === 0) {
+        content.innerHTML = `
+          <div class="state-box">
+            <div class="state-icon">🕵️</div>
+            <div class="state-title">No intelligence yet</div>
+            <div class="state-sub">Save spy reports from <a href="/tools/spy-on-productivity/" style="color:var(--blue2);font-weight:600">Spy Productivity</a> or add manual notes from player and alliance profiles.</div>
+          </div>`;
+        return;
+      }
+
+      // Filter + search
+      let filtered = allEntries;
+      if (activeFilter !== 'all') {
+        filtered = filtered.filter(e => e.target_type === activeFilter);
+      }
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        filtered = filtered.filter(e =>
+          e.target_name.toLowerCase().includes(q) ||
+          (e.content || '').toLowerCase().includes(q)
+        );
+      }
+
+      // Group by target
+      const groups = {};
+      filtered.forEach(entry => {
+        const key = `${entry.target_type}::${entry.target_id}::${entry.server}`;
+        if (!groups[key]) {
+          groups[key] = {
+            target_type: entry.target_type,
+            target_id:   entry.target_id,
+            target_name: entry.target_name,
+            server:      entry.server,
+            entries:     []
+          };
+        }
+        groups[key].entries.push(entry);
+      });
+
+      const groupList = Object.values(groups);
+      const totalTargets = groupList.length;
+
+      // Build HTML
+      let html = `
+        <div class="filters-row">
+          <button class="filter-btn ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">All</button>
+          <button class="filter-btn ${activeFilter==='player'?'active':''}" onclick="setFilter('player')">👤 Players</button>
+          <button class="filter-btn ${activeFilter==='alliance'?'active':''}" onclick="setFilter('alliance')">🏰 Alliances</button>
+          <button class="filter-btn ${activeFilter==='village'?'active':''}" onclick="setFilter('village')">🏘️ Villages</button>
+          <div class="filter-sep"></div>
+          <input class="search-box" type="text" placeholder="Search targets…" value="${searchQuery}"
+            oninput="setSearch(this.value)" />
+          <span class="entries-count">${totalTargets} target${totalTargets!==1?'s':''} · ${filtered.length} entr${filtered.length!==1?'ies':'y'}</span>
+        </div>`;
+
+      if (groupList.length === 0) {
+        html += `
+          <div class="state-box">
+            <div class="state-icon">🔍</div>
+            <div class="state-title">No results</div>
+            <div class="state-sub">No targets match your filter or search.</div>
+          </div>`;
+      } else {
+        groupList.forEach((group, gi) => {
+          html += renderTargetCard(group, gi);
+        });
+      }
+
+      content.innerHTML = html;
+    }
+
+    function renderTargetCard(group, index) {
+      const typeEmoji = { player: '👤', alliance: '🏰', village: '🏘️' };
+      const tagClass  = { player: 'tag-player', alliance: 'tag-alliance', village: 'tag-village' };
+      const sourceTypes = [...new Set(group.entries.map(e => e.source_type))];
+
+      const sourcePips = sourceTypes.map(s => {
+        const labels = { spy_report: '🔭 Spy', battle_report: '⚔️ Battle', artifact: '🏺 Artifact', manual: '📝 Manual' };
+        const classes = { spy_report: 'pip-spy', battle_report: 'pip-battle', artifact: 'pip-artifact', manual: 'pip-manual' };
+        return `<span class="source-pip ${classes[s]}">${labels[s]||s}</span>`;
+      }).join('');
+
+      const cardId = `card-${index}`;
+
+      return `
+        <div class="target-group" style="animation-delay:${index*0.04}s">
+          <div class="target-card" id="${cardId}">
+            <div class="target-header" onclick="toggleCard('${cardId}')">
+              <div class="target-avatar">${typeEmoji[group.target_type]||'❓'}</div>
+              <div class="target-info">
+                <div class="target-name">${escHtml(group.target_name)}</div>
+                <div class="target-meta">
+                  <span class="target-tag ${tagClass[group.target_type]}">${group.target_type}</span>
+                  <span class="target-server">${group.server}</span>
+                </div>
+              </div>
+              <div class="target-right">
+                <div class="target-sources">${sourcePips}</div>
+                <span class="target-count">${group.entries.length} entr${group.entries.length!==1?'ies':'y'}</span>
+                <span class="chevron">▼</span>
+              </div>
+            </div>
+            <div class="dossier">
+              <div class="dossier-toolbar">
+                <span class="dossier-toolbar-left">Intelligence entries — sorted newest first</span>
+                <button class="dossier-add-btn" onclick="openManualModal('${escAttr(group.target_type)}','${escAttr(group.target_id)}','${escAttr(group.target_name)}','${escAttr(group.server)}')">
+                  + Add Note
+                </button>
+              </div>
+              <div class="entry-list">
+                ${group.entries.map(e => renderEntry(e)).join('')}
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    function renderEntry(e) {
+      const sourceConfig = {
+        spy_report:    { icon: '🔭', label: 'Spy Report',    cls: 'icon-spy' },
+        battle_report: { icon: '⚔️', label: 'Battle Report', cls: 'icon-battle' },
+        artifact:      { icon: '🏺', label: 'Artifact',      cls: 'icon-artifact' },
+        manual:        { icon: '📝', label: 'Manual Note',   cls: 'icon-manual' },
+      };
+      const cfg = sourceConfig[e.source_type] || { icon: '❓', label: e.source_type, cls: 'icon-manual' };
+      const date = formatDate(e.created_at);
+
+      let dataHTML = '';
+
+      if (e.source_type === 'spy_report' && e.data) {
+        const d = e.data;
+        dataHTML = `
+          <div class="entry-res-row">
+            <span class="entry-res">🌲 <strong>${fmtNum(d.wood)}</strong>/hr</span>
+            <span class="entry-res">🧱 <strong>${fmtNum(d.clay)}</strong>/hr</span>
+            <span class="entry-res">⚙️ <strong>${fmtNum(d.iron)}</strong>/hr</span>
+            <span class="entry-res">🌾 <strong>${fmtNum(d.crop)}</strong>/hr</span>
+            ${d.cranny ? `<span class="entry-res">🏚️ Cranny <strong>${fmtNum(d.cranny)}</strong></span>` : ''}
+          </div>
+          ${d.village ? `<div style="font-size:0.75rem;color:var(--text3);margin-top:4px">Village: ${escHtml(d.village)}${d.alliance?` · [${escHtml(d.alliance)}]`:''}</div>` : ''}
+          ${d.scanned_at ? `<div style="font-size:0.72rem;color:var(--text3);margin-top:2px">Scanned: ${formatDate(d.scanned_at)}</div>` : ''}`;
+      } else if (e.source_type === 'battle_report' && e.data) {
+        const d = e.data;
+        dataHTML = `<div class="entry-data">
+          vs <strong>${escHtml(d.defender?.name||'?')}</strong>
+          ${d.bounty ? ` · Bounty: ${fmtNum((d.bounty.wood||0)+(d.bounty.clay||0)+(d.bounty.iron||0)+(d.bounty.crop||0))} res` : ''}
+        </div>`;
+      } else if (e.source_type === 'artifact' && e.data) {
+        dataHTML = `<div class="entry-data">🏺 <strong>${escHtml(e.data.artifact_name||'Unknown')}</strong>${e.data.artifact_size?` · ${e.data.artifact_size}`:''}</div>`;
+      }
+
+      const notesHTML = e.content
+        ? `<div class="entry-notes">"${escHtml(e.content)}"</div>`
+        : '';
+
+      return `
+        <div class="entry-item" id="entry-${e.id}">
+          <div class="entry-source-icon ${cfg.cls}">${cfg.icon}</div>
+          <div class="entry-body">
+            <div class="entry-header-row">
+              <span class="entry-source-label">${cfg.label}</span>
+              <span class="entry-date">${date}</span>
+            </div>
+            ${dataHTML}
+            ${notesHTML}
+          </div>
+          <div class="entry-actions">
+            <button class="entry-delete-btn" title="Delete" onclick="deleteEntry('${e.id}')">🗑</button>
+          </div>
+        </div>`;
+    }
+
+    // ── INTERACTIONS ──────────────────────────────────────────────────
+
+    function toggleCard(cardId) {
+      const card = document.getElementById(cardId);
+      if (card) card.classList.toggle('open');
+    }
+
+    function setFilter(f) {
+      activeFilter = f;
+      renderPage();
+    }
+
+    function setSearch(val) {
+      searchQuery = val;
+      renderPage();
+    }
+
+    async function deleteEntry(entryId) {
+      if (!confirm('Delete this intelligence entry?')) return;
+      try {
+        const { error } = await window._supabase
+          .from('intelligence_entries')
+          .delete()
+          .eq('id', entryId);
+        if (error) throw error;
+        allEntries = allEntries.filter(e => e.id !== entryId);
+        renderPage();
+      } catch (err) {
+        alert('Failed to delete: ' + err.message);
+      }
+    }
+
+    // ── MANUAL NOTE MODAL ─────────────────────────────────────────────
+
+    function openManualModal(targetType, targetId, targetName, server) {
+      closeModal();
+      const modal = document.createElement('div');
+      modal.className = 'modal-backdrop';
+      modal.id = 'manual-modal';
+      modal.innerHTML = `
+        <div class="modal-box">
+          <div class="modal-title">📝 Add Note</div>
+          <div class="modal-sub">Manual intelligence for <strong>${escHtml(targetName)}</strong></div>
+          <div class="modal-field">
+            <label class="modal-label">NOTE</label>
+            <textarea class="modal-textarea" id="manual-note-input" placeholder="e.g. Active at night, aggressive raider, 3 large armies…" autofocus></textarea>
+          </div>
+          <div class="modal-actions">
+            <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="modal-btn-save" id="manual-save-btn"
+              onclick="confirmManualSave('${escAttr(targetType)}','${escAttr(targetId)}','${escAttr(targetName)}','${escAttr(server)}')">
+              Save
+            </button>
+          </div>
+        </div>`;
+      modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+      document.body.appendChild(modal);
+      setTimeout(() => document.getElementById('manual-note-input')?.focus(), 100);
+    }
+
+    async function confirmManualSave(targetType, targetId, targetName, server) {
+      const btn = document.getElementById('manual-save-btn');
+      const content = document.getElementById('manual-note-input')?.value?.trim();
+      if (!content) { alert('Please enter a note.'); return; }
+
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      const user = await window.getUser();
+      if (!user) { closeModal(); return; }
+
+      try {
+        const { data, error } = await window._supabase
+          .from('intelligence_entries')
+          .insert({
+            user_id: user.id, server, target_type: targetType,
+            target_id: targetId, target_name: targetName,
+            source_type: 'manual', data: {}, content,
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+        allEntries.unshift(data);
+        closeModal();
+        renderPage();
+
+        // Re-open the card for this target
+        setTimeout(() => {
+          const cards = document.querySelectorAll('.target-card');
+          cards.forEach(card => {
+            const nameEl = card.querySelector('.target-name');
+            if (nameEl && nameEl.textContent === targetName) {
+              card.classList.add('open');
+            }
+          });
+        }, 50);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Save';
+        alert('Failed to save: ' + err.message);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('manual-modal')?.remove();
+    }
+
+    // ── HELPERS ───────────────────────────────────────────────────────
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      const pad = n => String(n).padStart(2,'0');
+      return `${pad(d.getDate())}.${pad(d.getMonth()+1)}.${String(d.getFullYear()).slice(-2)}, ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    function fmtNum(n) {
+      if (n == null || isNaN(n)) return '0';
+      return Number(n).toLocaleString();
+    }
+
+    function escHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function escAttr(str) {
+      if (!str) return '';
+      return String(str).replace(/'/g,"\\'");
+    }
+
+    // ── START ─────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
