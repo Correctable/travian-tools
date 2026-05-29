@@ -103,18 +103,18 @@
 
     // Menu login-only — dirender oleh updateAuthState()
     myStuffItems: [
-      { icon: '📝', title: 'Notes',           desc: 'Personal notes & reminders',         badge: 'FREE', href: '/account/notes/'     },
+      { icon: '📝', title: 'Intelligence',           desc: 'Your personal data',         badge: 'FREE', href: '/account/intelligence/'     },
       { icon: '👁',  title: 'Watchlist',       desc: 'Track players & alliances',          badge: 'PRO',  href: '/account/watchlist/' },
-      { icon: '⚔️', title: 'Battle Reports',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/reports/'   },
+      { icon: '⚔️', title: 'Battle Reports',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/saved-reports/'   },
     ],
 
     allianceItems: [
       { icon: '🏰', title: 'Workspace',       desc: 'Alliance dashboard & overview',      badge: 'FREE', href: '/alliance/workspace/'           },
-      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PRO',  href: '/account/workspace/troops/'    },
-      { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'PRO',  href: '/account/workspace/attack/'    },
-      { icon: '🛡️', title: 'Defense Plan',    desc: 'Organize defensive assignments',     badge: 'PRO',  href: '/account/workspace/defense/'   },
-      { icon: '🏺', title: 'Artifact Tracker',desc: 'Track alliance artifacts',           badge: 'PRO',  href: '/account/workspace/artifacts/' },
-      { icon: '🌟', title: 'World Wonder',    desc: 'WW build progress tracker',          badge: 'PRO',  href: '/account/workspace/ww/'        },
+      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PRO',  href: '/alliance/workspace/troops/'    },
+      { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'PRO',  href: '/alliance/workspace/attack/'    },
+      { icon: '🛡️', title: 'Defense Plan',    desc: 'Organize defensive assignments',     badge: 'PRO',  href: '/alliance/workspace/defense/'   },
+      { icon: '🏺', title: 'Artifact Tracker',desc: 'Track alliance artifacts',           badge: 'PRO',  href: '/alliance/workspace/artifacts/' },
+      { icon: '🌟', title: 'World Wonder',    desc: 'WW build progress tracker',          badge: 'PRO',  href: '/alliance/workspace/ww/'        },
     ],
 
     cta: {
