@@ -206,17 +206,11 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface
 </div>
 
 <script>
-const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
-const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
-
 // ── SERVER CONFIG ─────────────────────────────────────────
-// SERVER      = nilai kolom 'server' di Turso (tidak berubah)
-// SERVER_SLUG = slug di URL untuk link navigasi
 const SERVER      = 'ts5';
 const SERVER_SLUG = 'ts5.x1.asia';
-
-// Base path untuk link navigasi — mengikuti pola /s/{slug}/
-const BASE_PATH = `/s/${SERVER_SLUG}`;
+const BASE_PATH   = `/s/${SERVER_SLUG}`;
+const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
 
 const TRIBE = {
   1:'/images/travian/roman_medium.png',
@@ -234,24 +228,14 @@ let playerPage = 1, alliancePage = 1;
 const PG = 25;
 let allPlayers = [], allAlliances = [];
 
-async function query(sql, args=[]) {
-  const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
-    method:'POST',
-    headers:{'Authorization':`Bearer ${TURSO_TOKEN}`,'Content-Type':'application/json'},
-    body: JSON.stringify({ requests:[
-      {type:'execute',stmt:{sql,args:args.map(v=>
-        v===null?{type:'null',value:null}
-        :typeof v==='number'?{type:'integer',value:String(v)}
-        :{type:'text',value:String(v)}
-      )}},
-      {type:'close'}
-    ]})
-  });
-  const data = await res.json();
-  const result = data.results?.[0]?.response?.result;
-  if (!result) return [];
-  const cols = result.cols.map(c=>c.name);
-  return result.rows.map(row=>{const o={};row.forEach((c,i)=>o[cols[i]]=c.value);return o;});
+async function apiGet(endpoint, params={}) {
+  const url = new URL(`${API_BASE}/api/${endpoint}`);
+  Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
+  const res = await fetch(url.toString());
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'API error');
+  return json;
 }
 
 const fmt = n => n ? Number(n).toLocaleString() : '—';
@@ -265,50 +249,59 @@ function growthHtml(pop, prev) {
 }
 
 async function loadSnap() {
-  const rows = await query('SELECT * FROM snapshots WHERE server=? ORDER BY snap_date DESC LIMIT 1',[SERVER]);
-  if (!rows.length) return;
-  const s = rows[0];
-  document.getElementById('sPlayers').textContent   = fmt(s.total_players);
-  document.getElementById('sVillages').textContent  = fmt(s.total_villages);
-  document.getElementById('sAlliances').textContent = fmt(s.total_alliances);
-  document.getElementById('sPop').textContent       = fmt(s.total_population);
-  document.getElementById('lastUpdated').textContent = `Data updated: ${s.snap_date} · Next update: daily at 06:00 WIB`;
+  try {
+    const data = await apiGet('snapshot', { server: SERVER });
+    const s = data.snapshot;
+    if (!s) return;
+    document.getElementById('sPlayers').textContent   = fmt(s.total_players);
+    document.getElementById('sVillages').textContent  = fmt(s.total_villages);
+    document.getElementById('sAlliances').textContent = fmt(s.total_alliances);
+    document.getElementById('sPop').textContent       = fmt(s.total_population);
+    document.getElementById('lastUpdated').textContent = `Data updated: ${s.snap_date} · Next update: daily at 06:00 WIB`;
+  } catch(e) { console.error(e); }
 }
 
 async function loadPlayers() {
   document.getElementById('playersTbody').innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr>';
-  const orderBy = playerSort==='population' ? 'p.population DESC' : '(p.population - COALESCE(ph.population, p.population)) DESC';
-  allPlayers = await query(
-    `SELECT p.player_id,p.player_name,p.tribe,p.alliance_tag,p.population,p.village_count,
-            ph.population AS pop_prev
-     FROM players p
-     LEFT JOIN player_history ph
-       ON ph.player_id=p.player_id AND ph.server=p.server
-       AND ph.snap_date=DATE(p.snap_date,'-1 days')
-     WHERE p.server=?
-     ORDER BY ${orderBy} LIMIT 50`,
-    [SERVER]
-  );
-  playerPage = 1;
-  renderPlayers();
+  try {
+    const data = await apiGet('statistics', { server: SERVER, type: 'players', page: 1 });
+    allPlayers = (data.rows || []).map(p => ({
+      player_id:    p.player_id,
+      player_name:  p.player_name,
+      tribe:        p.tribe,
+      alliance_tag: p.alliance_tag,
+      population:   p.population,
+      village_count: p.village_count,
+      pop_prev:     p.pop_7d_ago,
+      growth_7d:    p.growth_7d,
+      rank:         p.rank,
+    }));
+    playerPage = 1;
+    renderPlayers();
+  } catch(e) {
+    document.getElementById('playersTbody').innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:20px;text-align:center">Error: ${e.message}</td></tr>`;
+  }
 }
 
 async function loadAlliances() {
   document.getElementById('alliancesTbody').innerHTML = '<tr class="loading-row"><td colspan="4"><span class="spinner"></span>Loading...</td></tr>';
-  const orderBy = allianceSort==='population' ? 'a.population DESC' : '(a.population - COALESCE(ah.population, a.population)) DESC';
-  allAlliances = await query(
-    `SELECT a.alliance_id,a.alliance_tag,a.member_count,a.village_count,a.population,
-            ah.population AS pop_prev
-     FROM alliances a
-     LEFT JOIN alliance_history ah
-       ON ah.alliance_id=a.alliance_id AND ah.server=a.server
-       AND ah.snap_date=DATE(a.snap_date,'-1 days')
-     WHERE a.server=?
-     ORDER BY ${orderBy} LIMIT 50`,
-    [SERVER]
-  );
-  alliancePage = 1;
-  renderAlliances();
+  try {
+    const data = await apiGet('statistics', { server: SERVER, type: 'alliances', page: 1 });
+    allAlliances = (data.rows || []).map(a => ({
+      alliance_id:   a.alliance_id,
+      alliance_tag:  a.alliance_tag,
+      member_count:  a.member_count,
+      village_count: a.village_count,
+      population:    a.population,
+      pop_prev:      a.pop_7d_ago,
+      growth_7d:     a.growth_7d,
+      rank:          a.rank,
+    }));
+    alliancePage = 1;
+    renderAlliances();
+  } catch(e) {
+    document.getElementById('alliancesTbody').innerHTML = `<tr><td colspan="4" style="color:var(--red);padding:20px;text-align:center">Error: ${e.message}</td></tr>`;
+  }
 }
 
 function renderPlayers() {
@@ -395,59 +388,4 @@ document.getElementById('searchInput').addEventListener('keydown',e=>{
 });
 document.addEventListener('click',e=>{if(!e.target.closest('.search-section'))hideSearch();});
 
-async function doSearch(){
-  const type = document.getElementById('searchType').value;
-  const q    = document.getElementById('searchInput').value.trim();
-  const box  = document.getElementById('searchResults');
-  if(!q||q.length<2){hideSearch();return;}
-  box.innerHTML='<div class="search-empty"><span class="spinner"></span> Searching...</div>';
-  box.classList.add('show');
-
-  if(type==='player'){
-    const rows = await query(
-      `SELECT player_id,player_name,tribe,alliance_tag,population,village_count
-       FROM players WHERE server=? AND player_name LIKE ? LIMIT 8`,
-      [SERVER,`%${q}%`]
-    );
-    box.innerHTML = rows.length ? rows.map(p=>`
-      <a class="search-result-item" href="${BASE_PATH}/statistics/player/?id=${p.player_id}">
-        <span class="sri-icon">${TRIBE[p.tribe]?`<img src="${TRIBE[p.tribe]}" style="width:22px;height:22px;object-fit:contain">`:'👤'}</span>
-        <div>
-          <div class="sri-name">${p.player_name}</div>
-          <div class="sri-sub">${TRIBE_NAME[p.tribe]||''} · ${p.alliance_tag?'['+p.alliance_tag+']':'No alliance'} · ${p.village_count} villages</div>
-        </div>
-        <div class="sri-pop">${fmt(p.population)}</div>
-      </a>`).join('')
-    : `<div class="search-empty">No players found for "<b>${q}</b>"</div>`;
-  } else {
-    const rows = await query(
-      `SELECT alliance_id,alliance_tag,member_count,village_count,population
-       FROM alliances WHERE server=? AND alliance_tag LIKE ? LIMIT 8`,
-      [SERVER,`%${q}%`]
-    );
-    box.innerHTML = rows.length ? rows.map(a=>`
-      <a class="search-result-item" href="${BASE_PATH}/statistics/alliance/?id=${a.alliance_id}">
-        <span class="sri-icon">🛡️</span>
-        <div>
-          <div class="sri-name">[${a.alliance_tag}]</div>
-          <div class="sri-sub">${a.member_count} members · ${a.village_count} villages</div>
-        </div>
-        <div class="sri-pop">${fmt(a.population)}</div>
-      </a>`).join('')
-    : `<div class="search-empty">No alliances found for "<b>${q}</b>"</div>`;
-  }
-}
-function hideSearch(){document.getElementById('searchResults').classList.remove('show');}
-
-// Init
-loadSnap();
-loadPlayers();
-loadAlliances();
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
-<script src="/navbar.js"></script>
-</body>
-</html>
+asy
