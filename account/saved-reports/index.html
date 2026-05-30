@@ -291,7 +291,7 @@
       <div class="page-icon">⚔️</div>
       <div>
         <div class="page-title">Battle Reports</div>
-        <div class="page-subtitle">History battle report yang pernah kamu share atau simpan.</div>
+        <div class="page-subtitle">History of battle reports you've shared or saved.</div>
       </div>
     </div>
     <div class="page-badges">
@@ -304,10 +304,10 @@
 <!-- Auth Gate -->
 <div class="page-wrap" id="auth-gate">
   <div class="gate-icon">🔒</div>
-  <div class="gate-title">Login dulu, yuk</div>
-  <div class="gate-desc">Halaman ini butuh akun untuk diakses. Login atau buat akun gratis untuk melihat history battle report.</div>
+  <div class="gate-title">Sign in to continue</div>
+  <div class="gate-desc">This page requires an account. Log in or create a free account to view your battle report history.</div>
   <a href="/login/?redirect=/account/battle-reports/" class="gate-btn gate-btn-primary">Log In</a>
-  <a href="/register/" class="gate-btn gate-btn-ghost">Daftar Gratis</a>
+  <a href="/register/" class="gate-btn gate-btn-ghost">Sign Up Free</a>
 </div>
 
 <!-- Main Content (shown after auth check) -->
@@ -317,10 +317,10 @@
   <div id="free-banner">
     <div class="free-banner-icon">⏳</div>
     <div class="free-banner-body">
-      <div class="free-banner-title">Akun Free — Report tersimpan maksimal 30 hari</div>
-      <div class="free-banner-desc">Report kedaluwarsa tidak bisa dibuka lagi, tapi tetap tercatat di sini selama 7 hari setelah expired. Upgrade ke Pro untuk link permanen tanpa batas waktu.</div>
+      <div class="free-banner-title">Free Account — Saved reports expire after 30 days</div>
+      <div class="free-banner-desc">Expired reports can no longer be opened, but remain listed here for 7 days after expiry. Upgrade to Pro for permanent links with no time limit.</div>
     </div>
-    <a href="/account/upgrade/" class="free-banner-cta">Upgrade Pro →</a>
+    <a href="/account/upgrade/" class="free-banner-cta">Upgrade to Pro →</a>
   </div>
 
   <!-- Toolbar -->
@@ -330,22 +330,22 @@
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
-        <input type="text" class="search-input" id="searchInput" placeholder="Cari nama player…" />
+        <input type="text" class="search-input" id="searchInput" placeholder="Search player name…" />
       </div>
 
       <select class="filter-select" id="outcomeFilter">
-        <option value="">Semua outcome</option>
-        <option value="win">Menang ⚔️</option>
-        <option value="loss">Kalah 🛡️</option>
+        <option value="">All outcomes</option>
+        <option value="win">Victory ⚔️</option>
+        <option value="loss">Defeat 🛡️</option>
         <option value="draw">Draw</option>
       </select>
 
       <select class="filter-select" id="statusFilter">
-        <option value="">Semua status</option>
-        <option value="active">Aktif</option>
-        <option value="soon">Segera expired</option>
-        <option value="expired">Kedaluwarsa</option>
-        <option value="permanent">Permanen</option>
+        <option value="">All statuses</option>
+        <option value="active">Active</option>
+        <option value="soon">Expiring soon</option>
+        <option value="expired">Expired</option>
+        <option value="permanent">Permanent</option>
       </select>
     </div>
     <div class="toolbar-right">
@@ -357,13 +357,13 @@
   <div class="reports-table-wrap">
     <div class="loading-state" id="loadingState">
       <div class="spinner"></div>
-      <div>Memuat reports…</div>
+      <div>Loading reports…</div>
     </div>
 
     <div class="empty-state" id="emptyState" style="display:none;">
       <div class="empty-icon">📋</div>
-      <div class="empty-title">Belum ada battle report tersimpan</div>
-      <div class="empty-desc">Parse battle report dari Travian lalu klik tombol Share — report akan otomatis tersimpan di sini.</div>
+      <div class="empty-title">No battle reports saved yet</div>
+      <div class="empty-desc">Parse a battle report from Travian and click Share — it will be saved here automatically.</div>
       <a href="/reports/" class="empty-cta">
         <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
           <path d="M12 5v14M5 12h14"/>
@@ -374,8 +374,8 @@
 
     <div class="empty-state" id="noResultsState" style="display:none;">
       <div class="empty-icon">🔍</div>
-      <div class="empty-title">Tidak ada hasil</div>
-      <div class="empty-desc">Coba ubah filter atau kata kunci pencarian.</div>
+      <div class="empty-title">No results found</div>
+      <div class="empty-desc">Try changing your filters or search query.</div>
     </div>
 
     <table class="reports-table" id="reportsTable" style="display:none;">
@@ -383,10 +383,10 @@
         <tr>
           <th>Battle</th>
           <th>Outcome</th>
-          <th>Tanggal Simpan</th>
+          <th>Saved On</th>
           <th>Bounty</th>
-          <th>Status Link</th>
-          <th>Aksi</th>
+          <th>Link Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="reportsBody"></tbody>
@@ -404,11 +404,11 @@
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-box">
     <div class="modal-icon">🗑️</div>
-    <div class="modal-title">Hapus Battle Report?</div>
-    <div class="modal-desc">Report ini akan dihapus dari historymu. Share link yang sudah disebarkan juga tidak akan bisa diakses lagi.</div>
+    <div class="modal-title">Delete Battle Report?</div>
+    <div class="modal-desc">This report will be permanently removed from your history. Any shared links will no longer be accessible.</div>
     <div class="modal-actions">
-      <button class="modal-btn modal-btn-cancel" id="cancelDelete">Batal</button>
-      <button class="modal-btn modal-btn-delete" id="confirmDelete">Hapus</button>
+      <button class="modal-btn modal-btn-cancel" id="cancelDelete">Cancel</button>
+      <button class="modal-btn modal-btn-delete" id="confirmDelete">Delete</button>
     </div>
   </div>
 </div>
@@ -456,13 +456,13 @@
       .order('created_at', { ascending: false });
 
     if (error) {
-      showToast('Gagal memuat reports: ' + error.message, 'error');
+      showToast('Failed to load reports: ' + error.message, 'error');
       return [];
     }
     return data || [];
   }
 
-  /* ── Parse minimal metadata dari raw content ── */
+  /* ── Parse minimal metadata from raw content ── */
   function parseReportMeta(content) {
     const meta = { attacker: '?', defender: '?', outcome: 'draw', bounty: 0 };
     if (!content) return meta;
@@ -504,8 +504,8 @@
 
   function expiryPill(expiresAt) {
     const status = getExpiryStatus(expiresAt);
-    if (status === 'permanent') return `<span class="expiry-pill permanent">♾ Permanen</span>`;
-    if (status === 'expired')   return `<span class="expiry-pill expired">✕ Kedaluwarsa</span>`;
+    if (status === 'permanent') return `<span class="expiry-pill permanent">♾ Permanent</span>`;
+    if (status === 'expired')   return `<span class="expiry-pill expired">✕ Expired</span>`;
     const days = Math.ceil((new Date(expiresAt) - Date.now()) / 86400000);
     if (status === 'soon') return `<span class="expiry-pill soon">⚠ ${days}h lagi</span>`;
     return `<span class="expiry-pill active">${days} hari lagi</span>`;
@@ -522,8 +522,8 @@
     return n.toLocaleString();
   }
   function outcomeLabel(o) {
-    if (o === 'win')  return `<span class="outcome-badge win">Menang ⚔️</span>`;
-    if (o === 'loss') return `<span class="outcome-badge loss">Kalah 🛡️</span>`;
+    if (o === 'win')  return `<span class="outcome-badge win">Victory ⚔️</span>`;
+    if (o === 'loss') return `<span class="outcome-badge loss">Defeat 🛡️</span>`;
     return `<span class="outcome-badge draw">Draw</span>`;
   }
   function escHtml(s) {
@@ -584,19 +584,19 @@
         <td>${expiryPill(r.expires_at)}</td>
         <td>
           <div class="actions-cell">
-            <a href="/r/?id=${r.id}" target="_blank" class="action-btn${isExp?' disabled':''}" title="${isExp?'Report sudah kedaluwarsa':'Buka report'}" ${isExp?'tabindex="-1" aria-disabled="true"':''}>
+            <a href="/r/?id=${r.id}" target="_blank" class="action-btn${isExp?' disabled':''}" title="${isExp?'Report has expired':'Open report'}" ${isExp?'tabindex="-1" aria-disabled="true"':''}>
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                 <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </a>
-            <button class="action-btn${isExp?' disabled':''}" title="Salin link" ${isExp?'disabled':''} onclick="copyLink('${r.id}')">
+            <button class="action-btn${isExp?' disabled':''}" title="Copy link" ${isExp?'disabled':''} onclick="copyLink('${r.id}')">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                 <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
               </svg>
             </button>
-            <button class="action-btn danger" title="Hapus" onclick="openDelete('${r.id}')">
+            <button class="action-btn danger" title="Delete" onclick="openDelete('${r.id}')">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6"/>
                 <path d="M19 6l-1 14H6L5 6"/>
@@ -624,7 +624,7 @@
     const btns = document.getElementById('paginationBtns');
     const start = (currentPage-1)*PAGE_SIZE+1;
     const end   = Math.min(currentPage*PAGE_SIZE, filtered.length);
-    info.textContent = `${start}–${end} dari ${filtered.length}`;
+    info.textContent = `${start}–${end} of ${filtered.length}`;
 
     let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
     for (let p = 1; p <= totalPages; p++) {
@@ -666,8 +666,8 @@
   /* ── Copy link ── */
   window.copyLink = async (id) => {
     const url = `${location.origin}/r/?id=${id}`;
-    try { await navigator.clipboard.writeText(url); showToast('Link disalin!', 'success'); }
-    catch { prompt('Salin link ini:', url); }
+    try { await navigator.clipboard.writeText(url); showToast('Link copied!', 'success'); }
+    catch { prompt('Copy this link:', url); }
   };
 
   /* ── Delete ── */
@@ -691,11 +691,11 @@
       .eq('id', id)
       .eq('user_id', user.id);
 
-    if (error) { showToast('Gagal menghapus: ' + error.message, 'error'); return; }
+    if (error) { showToast('Failed to delete: ' + error.message, 'error'); return; }
 
     allReports = allReports.filter(r => r.id !== id);
     applyFilters();
-    showToast('Report dihapus.', 'success');
+    showToast('Report deleted.', 'success');
   });
   document.getElementById('deleteModal').addEventListener('click', e => {
     if (e.target === e.currentTarget) { e.currentTarget.classList.remove('show'); pendingDeleteId = null; }
