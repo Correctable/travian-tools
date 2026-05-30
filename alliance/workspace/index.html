@@ -793,11 +793,20 @@
     await checkWorkspace();
   });
 
+  // Tunggu window._supabase siap (async IIFE di supabase.js)
+  async function waitForSupabase(timeout = 5000) {
+    const start = Date.now();
+    while (typeof window._supabase === 'undefined' || typeof window.getUser !== 'function') {
+      if (Date.now() - start > timeout) throw new Error('Supabase init timeout');
+      await sleep(50);
+    }
+  }
+
   async function checkWorkspace() {
     try {
-      await sleep(300);
+      await waitForSupabase();
 
-      const user = typeof window.getUser === 'function' ? await window.getUser() : null;
+      const user = await window.getUser();
       if (!user) {
         window.location.href = '/login/?redirect=/alliance/workspace/';
         return;
