@@ -1,57 +1,1476 @@
-// supabase.js — Shared Supabase client for TravianTools
-// Load order di setiap halaman yang butuh auth/database:
-//
-//   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-//   <script src="/supabase.js"></script>
-//   <script src="/servers.js"></script>
-//   <script src="/navbar.js"></script>
-//
-// Akses client via window._supabase dari file lain.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alliance Workspace — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
 
-(function () {
-  const SUPABASE_URL  = 'https://bcsomahzvxbzzmguldsm.supabase.co';
-  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJjc29tYWh6dnhienptZ3VsZHNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3OTk3MjgsImV4cCI6MjA5NTM3NTcyOH0.FGrCaavzrQEtgktWDhueSid6ZFu_rRJBQS2C0MBd6ds';
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  if (typeof supabase === 'undefined') {
-    console.error('[TravianTools] Supabase CDN belum di-load. Pastikan script CDN ada sebelum supabase.js.');
-    return;
-  }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
 
-  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: {
-      persistSession: true,       // session disimpan di localStorage
-      autoRefreshToken: true,     // token di-refresh otomatis sebelum expired
-      detectSessionInUrl: true,   // handle redirect dari email confirmation
-    },
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+    @keyframes spin   { to { transform: rotate(360deg); } }
+
+    /* ── PAGE HEADER (canonical pattern dari design spec) ── */
+    .page-header {
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner {
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--green-bg); border: 1px solid rgba(5,150,105,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+    }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-badges { display: flex; align-items: center; gap: 8px; }
+    .page-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .page-badge.pro      { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .page-badge.login    { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+
+    /* ── WORKSPACE SUB-NAV ── */
+    .ws-subnav {
+      display: flex; align-items: center;
+      gap: 2px; flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .ws-subnav-item {
+      padding: 7px 13px; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text3); text-decoration: none;
+      transition: all 0.15s; white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .ws-subnav-item:hover {
+      color: var(--navy); background: var(--surface2);
+    }
+    .ws-subnav-item.active {
+      color: var(--green); background: var(--green-bg);
+      border-color: rgba(5,150,105,0.2);
+    }
+    .ws-subnav-settings {
+      color: var(--text2) !important;
+      border-color: var(--border) !important;
+      background: var(--surface2) !important;
+      margin-left: 6px;
+    }
+    .ws-subnav-settings:hover {
+      border-color: var(--amber) !important;
+      color: var(--amber) !important;
+      background: var(--amber-bg) !important;
+    }
+
+    /* responsive — stack sub-nav below title on small screens */
+    @media (max-width: 860px) {
+      .page-header-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .ws-subnav { justify-content: flex-start; }
+    }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+    @media (max-width: 768px) {
+      .page-wrap { padding: 28px 16px 48px; }
+      .page-header { padding: 20px 16px 18px; }
+    }
+
+    /* ── LOADING ── */
+    #loadingState {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 280px; gap: 14px;
+    }
+    .spinner {
+      width: 34px; height: 34px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue2);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    .loading-text { font-size: 0.85rem; color: var(--text3); }
+
+    /* ══════════════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════════════ */
+    #emptyState { display: none; animation: fadeUp 0.4s ease both; }
+
+    .empty-heading {
+      margin-bottom: 28px;
+    }
+    .empty-heading h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--navy); letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .empty-heading p { font-size: 0.875rem; color: var(--text2); }
+
+    /* Join banner */
+    .join-banner {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue2);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 0.855rem; color: var(--text2);
+      margin-bottom: 24px; line-height: 1.55;
+    }
+    .join-banner a {
+      color: var(--blue2); font-weight: 600;
+      text-decoration: none; white-space: nowrap;
+    }
+    .join-banner a:hover { text-decoration: underline; }
+
+    /* Choice grid */
+    .choice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 560px) { .choice-grid { grid-template-columns: 1fr; } }
+
+    .choice-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 22px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+      background: var(--surface);
+      position: relative; overflow: hidden;
+      text-decoration: none; color: inherit; display: block;
+    }
+    .choice-card:hover { transform: translateY(-2px); }
+    .choice-card.create:hover {
+      border-color: var(--blue2);
+      box-shadow: 0 6px 24px rgba(37,99,235,0.1);
+    }
+    .choice-card.join:hover {
+      border-color: var(--green);
+      box-shadow: 0 6px 24px rgba(5,150,105,0.1);
+    }
+
+    .card-icon {
+      width: 42px; height: 42px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; margin-bottom: 14px;
+    }
+    .create .card-icon { background: var(--blue-glow);  border: 1px solid rgba(37,99,235,0.15); }
+    .join   .card-icon { background: var(--green-bg);   border: 1px solid rgba(5,150,105,0.15); }
+
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.975rem; font-weight: 700;
+      color: var(--navy); margin-bottom: 6px;
+    }
+    .card-desc {
+      font-size: 0.82rem; color: var(--text2); line-height: 1.55;
+    }
+    .card-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.7rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px; margin-top: 12px;
+    }
+    .tag-pro  { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.18); }
+    .tag-free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.18); }
+
+    /* Pro lock overlay */
+    .pro-lock {
+      position: absolute; inset: 0;
+      background: rgba(248,250,255,0.88);
+      backdrop-filter: blur(3px);
+      border-radius: 13px;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 8px; text-align: center; padding: 20px;
+    }
+    .pro-lock.show { display: flex; }
+    .pro-lock-icon { font-size: 1.6rem; }
+    .pro-lock-text { font-size: 0.8rem; color: var(--text2); font-weight: 500; line-height: 1.45; }
+    .pro-lock-cta {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 15px; border-radius: 8px;
+      background: var(--amber); color: #fff;
+      font-size: 0.78rem; font-weight: 700;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background 0.15s, transform 0.15s;
+    }
+    .pro-lock-cta:hover { background: #b45309; transform: translateY(-1px); }
+
+    /* ══════════════════════════════════════
+       CREATE FORM STATE
+    ══════════════════════════════════════ */
+    #createState {
+      display: none;
+      max-width: 560px;
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .form-topbar {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+    }
+    .btn-back {
+      width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.9rem; cursor: pointer; transition: background 0.14s;
+      color: var(--text2);
+    }
+    .btn-back:hover { background: var(--border); }
+    .form-topbar-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--navy); letter-spacing: -0.02em;
+    }
+    .form-topbar-sub { font-size: 0.8rem; color: var(--text3); margin-top: 1px; }
+
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 26px;
+    }
+
+    .field { margin-bottom: 22px; }
+    .field:last-of-type { margin-bottom: 0; }
+
+    .field-label {
+      display: block; font-size: 0.78rem; font-weight: 600;
+      color: var(--text2); margin-bottom: 7px; letter-spacing: 0.01em;
+    }
+    .field-label .req { color: var(--red); margin-left: 2px; }
+
+    .field-input {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--navy); background: var(--surface);
+      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field-input:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+    .field-input::placeholder { color: var(--text3); }
+
+    .field-select {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--navy); background: var(--surface);
+      outline: none; cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a93bc' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 13px center;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field-select:focus {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    .field-hint { font-size: 0.74rem; color: var(--text3); margin-top: 5px; }
+
+    /* Divider */
+    .field-divider { height: 1px; background: var(--border); margin: 4px 0 22px; }
+
+    /* Searchable account dropdown */
+    .acct-dropdown { position: relative; }
+
+    .acct-trigger {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--text3); background: var(--surface);
+      outline: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .acct-trigger.has-value { color: var(--navy); font-weight: 500; }
+    .acct-trigger.is-open {
+      border-color: var(--blue2);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+      border-bottom-color: transparent;
+    }
+    .acct-trigger.is-disabled { opacity: 0.48; cursor: not-allowed; pointer-events: none; }
+    .acct-chevron { font-size: 0.65rem; color: var(--text3); transition: transform 0.18s; flex-shrink: 0; }
+    .acct-chevron.flipped { transform: rotate(180deg); }
+
+    .acct-panel {
+      display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
+      background: var(--surface);
+      border: 1.5px solid var(--blue2); border-top: none;
+      border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+      box-shadow: 0 14px 36px rgba(15,33,83,0.1);
+      overflow: hidden;
+    }
+    .acct-panel.is-open { display: block; animation: fadeIn 0.12s ease; }
+
+    .acct-search-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+    }
+    .acct-search-icon { font-size: 0.8rem; color: var(--text3); flex-shrink: 0; }
+    .acct-search-input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 0.855rem; color: var(--navy);
+    }
+    .acct-search-input::placeholder { color: var(--text3); }
+
+    .acct-list { max-height: 216px; overflow-y: auto; }
+    .acct-list::-webkit-scrollbar { width: 4px; }
+    .acct-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .acct-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 13px; cursor: pointer; font-size: 0.855rem;
+      transition: background 0.1s;
+    }
+    .acct-item:hover  { background: var(--surface2); }
+    .acct-item.active { background: var(--blue-glow); color: var(--blue2); font-weight: 600; }
+    .acct-item-pop { font-size: 0.74rem; color: var(--text3); }
+    .acct-item.active .acct-item-pop { color: var(--blue-light); }
+
+    .acct-status {
+      padding: 16px 13px; text-align: center;
+      font-size: 0.82rem; color: var(--text3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .mini-spin {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border); border-top-color: var(--blue2);
+      border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+
+    /* Submit row */
+    .submit-row {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px; margin-top: 26px; padding-top: 22px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-cancel {
+      padding: 10px 20px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: background 0.14s;
+    }
+    .btn-cancel:hover { background: var(--border); }
+    .btn-submit {
+      padding: 10px 22px; border-radius: 10px;
+      background: var(--navy); border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 700;
+      color: #fff; cursor: pointer; transition: all 0.18s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: var(--navy2); transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(15,33,83,0.2);
+    }
+    .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ══════════════════════════════════════
+       WORKSPACE STATE — card selector
+    ══════════════════════════════════════ */
+    #workspaceState {
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .ws-heading {
+      margin-bottom: 28px;
+    }
+    .ws-heading h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--navy); letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .ws-heading p { font-size: 0.875rem; color: var(--text2); }
+
+    .ws-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 560px;
+    }
+
+    .ws-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+      background: var(--surface);
+      text-decoration: none; color: inherit;
+    }
+    .ws-card:hover {
+      border-color: var(--green);
+      box-shadow: 0 6px 24px rgba(5,150,105,0.1);
+      transform: translateY(-1px);
+    }
+
+    .ws-card-icon {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      background: var(--green-bg); border: 1px solid rgba(5,150,105,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+
+    .ws-card-body { flex: 1; min-width: 0; }
+    .ws-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--navy);
+      letter-spacing: -0.01em; margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ws-card-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .ws-meta-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.75rem; color: var(--text3); font-weight: 500;
+    }
+    .ws-meta-chip .chip-dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--text3); flex-shrink: 0;
+    }
+    .ws-meta-chip:first-child .chip-dot { display: none; }
+
+    .ws-card-arrow {
+      color: var(--text3); font-size: 1rem; flex-shrink: 0;
+      transition: transform 0.18s, color 0.18s;
+    }
+    .ws-card:hover .ws-card-arrow {
+      transform: translateX(3px);
+      color: var(--green);
+    }
+
+    .ws-new-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; margin-top: 8px;
+      background: var(--surface2); border: 1.5px dashed var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: var(--text3); cursor: pointer; transition: all 0.18s;
+      max-width: 560px; width: 100%; justify-content: center;
+    }
+    .ws-new-btn:hover {
+      border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow);
+    }
+
+    /* ── TOAST ── */
+    .toast-wrap {
+      position: fixed; bottom: 24px; right: 24px;
+      display: flex; flex-direction: column; gap: 8px; z-index: 9999;
+    }
+    .toast {
+      padding: 11px 18px; border-radius: 11px;
+      font-size: 0.84rem; font-weight: 500; color: #fff;
+      box-shadow: 0 8px 24px rgba(15,33,83,0.16);
+      animation: fadeUp 0.22s ease; max-width: 300px;
+    }
+    .toast.success { background: #065f46; }
+    .toast.error   { background: #7f1d1d; }
+    .toast.info    { background: var(--navy2); }
+  </style>
+  <!-- Supabase CDN — harus load sebelum supabase.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+
+<!-- NAVBAR — shared component -->
+<div id="navbar-root"></div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- PAGE HEADER -->
+<div class="page-header" id="pageHeader">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Alliance</span>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current" id="breadcrumbLast">Workspace</span>
+  </nav>
+  <div class="page-header-inner">
+    <!-- Left: title -->
+    <div class="page-title-group">
+      <div class="page-icon">🏰</div>
+      <div>
+        <div class="page-title">Alliance Workspace</div>
+        <div class="page-subtitle">Coordinate your alliance — attacks, defense, rally points, and more.</div>
+      </div>
+    </div>
+    <!-- Right: workspace nav (hidden until workspace selected) -->
+    <nav class="ws-subnav" id="wsSubnav" style="display:none;">
+      <a class="ws-subnav-item active" data-page="overview"  href="#">Overview</a>
+      <a class="ws-subnav-item" data-page="troops"   href="#">Troops</a>
+      <a class="ws-subnav-item" data-page="attack"   href="#">Attack</a>
+      <a class="ws-subnav-item" data-page="defense"  href="#">Defense</a>
+      <a class="ws-subnav-item" data-page="artifacts" href="#">Artifacts</a>
+      <a class="ws-subnav-item" data-page="ww"       href="#">World Wonder</a>
+      <a class="ws-subnav-item ws-subnav-settings" data-page="settings" href="#" id="wsSettingsTab" style="display:none;">⚙️ Settings</a>
+    </nav>
+  </div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page-wrap">
+
+  <!-- STATE: Loading -->
+  <div id="loadingState">
+    <div class="spinner"></div>
+    <div class="loading-text">Checking your workspace…</div>
+  </div>
+
+  <!-- STATE: No workspace -->
+  <div id="emptyState">
+    <div class="empty-heading">
+      <h2>Your Alliance</h2>
+      <p>Join an existing workspace via invite link, or create your own if you're the alliance coordinator.</p>
+    </div>
+
+    <div class="join-banner">
+      <span>🔗</span>
+      <span>
+        Already have an invite link from your coordinator?
+        <a href="/alliance/join/">Join an existing workspace →</a>
+      </span>
+    </div>
+
+    <div class="choice-grid">
+      <!-- Create Alliance -->
+      <div class="choice-card create" id="createCard" onclick="showCreate()">
+        <div class="card-icon">🏰</div>
+        <div class="card-title">Create Alliance</div>
+        <div class="card-desc">
+          Set up a workspace for your alliance. You'll be the founder and can invite coordinators and members.
+        </div>
+        <span class="card-tag tag-pro">⚡ Pro Required</span>
+
+        <!-- Pro gate overlay -->
+        <div class="pro-lock" id="proLock">
+          <div class="pro-lock-icon">🔒</div>
+          <div class="pro-lock-text">Creating a workspace requires a Pro subscription.</div>
+          <a href="/upgrade/" class="pro-lock-cta">⚡ Upgrade to Pro</a>
+        </div>
+      </div>
+
+      <!-- Join via link -->
+      <a href="/alliance/join/" class="choice-card join">
+        <div class="card-icon">🔗</div>
+        <div class="card-title">Join via Invite Link</div>
+        <div class="card-desc">
+          Paste the invite link shared by your coordinator to join an existing workspace.
+        </div>
+        <span class="card-tag tag-free">✓ Free</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATE: Create form -->
+  <div id="createState">
+    <div class="form-topbar">
+      <button class="btn-back" onclick="showEmpty()" title="Back">←</button>
+      <div>
+        <div class="form-topbar-title">Create Alliance</div>
+        <div class="form-topbar-sub">Your workspace will be ready immediately after setup.</div>
+      </div>
+    </div>
+
+    <div class="form-card">
+
+      <!-- 1. Travian Server -->
+      <div class="field">
+        <label class="field-label" for="serverSelect">
+          Travian Server <span class="req">*</span>
+        </label>
+        <select class="field-select" id="serverSelect" onchange="onServerChange()">
+          <option value="">— Select server —</option>
+        </select>
+        <div class="field-hint">Only servers with available data are listed.</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- 2. Select Alliance (searchable) -->
+      <div class="field">
+        <label class="field-label">
+          Alliance <span class="req">*</span>
+        </label>
+        <div class="acct-dropdown" id="allianceDropdown">
+          <div class="acct-trigger is-disabled" id="allianceTrigger" onclick="toggleAlliance()">
+            <span id="allianceTriggerText">Select a server first</span>
+            <span class="acct-chevron" id="allianceChevron">▼</span>
+          </div>
+          <div class="acct-panel" id="alliancePanel">
+            <div class="acct-search-row">
+              <span class="acct-search-icon">🔍</span>
+              <input
+                type="text" class="acct-search-input" id="allianceSearch"
+                placeholder="Search alliance name…"
+                oninput="filterAlliances()" autocomplete="off"
+              />
+            </div>
+            <div class="acct-list" id="allianceList">
+              <div class="acct-status">
+                <div class="mini-spin"></div> Loading alliances…
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field-hint">Select your alliance on this server.</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- 3. Workspace Name / alias (auto-fill, editable) -->
+      <div class="field">
+        <label class="field-label" for="allianceName">
+          Workspace Name <span class="req">*</span>
+        </label>
+        <input
+          type="text" id="allianceName" class="field-input"
+          placeholder="Select an alliance first…"
+          maxlength="60" autocomplete="off"
+          oninput="validateForm()"
+          disabled
+        />
+        <div class="field-hint">Auto-filled from alliance name — you can rename it freely.</div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <!-- 4. Your Travian Account (searchable, member dari alliance) -->
+      <div class="field">
+        <label class="field-label">
+          Your Travian Account <span class="req">*</span>
+        </label>
+        <div class="acct-dropdown" id="acctDropdown">
+          <div class="acct-trigger is-disabled" id="acctTrigger" onclick="toggleAcct()">
+            <span id="acctTriggerText">Select an alliance first</span>
+            <span class="acct-chevron" id="acctChevron">▼</span>
+          </div>
+          <div class="acct-panel" id="acctPanel">
+            <div class="acct-search-row">
+              <span class="acct-search-icon">🔍</span>
+              <input
+                type="text" class="acct-search-input" id="acctSearch"
+                placeholder="Search player name…"
+                oninput="filterPlayers()" autocomplete="off"
+              />
+            </div>
+            <div class="acct-list" id="acctList">
+              <div class="acct-status">
+                <div class="mini-spin"></div> Loading players…
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field-hint">Your account will be linked to all workspace activity — troop input, rally point, etc.</div>
+      </div>
+
+      <!-- Actions -->
+      <div class="submit-row">
+        <button class="btn-cancel" onclick="showEmpty()">Cancel</button>
+        <button class="btn-submit" id="submitBtn" onclick="handleSubmit()" disabled>
+          🏰 Create Workspace
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STATE: Workspace selector -->
+  <div id="workspaceState">
+  </div>
+
+  <!-- STATE: Dashboard (after workspace selected) -->
+  <div id="dashboardState" style="display:none;">
+  </div>
+
+</div><!-- /.page-wrap -->
+
+<!-- LOAD ORDER: supabase.js → servers.js → navbar.js -->
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+
+<script>
+  // ─────────────────────────────────────────────
+  // CONFIG
+  // ─────────────────────────────────────────────
+  const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+
+  // ─────────────────────────────────────────────
+  // STATE
+  // ─────────────────────────────────────────────
+  let allAlliances      = [];
+  let selectedAlliance  = null;
+  let allianceOpen      = false;
+
+  let allPlayers        = [];
+  let selectedPlayer    = null;
+  let acctOpen          = false;
+
+  // ─────────────────────────────────────────────
+  // INIT
+  // ─────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Populate server dropdown dari SERVERS config (servers.js)
+    const sel = document.getElementById('serverSelect');
+    if (typeof SERVERS !== 'undefined') {
+      SERVERS.filter(s => s.active).forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.slug;
+        opt.dataset.server = s.server || s.slug.split('.')[0].replace('ts','ts');
+        opt.textContent = `${s.label} (${s.slug})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    // Auth + workspace check
+    await checkWorkspace();
   });
 
-  // Expose ke global supaya bisa diakses dari navbar.js dan halaman lain
-  window._supabase = client;
+  async function checkWorkspace() {
+    try {
+      await sleep(300);
 
-  // Helper: ambil session aktif
-  window.getSession = async function () {
-    const { data: { session } } = await client.auth.getSession();
-    return session;
-  };
+      const user = typeof window.getUser === 'function' ? await window.getUser() : null;
+      if (!user) {
+        window.location.href = '/login/?redirect=/alliance/workspace/';
+        return;
+      }
 
-  // Helper: ambil user aktif (null jika belum login)
-  window.getUser = async function () {
-    const session = await window.getSession();
-    return session ? session.user : null;
-  };
+      const db = window._supabase;
+      const { data, error } = await db
+        .from('workspace_members')
+        .select('role, player_name, workspaces(id, name, server, alliance_tag)')
+        .eq('user_id', user.id);
 
-  // Helper: cek apakah user Pro
-  // Konvensi: simpan role di user_metadata.role = 'pro'
-  window.isPro = async function () {
-    const user = await window.getUser();
-    if (!user) return false;
-    return user.user_metadata?.role === 'pro';
-  };
+      if (error) throw error;
 
-  // Helper: logout
-  window.signOut = async function () {
-    await client.auth.signOut();
-    window.location.href = '/';
-  };
+      if (data && data.length) {
+        const list = data.map(d => ({
+          id:           d.workspaces.id,
+          name:         d.workspaces.name,
+          server:       d.workspaces.server,
+          alliance_tag: d.workspaces.alliance_tag,
+          player_name:  d.player_name,
+          role:         d.role,
+        }));
+        showWorkspace(list);
+        return;
+      }
 
-})();
+      showEmpty();
+
+    } catch (e) {
+      console.error('checkWorkspace error:', e);
+      showEmpty();
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // VIEW SWITCHERS
+  // ─────────────────────────────────────────────
+  // current workspace data (set after create or fetch)
+  let currentWorkspace = null;
+
+  function showEmpty() {
+    hide('loadingState'); hide('createState'); hide('workspaceState'); show('emptyState');
+    resetForm();
+  }
+
+  function showCreate() {
+    hide('loadingState'); hide('emptyState'); hide('workspaceState'); show('createState');
+  }
+
+  let activeWsPage = 'overview';
+
+  function showWorkspace(ws) {
+    currentWorkspace = ws;
+    hide('loadingState'); hide('emptyState'); hide('createState'); hide('dashboardState');
+
+    const el = document.getElementById('workspaceState');
+    el.innerHTML = `
+      <div class="ws-heading">
+        <h2>Your Alliance</h2>
+        <p>Select a workspace to continue.</p>
+      </div>
+      <div class="ws-cards" id="wsCards"></div>
+      <button class="ws-new-btn" onclick="showEmpty()">+ Join another workspace</button>
+    `;
+
+    // Render cards — ws can be single object or array
+    const list = Array.isArray(ws) ? ws : [ws];
+    const cards = document.getElementById('wsCards');
+    list.forEach(w => {
+      const card = document.createElement('div');
+      card.className = 'ws-card';
+      card.innerHTML = `
+        <div class="ws-card-icon">🏰</div>
+        <div class="ws-card-body">
+          <div class="ws-card-name">${esc2(w.name)}</div>
+          <div class="ws-card-meta">
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${esc2(w.server)}</span>
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${esc2(w.player_name)}</span>
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${w.role === 'founder' || w.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member'}</span>
+          </div>
+        </div>
+        <div class="ws-card-arrow">›</div>
+      `;
+      card.addEventListener('click', () => enterWorkspace(w));
+      cards.appendChild(card);
+    });
+
+    show('workspaceState');
+    // Hide sub-nav while in selector
+    document.getElementById('wsSubnav').style.display = 'none';
+  }
+
+  function enterWorkspace(ws) {
+    currentWorkspace = ws;
+    hide('workspaceState');
+
+    // Show sub-nav
+    const subnav = document.getElementById('wsSubnav');
+    subnav.style.display = 'flex';
+
+    // Show settings tab for admin roles
+    const settingsTab = document.getElementById('wsSettingsTab');
+    if (ws.role === 'founder' || ws.role === 'coordinator') {
+      settingsTab.style.display = '';
+    } else {
+      settingsTab.style.display = 'none';
+    }
+
+    // Wire up sub-nav clicks
+    subnav.querySelectorAll('.ws-subnav-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        switchWsPage(item.dataset.page);
+      });
+    });
+
+    switchWsPage('overview');
+  }
+
+  function switchWsPage(page) {
+    activeWsPage = page;
+    // Update active tab
+    document.querySelectorAll('.ws-subnav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === page);
+    });
+    showDashboard(page);
+  }
+
+  function showDashboard(page) {
+    hide('workspaceState');
+    const el = document.getElementById('dashboardState');
+    el.style.display = 'block';
+
+    if (page === 'overview') renderOverview(el);
+    else {
+      el.innerHTML = `
+        <div style="padding:60px 0;text-align:center;color:var(--text3);">
+          <div style="font-size:2rem;margin-bottom:12px;">🚧</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px;">Coming Soon</div>
+          <div style="font-size:0.875rem;">This feature is under construction.</div>
+        </div>`;
+    }
+  }
+
+  function renderOverview(el) {
+    const ws = currentWorkspace;
+    const isAdmin = ws.role === 'founder' || ws.role === 'coordinator';
+
+    el.innerHTML = `
+      <div style="max-width:900px;">
+
+        <!-- Alliance + Player info row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+          <!-- Alliance card -->
+          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Alliance</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏰</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.name)}</div>
+                <div style="font-size:0.78rem;color:var(--text3);margin-top:2px;">${esc2(ws.server)}</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;" id="allianceStats">
+              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
+                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+                Loading alliance data…
+              </div>
+            </div>
+          </div>
+
+          <!-- Player card -->
+          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Your Account</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--navy2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0;">${esc2(ws.player_name).charAt(0).toUpperCase()}</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.player_name)}</div>
+                <div style="margin-top:3px;">
+                  <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:2px 9px;border-radius:20px;${isAdmin ? 'background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.2);' : 'background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.18);'}">
+                    ${ws.role === 'founder' ? '👑 Founder' : ws.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;" id="playerStats">
+              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
+                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+                Loading player data…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);margin-bottom:${isAdmin ? '16px' : '0'};">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:14px;">Quick Access</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+            ${[
+              { icon:'🪖', label:'Troop Summary', page:'troops', pro:true },
+              { icon:'🗡️', label:'Attack Plan',   page:'attack',   pro:true },
+              { icon:'🛡️', label:'Defense Plan',  page:'defense',  pro:true },
+              { icon:'🏺', label:'Artifact Tracker', page:'artifacts', pro:true },
+              { icon:'🌟', label:'World Wonder',  page:'ww',       pro:true },
+            ].map(item => `
+              <button onclick="switchWsPage('${item.page}')"
+                style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all 0.15s;text-align:left;font-family:'DM Sans',sans-serif;"
+                onmouseover="this.style.borderColor='var(--blue2)';this.style.background='var(--blue-glow)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+                <span style="font-size:1.3rem;">${item.icon}</span>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--navy);">${item.label}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Admin: Settings -->
+        ${isAdmin ? `
+        <div style="border:1px solid rgba(217,119,6,0.25);border-radius:14px;padding:20px 22px;background:var(--surface);">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--amber);margin-bottom:14px;">⚙️ Workspace Settings</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              🔗 Invite Members
+            </button>
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              👥 Manage Members
+            </button>
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              🔄 Regenerate Links
+            </button>
+          </div>
+        </div>` : ''}
+
+      </div>
+    `;
+
+    // Fetch alliance + player data
+    fetchOverviewData(ws);
+  }
+
+  async function fetchOverviewData(ws) {
+    const serverKey = ws.server.split('.')[0]; // ts5 from ts5.x1.asia
+    try {
+      const [allianceRes, playerRes] = await Promise.all([
+        fetch(`${API_BASE}/api/alliance?server=${serverKey}&name=${encodeURIComponent(ws.alliance_tag || ws.name)}`),
+        fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(ws.player_name)}`),
+      ]);
+      const [allianceData, playerData] = await Promise.all([allianceRes.json(), playerRes.json()]);
+
+      // Alliance stats
+      const a = allianceData.alliance || allianceData;
+      const allianceEl = document.getElementById('allianceStats');
+      if (allianceEl && a) {
+        allianceEl.innerHTML = [
+          { label: 'Rank',       value: a.rank       ? `#${a.rank}`                          : '—' },
+          { label: 'Population', value: a.population ? Number(a.population).toLocaleString() : '—' },
+          { label: 'Members',    value: a.member_count ?? a.members ?? '—' },
+        ].map(r => `
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
+            <span style="color:var(--text3);">${r.label}</span>
+            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
+          </div>
+        `).join('');
+      }
+
+      // Player stats
+      const p = playerData.player || playerData;
+      const playerEl = document.getElementById('playerStats');
+      if (playerEl && p) {
+        playerEl.innerHTML = [
+          { label: 'Population', value: p.population ? Number(p.population).toLocaleString() : '—' },
+          { label: 'Villages',   value: p.villages   ? (Array.isArray(p.villages) ? p.villages.length : p.villages) : '—' },
+          { label: 'Rank',       value: p.rank        ? `#${p.rank}`                          : '—' },
+        ].map(r => `
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
+            <span style="color:var(--text3);">${r.label}</span>
+            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
+          </div>
+        `).join('');
+      }
+
+    } catch(err) {
+      console.error('fetchOverviewData error:', err);
+    }
+  }
+
+  function esc2(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // ─────────────────────────────────────────────
+  // SERVER CHANGE → fetch alliances
+  // ─────────────────────────────────────────────
+  async function onServerChange() {
+    const sel  = document.getElementById('serverSelect');
+    const slug = sel.value;
+    const opt  = sel.options[sel.selectedIndex];
+
+    // Reset alliance & player
+    selectedAlliance = null; allAlliances = [];
+    selectedPlayer   = null; allPlayers   = [];
+    setDropTrigger('alliance', { text: 'Loading alliances…', disabled: false, hasValue: false });
+    setDropTrigger('acct',     { text: 'Select an alliance first', disabled: true, hasValue: false });
+    disableAliasInput(true);
+    validateForm();
+
+    if (!slug) {
+      setDropTrigger('alliance', { text: 'Select a server first', disabled: true });
+      return;
+    }
+
+    const serverKey = opt.dataset.server || slug.split('.')[0];
+
+    try {
+      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=alliances&page=1`);
+      const data = await res.json();
+
+      allAlliances = (data.rows || []).map(a => ({
+        id:         String(a.alliance_id  || ''),
+        name:       String(a.alliance_tag || ''),
+        members:    Number(a.member_count || 0),
+        serverKey,
+      }));
+
+      setDropTrigger('alliance', { text: 'Search your alliance…', disabled: false, hasValue: false });
+
+    } catch (err) {
+      console.error(err);
+      setDropTrigger('alliance', { text: 'Failed to load — try again', disabled: false });
+      toast('Could not load alliance list.', 'error');
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // ALLIANCE CHANGE → fetch members
+  // ─────────────────────────────────────────────
+  async function onAllianceSelect(id, name, serverKey) {
+    selectedAlliance = { id, name, serverKey };
+    setDropTrigger('alliance', { text: name, disabled: false, hasValue: true });
+    closeAlliance();
+
+    // Auto-fill alias
+    disableAliasInput(false);
+    const aliasInput = document.getElementById('allianceName');
+    aliasInput.value = name;
+    aliasInput.placeholder = name;
+
+    // Reset player
+    selectedPlayer = null; allPlayers = [];
+    setDropTrigger('acct', { text: 'Loading members…', disabled: false, hasValue: false });
+    validateForm();
+
+    try {
+      // Fetch alliance detail — includes members list
+      const res  = await fetch(`${API_BASE}/api/alliance?server=${serverKey}&name=${encodeURIComponent(name)}`);
+      const data = await res.json();
+
+      // data.members = array of players in this alliance
+      allPlayers = (data.members || []).map(p => ({
+        id:         String(p.player_id   || p.id   || ''),
+        name:       String(p.player_name || p.name || ''),
+        population: Number(p.population  || p.pop  || 0),
+      }));
+
+      setDropTrigger('acct', {
+        text:     allPlayers.length ? 'Search your account…' : 'No members found',
+        disabled: !allPlayers.length,
+        hasValue: false,
+      });
+
+    } catch (err) {
+      console.error(err);
+      setDropTrigger('acct', { text: 'Failed to load — try again', disabled: false });
+      toast('Could not load member list.', 'error');
+    }
+  }
+
+  function disableAliasInput(disabled) {
+    const el = document.getElementById('allianceName');
+    if (!el) return;
+    el.disabled = disabled;
+    if (disabled) { el.value = ''; el.placeholder = 'Select an alliance first…'; }
+  }
+
+  // ─────────────────────────────────────────────
+  // ALLIANCE DROPDOWN
+  // ─────────────────────────────────────────────
+  function toggleAlliance() {
+    const trigger = document.getElementById('allianceTrigger');
+    if (trigger.classList.contains('is-disabled')) return;
+    allianceOpen ? closeAlliance() : openAlliance();
+  }
+
+  function openAlliance() {
+    allianceOpen = true;
+    document.getElementById('alliancePanel').classList.add('is-open');
+    document.getElementById('allianceTrigger').classList.add('is-open');
+    document.getElementById('allianceChevron').classList.add('flipped');
+    renderAllianceList(allAlliances);
+    setTimeout(() => document.getElementById('allianceSearch').focus(), 40);
+  }
+
+  function closeAlliance() {
+    allianceOpen = false;
+    document.getElementById('alliancePanel').classList.remove('is-open');
+    document.getElementById('allianceTrigger').classList.remove('is-open');
+    document.getElementById('allianceChevron').classList.remove('flipped');
+    document.getElementById('allianceSearch').value = '';
+  }
+
+  function filterAlliances() {
+    const q = document.getElementById('allianceSearch').value.toLowerCase().trim();
+    const filtered = q ? allAlliances.filter(a => a.name.toLowerCase().includes(q)) : allAlliances;
+    renderAllianceList(filtered);
+  }
+
+  let renderedAlliances = [];
+
+  function renderAllianceList(alliances) {
+    const list = document.getElementById('allianceList');
+    if (!alliances.length) {
+      list.innerHTML = `<div class="acct-status">No alliances found</div>`;
+      renderedAlliances = [];
+      return;
+    }
+    renderedAlliances = alliances.slice(0, 200);
+    list.innerHTML = renderedAlliances.map((a, i) => `
+      <div class="acct-item ${selectedAlliance?.id === a.id ? 'active' : ''}"
+           data-aidx="${i}">
+        <span>${esc(a.name)}</span>
+        <span class="acct-item-pop">${a.members} members</span>
+      </div>
+    `).join('');
+    list.querySelectorAll('.acct-item[data-aidx]').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const a = renderedAlliances[parseInt(el.dataset.aidx)];
+        if (a) onAllianceSelect(a.id, a.name, a.serverKey);
+      });
+    });
+    if (alliances.length > 200) {
+      list.innerHTML += `<div class="acct-status" style="border-top:1px solid var(--border);font-size:0.74rem;">
+        Showing 200 of ${alliances.length} — type to narrow down
+      </div>`;
+    }
+  }
+
+  document.addEventListener('click', e => {
+    const ad = document.getElementById('allianceDropdown');
+    if (ad && !ad.contains(e.target)) closeAlliance();
+  });
+
+  // ─────────────────────────────────────────────
+  // PLAYER DROPDOWN
+  // ─────────────────────────────────────────────
+  function toggleAcct() {
+    const trigger = document.getElementById('acctTrigger');
+    if (trigger.classList.contains('is-disabled')) return;
+    acctOpen ? closeAcct() : openAcct();
+  }
+
+  function openAcct() {
+    acctOpen = true;
+    document.getElementById('acctPanel').classList.add('is-open');
+    document.getElementById('acctTrigger').classList.add('is-open');
+    document.getElementById('acctChevron').classList.add('flipped');
+    renderAcctList(allPlayers);
+    setTimeout(() => document.getElementById('acctSearch').focus(), 40);
+  }
+
+  function closeAcct() {
+    acctOpen = false;
+    document.getElementById('acctPanel').classList.remove('is-open');
+    document.getElementById('acctTrigger').classList.remove('is-open');
+    document.getElementById('acctChevron').classList.remove('flipped');
+    document.getElementById('acctSearch').value = '';
+  }
+
+  function filterPlayers() {
+    const q = document.getElementById('acctSearch').value.toLowerCase().trim();
+    const filtered = q ? allPlayers.filter(p => p.name.toLowerCase().includes(q)) : allPlayers;
+    renderAcctList(filtered);
+  }
+
+  let renderedPlayers = [];
+
+  function renderAcctList(players) {
+    const list = document.getElementById('acctList');
+    if (!players.length) {
+      list.innerHTML = '<div class="acct-status">No players found</div>';
+      renderedPlayers = [];
+      return;
+    }
+    renderedPlayers = players.slice(0, 200);
+    list.innerHTML = renderedPlayers.map((p, i) =>
+      `<div class="acct-item${p.id === selectedPlayer?.id ? ' active' : ''}" data-idx="${i}">` +
+      `<span>${p.name}</span>` +
+      `<span class="acct-item-pop">pop ${p.population.toLocaleString()}</span>` +
+      `</div>`
+    ).join('');
+    list.querySelectorAll('.acct-item[data-idx]').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const p = renderedPlayers[parseInt(el.dataset.idx)];
+        if (p) selectPlayer(p);
+      });
+    });
+    if (players.length > 200) {
+      const note = document.createElement('div');
+      note.className = 'acct-status';
+      note.style.cssText = 'border-top:1px solid var(--border);font-size:0.74rem;';
+      note.textContent = `Showing 200 of ${players.length} — type to narrow down`;
+      list.appendChild(note);
+    }
+  }
+
+  function selectPlayer(p) {
+    selectedPlayer = { id: p.id, name: p.name, population: p.population };
+    setDropTrigger('acct', { text: p.name, disabled: false, hasValue: true });
+    closeAcct();
+    validateForm();
+  }
+
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('acctDropdown');
+    if (dd && !dd.contains(e.target)) closeAcct();
+    // alliance outside click handled separately above
+  });
+
+  // ─────────────────────────────────────────────
+  // FORM VALIDATION
+  // ─────────────────────────────────────────────
+  function validateForm() {
+    const alias  = document.getElementById('allianceName')?.value?.trim();
+    const server = document.getElementById('serverSelect')?.value;
+    const ok     = !!(server && selectedAlliance && alias && selectedPlayer);
+    const btn    = document.getElementById('submitBtn');
+    if (btn) btn.disabled = !ok;
+  }
+
+  // ─────────────────────────────────────────────
+  // SUBMIT
+  // ─────────────────────────────────────────────
+  async function handleSubmit() {
+    const alias  = document.getElementById('allianceName').value.trim();
+    const slug   = document.getElementById('serverSelect').value;
+    if (!slug || !selectedAlliance || !alias || !selectedPlayer) return;
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="mini-spin" style="width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;"></div> Creating…';
+
+    try {
+      // TODO: insert ke Supabase
+      // const user = await window.getUser();
+      // const { data, error } = await window._supabase.from('workspaces').insert({
+      //   name:                  alias,
+      //   server:                slug,
+      //   alliance_id:           selectedAlliance.id,
+      //   alliance_name:         selectedAlliance.name,
+      //   founder_id:            user.id,
+      //   travian_player_id:     selectedPlayer.id,
+      //   travian_player_name:   selectedPlayer.name,
+      // }).select().single();
+      // if (error) throw error;
+
+      await sleep(1100);
+      const user = await window.getUser();
+      const db   = window._supabase;
+
+      // 1. Insert workspace
+      const { data: wsData, error: wsError } = await db
+        .from('workspaces')
+        .insert({
+          name:         alias,
+          server:       slug,
+          alliance_tag: selectedAlliance.name,
+          founder_id:   user.id,
+        })
+        .select('id')
+        .single();
+
+      if (wsError) throw wsError;
+
+      // 2. Insert founder as member
+      const { error: memberError } = await db
+        .from('workspace_members')
+        .insert({
+          workspace_id: wsData.id,
+          user_id:      user.id,
+          role:         'founder',
+          player_name:  selectedPlayer.name,
+        });
+
+      if (memberError) throw memberError;
+
+      const newWs = {
+        id:           wsData.id,
+        name:         alias,
+        server:       slug,
+        alliance_tag: selectedAlliance.name,
+        player_name:  selectedPlayer.name,
+        role:         'founder',
+      };
+
+      toast('🏰 Alliance workspace created!', 'success');
+      showWorkspace([newWs]);
+      resetForm();
+
+    } catch (err) {
+      console.error(err);
+      toast('Something went wrong. Please try again.', 'error');
+      btn.disabled = false;
+      btn.innerHTML = '🏰 Create Workspace';
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // HELPERS
+  // ─────────────────────────────────────────────
+  // generic trigger setter — type: 'alliance' | 'acct'
+  function setDropTrigger(type, { text, disabled, hasValue }) {
+    const ids = {
+      alliance: { trigger: 'allianceTrigger', span: 'allianceTriggerText' },
+      acct:     { trigger: 'acctTrigger',     span: 'acctTriggerText'     },
+    };
+    const { trigger: tId, span: sId } = ids[type] || {};
+    const trigger = document.getElementById(tId);
+    const span    = document.getElementById(sId);
+    if (!trigger || !span) return;
+    span.textContent = text;
+    trigger.classList.toggle('is-disabled', !!disabled);
+    trigger.classList.toggle('has-value',   !!hasValue);
+  }
+
+  function resetForm() {
+    const s = document.getElementById('serverSelect');
+    if (s) s.value = '';
+    selectedAlliance = null; allAlliances = [];
+    selectedPlayer   = null; allPlayers   = [];
+    setDropTrigger('alliance', { text: 'Select a server first', disabled: true,  hasValue: false });
+    setDropTrigger('acct',     { text: 'Select an alliance first', disabled: true, hasValue: false });
+    disableAliasInput(true);
+    const btn = document.getElementById('submitBtn');
+    if (btn) { btn.disabled = true; btn.innerHTML = '🏰 Create Workspace'; }
+  }
+
+  function show(id) { const el = document.getElementById(id); if (el) el.style.display = 'block'; }
+  function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function esc(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+      .replace(/'/g,'&#39;');
+  }
+
+  function toast(msg, type = 'info') {
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+</script>
+
+</body>
+</html>
