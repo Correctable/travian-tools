@@ -532,6 +532,8 @@
     .toast.error   { background: #7f1d1d; }
     .toast.info    { background: var(--navy2); }
   </style>
+  <!-- Supabase CDN — harus load sebelum supabase.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -749,8 +751,7 @@
 
 </div><!-- /.page-wrap -->
 
-<!-- LOAD ORDER: supabase cdn → supabase.js → servers.js → navbar.js -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- LOAD ORDER: supabase.js → servers.js → navbar.js -->
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
