@@ -103,8 +103,7 @@
 
     // Menu login-only — dirender oleh updateAuthState()
     myStuffItems: [
-      { icon: '📝', title: 'Intelligence',           desc: 'Your personal data',         badge: 'FREE', href: '/account/intelligence/'     },
-      { icon: '👁',  title: 'Watchlist',       desc: 'Track players & alliances',          badge: 'PRO',  href: '/account/watchlist/' },
+      { icon: '👁', title: 'Intelligence',           desc: 'Your personal data',         badge: 'FREE', href: '/account/intelligence/'     },
       { icon: '⚔️', title: 'Battle Reports',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/saved-reports/'   },
     ],
 
