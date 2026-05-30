@@ -794,7 +794,6 @@
 
   async function checkWorkspace() {
     try {
-      // Tunggu supabase.js siap (navbar.js juga async init)
       await sleep(300);
 
       const user = typeof window.getUser === 'function' ? await window.getUser() : null;
@@ -803,28 +802,32 @@
         return;
       }
 
-      // TODO: query Supabase — check if user is member of any workspace
-      // const { data } = await window._supabase
-      //   .from('workspace_members')
-      //   .select('role, workspaces(id, name, server, travian_player_name)')
-      //   .eq('user_id', user.id)
-      //   .maybeSingle();
-      // if (data) {
-      //   showWorkspace({
-      //     id:          data.workspaces.id,
-      //     name:        data.workspaces.name,
-      //     server:      data.workspaces.server,
-      //     player_name: data.workspaces.travian_player_name,
-      //     role:        data.role,
-      //   });
-      //   return;
-      // }
+      const db = window._supabase;
+      const { data, error } = await db
+        .from('workspace_members')
+        .select('role, player_name, workspaces(id, name, server, alliance_tag)')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      if (data && data.length) {
+        const list = data.map(d => ({
+          id:           d.workspaces.id,
+          name:         d.workspaces.name,
+          server:       d.workspaces.server,
+          alliance_tag: d.workspaces.alliance_tag,
+          player_name:  d.player_name,
+          role:         d.role,
+        }));
+        showWorkspace(list);
+        return;
+      }
 
       showEmpty();
 
     } catch (e) {
       console.error('checkWorkspace error:', e);
-      showEmpty(); // selalu tampilkan sesuatu
+      showEmpty();
     }
   }
 
@@ -1368,16 +1371,46 @@
       // if (error) throw error;
 
       await sleep(1100);
-      toast('🏰 Alliance workspace created!', 'success');
+      const user = await window.getUser();
+      const db   = window._supabase;
 
-      // Show workspace card immediately
-      showWorkspace({
-        id:          'ws-' + Math.random().toString(36).slice(2,10),
-        name:        alias,
-        server:      slug,
-        player_name: selectedPlayer.name,
-        role:        'founder',
-      });
+      // 1. Insert workspace
+      const { data: wsData, error: wsError } = await db
+        .from('workspaces')
+        .insert({
+          name:         alias,
+          server:       slug,
+          alliance_tag: selectedAlliance.name,
+          founder_id:   user.id,
+        })
+        .select('id')
+        .single();
+
+      if (wsError) throw wsError;
+
+      // 2. Insert founder as member
+      const { error: memberError } = await db
+        .from('workspace_members')
+        .insert({
+          workspace_id: wsData.id,
+          user_id:      user.id,
+          role:         'founder',
+          player_name:  selectedPlayer.name,
+        });
+
+      if (memberError) throw memberError;
+
+      const newWs = {
+        id:           wsData.id,
+        name:         alias,
+        server:       slug,
+        alliance_tag: selectedAlliance.name,
+        player_name:  selectedPlayer.name,
+        role:         'founder',
+      };
+
+      toast('🏰 Alliance workspace created!', 'success');
+      showWorkspace([newWs]);
       resetForm();
 
     } catch (err) {
