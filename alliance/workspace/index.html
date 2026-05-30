@@ -84,6 +84,44 @@
     .page-badge.pro      { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
     .page-badge.login    { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
 
+    /* ── WORKSPACE SUB-NAV ── */
+    .ws-subnav {
+      display: flex; align-items: center;
+      gap: 2px; flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .ws-subnav-item {
+      padding: 7px 13px; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 600;
+      color: var(--text3); text-decoration: none;
+      transition: all 0.15s; white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .ws-subnav-item:hover {
+      color: var(--navy); background: var(--surface2);
+    }
+    .ws-subnav-item.active {
+      color: var(--green); background: var(--green-bg);
+      border-color: rgba(5,150,105,0.2);
+    }
+    .ws-subnav-settings {
+      color: var(--text2) !important;
+      border-color: var(--border) !important;
+      background: var(--surface2) !important;
+      margin-left: 6px;
+    }
+    .ws-subnav-settings:hover {
+      border-color: var(--amber) !important;
+      color: var(--amber) !important;
+      background: var(--amber-bg) !important;
+    }
+
+    /* responsive — stack sub-nav below title on small screens */
+    @media (max-width: 860px) {
+      .page-header-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .ws-subnav { justify-content: flex-start; }
+    }
+
     /* ── PAGE WRAP ── */
     .page-wrap {
       position: relative; z-index: 1;
@@ -391,6 +429,94 @@
     }
     .btn-submit:disabled { opacity: 0.45; cursor: not-allowed; }
 
+    /* ══════════════════════════════════════
+       WORKSPACE STATE — card selector
+    ══════════════════════════════════════ */
+    #workspaceState {
+      display: none;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .ws-heading {
+      margin-bottom: 28px;
+    }
+    .ws-heading h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem; font-weight: 700;
+      color: var(--navy); letter-spacing: -0.02em; margin-bottom: 4px;
+    }
+    .ws-heading p { font-size: 0.875rem; color: var(--text2); }
+
+    .ws-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 560px;
+    }
+
+    .ws-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: flex; align-items: center; gap: 16px;
+      cursor: pointer;
+      transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+      background: var(--surface);
+      text-decoration: none; color: inherit;
+    }
+    .ws-card:hover {
+      border-color: var(--green);
+      box-shadow: 0 6px 24px rgba(5,150,105,0.1);
+      transform: translateY(-1px);
+    }
+
+    .ws-card-icon {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      background: var(--green-bg); border: 1px solid rgba(5,150,105,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+
+    .ws-card-body { flex: 1; min-width: 0; }
+    .ws-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--navy);
+      letter-spacing: -0.01em; margin-bottom: 4px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .ws-card-meta {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .ws-meta-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.75rem; color: var(--text3); font-weight: 500;
+    }
+    .ws-meta-chip .chip-dot {
+      width: 3px; height: 3px; border-radius: 50%;
+      background: var(--text3); flex-shrink: 0;
+    }
+    .ws-meta-chip:first-child .chip-dot { display: none; }
+
+    .ws-card-arrow {
+      color: var(--text3); font-size: 1rem; flex-shrink: 0;
+      transition: transform 0.18s, color 0.18s;
+    }
+    .ws-card:hover .ws-card-arrow {
+      transform: translateX(3px);
+      color: var(--green);
+    }
+
+    .ws-new-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 18px; border-radius: 10px; margin-top: 8px;
+      background: var(--surface2); border: 1.5px dashed var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: var(--text3); cursor: pointer; transition: all 0.18s;
+      max-width: 560px; width: 100%; justify-content: center;
+    }
+    .ws-new-btn:hover {
+      border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow);
+    }
+
     /* ── TOAST ── */
     .toast-wrap {
       position: fixed; bottom: 24px; right: 24px;
@@ -415,16 +541,17 @@
 <!-- TOAST -->
 <div class="toast-wrap" id="toastWrap"></div>
 
-<!-- PAGE HEADER (canonical pattern) -->
-<div class="page-header">
+<!-- PAGE HEADER -->
+<div class="page-header" id="pageHeader">
   <nav class="breadcrumb">
     <a href="/">Home</a>
     <span class="breadcrumb-sep">›</span>
     <span class="breadcrumb-current">Alliance</span>
     <span class="breadcrumb-sep">›</span>
-    <span class="breadcrumb-current">Workspace</span>
+    <span class="breadcrumb-current" id="breadcrumbLast">Workspace</span>
   </nav>
   <div class="page-header-inner">
+    <!-- Left: title -->
     <div class="page-title-group">
       <div class="page-icon">🏰</div>
       <div>
@@ -432,10 +559,16 @@
         <div class="page-subtitle">Coordinate your alliance — attacks, defense, rally points, and more.</div>
       </div>
     </div>
-    <div class="page-badges">
-      <span class="page-badge pro">PRO</span>
-      <span class="page-badge login">Login required</span>
-    </div>
+    <!-- Right: workspace nav (hidden until workspace selected) -->
+    <nav class="ws-subnav" id="wsSubnav" style="display:none;">
+      <a class="ws-subnav-item active" data-page="overview"  href="#">Overview</a>
+      <a class="ws-subnav-item" data-page="troops"   href="#">Troops</a>
+      <a class="ws-subnav-item" data-page="attack"   href="#">Attack</a>
+      <a class="ws-subnav-item" data-page="defense"  href="#">Defense</a>
+      <a class="ws-subnav-item" data-page="artifacts" href="#">Artifacts</a>
+      <a class="ws-subnav-item" data-page="ww"       href="#">World Wonder</a>
+      <a class="ws-subnav-item ws-subnav-settings" data-page="settings" href="#" id="wsSettingsTab" style="display:none;">⚙️ Settings</a>
+    </nav>
   </div>
 </div>
 
@@ -606,6 +739,14 @@
     </div>
   </div>
 
+  <!-- STATE: Workspace selector -->
+  <div id="workspaceState">
+  </div>
+
+  <!-- STATE: Dashboard (after workspace selected) -->
+  <div id="dashboardState" style="display:none;">
+  </div>
+
 </div><!-- /.page-wrap -->
 
 <!-- LOAD ORDER: supabase cdn → supabase.js → servers.js → navbar.js -->
@@ -662,13 +803,22 @@
         return;
       }
 
-      // TODO: query Supabase workspaces table
+      // TODO: query Supabase — check if user is member of any workspace
       // const { data } = await window._supabase
-      //   .from('workspaces')
-      //   .select('id')
-      //   .eq('founder_id', user.id)
+      //   .from('workspace_members')
+      //   .select('role, workspaces(id, name, server, travian_player_name)')
+      //   .eq('user_id', user.id)
       //   .maybeSingle();
-      // if (data) { window.location.href = '/alliance/workspace/dashboard/'; return; }
+      // if (data) {
+      //   showWorkspace({
+      //     id:          data.workspaces.id,
+      //     name:        data.workspaces.name,
+      //     server:      data.workspaces.server,
+      //     player_name: data.workspaces.travian_player_name,
+      //     role:        data.role,
+      //   });
+      //   return;
+      // }
 
       showEmpty();
 
@@ -681,26 +831,264 @@
   // ─────────────────────────────────────────────
   // VIEW SWITCHERS
   // ─────────────────────────────────────────────
+  // current workspace data (set after create or fetch)
+  let currentWorkspace = null;
+
   function showEmpty() {
-    hide('loadingState'); hide('createState'); show('emptyState');
-
-    // Pro gate
-    const isPro = typeof window.isPro === 'function'
-      ? window.isPro()   // async — handle below
-      : true;            // mock: assume Pro for preview
-
-    // For async isPro:
-    // isPro.then(pro => { if (!pro) document.getElementById('proLock').classList.add('show'); });
-    // For mock:
-    // document.getElementById('proLock').classList.remove('show');
-
+    hide('loadingState'); hide('createState'); hide('workspaceState'); show('emptyState');
     resetForm();
   }
 
   function showCreate() {
-    // Pro check
-    // const pro = await window.isPro(); if (!pro) return;
-    hide('loadingState'); hide('emptyState'); show('createState');
+    hide('loadingState'); hide('emptyState'); hide('workspaceState'); show('createState');
+  }
+
+  let activeWsPage = 'overview';
+
+  function showWorkspace(ws) {
+    currentWorkspace = ws;
+    hide('loadingState'); hide('emptyState'); hide('createState'); hide('dashboardState');
+
+    const el = document.getElementById('workspaceState');
+    el.innerHTML = `
+      <div class="ws-heading">
+        <h2>Your Alliance</h2>
+        <p>Select a workspace to continue.</p>
+      </div>
+      <div class="ws-cards" id="wsCards"></div>
+      <button class="ws-new-btn" onclick="showEmpty()">+ Join another workspace</button>
+    `;
+
+    // Render cards — ws can be single object or array
+    const list = Array.isArray(ws) ? ws : [ws];
+    const cards = document.getElementById('wsCards');
+    list.forEach(w => {
+      const card = document.createElement('div');
+      card.className = 'ws-card';
+      card.innerHTML = `
+        <div class="ws-card-icon">🏰</div>
+        <div class="ws-card-body">
+          <div class="ws-card-name">${esc2(w.name)}</div>
+          <div class="ws-card-meta">
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${esc2(w.server)}</span>
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${esc2(w.player_name)}</span>
+            <span class="ws-meta-chip"><span class="chip-dot"></span>${w.role === 'founder' || w.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member'}</span>
+          </div>
+        </div>
+        <div class="ws-card-arrow">›</div>
+      `;
+      card.addEventListener('click', () => enterWorkspace(w));
+      cards.appendChild(card);
+    });
+
+    show('workspaceState');
+    // Hide sub-nav while in selector
+    document.getElementById('wsSubnav').style.display = 'none';
+  }
+
+  function enterWorkspace(ws) {
+    currentWorkspace = ws;
+    hide('workspaceState');
+
+    // Show sub-nav
+    const subnav = document.getElementById('wsSubnav');
+    subnav.style.display = 'flex';
+
+    // Show settings tab for admin roles
+    const settingsTab = document.getElementById('wsSettingsTab');
+    if (ws.role === 'founder' || ws.role === 'coordinator') {
+      settingsTab.style.display = '';
+    } else {
+      settingsTab.style.display = 'none';
+    }
+
+    // Wire up sub-nav clicks
+    subnav.querySelectorAll('.ws-subnav-item').forEach(item => {
+      item.addEventListener('click', e => {
+        e.preventDefault();
+        switchWsPage(item.dataset.page);
+      });
+    });
+
+    switchWsPage('overview');
+  }
+
+  function switchWsPage(page) {
+    activeWsPage = page;
+    // Update active tab
+    document.querySelectorAll('.ws-subnav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.page === page);
+    });
+    showDashboard(page);
+  }
+
+  function showDashboard(page) {
+    hide('workspaceState');
+    const el = document.getElementById('dashboardState');
+    el.style.display = 'block';
+
+    if (page === 'overview') renderOverview(el);
+    else {
+      el.innerHTML = `
+        <div style="padding:60px 0;text-align:center;color:var(--text3);">
+          <div style="font-size:2rem;margin-bottom:12px;">🚧</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:6px;">Coming Soon</div>
+          <div style="font-size:0.875rem;">This feature is under construction.</div>
+        </div>`;
+    }
+  }
+
+  function renderOverview(el) {
+    const ws = currentWorkspace;
+    const isAdmin = ws.role === 'founder' || ws.role === 'coordinator';
+
+    el.innerHTML = `
+      <div style="max-width:900px;">
+
+        <!-- Alliance + Player info row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+          <!-- Alliance card -->
+          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Alliance</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:42px;height:42px;border-radius:11px;background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏰</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.name)}</div>
+                <div style="font-size:0.78rem;color:var(--text3);margin-top:2px;">${esc2(ws.server)}</div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;" id="allianceStats">
+              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
+                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+                Loading alliance data…
+              </div>
+            </div>
+          </div>
+
+          <!-- Player card -->
+          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
+            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Your Account</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--navy2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0;">${esc2(ws.player_name).charAt(0).toUpperCase()}</div>
+              <div>
+                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.player_name)}</div>
+                <div style="margin-top:3px;">
+                  <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:2px 9px;border-radius:20px;${isAdmin ? 'background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.2);' : 'background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.18);'}">
+                    ${ws.role === 'founder' ? '👑 Founder' : ws.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member'}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;" id="playerStats">
+              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
+                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
+                Loading player data…
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);margin-bottom:${isAdmin ? '16px' : '0'};">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:14px;">Quick Access</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
+            ${[
+              { icon:'🪖', label:'Troop Summary', page:'troops', pro:true },
+              { icon:'🗡️', label:'Attack Plan',   page:'attack',   pro:true },
+              { icon:'🛡️', label:'Defense Plan',  page:'defense',  pro:true },
+              { icon:'🏺', label:'Artifact Tracker', page:'artifacts', pro:true },
+              { icon:'🌟', label:'World Wonder',  page:'ww',       pro:true },
+            ].map(item => `
+              <button onclick="switchWsPage('${item.page}')"
+                style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all 0.15s;text-align:left;font-family:'DM Sans',sans-serif;"
+                onmouseover="this.style.borderColor='var(--blue2)';this.style.background='var(--blue-glow)'"
+                onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+                <span style="font-size:1.3rem;">${item.icon}</span>
+                <span style="font-size:0.82rem;font-weight:600;color:var(--navy);">${item.label}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Admin: Settings -->
+        ${isAdmin ? `
+        <div style="border:1px solid rgba(217,119,6,0.25);border-radius:14px;padding:20px 22px;background:var(--surface);">
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--amber);margin-bottom:14px;">⚙️ Workspace Settings</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              🔗 Invite Members
+            </button>
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              👥 Manage Members
+            </button>
+            <button onclick="switchWsPage('settings')" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
+              onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
+              onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
+              🔄 Regenerate Links
+            </button>
+          </div>
+        </div>` : ''}
+
+      </div>
+    `;
+
+    // Fetch alliance + player data
+    fetchOverviewData(ws);
+  }
+
+  async function fetchOverviewData(ws) {
+    const serverKey = ws.server.split('.')[0]; // ts5 from ts5.x1.asia
+    try {
+      const [allianceRes, playerRes] = await Promise.all([
+        fetch(`${API_BASE}/api/alliance?server=${serverKey}&name=${encodeURIComponent(ws.alliance_tag || ws.name)}`),
+        fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(ws.player_name)}`),
+      ]);
+      const [allianceData, playerData] = await Promise.all([allianceRes.json(), playerRes.json()]);
+
+      // Alliance stats
+      const a = allianceData.alliance || allianceData;
+      const allianceEl = document.getElementById('allianceStats');
+      if (allianceEl && a) {
+        allianceEl.innerHTML = [
+          { label: 'Rank',       value: a.rank       ? `#${a.rank}`                          : '—' },
+          { label: 'Population', value: a.population ? Number(a.population).toLocaleString() : '—' },
+          { label: 'Members',    value: a.member_count ?? a.members ?? '—' },
+        ].map(r => `
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
+            <span style="color:var(--text3);">${r.label}</span>
+            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
+          </div>
+        `).join('');
+      }
+
+      // Player stats
+      const p = playerData.player || playerData;
+      const playerEl = document.getElementById('playerStats');
+      if (playerEl && p) {
+        playerEl.innerHTML = [
+          { label: 'Population', value: p.population ? Number(p.population).toLocaleString() : '—' },
+          { label: 'Villages',   value: p.villages   ? (Array.isArray(p.villages) ? p.villages.length : p.villages) : '—' },
+          { label: 'Rank',       value: p.rank        ? `#${p.rank}`                          : '—' },
+        ].map(r => `
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
+            <span style="color:var(--text3);">${r.label}</span>
+            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
+          </div>
+        `).join('');
+      }
+
+    } catch(err) {
+      console.error('fetchOverviewData error:', err);
+    }
+  }
+
+  function esc2(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
   // ─────────────────────────────────────────────
@@ -981,10 +1369,16 @@
 
       await sleep(1100);
       toast('🏰 Alliance workspace created!', 'success');
-      setTimeout(() => {
-        // window.location.href = '/alliance/workspace/dashboard/';
-        toast('Redirecting to dashboard…', 'info');
-      }, 1000);
+
+      // Show workspace card immediately
+      showWorkspace({
+        id:          'ws-' + Math.random().toString(36).slice(2,10),
+        name:        alias,
+        server:      slug,
+        player_name: selectedPlayer.name,
+        role:        'founder',
+      });
+      resetForm();
 
     } catch (err) {
       console.error(err);
