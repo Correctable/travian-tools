@@ -483,8 +483,15 @@
 
 <div class="page-wrap">
 
+  <!-- Default state -->
+  <div id="default-state" style="text-align:center;padding:64px 20px;">
+    <div style="font-size:2rem;margin-bottom:12px">🌿</div>
+    <h3 style="font-family:'Space Grotesk',sans-serif;color:var(--navy);margin-bottom:6px">Enter your coordinates</h3>
+    <p style="font-size:0.875rem;color:var(--text3)">Input your village coordinates and click Search to find nearby oases.</p>
+  </div>
+
   <!-- Loading -->
-  <div id="loading-state">
+  <div id="loading-state" style="display:none">
     <div class="spinner"></div>
     <p>Loading oasis database…</p>
   </div>
@@ -527,6 +534,14 @@
         <option value="25">+25% and above</option>
         <option value="50">+50% only</option>
       </select>
+    </div>
+    <div class="control-card" style="display:flex;align-items:flex-end">
+      <button id="search-btn" onclick="doSearch()" style="
+        height:38px;padding:0 24px;border-radius:8px;border:none;
+        background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;
+        font-size:0.875rem;font-weight:600;cursor:pointer;width:100%;
+        transition:background 0.18s;
+      ">Search</button>
     </div>
   </div>
 
@@ -821,15 +836,27 @@
   }
 
   // ── LOAD DATABASE ─────────────────────────────────────────────────
-  async function loadDatabase(server) {
-    document.getElementById('loading-state').style.display = 'block';
-    document.getElementById('error-state').style.display   = 'none';
-    document.getElementById('controls').style.display      = 'none';
-    document.getElementById('stats-bar').style.display     = 'none';
-    document.getElementById('table-section').style.display = 'none';
+  async function doSearch() {
+    const btn = document.getElementById('search-btn');
+    btn.textContent = 'Searching…'; btn.disabled = true;
+    loadDatabase();
+  }
+
+  async function loadDatabase() {
+    const serverSel = document.getElementById('serverSel');
+    const server    = serverSel ? serverSel.value : 'ts5';
+    const cx        = document.getElementById('cx').value;
+    const cy        = document.getElementById('cy').value;
+    const radius    = document.getElementById('radius').value || 30;
+
+    document.getElementById('default-state').style.display  = 'none';
+    document.getElementById('loading-state').style.display  = 'block';
+    document.getElementById('error-state').style.display    = 'none';
+    document.getElementById('stats-bar').style.display      = 'none';
+    document.getElementById('table-section').style.display  = 'none';
 
     try {
-      const data = await apiGet('oasis', { server, page: 1 });
+      const data = await apiGet('oasis', { server, cx, cy, radius });
       const rows = data.rows || [];
 
       const total = data.total || rows.length;
@@ -860,16 +887,20 @@
       document.getElementById('stat-total').textContent = isCapped
         ? `${allOases.length.toLocaleString()} (preview of ${total.toLocaleString()})`
         : allOases.length.toLocaleString();
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('controls').style.display    = 'grid';
-      document.getElementById('stats-bar').style.display   = 'flex';
-      document.getElementById('table-section').style.display = 'block';
+      document.getElementById('loading-state').style.display  = 'none';
+      document.getElementById('controls').style.display       = 'grid';
+      document.getElementById('stats-bar').style.display      = 'flex';
+      document.getElementById('table-section').style.display  = 'block';
+      const btn = document.getElementById('search-btn');
+      if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
 
       applyFilters();
     } catch (err) {
       console.error(err);
       document.getElementById('loading-state').style.display = 'none';
       document.getElementById('error-state').style.display   = 'block';
+      const btn = document.getElementById('search-btn');
+      if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
     }
   }
 
@@ -1033,15 +1064,22 @@
     window.scrollTo({ top: document.getElementById('table-section').offsetTop - 20, behavior: 'smooth' });
   }
 
-  // ── LIVE FILTER ───────────────────────────────────────────────────
-  ['cx', 'cy', 'radius', 'min-bonus'].forEach(id => {
+  // ── LIVE FILTER (min-bonus and res only — no auto re-fetch) ─────────
+  ['min-bonus'].forEach(id => {
     const el = document.getElementById(id);
-    el.addEventListener('input',  () => { currentPage = 1; applyFilters(); });
-    el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+    if (el) {
+      el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
+    }
   });
 
-  // ── INIT ──────────────────────────────────────────────────────────
-  loadDatabase('ts5.x1.asia.travian.com');
+  // Enter key on coords triggers search
+  ['cx','cy','radius'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  });
+
+  // ── INIT — show default state, wait for user input ─────────────────
+  document.getElementById('controls').style.display = 'grid';
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
