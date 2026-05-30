@@ -34,6 +34,12 @@ const LIMITS = {
 // ── VALID SERVERS ─────────────────────────────────────────────────────────────
 const VALID_SERVERS = ['ts5', 'ts1'];
 
+// Server slug → full server string used in oases/village_tiles tables
+const OASIS_SERVER = {
+  'ts5': 'ts5.x1.asia.travian.com',
+  'ts1': 'ts1.x1.asia.travian.com',
+};
+
 // ── MAIN HANDLER ──────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
@@ -320,14 +326,15 @@ async function handleInactive(params, env) {
 
 // ── OASIS DATA ────────────────────────────────────────────────────────────────
 async function handleOasis(params, env) {
-  const server  = validateServer(params.get('server'));
-  const page    = Math.max(1, parseInt(params.get('page') || '1'));
-  const sort    = params.get('sort') || 'max_bonus';
-  const type    = params.get('type') || 'all';
-  const limit   = LIMITS.oasis;
-  const offset  = (page - 1) * limit;
+  const server      = validateServer(params.get('server'));
+  const serverOasis = OASIS_SERVER[server]; // e.g. 'ts5.x1.asia.travian.com'
+  const page        = Math.max(1, parseInt(params.get('page') || '1'));
+  const sort        = params.get('sort') || 'max_bonus';
+  const type        = params.get('type') || 'all';
+  const limit       = LIMITS.oasis;
+  const offset      = (page - 1) * limit;
 
-  if (!server) return jsonError('Invalid server', 400);
+  if (!server || !serverOasis) return jsonError('Invalid server', 400);
 
   const validSorts = ['max_bonus', 'x', 'y'];
   const sortCol = validSorts.includes(sort) ? sort : 'max_bonus';
@@ -341,12 +348,12 @@ async function handleOasis(params, env) {
     WHERE server=? ${typeFilter}
     ORDER BY ${sortCol} DESC
     LIMIT ? OFFSET ?
-  `, [server, ...typeArgs, limit, offset]);
+  `, [serverOasis, ...typeArgs, limit, offset]);
 
   // Get total count for pagination info
   const countRows = await turso(env,
     `SELECT COUNT(*) as total FROM oases WHERE server=? ${typeFilter}`,
-    [server, ...typeArgs]
+    [serverOasis, ...typeArgs]
   );
   const total = Number(countRows[0]?.total || 0);
 
@@ -379,7 +386,7 @@ async function handleVillages(params, env) {
   const cropPlaceholders = crops.map(() => '?').join(',');
 
   // Server for tiles uses different slug format
-  const serverTiles = server + '.x1.asia';
+  const serverTiles = OASIS_SERVER[server] || (server + '.x1.asia.travian.com');
 
   const [tiles, villages, oases] = await Promise.all([
     turso(env, `
