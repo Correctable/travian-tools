@@ -365,9 +365,7 @@
         <div class="page-subtitle">Track and share your troops with the alliance.</div>
       </div>
     </div>
-    <div class="page-actions" id="pageActions" style="display:none;">
-      <button class="btn btn-amber" onclick="openModal()">📋 Paste / Edit Troops</button>
-    </div>
+    <div class="page-actions" id="pageActions" style="display:none;"></div>
   </div>
 </div>
 
@@ -411,7 +409,8 @@
           <span class="last-updated" id="lastUpdated"></span>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Update</button>
+          <button class="btn btn-sm btn-secondary" onclick="openModal('manual')">✏️ Edit Village</button>
+          <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Paste Travian Plus</button>
         </div>
       </div>
       <div class="section-body">
@@ -467,15 +466,16 @@
     document.getElementById('wsServer').textContent = ws.server;
     document.getElementById('wsRole').textContent   = ws.role === 'founder' ? '👑 Founder' : ws.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member';
 
-    // Fetch villages from API
+    // Fetch villages from API first, then render skeleton table
     await fetchVillages();
 
-    // Fetch existing troop data
-    await fetchMyTroops();
-
+    // Show page immediately with empty table
     hide('loadingState');
     show('mainContent');
-    document.getElementById('pageActions').style.display = 'flex';
+    renderMyTroops(); // render with empty data first
+
+    // Then fetch existing troop data and re-render
+    await fetchMyTroops();
   });
 
   // ── WORKSPACE STORAGE ──
@@ -546,17 +546,9 @@
     const badgeEl = document.getElementById('myTribeBadge');
     const updatedEl = document.getElementById('lastUpdated');
 
-    if (!Object.keys(myTroops).length) {
-      head.innerHTML = '';
-      body.innerHTML = '<tr class="empty-row"><td colspan="20">No troop data yet. Click <strong>Update</strong> to add your troops.</td></tr>';
-      badgeEl.innerHTML = '';
-      updatedEl.textContent = '';
-      return;
-    }
-
-    // Detect tribe (use first village's tribe)
+    // Detect tribe from existing data, default to teuton if none
     const firstRow = Object.values(myTroops)[0];
-    const tribe = firstRow.tribe || 'teuton';
+    const tribe = firstRow?.tribe || 'teuton';
 
     // Badge
     badgeEl.innerHTML = `<span class="tribe-badge tribe-${tribe}">${tribeLabelMap[tribe] || tribe}</span>`;
@@ -583,11 +575,22 @@
       <th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle('uhero') || ''}"></span></div></th>
     </tr>`;
 
-    // Villages to show: all in myVillages + any in myTroops not in myVillages
-    const allVillageNames = [
-      ...myVillages.map(v => v.name),
-      ...Object.keys(myTroops).filter(n => !myVillages.find(v => v.name === n))
-    ];
+    // Villages: myVillages as base (from API), + any in myTroops not already listed
+    const allVillageNames = myVillages.length
+      ? [
+          ...myVillages.map(v => v.name),
+          ...Object.keys(myTroops).filter(n => !myVillages.find(v => v.name === n))
+        ]
+      : Object.keys(myTroops);
+
+    // If truly nothing to show yet
+    if (!allVillageNames.length) {
+      head.innerHTML = '';
+      body.innerHTML = '<tr class="empty-row"><td colspan="20">Loading villages…</td></tr>';
+      badgeEl.innerHTML = '';
+      updatedEl.textContent = '';
+      return;
+    }
 
     // Sum row
     const sums = {};
@@ -631,7 +634,7 @@
   }
 
   // ── MODAL ──
-  function openModal(villageName) {
+  function openModal(tabOrVillage) {
     document.getElementById('inputModal').classList.remove('hidden');
     document.getElementById('parseInput').value = '';
     document.getElementById('parseResult').innerHTML = '';
@@ -639,10 +642,12 @@
     manualTribe = null;
     switchTab('parse');
 
-    // Pre-select village in manual if given
-    if (villageName) {
+    if (tabOrVillage === 'manual') {
       switchTab('manual');
-      document.getElementById('villageSelect').value = villageName;
+    } else if (tabOrVillage && tabOrVillage !== 'parse') {
+      // village name passed
+      switchTab('manual');
+      document.getElementById('villageSelect').value = tabOrVillage;
       onVillageSelect();
     }
   }
