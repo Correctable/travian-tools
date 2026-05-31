@@ -564,7 +564,7 @@
     <!-- Right: workspace nav (hidden until workspace selected) -->
     <nav class="ws-subnav" id="wsSubnav" style="display:none;">
       <a class="ws-subnav-item active" data-page="overview"  href="#">Overview</a>
-      <a class="ws-subnav-item" data-page="troops"   href="#">Troops</a>
+      <a class="ws-subnav-item" data-page="troops"   href="/alliance/troop-summary/">Troops</a>
       <a class="ws-subnav-item" data-page="attack"   href="#">Attack</a>
       <a class="ws-subnav-item" data-page="defense"  href="#">Defense</a>
       <a class="ws-subnav-item" data-page="artifacts" href="#">Artifacts</a>
@@ -901,6 +901,8 @@
 
   function enterWorkspace(ws) {
     currentWorkspace = ws;
+    // Persist active workspace for other alliance pages
+    try { sessionStorage.setItem('tt_active_workspace', JSON.stringify(ws)); } catch(e) {}
     hide('workspaceState');
 
     // Show sub-nav
@@ -1007,13 +1009,13 @@
           <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:14px;">Quick Access</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
             ${[
-              { icon:'🪖', label:'Troop Summary', page:'troops', pro:true },
+              { icon:'🪖', label:'Troop Summary', page:'troops', url:'/alliance/troop-summary/', pro:true },
               { icon:'🗡️', label:'Attack Plan',   page:'attack',   pro:true },
               { icon:'🛡️', label:'Defense Plan',  page:'defense',  pro:true },
               { icon:'🏺', label:'Artifact Tracker', page:'artifacts', pro:true },
               { icon:'🌟', label:'World Wonder',  page:'ww',       pro:true },
             ].map(item => `
-              <button onclick="switchWsPage('${item.page}')"
+              <button onclick="${item.url ? `window.location.href='${item.url}'` : `switchWsPage('${item.page}')`}"
                 style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all 0.15s;text-align:left;font-family:'DM Sans',sans-serif;"
                 onmouseover="this.style.borderColor='var(--blue2)';this.style.background='var(--blue-glow)'"
                 onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
