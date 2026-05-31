@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Travian Tools — sonybukansoni.com</title>
+  <title>TravianTools — Smart tools for smarter commanders</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -11,16 +11,13 @@
     :root {
       --navy:       #0f2153;
       --navy2:      #1a3068;
-      --navy3:      #0b1a3d;
-      --blue:       #1d4ed8;
       --blue2:      #2563eb;
       --blue-light: #3b82f6;
-      --blue-glow:  rgba(59,130,246,0.1);
+      --blue-glow:  rgba(59,130,246,0.10);
       --cyan:       #0891b2;
       --surface:    #ffffff;
       --surface2:   #f8faff;
       --border:     #e2e8f3;
-      --border2:    rgba(37,99,235,0.25);
       --text:       #0f2153;
       --text2:      #3d5a8a;
       --text3:      #7a93bc;
@@ -42,583 +39,561 @@
       overflow-x: hidden;
     }
 
-    /* Subtle dot grid */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.055) 1px, transparent 1px);
       background-size: 32px 32px;
-      pointer-events: none;
-      z-index: 0;
+      pointer-events: none; z-index: 0;
     }
 
-    /* Light blue glow top */
     body::after {
       content: '';
       position: fixed;
-      top: -180px;
-      left: 50%;
+      top: -200px; left: 50%;
       transform: translateX(-50%);
-      width: 900px;
-      height: 500px;
-      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
-      pointer-events: none;
-      z-index: 0;
+      width: 1000px; height: 560px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0;
     }
 
-    /* Navbar di-handle oleh navbar.js */
-
-    .btn-primary {
-      font-size: 0.825rem;
-      font-weight: 600;
-      color: #fff;
-      background: var(--blue2);
-      border: 1px solid transparent;
-      padding: 8px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.18s;
-      font-family: 'DM Sans', sans-serif;
-      box-shadow: 0 0 20px rgba(37,99,235,0.3);
-    }
-    .btn-primary:hover {
-      background: var(--blue-light);
-      box-shadow: 0 0 28px rgba(59,130,246,0.45);
-      transform: translateY(-1px);
-    }
-
-    /* ── TOOLS GRID ── */
-    .section {
-      position: relative;
-      z-index: 1;
+    .main-wrap {
+      position: relative; z-index: 1;
       max-width: 1060px;
       margin: 0 auto;
-      padding: 72px 24px;
+      padding: 36px 24px 72px;
     }
 
-    .section-header {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      margin-bottom: 40px;
+    /* ── CATEGORY ── */
+    .cat-section { margin-bottom: 36px; }
+    .cat-section:last-child { margin-bottom: 0; }
+
+    .cat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 11px; padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .section-tag {
-      font-size: 0.7rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--blue-light);
-      margin-bottom: 8px;
+    .cat-label-wrap { display: flex; align-items: center; gap: 8px; }
+
+    .cat-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.18);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
     }
 
-    .section-title {
+    .cat-title {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--text);
-      letter-spacing: -0.02em;
+      font-size: 0.82rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.01em;
     }
 
-    .section-link {
-      font-size: 0.825rem;
-      font-weight: 500;
-      color: var(--blue-light);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: gap 0.18s;
+    .cat-count {
+      font-size: 0.62rem; font-weight: 600; color: var(--text3);
+      background: var(--surface2); border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 100px;
     }
-    .section-link:hover { gap: 9px; }
 
+    .cat-link {
+      font-size: 0.72rem; font-weight: 500; color: var(--blue-light);
+      text-decoration: none; display: flex; align-items: center;
+      gap: 3px; transition: gap 0.18s;
+    }
+    .cat-link:hover { gap: 6px; }
+
+    .cat-note { font-size: 0.68rem; color: var(--text3); }
+
+    /* ── CARDS ── */
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 10px;
     }
 
     .card {
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 24px;
-      text-decoration: none;
-      color: inherit;
-      position: relative;
-      overflow: hidden;
-      transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
-      animation: fadeUp 0.45s ease both;
+      background: #fff; border: 1px solid var(--border);
+      border-radius: 11px; padding: 14px 16px;
+      text-decoration: none; color: inherit;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      animation: fadeUp 0.38s ease both;
+      display: flex; align-items: center; gap: 13px;
     }
-
-    .card:nth-child(1) { animation-delay: 0.08s; }
-    .card:nth-child(2) { animation-delay: 0.14s; }
-    .card:nth-child(3) { animation-delay: 0.20s; }
-    .card:nth-child(4) { animation-delay: 0.26s; }
-    .card:nth-child(5) { animation-delay: 0.32s; }
-    .card:nth-child(6) { animation-delay: 0.38s; }
 
     .card::before {
       content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--card-gradient, linear-gradient(90deg, var(--blue2), var(--cyan)));
-      opacity: 0;
-      transition: opacity 0.22s;
+      position: absolute; top: 0; left: 0; bottom: 0; width: 3px;
+      background: var(--card-gradient, linear-gradient(180deg, var(--blue2), var(--cyan)));
+      opacity: 0; transition: opacity 0.2s;
     }
 
     .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(15,33,83,0.1), 0 0 0 1px var(--card-color, var(--blue-light));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(15,33,83,0.08), 0 0 0 1px var(--card-color, var(--blue-light));
       border-color: var(--card-color, var(--blue-light));
     }
-
     .card:hover::before { opacity: 1; }
 
-    .card-disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
     .card-icon-wrap {
-      width: 46px;
-      height: 46px;
-      border-radius: 12px;
+      width: 38px; height: 38px; border-radius: 9px;
       background: var(--card-icon-bg, var(--blue-glow));
       border: 1px solid var(--card-border, rgba(59,130,246,0.2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
     }
 
-    .card-badge {
-      font-size: 0.6rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      padding: 3px 9px;
-      border-radius: 100px;
+    .card-body { flex: 1; min-width: 0; }
+
+    .card-title-row {
+      display: flex; align-items: center; gap: 6px; margin-bottom: 2px;
     }
 
     .card h3 {
       font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.975rem;
-      font-weight: 600;
-      color: var(--text);
-      margin-bottom: 6px;
-      letter-spacing: -0.01em;
+      font-size: 0.845rem; font-weight: 600;
+      color: var(--text); letter-spacing: -0.01em;
+      white-space: nowrap;
     }
+
+    .badge {
+      font-size: 0.52rem; font-weight: 700; letter-spacing: 0.07em;
+      padding: 2px 6px; border-radius: 100px; text-transform: uppercase; flex-shrink: 0;
+    }
+    .badge-free  { background: var(--green-bg);  color: var(--green);      border: 1px solid rgba(5,150,105,0.2); }
+    .badge-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+    .badge-pro   { background: var(--amber-bg);  color: var(--amber);      border: 1px solid rgba(217,119,6,0.2); }
+    .badge-plus  { background: var(--amber-bg);  color: var(--amber);      border: 1px solid rgba(217,119,6,0.2); }
 
     .card p {
-      font-size: 0.825rem;
-      color: var(--text2);
-      line-height: 1.65;
-    }
-
-    .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 18px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .card-meta {
-      font-size: 0.7rem;
-      color: var(--text3);
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      font-size: 0.73rem; color: var(--text3);
+      line-height: 1.4; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
     }
 
     .card-arrow {
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      color: var(--text2);
-      transition: all 0.18s;
+      width: 22px; height: 22px; border-radius: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: var(--text3);
+      transition: all 0.18s; flex-shrink: 0;
     }
-
     .card:hover .card-arrow {
       background: var(--card-color, var(--blue2));
       border-color: var(--card-color, var(--blue2));
-      color: white;
-      transform: translateX(2px);
+      color: white; transform: translateX(2px);
     }
 
-    /* Card color variants */
-    .card-green {
-      --card-color: var(--green);
-      --card-gradient: linear-gradient(90deg, #10b981, #06b6d4);
-      --card-icon-bg: var(--green-bg);
-      --card-border: rgba(16,185,129,0.25);
-    }
+    .card-blue   { --card-color: var(--blue2);  --card-gradient: linear-gradient(180deg, var(--blue2), var(--cyan)); --card-icon-bg: var(--blue-glow); --card-border: rgba(59,130,246,0.2); }
+    .card-green  { --card-color: var(--green);  --card-gradient: linear-gradient(180deg, #10b981, #06b6d4);          --card-icon-bg: var(--green-bg);  --card-border: rgba(16,185,129,0.25); }
+    .card-amber  { --card-color: var(--amber);  --card-gradient: linear-gradient(180deg, #f59e0b, #ef4444);          --card-icon-bg: var(--amber-bg);  --card-border: rgba(245,158,11,0.25); }
+    .card-purple { --card-color: var(--purple); --card-gradient: linear-gradient(180deg, #8b5cf6, #3b82f6);          --card-icon-bg: var(--purple-bg); --card-border: rgba(139,92,246,0.25); }
+    .card-red    { --card-color: var(--red);    --card-gradient: linear-gradient(180deg, #ef4444, #f59e0b);          --card-icon-bg: var(--red-bg);    --card-border: rgba(239,68,68,0.25); }
+    .card-cyan   { --card-color: var(--cyan);   --card-gradient: linear-gradient(180deg, #06b6d4, #3b82f6);          --card-icon-bg: rgba(6,182,212,0.08); --card-border: rgba(6,182,212,0.25); }
 
-    .card-amber {
-      --card-color: var(--amber);
-      --card-gradient: linear-gradient(90deg, #f59e0b, #ef4444);
-      --card-icon-bg: var(--amber-bg);
-      --card-border: rgba(245,158,11,0.25);
-    }
+    .cards .card:nth-child(1)  { animation-delay: 0.03s; }
+    .cards .card:nth-child(2)  { animation-delay: 0.06s; }
+    .cards .card:nth-child(3)  { animation-delay: 0.09s; }
+    .cards .card:nth-child(4)  { animation-delay: 0.12s; }
+    .cards .card:nth-child(5)  { animation-delay: 0.15s; }
+    .cards .card:nth-child(6)  { animation-delay: 0.18s; }
+    .cards .card:nth-child(7)  { animation-delay: 0.21s; }
 
-    .card-purple {
-      --card-color: var(--purple);
-      --card-gradient: linear-gradient(90deg, #8b5cf6, #3b82f6);
-      --card-icon-bg: var(--purple-bg);
-      --card-border: rgba(139,92,246,0.25);
-    }
-
-    .card-red {
-      --card-color: var(--red);
-      --card-gradient: linear-gradient(90deg, #ef4444, #f59e0b);
-      --card-icon-bg: var(--red-bg);
-      --card-border: rgba(239,68,68,0.25);
-    }
-
-    .card-cyan {
-      --card-color: var(--cyan);
-      --card-gradient: linear-gradient(90deg, #06b6d4, #3b82f6);
-      --card-icon-bg: rgba(6,182,212,0.1);
-      --card-border: rgba(6,182,212,0.25);
-    }
-
-    /* ── COMING SOON SECTION ── */
+    /* ── COMING SOON ── */
     .soon-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(172px, 1fr));
+      gap: 8px;
     }
 
     .soon-card {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      animation: fadeUp 0.45s ease both;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 9px; padding: 10px 13px;
+      display: flex; align-items: center; gap: 9px;
+      animation: fadeUp 0.38s ease both;
     }
-
-    .soon-card:nth-child(1) { animation-delay: 0.05s; }
-    .soon-card:nth-child(2) { animation-delay: 0.1s; }
-    .soon-card:nth-child(3) { animation-delay: 0.15s; }
-    .soon-card:nth-child(4) { animation-delay: 0.2s; }
-    .soon-card:nth-child(5) { animation-delay: 0.25s; }
-    .soon-card:nth-child(6) { animation-delay: 0.3s; }
+    .soon-card:nth-child(1)  { animation-delay: 0.03s; }
+    .soon-card:nth-child(2)  { animation-delay: 0.06s; }
+    .soon-card:nth-child(3)  { animation-delay: 0.09s; }
+    .soon-card:nth-child(4)  { animation-delay: 0.12s; }
+    .soon-card:nth-child(5)  { animation-delay: 0.15s; }
+    .soon-card:nth-child(6)  { animation-delay: 0.18s; }
+    .soon-card:nth-child(7)  { animation-delay: 0.21s; }
+    .soon-card:nth-child(8)  { animation-delay: 0.24s; }
+    .soon-card:nth-child(9)  { animation-delay: 0.27s; }
+    .soon-card:nth-child(10) { animation-delay: 0.30s; }
+    .soon-card:nth-child(11) { animation-delay: 0.33s; }
 
     .soon-icon {
-      font-size: 1.2rem;
-      width: 36px;
-      height: 36px;
-      border-radius: 9px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+      font-size: 0.9rem; width: 28px; height: 28px; border-radius: 6px;
+      background: #fff; border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-
-    .soon-name {
-      font-size: 0.825rem;
-      font-weight: 500;
-      color: var(--text2);
-    }
-
-    .soon-tag {
-      font-size: 0.58rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      color: var(--text3);
-      background: rgba(255,255,255,0.04);
-      padding: 2px 7px;
-      border-radius: 100px;
-      margin-top: 2px;
-      display: inline-block;
-    }
-
-    /* Divider */
-    .section-divider {
-      position: relative;
-      z-index: 1;
-      height: 1px;
-      background: var(--border);
-      max-width: 1060px;
-      margin: 0 auto;
+    .soon-name { font-size: 0.75rem; font-weight: 500; color: var(--text2); }
+    .soon-badge {
+      font-size: 0.5rem; font-weight: 600; letter-spacing: 0.06em;
+      color: var(--text3); background: #fff; border: 1px solid var(--border);
+      padding: 1px 5px; border-radius: 100px; margin-top: 2px;
+      display: inline-block; text-transform: uppercase;
     }
 
     /* ── FOOTER ── */
     footer {
-      position: relative;
-      z-index: 1;
-      border-top: 1px solid var(--border);
-      background: var(--surface2);
-      padding: 32px 40px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border); background: var(--surface2);
+      padding: 22px 40px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-
-    .footer-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-    }
-
+    .footer-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .footer-logo {
-      width: 28px;
-      height: 28px;
+      width: 22px; height: 22px;
       background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
+      border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;
     }
-
-    .footer-name {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: var(--text2);
-    }
-
-    .footer-links {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-
-    .footer-link {
-      font-size: 0.775rem;
-      color: var(--text3);
-      text-decoration: none;
-      transition: color 0.15s;
-    }
+    .footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 600; color: var(--text2); }
+    .footer-links { display: flex; align-items: center; gap: 20px; }
+    .footer-link { font-size: 0.7rem; color: var(--text3); text-decoration: none; transition: color 0.15s; }
     .footer-link:hover { color: var(--text2); }
+    .footer-copy { font-size: 0.68rem; color: var(--text3); }
 
-    .footer-copy {
-      font-size: 0.75rem;
-      color: var(--text3);
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-14px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(18px); }
+      from { opacity: 0; transform: translateY(12px); }
       to   { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
     }
 
     @media (max-width: 768px) {
-      .hero { padding: 64px 16px 48px; }
-      .stats-strip { gap: 24px; flex-wrap: wrap; }
-      footer { flex-direction: column; gap: 20px; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .main-wrap { padding: 20px 16px 48px; }
+      .cat-section { margin-bottom: 28px; }
+      .cards { grid-template-columns: 1fr; }
+      .soon-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); }
+      .card p { white-space: normal; }
+      footer { flex-direction: column; gap: 14px; text-align: center; padding: 18px; }
+      .footer-links { flex-wrap: wrap; justify-content: center; gap: 12px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <div id="navbar-root"></div>
 
-  <!-- TOOLS SECTION -->
-  <section class="section" id="tools">
-    <div class="section-header">
-      <div>
-        <div class="section-tag">Available Now</div>
-        <div class="section-title">Tools you can use today</div>
+  <div class="main-wrap">
+
+    <!-- TOOLS -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon">🔧</div>
+          <span class="cat-title">Tools</span>
+          <span class="cat-count">6</span>
+        </div>
       </div>
-      <a href="#" class="section-link">View all tools →</a>
-    </div>
-    <div class="cards">
+      <div class="cards">
 
-      <a class="card card-green" href="/tools/oasis_finder/">
-        <div class="card-top">
-          <div class="card-icon-wrap">🌿</div>
-          <span class="card-badge badge-free">FREE PREVIEW</span>
-        </div>
-        <h3>Oasis Finder</h3>
-        <p>Find every oasis near your coordinates. Filter by resource type, bonus percentage, and distance radius.</p>
-        <div class="card-footer">
-          <span class="card-meta">⚡ Full data requires account</span>
-          <div class="card-arrow">→</div>
-        </div>
-      </a>
-
-      <a class="card" href="/tools/spy-on-productivity/">
-        <div class="card-top">
-          <div class="card-icon-wrap" style="background:var(--blue-glow);border:1px solid rgba(59,130,246,0.2)">🕵️</div>
-          <span class="card-badge badge-free">FREE</span>
-        </div>
-        <h3>Spy Productivity</h3>
-        <p>Paste two spy reports to estimate a village's resource production per hour from the difference between scans.</p>
-        <div class="card-footer">
-          <span class="card-meta">✓ No account needed</span>
-          <div class="card-arrow">→</div>
-        </div>
-      </a>
-
-      <a class="card card-amber" href="/tools/attack-planner/">
-        <div class="card-top">
+        <a class="card card-red" href="/reports/">
           <div class="card-icon-wrap">⚔️</div>
-          <span class="card-badge badge-free">FREE</span>
-        </div>
-        <h3>Attack Planner</h3>
-        <p>Plan multi-wave attacks with precise timing. Coordinate simultaneous hits across multiple villages.</p>
-        <div class="card-footer">
-          <span class="card-meta">✓ No account needed</span>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Battle Report</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Parse &amp; share battle reports with your alliance</p>
+          </div>
           <div class="card-arrow">→</div>
-        </div>
-      </a>
+        </a>
 
-      <a class="card card-purple" href="/tools/village-tree/">
-        <div class="card-top">
+        <a class="card card-blue" href="/tools/building-costs/">
+          <div class="card-icon-wrap">🏰</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Building Cost</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Construction cost &amp; time per building level</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-blue" href="/tools/spy-on-productivity/">
+          <div class="card-icon-wrap">🕵️</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Spy Productivity</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Estimate village resource production from spy reports</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-amber" href="/tools/attack-planner/">
+          <div class="card-icon-wrap">⚔️</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Attack Planner</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Plan multi-wave attacks with precise timing</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-purple" href="/tools/village-tree/">
           <div class="card-icon-wrap">🏘️</div>
-          <span class="card-badge badge-free">FREE</span>
-        </div>
-        <h3>Village Tree</h3>
-        <p>Visualize your building queue and plan your village development path step by step.</p>
-        <div class="card-footer">
-          <span class="card-meta">✓ No account needed</span>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Village Tree</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Visualize your expansion tree</p>
+          </div>
           <div class="card-arrow">→</div>
-        </div>
-      </a>
+        </a>
 
-      <a class="card card-amber" href="/simulators/field-production/">
-        <div class="card-top">
-          <div class="card-icon-wrap" style="background:var(--amber-bg);border:1px solid rgba(217,119,6,0.2)">🌾</div>
-          <span class="card-badge badge-free">FREE</span>
+      </div>
+    </div>
+
+    <!-- STATISTICS -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon">📊</div>
+          <span class="cat-title">Statistics</span>
+          <span class="cat-count">2</span>
         </div>
-        <h3>Field Production</h3>
-        <p>Simulate resource output per hour. Configure field levels, tribe, oases, Waterworks, speed server, and plus account.</p>
-        <div class="card-footer">
-          <span class="card-meta">✓ No account needed</span>
+        <a href="/s/" class="cat-link">Pick a server →</a>
+      </div>
+      <div class="cards">
+
+        <a class="card card-blue" href="/s/ts5.x1.asia/statistics/">
+          <div class="card-icon-wrap">📈</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Server Statistics</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Track player &amp; alliance growth with full history</p>
+          </div>
           <div class="card-arrow">→</div>
-        </div>
-      </a>
+        </a>
 
-    </div>
-  </section>
+        <a class="card card-blue" href="/s/ts5.x1.asia/statistics/inactive-search/">
+          <div class="card-icon-wrap">💤</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Inactive Search</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Find inactive players &amp; farmable villages</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
 
-  <div class="section-divider"></div>
-
-  <!-- COMING SOON -->
-  <section class="section">
-    <div class="section-header">
-      <div>
-        <div class="section-tag">Roadmap</div>
-        <div class="section-title">Coming soon</div>
       </div>
     </div>
-    <div class="soon-grid">
 
-      <div class="soon-card">
-        <div class="soon-icon">📊</div>
-        <div>
-          <div class="soon-name">Troop Simulator</div>
-          <span class="soon-tag">PLANNED</span>
+    <!-- EXPLORE -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon" style="background:var(--green-bg);border-color:rgba(5,150,105,0.18)">🌍</div>
+          <span class="cat-title">Explore</span>
+          <span class="cat-count">3</span>
         </div>
+        <a href="/s/" class="cat-link">Pick a server →</a>
       </div>
+      <div class="cards">
 
-      <div class="soon-card">
-        <div class="soon-icon">🗺️</div>
-        <div>
-          <div class="soon-name">Map Scanner</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
+        <a class="card card-green" href="/s/ts5.x1.asia/map/">
+          <div class="card-icon-wrap">🗺️</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Interactive Map</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Explore the live server map with filters</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-green" href="/s/ts5.x1.asia/village-finder/">
+          <div class="card-icon-wrap">🌿</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Village Finder</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Search the best village spot for your settler</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-cyan" href="/s/ts5.x1.asia/oasis-data/">
+          <div class="card-icon-wrap">🌿</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Oasis Database</h3>
+              <span class="badge badge-plus">Plus</span>
+            </div>
+            <p>All oases on the server for your farming needs</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
       </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">🔭</div>
-        <div>
-          <div class="soon-name">Player Tracker</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">🏰</div>
-        <div>
-          <div class="soon-name">Village Analyzer</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">🏘️</div>
-        <div>
-          <div class="soon-name">Village Planner</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">⚔️</div>
-        <div>
-          <div class="soon-name">Battle Simulator</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">⏱️</div>
-        <div>
-          <div class="soon-name">Troop Training</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
-      <div class="soon-card">
-        <div class="soon-icon">📈</div>
-        <div>
-          <div class="soon-name">Alliance Stats</div>
-          <span class="soon-tag">PLANNED</span>
-        </div>
-      </div>
-
     </div>
-  </section>
 
-  <!-- FOOTER -->
+    <!-- SIMULATORS -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon" style="background:var(--amber-bg);border-color:rgba(217,119,6,0.18)">⚗️</div>
+          <span class="cat-title">Simulators</span>
+          <span class="cat-count">2</span>
+        </div>
+      </div>
+      <div class="cards">
+
+        <a class="card card-amber" href="/simulators/field-production/">
+          <div class="card-icon-wrap">🌾</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Field Production</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Simulate resource output with tribe, oases &amp; bonuses</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-amber" href="/simulators/village-planner/">
+          <div class="card-icon-wrap">🏘️</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Village Planner</h3>
+              <span class="badge badge-free">Free</span>
+            </div>
+            <p>Plan buildings, upgrade path &amp; total costs</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- MY STUFF -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon" style="background:var(--purple-bg);border-color:rgba(124,58,237,0.18)">🗂️</div>
+          <span class="cat-title">My Stuff</span>
+          <span class="cat-count">2</span>
+        </div>
+        <span class="cat-note">🔐 Login required</span>
+      </div>
+      <div class="cards">
+
+        <a class="card card-purple" href="/account/intelligence/">
+          <div class="card-icon-wrap">👁</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Intelligence</h3>
+              <span class="badge badge-login">Login</span>
+            </div>
+            <p>Your personal target dossier &amp; intel notes</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-purple" href="/account/saved-reports/">
+          <div class="card-icon-wrap">⚔️</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Archive</h3>
+              <span class="badge badge-pro">Pro</span>
+            </div>
+            <p>Saved report history &amp; permanent share links</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- ALLIANCE -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon" style="background:var(--blue-glow)">🛡️</div>
+          <span class="cat-title">Alliance</span>
+          <span class="cat-count">2</span>
+        </div>
+        <span class="cat-note">🔐 Login required</span>
+      </div>
+      <div class="cards">
+
+        <a class="card card-blue" href="/alliance/workspace/">
+          <div class="card-icon-wrap">🏰</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Workspace</h3>
+              <span class="badge badge-login">Login</span>
+            </div>
+            <p>Alliance dashboard &amp; overview</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+        <a class="card card-amber" href="/alliance/troop-summary/">
+          <div class="card-icon-wrap">💂</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <h3>Troop Summary</h3>
+              <span class="badge badge-pro">Pro</span>
+            </div>
+            <p>Aggregate troop counts across all members</p>
+          </div>
+          <div class="card-arrow">→</div>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- COMING SOON -->
+    <div class="cat-section">
+      <div class="cat-header">
+        <div class="cat-label-wrap">
+          <div class="cat-icon" style="background:var(--surface2);border-color:var(--border)">🗓️</div>
+          <span class="cat-title">Coming Soon</span>
+        </div>
+      </div>
+      <div class="soon-grid">
+        <div class="soon-card"><div class="soon-icon">⚔️</div><div><div class="soon-name">Battle Simulator</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🪖</div><div><div class="soon-name">Troop Simulator</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">⏱️</div><div><div class="soon-name">Troop Training</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🌾</div><div><div class="soon-name">Crop Balance</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🏰</div><div><div class="soon-name">Village Analyzer</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">📈</div><div><div class="soon-name">Alliance Stats</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🛡️</div><div><div class="soon-name">Defense Planner</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🗡️</div><div><div class="soon-name">Attack Plan</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🛡️</div><div><div class="soon-name">Defense Plan</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🏺</div><div><div class="soon-name">Artifact Tracker</div><span class="soon-badge">Planned</span></div></div>
+        <div class="soon-card"><div class="soon-icon">🌟</div><div><div class="soon-name">World Wonder</div><span class="soon-badge">Planned</span></div></div>
+      </div>
+    </div>
+
+  </div>
+
   <footer>
     <a href="/" class="footer-brand">
       <div class="footer-logo">⚔️</div>
       <span class="footer-name">TravianTools · sonybukansoni.com</span>
     </a>
     <div class="footer-links">
-      <a href="#" class="footer-link">Tools</a>
-      <a href="#" class="footer-link">Guides</a>
-      <a href="#" class="footer-link">Changelog</a>
-      <a href="#" class="footer-link">Contact</a>
+      <a href="/tools/" class="footer-link">Tools</a>
+      <a href="/simulators/" class="footer-link">Simulators</a>
+      <a href="/s/" class="footer-link">Servers</a>
     </div>
-    <span class="footer-copy">© 2025 sonybukansoni.com</span>
+    <span class="footer-copy">© 2026 sonybukansoni.com</span>
   </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

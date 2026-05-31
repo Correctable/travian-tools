@@ -445,7 +445,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1rem;
       flex-shrink: 0;
     }
 
@@ -903,6 +902,7 @@
   </footer>
 
   <script>
+    const RES_BASE = '/cdn/icons/resource/';
     // ── PARSERS ──────────────────────────────────────────────────────
 
     function cleanNum(str) {
@@ -1109,10 +1109,10 @@
           </div>
           <div class="production-body">
             <div class="resource-rows">
-              ${resRow('🌲', 'wood', 'Wood', prod.wood, barW(prod.wood))}
-              ${resRow('🧱', 'clay', 'Clay', prod.clay, barW(prod.clay))}
-              ${resRow('⚙️', 'iron', 'Iron', prod.iron, barW(prod.iron))}
-              ${resRow('🌾', 'crop', 'Crop', prod.crop, barW(prod.crop))}
+              ${resRow('lumber_tiny', 'wood', 'Wood', prod.wood, barW(prod.wood))}
+              ${resRow('clay_tiny', 'clay', 'Clay', prod.clay, barW(prod.clay))}
+              ${resRow('iron_tiny', 'iron', 'Iron', prod.iron, barW(prod.iron))}
+              ${resRow('crop_tiny', 'crop', 'Crop', prod.crop, barW(prod.crop))}
             </div>
             <div class="total-row">
               <span class="total-label">Total production / hour</span>
@@ -1304,7 +1304,7 @@
         : fmtNum(value);
       return `
         <div class="resource-row">
-          <div class="res-icon-wrap ${cls}">${icon}</div>
+          <div class="res-icon-wrap ${cls}"><img src="${RES_BASE}${icon}.png" width="20" alt=""></div>
           <span class="res-label">${label}</span>
           <div class="res-bar-wrap">
             <div class="res-bar ${cls}" data-width="${barWidth}" style="width:0%"></div>

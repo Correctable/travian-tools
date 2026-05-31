@@ -521,10 +521,10 @@
       <label class="control-label">Resource Type</label>
       <div class="res-btns">
         <button class="res-btn active-all" data-res="all" onclick="toggleRes(this)">All</button>
-        <button class="res-btn" data-res="wood" onclick="toggleRes(this)"><img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png"> Lumber</button>
-        <button class="res-btn" data-res="clay" onclick="toggleRes(this)"><img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png"> Clay</button>
-        <button class="res-btn" data-res="iron" onclick="toggleRes(this)"><img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png"> Iron</button>
-        <button class="res-btn" data-res="crop" onclick="toggleRes(this)"><img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png"> Crop</button>
+        <button class="res-btn" data-res="wood" onclick="toggleRes(this)"><img src="/cdn/icons/resource/lumber_tiny.png" alt="Lumber"> Lumber</button>
+        <button class="res-btn" data-res="clay" onclick="toggleRes(this)"><img src="/cdn/icons/resource/clay_tiny.png" alt="Clay"> Clay</button>
+        <button class="res-btn" data-res="iron" onclick="toggleRes(this)"><img src="/cdn/icons/resource/iron_tiny.png" alt="Iron"> Iron</button>
+        <button class="res-btn" data-res="crop" onclick="toggleRes(this)"><img src="/cdn/icons/resource/crop_tiny.png" alt="Crop"> Crop</button>
       </div>
     </div>
     <div class="control-card">
@@ -732,7 +732,7 @@
 <script>
   const PREVIEW_CAP = 1000;
   const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
-  const CDN         = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/';
+  const CDN         = '/cdn/icons/resource/';
 
   const RES_KEY = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
   const RES_COLOR = { wood: 'var(--wood)', clay: 'var(--clay)', iron: 'var(--iron)', crop: 'var(--crop)' };

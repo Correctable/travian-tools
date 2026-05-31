@@ -68,7 +68,7 @@
           { icon: '🏰', title: 'Building Cost',    desc: 'Construction cost per level',        badge: 'FREE', href: '/tools/building-costs/',          serverBased: false },
           { icon: '🕵️', title: 'Spy Productivity', desc: 'Estimate resource production',       badge: 'FREE', href: '/tools/spy-on-productivity/',     serverBased: false },
           { icon: '⚔️', title: 'Attack Planner',   desc: 'Plan multi-wave attacks',            badge: 'FREE', href: '/tools/attack-planner/',          serverBased: false },
-          { icon: '🏘️', title: 'Village Tree',     desc: 'Plan your building queue',           badge: 'FREE', href: '/tools/village-tree/',            serverBased: false },
+          { icon: '🏘️', title: 'Village Tree',     desc: 'Visualize your expansion tree',      badge: 'FREE', href: '/tools/village-tree/',            serverBased: false },
           { icon: '📊', title: 'Troop Simulator',  desc: 'Simulate battle outcomes',           badge: 'SOON', href: '#',                               serverBased: false },
         ],
       },
@@ -104,7 +104,7 @@
     // Menu login-only — dirender oleh updateAuthState()
     myStuffItems: [
       { icon: '👁', title: 'Intelligence',           desc: 'Your personal data',         badge: 'FREE', href: '/account/intelligence/'     },
-      { icon: '⚔️', title: 'Battle Reports',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/saved-reports/'   },
+      { icon: '⚔️', title: 'Archive',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/saved-reports/'   },
     ],
 
     allianceItems: [

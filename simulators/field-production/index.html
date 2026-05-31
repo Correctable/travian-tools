@@ -145,19 +145,19 @@
       box-shadow: 0 2px 16px rgba(15,33,83,0.12), 0 0 0 1px var(--border);
       background-size: cover;
     }
-    #resourceFieldContainer.resourceField1  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField1.png'); }
-    #resourceFieldContainer.resourceField2  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField2.png'); }
-    #resourceFieldContainer.resourceField3  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField3.png'); }
-    #resourceFieldContainer.resourceField4  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField4.png'); }
-    #resourceFieldContainer.resourceField5  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField5.png'); }
-    #resourceFieldContainer.resourceField6  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField6.png'); }
-    #resourceFieldContainer.resourceField7  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField7.png'); }
-    #resourceFieldContainer.resourceField8  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField8.png'); }
-    #resourceFieldContainer.resourceField9  { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField9.png'); }
-    #resourceFieldContainer.resourceField10 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField10.png'); }
-    #resourceFieldContainer.resourceField11 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField11.png'); }
-    #resourceFieldContainer.resourceField12 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField12.png'); }
-    #resourceFieldContainer.resourceField13 { background-image: url('https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/resourceField13.png'); }
+    #resourceFieldContainer.resourceField1  { background-image: url('/cdn/tiles/default/resourceField1.png'); }
+    #resourceFieldContainer.resourceField2  { background-image: url('/cdn/tiles/default/resourceField2.png'); }
+    #resourceFieldContainer.resourceField3  { background-image: url('/cdn/tiles/default/resourceField3.png'); }
+    #resourceFieldContainer.resourceField4  { background-image: url('/cdn/tiles/default/resourceField4.png'); }
+    #resourceFieldContainer.resourceField5  { background-image: url('/cdn/tiles/default/resourceField5.png'); }
+    #resourceFieldContainer.resourceField6  { background-image: url('/cdn/tiles/default/resourceField6.png'); }
+    #resourceFieldContainer.resourceField7  { background-image: url('/cdn/tiles/default/resourceField7.png'); }
+    #resourceFieldContainer.resourceField8  { background-image: url('/cdn/tiles/default/resourceField8.png'); }
+    #resourceFieldContainer.resourceField9  { background-image: url('/cdn/tiles/default/resourceField9.png'); }
+    #resourceFieldContainer.resourceField10 { background-image: url('/cdn/tiles/default/resourceField10.png'); }
+    #resourceFieldContainer.resourceField11 { background-image: url('/cdn/tiles/default/resourceField11.png'); }
+    #resourceFieldContainer.resourceField12 { background-image: url('/cdn/tiles/default/resourceField12.png'); }
+    #resourceFieldContainer.resourceField13 { background-image: url('/cdn/tiles/default/resourceField13.png'); }
     #villageCenterImg {
       position: absolute; top: 0; left: 0; width: 473px; height: 304px;
       z-index: 5; pointer-events: none;
@@ -521,25 +521,25 @@
           <div class="res-control-row">
             <span class="row-label">Plus account</span>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
+              <img class="res-icon-sm" src="/cdn/icons/resource/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
               <select class="plus-select" id="plusLumber" onchange="updateProduction()">
                 <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
               </select>
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="C">
+              <img class="res-icon-sm" src="/cdn/icons/resource/clay_tiny.png" onerror="this.style.display='none'" alt="C">
               <select class="plus-select" id="plusClay" onchange="updateProduction()">
                 <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
               </select>
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="I">
+              <img class="res-icon-sm" src="/cdn/icons/resource/iron_tiny.png" onerror="this.style.display='none'" alt="I">
               <select class="plus-select" id="plusIron" onchange="updateProduction()">
                 <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
               </select>
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="W">
+              <img class="res-icon-sm" src="/cdn/icons/resource/crop_tiny.png" onerror="this.style.display='none'" alt="W">
               <select class="plus-select" id="plusCrop" onchange="updateProduction()">
                 <option value="0">Off</option><option value="15">+15%</option><option value="25">+25%</option>
               </select>
@@ -549,19 +549,19 @@
           <div class="res-control-row">
             <span class="row-label">Set all to lv</span>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
+              <img class="res-icon-sm" src="/cdn/icons/resource/lumber_tiny.png" onerror="this.style.display='none'" alt="L">
               <input type="number" id="massLumber" min="0" max="10" placeholder="—" oninput="setAllLevel(1,+this.value)">
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="C">
+              <img class="res-icon-sm" src="/cdn/icons/resource/clay_tiny.png" onerror="this.style.display='none'" alt="C">
               <input type="number" id="massClay" min="0" max="10" placeholder="—" oninput="setAllLevel(2,+this.value)">
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="I">
+              <img class="res-icon-sm" src="/cdn/icons/resource/iron_tiny.png" onerror="this.style.display='none'" alt="I">
               <input type="number" id="massIron" min="0" max="10" placeholder="—" oninput="setAllLevel(3,+this.value)">
             </div>
             <div class="res-ctrl-cell">
-              <img class="res-icon-sm" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="W">
+              <img class="res-icon-sm" src="/cdn/icons/resource/crop_tiny.png" onerror="this.style.display='none'" alt="W">
               <input type="number" id="massCrop" min="0" max="10" placeholder="—" oninput="setAllLevel(4,+this.value)">
             </div>
           </div>
@@ -660,25 +660,25 @@
             </thead>
             <tbody>
               <tr>
-                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" onerror="this.style.display='none'" alt="">Lumber</span></td>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="/cdn/icons/resource/lumber_tiny.png" onerror="this.style.display='none'" alt="">Lumber</span></td>
                 <td class="num" id="pLumberBase">0</td><td id="pLumberFact" class="zero">—</td>
                 <td id="pLumberOasis" class="zero">—</td><td id="pLumberPlus" class="zero">—</td>
                 <td class="num" id="pLumberTotal">0</td>
               </tr>
               <tr>
-                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" onerror="this.style.display='none'" alt="">Clay</span></td>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="/cdn/icons/resource/clay_tiny.png" onerror="this.style.display='none'" alt="">Clay</span></td>
                 <td class="num" id="pClayBase">0</td><td id="pClayFact" class="zero">—</td>
                 <td id="pClayOasis" class="zero">—</td><td id="pClayPlus" class="zero">—</td>
                 <td class="num" id="pClayTotal">0</td>
               </tr>
-              <tr>
-                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" onerror="this.style.display='none'" alt="">Iron</span></td>
+              <tr>  
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="/cdn/icons/resource/iron_tiny.png" onerror="this.style.display='none'" alt="">Iron</span></td>
                 <td class="num" id="pIronBase">0</td><td id="pIronFact" class="zero">—</td>
                 <td id="pIronOasis" class="zero">—</td><td id="pIronPlus" class="zero">—</td>
                 <td class="num" id="pIronTotal">0</td>
               </tr>
               <tr>
-                <td><span class="res-label-cell"><img class="res-icon-tbl" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" onerror="this.style.display='none'" alt="">Crop</span></td>
+                <td><span class="res-label-cell"><img class="res-icon-tbl" src="/cdn/icons/resource/crop_tiny.png" onerror="this.style.display='none'" alt="">Crop</span></td>
                 <td class="num" id="pCropBase">0</td><td id="pCropFact" class="zero">—</td>
                 <td id="pCropOasis" class="zero">—</td><td id="pCropPlus" class="zero">—</td>
                 <td class="num" id="pCropTotal">0</td>
@@ -725,9 +725,9 @@
   </footer>
 
 <script>
-const CDN    = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/buildings';
-const CDN_VC = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/background/resourceFields/tribeSpecificCenter';
-const CDN_RES= 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources';
+const CDN    = '/cdn/buildings/themes/default';
+const CDN_VC = '/cdn/tiles/default/tribeSpecificCenter';
+const CDN_RES= '/cdn/icons/resource';
 
 const FIELD_TYPES = {
   1:{ratio:'3-3-3-9',dist:[4,4,1,4,4,2,3,4,4,3,3,4,4,1,4,2,1,2]},

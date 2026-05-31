@@ -25,49 +25,24 @@ body{background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-heig
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(37,99,235,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
 
-/* ── NAVBAR ── */
-nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);box-shadow:0 1px 0 rgba(37,99,235,0.06);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;gap:32px}
-.nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}
-.nav-brand-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 16px rgba(37,99,235,0.4)}
-.nav-brand-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--text);letter-spacing:-0.01em}
-.nav-brand-name span{color:var(--blue-light)}
-.nav-menu{display:flex;align-items:center;gap:4px;flex:1;justify-content:center}
-.nav-item{position:relative}
-.nav-link{display:flex;align-items:center;gap:5px;font-size:0.875rem;font-weight:500;color:var(--text2);text-decoration:none;padding:8px 14px;border-radius:8px;transition:all 0.18s;cursor:pointer;background:none;border:none;font-family:'DM Sans',sans-serif;white-space:nowrap}
-.nav-link:hover,.nav-item:hover>.nav-link{color:var(--navy);background:var(--surface2)}
-.nav-link .chevron{font-size:0.6rem;opacity:0.6;transition:transform 0.2s}
-.nav-item:hover>.nav-link .chevron{transform:rotate(180deg)}
-.dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-8px);background:#fff;border:1px solid var(--border);border-radius:14px;padding:8px;min-width:240px;opacity:0;visibility:hidden;transition:all 0.2s ease;box-shadow:0 20px 60px rgba(15,33,83,0.12),0 4px 16px rgba(37,99,235,0.06)}
-.nav-item:hover .dropdown{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
-.dropdown-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;text-decoration:none;transition:background 0.15s}
-.dropdown-item:hover{background:var(--surface2)}
-.dropdown-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0}
-.dropdown-text strong{display:block;font-size:0.825rem;font-weight:600;color:var(--text);margin-bottom:1px}
-.dropdown-text span{font-size:0.72rem;color:var(--text3)}
-.dropdown-badge{margin-left:auto;font-size:0.6rem;font-weight:600;letter-spacing:0.05em;padding:2px 7px;border-radius:100px}
-.badge-free{background:var(--green-bg);color:var(--green)}
-.badge-soon{background:rgba(0,0,0,0.04);color:var(--text3)}
-.badge-new{background:var(--amber-bg);color:var(--amber)}
-.dropdown-divider{height:1px;background:var(--border);margin:6px 0}
-.nav-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.btn-ghost{font-size:0.825rem;font-weight:500;color:var(--text2);background:none;border:1px solid var(--border);padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;font-family:'DM Sans',sans-serif}
-.btn-ghost:hover{border-color:var(--border2);color:var(--navy)}
-.btn-primary{font-size:0.825rem;font-weight:600;color:#fff;background:var(--blue2);border:none;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.18s;text-decoration:none;font-family:'DM Sans',sans-serif;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
-.btn-primary:hover{background:var(--blue);box-shadow:0 4px 16px rgba(37,99,235,0.35)}
+/* ── PAGE HEADER ── */
+.page-header{position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:28px 40px 24px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+.breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s}
+.breadcrumb a:hover{color:var(--blue2)}
+.breadcrumb span{color:var(--text2);font-weight:500}
+.page-header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-title-group{display:flex;align-items:center;gap:14px}
+.page-icon{width:44px;height:44px;border-radius:12px;background:var(--blue-glow);border:1px solid rgba(37,99,235,0.18);display:flex;align-items:center;justify-content:center;font-size:1.4rem}
+.page-title{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;color:var(--text)}
+.page-subtitle{font-size:0.8rem;color:var(--text3);margin-top:2px}
+.page-badges{display:flex;align-items:center;gap:8px}
+.page-badge{font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:4px 10px;border-radius:100px}
+.page-badge.free{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,0.2)}
+.page-badge.no-login{background:var(--blue-glow);color:var(--blue-light);border:1px solid rgba(59,130,246,0.2)}
 
 /* ── PAGE WRAPPER ── */
 .page-wrap{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:40px 24px 80px}
-
-/* ── PAGE HEADER ── */
-.page-header{margin-bottom:32px}
-.page-breadcrumb{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--text3);margin-bottom:16px}
-.page-breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s}
-.page-breadcrumb a:hover{color:var(--text2)}
-.page-breadcrumb .sep{opacity:0.5}
-.page-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.page-title{font-family:'Space Grotesk',sans-serif;font-size:1.75rem;font-weight:700;letter-spacing:-0.02em;color:var(--navy);line-height:1.2}
-.page-desc{font-size:0.9rem;color:var(--text2);margin-top:8px;line-height:1.6;max-width:560px}
-.page-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-bg);color:var(--green);font-size:0.7rem;font-weight:700;padding:4px 10px;border-radius:100px;letter-spacing:0.04em;flex-shrink:0;margin-top:4px}
 
 /* ── MENU VIEW ── */
 .menu-search-bar{display:flex;align-items:center;gap:10px;margin-bottom:28px}
@@ -110,7 +85,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop
 .bitem-name{font-size:0.78rem;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .bitem.active .bitem-name{font-weight:600;color:var(--item-text,var(--blue2))}
 .bitem-tribe{font-size:0.65rem;color:var(--text3);line-height:1.2}
-
+.menu-card-sub img, .bitem-tribe img { width:12px !important; height:12px !important; }
 /* detail panel */
 .detail-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
@@ -145,7 +120,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,0.92);backdrop
 table{width:100%;border-collapse:collapse;font-size:0.8rem;min-width:500px;font-family:'DM Sans',sans-serif}
 thead th{padding:9px 10px;text-align:right;font-size:0.7rem;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface2);z-index:2;letter-spacing:0.02em}
 thead th:first-child{text-align:center;width:44px}
-thead th img{vertical-align:middle;image-rendering:pixelated;width:14px;height:14px}
+thead th img{vertical-align:middle;image-rendering:pixelated;width:16px}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.08s}
 tbody tr:hover{background:var(--surface2)}
 tbody tr.row-sel{background:var(--sel-bg,var(--blue-glow))!important;outline:1px solid var(--sel-dot,var(--blue2));outline-offset:-1px}
@@ -190,105 +165,35 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
 </head>
 <body>
 
-<!-- ── NAVBAR ── -->
-<nav>
-  <a href="/" class="nav-brand">
-    <div class="nav-brand-logo">⚔️</div>
-    <span class="nav-brand-name">Travian<span>Tools</span></span>
-  </a>
-  <div class="nav-menu">
-    <div class="nav-item">
-      <button class="nav-link">Tools <span class="chevron">▼</span></button>
-      <div class="dropdown">
-        <a href="/tools/oasis_finder/" class="dropdown-item">
-          <div class="dropdown-icon" style="background:var(--green-bg)">🌿</div>
-          <div class="dropdown-text"><strong>Oasis Finder</strong><span>Find oases near your coords</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-        <a href="/tools/spy-on-productivity/" class="dropdown-item">
-          <div class="dropdown-icon" style="background:var(--blue-glow)">🕵️</div>
-          <div class="dropdown-text"><strong>Spy Productivity</strong><span>Estimate resource production</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-        <a href="/tools/attack-planner/" class="dropdown-item">
-          <div class="dropdown-icon" style="background:var(--amber-bg)">⚔️</div>
-          <div class="dropdown-text"><strong>Attack Planner</strong><span>Plan multi-wave attacks</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-        <a href="/tools/village-tree/" class="dropdown-item">
-          <div class="dropdown-icon" style="background:var(--purple-bg)">🏘️</div>
-          <div class="dropdown-text"><strong>Village Tree</strong><span>Plan your building queue</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-        <a href="/tools/building-costs/" class="dropdown-item" style="background:var(--surface2)">
-          <div class="dropdown-icon" style="background:var(--amber-bg)">🏗️</div>
-          <div class="dropdown-text"><strong>Building Costs</strong><span>Cost & time per building level</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-        <div class="dropdown-divider"></div>
-        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-          <div class="dropdown-icon" style="background:var(--purple-bg)">📊</div>
-          <div class="dropdown-text"><strong>Troop Simulator</strong><span>Simulate battles</span></div>
-          <span class="dropdown-badge badge-soon">SOON</span>
-        </a>
-      </div>
-    </div>
-    <div class="nav-item">
-      <button class="nav-link">Intelligence <span class="chevron">▼</span></button>
-      <div class="dropdown">
-        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-          <div class="dropdown-icon" style="background:var(--blue-glow)">🔭</div>
-          <div class="dropdown-text"><strong>Player Tracker</strong><span>Track player activity & growth</span></div>
-          <span class="dropdown-badge badge-soon">SOON</span>
-        </a>
-        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-          <div class="dropdown-icon" style="background:var(--amber-bg)">🏰</div>
-          <div class="dropdown-text"><strong>Village Analyzer</strong><span>Deep dive on enemy villages</span></div>
-          <span class="dropdown-badge badge-soon">SOON</span>
-        </a>
-        <a href="#" class="dropdown-item" style="opacity:.5;pointer-events:none">
-          <div class="dropdown-icon" style="background:var(--green-bg)">📈</div>
-          <div class="dropdown-text"><strong>Alliance Stats</strong><span>Compare alliance performance</span></div>
-          <span class="dropdown-badge badge-soon">SOON</span>
-        </a>
-      </div>
-    </div>
-    <div class="nav-item">
-      <button class="nav-link">Simulators <span class="chevron">▼</span></button>
-      <div class="dropdown">
-        <a href="/simulators/field-production/" class="dropdown-item">
-          <div class="dropdown-icon" style="background:var(--green-bg)">🌾</div>
-          <div class="dropdown-text"><strong>Field Production</strong><span>Simulate resource output/hr</span></div>
-          <span class="dropdown-badge badge-free">FREE</span>
-        </a>
-      </div>
-    </div>
-    <a href="#" class="nav-link">Changelog</a>
+<!-- NAVBAR -->
+<div id="navbar-root"></div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span>›</span>
+    <a href="/tools/">Tools</a>
+    <span>›</span>
+    <span>Building Costs</span>
   </div>
-  <div class="nav-actions">
-    <a href="/login/" class="btn-ghost">Log In</a>
-    <a href="/register/" class="btn-primary">Sign Up Free</a>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">🏗️</div>
+      <div>
+        <div class="page-title">Building Costs</div>
+        <div class="page-subtitle">Construction cost and build time for every building in Travian: Legends, per level.</div>
+      </div>
+    </div>
+    <div class="page-badges">
+      <span class="page-badge free">FREE</span>
+      <span class="page-badge no-login">No login required</span>
+    </div>
   </div>
-</nav>
+</div>
 
 <!-- ── PAGE ── -->
 <div class="page-wrap">
-
-  <!-- Page header -->
-  <div class="page-header fade-up">
-    <div class="page-breadcrumb">
-      <a href="/">Home</a><span class="sep">›</span>
-      <a href="#">Tools</a><span class="sep">›</span>
-      <span>Building Costs</span>
-    </div>
-    <div class="page-title-row">
-      <div>
-        <h1 class="page-title">🏗️ Building Costs</h1>
-        <p class="page-desc">Construction cost and build time for every building in Travian: Legends, per level. Click any building to explore its full upgrade path.</p>
-      </div>
-      <span class="page-badge">✓ FREE — No account needed</span>
-    </div>
-  </div>
 
   <!-- MENU VIEW -->
   <div id="menu-view" class="fade-up" style="animation-delay:0.07s">
@@ -342,10 +247,12 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
 const DATA_URL = '/data/buildings.json';
-const BASE     = '/images/travian/';
+const BASE      = '/cdn/icons/building/';
+const RES_BASE  = '/cdn/icons/resource/';
+const MISC_BASE = '/cdn/icons/misc/';
 const ICON_MAP = {1:'woodcutter',2:'clay_pit',3:'iron_mine',4:'cropland',5:'sawmill',6:'brickyard',7:'iron_foundry',8:'grain_mill',9:'bakery',10:'warehouse',11:'granary',13:'smithy',14:'tournament_square',15:'main_building',16:'rally_point',17:'marketplace',18:'embassy',19:'barracks',20:'stable',21:'workshop',22:'academy',23:'cranny',24:'town_hall',25:'residence',26:'palace',27:'treasury',28:'trade_office',29:'great_barracks',30:'great_stable',31:'city_wall',32:'earth_wall',33:'palisade',34:'stonemason',35:'brewery',36:'trapper',37:'hero_mansion',38:'great_warehouse',39:'great_granary',40:'wonder_of_the_world',41:'horse_drinkin_tough',42:'stonewall',43:'makeshift_wall',44:'command_center',45:'waterworks',46:'hospital'};
 const bIcon = g => `${BASE}${ICON_MAP[g]||'main_building'}.png`;
-const rIcon = n => `${BASE}${n}.png`;
+const rIcon = n => `${RES_BASE}${n}.png`;
 
 // ── CATEGORY CONFIG ───────────────────────────────────────────────────────
 const CAT_ORDER = ['resource','military','infrastructure'];
@@ -357,14 +264,14 @@ const CAT_COLOR = {
 };
 
 // ── HARDCODE MENU LIST (no fetch needed for menu state) ───────────────────
-const MENU_LIST = [{"gid":1,"name":"Woodcutter","category":"resource"},{"gid":2,"name":"Clay Pit","category":"resource"},{"gid":3,"name":"Iron Mine","category":"resource"},{"gid":4,"name":"Cropland","category":"resource"},{"gid":5,"name":"Sawmill","category":"resource"},{"gid":6,"name":"Brickyard","category":"resource"},{"gid":7,"name":"Iron Foundry","category":"resource"},{"gid":8,"name":"Grain Mill","category":"resource"},{"gid":9,"name":"Bakery","category":"resource"},{"gid":10,"name":"Warehouse","category":"infrastructure"},{"gid":11,"name":"Granary","category":"infrastructure"},{"gid":13,"name":"Smithy","category":"military"},{"gid":14,"name":"Tournament Square","category":"military"},{"gid":15,"name":"Main Building","category":"infrastructure"},{"gid":16,"name":"Rally Point","category":"military"},{"gid":17,"name":"Marketplace","category":"infrastructure"},{"gid":18,"name":"Embassy","category":"infrastructure"},{"gid":19,"name":"Barracks","category":"military"},{"gid":20,"name":"Stable","category":"military"},{"gid":21,"name":"Workshop","category":"military"},{"gid":22,"name":"Academy","category":"military"},{"gid":23,"name":"Cranny","category":"infrastructure"},{"gid":24,"name":"Town Hall","category":"infrastructure"},{"gid":25,"name":"Residence","category":"infrastructure"},{"gid":26,"name":"Palace","category":"infrastructure"},{"gid":27,"name":"Treasury","category":"infrastructure"},{"gid":28,"name":"Trade Office","category":"infrastructure"},{"gid":29,"name":"Great Barracks","category":"military","nonCapitalOnly":true},{"gid":30,"name":"Great Stable","category":"military","nonCapitalOnly":true},{"gid":31,"name":"City Wall","category":"military","tribes":["roman"]},{"gid":32,"name":"Earth Wall","category":"military","tribes":["teuton"]},{"gid":33,"name":"Palisade","category":"military","tribes":["gaul"]},{"gid":34,"name":"Stonemason","category":"infrastructure","capitalOnly":true},{"gid":35,"name":"Brewery","category":"military","tribes":["teuton"],"capitalOnly":true},{"gid":36,"name":"Trapper","category":"military","tribes":["gaul"]},{"gid":37,"name":"Hero's Mansion","category":"infrastructure"},{"gid":38,"name":"Great Warehouse","category":"infrastructure","capitalOnly":true},{"gid":39,"name":"Great Granary","category":"infrastructure","capitalOnly":true},{"gid":40,"name":"Wonder of the World","category":"infrastructure","capitalOnly":true},{"gid":41,"name":"Horse Drinking Trough","category":"military","tribes":["roman"]},{"gid":42,"name":"Stone Wall","category":"military","tribes":["egyptian"]},{"gid":43,"name":"Makeshift Wall","category":"military","tribes":["hun"]},{"gid":44,"name":"Command Center","category":"military","tribes":["hun"]},{"gid":45,"name":"Waterworks","category":"infrastructure","tribes":["egyptian"]},{"gid":46,"name":"Hospital","category":"military"}];
+const MENU_LIST = [{"gid":1,"name":"Woodcutter","category":"resource"},{"gid":2,"name":"Clay Pit","category":"resource"},{"gid":3,"name":"Iron Mine","category":"resource"},{"gid":4,"name":"Cropland","category":"resource"},{"gid":5,"name":"Sawmill","category":"resource"},{"gid":6,"name":"Brickyard","category":"resource"},{"gid":7,"name":"Iron Foundry","category":"resource"},{"gid":8,"name":"Grain Mill","category":"resource"},{"gid":9,"name":"Bakery","category":"resource"},{"gid":10,"name":"Warehouse","category":"infrastructure"},{"gid":11,"name":"Granary","category":"infrastructure"},{"gid":13,"name":"Smithy","category":"military"},{"gid":14,"name":"Tournament Square","category":"military"},{"gid":15,"name":"Main Building","category":"infrastructure"},{"gid":16,"name":"Rally Point","category":"military"},{"gid":17,"name":"Marketplace","category":"infrastructure"},{"gid":18,"name":"Embassy","category":"infrastructure"},{"gid":19,"name":"Barracks","category":"military"},{"gid":20,"name":"Stable","category":"military"},{"gid":21,"name":"Workshop","category":"military"},{"gid":22,"name":"Academy","category":"military"},{"gid":23,"name":"Cranny","category":"infrastructure"},{"gid":24,"name":"Town Hall","category":"infrastructure"},{"gid":25,"name":"Residence","category":"infrastructure"},{"gid":26,"name":"Palace","category":"infrastructure"},{"gid":27,"name":"Treasury","category":"infrastructure"},{"gid":28,"name":"Trade Office","category":"infrastructure"},{"gid":29,"name":"Great Barracks","category":"military","nonCapitalOnly":true},{"gid":30,"name":"Great Stable","category":"military","nonCapitalOnly":true},{"gid":31,"name":"City Wall","category":"military","tribes":["roman"]},{"gid":32,"name":"Earth Wall","category":"military","tribes":["teuton"]},{"gid":33,"name":"Palisade","category":"military","tribes":["gaul"]},{"gid":34,"name":"Stonemason","category":"infrastructure","capitalOnly":true},{"gid":35,"name":"Brewery","category":"military","tribes":["teuton"],"capitalOnly":true},{"gid":36,"name":"Trapper","category":"military","tribes":["gaul"]},{"gid":37,"name":"Hero's Mansion","category":"infrastructure"},{"gid":38,"name":"Great Warehouse","category":"infrastructure","capitalOnly":false},{"gid":39,"name":"Great Granary","category":"infrastructure","capitalOnly":false},{"gid":40,"name":"Wonder of the World","category":"infrastructure","capitalOnly":false},{"gid":41,"name":"Horse Drinking Trough","category":"military","tribes":["roman"]},{"gid":42,"name":"Stone Wall","category":"military","tribes":["egyptian"]},{"gid":43,"name":"Makeshift Wall","category":"military","tribes":["hun"]},{"gid":44,"name":"Command Center","category":"military","tribes":["hun"]},{"gid":45,"name":"Waterworks","category":"infrastructure","tribes":["egyptian"]},{"gid":46,"name":"Hospital","category":"military"}];
 
 // Formula resmi Travian (dari knowledgebase.legends.travian.com main.js):
 // buildingTime = 10 * Math.round(baseTime * factor / 10)
 // factor = (mbLevel === 0 ? 5 : 0.964^(mbLevel-1)) / speed
 // Data di JSON kita = raw MB lv0 = baseTime * 5
 // Maka: base = sec / 5, lalu terapkan factor
-const TRIBE_ICON = {roman:'🏛',gaul:'🌿',teuton:'⚔️',egyptian:'🔺',hun:'🏹'};
+const TRIBE_ICON = {roman:'roman',gaul:'gaul',teuton:'teuton',egyptian:'egyptian',hun:'hun',spartan:'spartan',viking:'viking'};
 const GID_NAME = {};
 MENU_LIST.forEach(b => GID_NAME[b.gid] = b.name);
 
@@ -398,7 +305,7 @@ function adjTime(sec, overrideMB) {
 function tribeInfo(b) {
   if (!b.tribes || b.tribes === 'all') return null;
   const arr = Array.isArray(b.tribes) ? b.tribes : [b.tribes];
-  return arr.map(t => `${TRIBE_ICON[t]||''}${t.charAt(0).toUpperCase()+t.slice(1)}`).join(', ');
+  return arr.map(t => TRIBE_ICON[t] ? `<img src="${MISC_BASE}${TRIBE_ICON[t]}_medium.png" width="12" style="vertical-align:middle;margin-right:3px;border-radius:3px" alt="${t}" onerror="this.style.display='none'"><span style="vertical-align:middle">${t.charAt(0).toUpperCase()+t.slice(1)}</span>` : t.charAt(0).toUpperCase()+t.slice(1)).join(', ');
 }
 function prereqStr(b) {
   if (!b.prerequisites?.length) return null;
@@ -709,7 +616,11 @@ function renderTable() {
   const thBonus   = hasBonus ? '<th style="color:var(--blue2)">' + getBonusLabel() + '</th>' : '';
 
   // Build header
-  const thImg = (icon, alt) => `<img src="${rIcon(icon)}" alt="${alt}" onerror="this.style.display='none'">`;
+  const MISC_ICONS = ['time', 'population', 'culture_point'];
+  const thImg = (icon, alt) => {
+    const src = MISC_ICONS.includes(icon) ? `${MISC_BASE}${icon}.png` : `${RES_BASE}${icon}.png`;
+    return `<img src="${src}" alt="${alt}" onerror="this.style.display='none'">`;
+  };
   table.innerHTML =
     '<colgroup>' +
       '<col style="width:44px"><col><col><col><col>' +
@@ -718,11 +629,11 @@ function renderTable() {
     '</colgroup>' +
     '<thead><tr>' +
       '<th>Lv</th>' +
-      '<th>' + thImg('resource_lumber','🪵') + '</th>' +
-      '<th>' + thImg('resource_clay','🧱') + '</th>' +
-      '<th>' + thImg('resource_iron','⛏') + '</th>' +
-      '<th>' + thImg('resource_crop','🌾') + '</th>' +
-      '<th>' + thImg('sum_of_resource','∑') + ' Total</th>' +
+      '<th>' + thImg('lumber_tiny','🪵') + '</th>' +
+      '<th>' + thImg('clay_tiny','🧱') + '</th>' +
+      '<th>' + thImg('iron_tiny','⛏') + '</th>' +
+      '<th>' + thImg('crop_tiny','🌾') + '</th>' +
+      '<th>' + thImg('resources_medium','∑') + ' Total</th>' +
       '<th>' + thImg('time','⏱') + '</th>' +
       '<th>' + thImg('population','Pop') + '</th>' +
       '<th>' + thImg('culture_point','CP') + '</th>' +
@@ -836,5 +747,6 @@ function renderRows(c, hasBonus, getBonusVal) {
 renderMenuGrid();
 document.getElementById('menu-search').addEventListener('input', e => renderMenuGrid(e.target.value));
 </script>
+<script src="/navbar.js"></script>
 </body>
 </html>

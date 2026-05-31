@@ -26,9 +26,9 @@
   'use strict';
 
   /* ── CDN ── */
-  const CDN_SPRITE = 'https://cdn.legends.travian.com/gpack/456.8/img_ltr/global/units';
-  const CDN_LEGACY = 'https://cdn.legends.travian.com/gpack/467.4/img_ltr/legacy/global';
-  const CDN_RES    = 'https://cdn.legends.travian.com/gpack/467.4/img_ltr/global/resources';
+  const CDN_SPRITE = '/cdn/units';
+  const CDN_LEGACY = '/cdn/icons';
+  const CDN_RES    = '/cdn/icons/resource';
   const SPRITE_SIZE = 26;
   const ICON_SIZE   = 26;
 

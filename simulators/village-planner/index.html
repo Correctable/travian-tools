@@ -331,16 +331,16 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
               <th class="col-name">Building</th>
               <th class="col-lv">Lv</th>
               <th class="col-res">
-                <img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" alt="Lumber" width="15">
+                <img src="/cdn/icons/resource/lumber_tiny.png" alt="Lumber" width="15">
               </th>
               <th class="col-res">
-                <img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" alt="Clay" width="15">
+                <img src="/cdn/icons/resource/clay_tiny.png" alt="Clay" width="15">
               </th>
               <th class="col-res">
-                <img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" alt="Iron" width="15">
+                <img src="/cdn/icons/resource/iron_tiny.png" alt="Iron" width="15">
               </th>
               <th class="col-res">
-                <img src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" alt="Crop" width="15">
+                <img src="/cdn/icons/resource/crop_tiny.png" alt="Crop" width="15">
               </th>
             </tr>
           </thead>
@@ -350,19 +350,19 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
         </table>
         <div class="res-grid">
           <div class="res-chip res-lumber">
-            <img class="res-icon" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/lumber_tiny.png" alt="Lumber">
+            <img class="res-icon" src="/cdn/icons/resource/lumber_tiny.png" alt="Lumber">
             <div><div class="res-label">Lumber</div><div class="res-value" id="totalLumber">0</div></div>
           </div>
           <div class="res-chip res-clay">
-            <img class="res-icon" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/clay_tiny.png" alt="Clay">
+            <img class="res-icon" src="/cdn/icons/resource/clay_tiny.png" alt="Clay">
             <div><div class="res-label">Clay</div><div class="res-value" id="totalClay">0</div></div>
           </div>
           <div class="res-chip res-iron">
-            <img class="res-icon" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/iron_tiny.png" alt="Iron">
+            <img class="res-icon" src="/cdn/icons/resource/iron_tiny.png" alt="Iron">
             <div><div class="res-label">Iron</div><div class="res-value" id="totalIron">0</div></div>
           </div>
           <div class="res-chip res-crop">
-            <img class="res-icon" src="https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/resources/crop_tiny.png" alt="Crop">
+            <img class="res-icon" src="/cdn/icons/resource/crop_tiny.png" alt="Crop">
             <div><div class="res-label">Crop</div><div class="res-value" id="totalCrop">0</div></div>
           </div>
         </div>
@@ -425,8 +425,8 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 
 <script src="prereq_logic.js"></script>
 <script>
-const CDN_B = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/global/buildings';
-const CDN_W = 'https://cdn.legends.travian.com/gpack/456.6/img_ltr/themes/default/buildings';
+const CDN_B = '/cdn/buildings/global';
+const CDN_W = '/cdn/buildings/themes/default';
 const TRIBE_WALL_GID = {roman:31,teuton:32,gaul:33,hun:43,egyptian:42};
 
 const SLOT_POS = {
