@@ -1424,8 +1424,27 @@
       };
 
       toast('🏰 Alliance workspace created!', 'success');
-      showWorkspace([newWs]);
       resetForm();
+
+      // Fetch ulang semua workspace dari Supabase supaya list lengkap
+      const { data: allMembers, error: fetchErr } = await db
+        .from('workspace_members')
+        .select('role, player_name, workspaces(id, name, server, alliance_tag)')
+        .eq('user_id', user.id);
+
+      if (!fetchErr && allMembers && allMembers.length) {
+        const list = allMembers.map(d => ({
+          id:           d.workspaces.id,
+          name:         d.workspaces.name,
+          server:       d.workspaces.server,
+          alliance_tag: d.workspaces.alliance_tag,
+          player_name:  d.player_name,
+          role:         d.role,
+        }));
+        showWorkspace(list);
+      } else {
+        showWorkspace([newWs]);
+      }
 
     } catch (err) {
       console.error(err);
