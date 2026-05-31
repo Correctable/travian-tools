@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Troop Summary — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); line-height: 1.65; min-height: 100vh; }
+
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn   { from { opacity:0; } to { opacity:1; } }
+    @keyframes spin     { to { transform: rotate(360deg); } }
+
+    /* PAGE HEADER */
+    .page-header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--amber-bg); border: 1px solid rgba(217,119,6,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-actions { display: flex; gap: 8px; }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 18px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.18s; text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-primary:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(15,33,83,0.2); }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .btn-amber:hover { background: rgba(217,119,6,0.15); }
+    .btn-sm { padding: 6px 13px; font-size: 0.8rem; border-radius: 8px; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+    /* PAGE WRAP */
+    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; }
+    @media (max-width: 768px) { .page-wrap { padding: 20px 16px 48px; } .page-header { padding: 20px 16px 18px; } }
+
+    /* LOADING */
+    .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 14px; }
+    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--blue2); border-radius: 50%; animation: spin 0.75s linear infinite; }
+    .loading-text { font-size: 0.85rem; color: var(--text3); }
+
+    /* WORKSPACE GATE */
+    #noWorkspace { display: none; }
+    .gate-box { max-width: 480px; margin: 60px auto; text-align: center; animation: fadeUp 0.4s ease; }
+    .gate-icon { font-size: 2.8rem; margin-bottom: 14px; }
+    .gate-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .gate-desc { font-size: 0.875rem; color: var(--text2); margin-bottom: 24px; }
+
+    /* MAIN CONTENT */
+    #mainContent { display: none; animation: fadeUp 0.4s ease; }
+
+    /* LAYOUT */
+    .layout { display: grid; grid-template-columns: 1fr; gap: 20px; }
+
+    /* SECTION CARD */
+    .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+    .section-head { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; }
+    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+    .section-body { padding: 0; }
+
+    /* WORKSPACE INFO BAR */
+    .ws-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 20px;
+      background: var(--green-bg); border: 1px solid rgba(5,150,105,0.2);
+      border-radius: 10px; margin-bottom: 20px;
+      font-size: 0.84rem; color: var(--text2);
+    }
+    .ws-bar strong { color: var(--navy); }
+    .ws-bar .ws-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* TRIBE BADGE */
+    .tribe-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700;
+    }
+    .tribe-roman    { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.18); }
+    .tribe-teuton   { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.18); }
+    .tribe-gaul     { background: rgba(5,150,105,0.08); color: #059669; border: 1px solid rgba(5,150,105,0.18); }
+    .tribe-egyptian { background: rgba(124,58,237,0.08); color: #7c3aed; border: 1px solid rgba(124,58,237,0.18); }
+    .tribe-hun      { background: rgba(8,145,178,0.08); color: #0891b2; border: 1px solid rgba(8,145,178,0.18); }
+    .tribe-unknown  { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+
+    /* TROOPS TABLE */
+    .troops-table-wrap { overflow-x: auto; }
+    .troops-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .troops-table th {
+      padding: 8px 12px; text-align: center;
+      font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: var(--text3);
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .troops-table th.village-col { text-align: left; min-width: 160px; }
+    .troops-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
+    .troops-table td.village-col { text-align: left; font-weight: 600; color: var(--navy); }
+    .troops-table tr:last-child td { border-bottom: none; }
+    .troops-table tbody tr:hover { background: var(--surface2); }
+    .troops-table .sum-row td { background: var(--surface2); font-weight: 700; color: var(--navy); border-top: 2px solid var(--border); }
+    .troops-table .zero { color: var(--text3); }
+
+    /* TROOP ICON */
+    .troop-icon-header {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+    }
+    .troop-sprite {
+      display: inline-block;
+      width: 26px; height: 26px;
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
+    }
+
+    /* EDIT BUTTON in table */
+    .edit-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 6px;
+      background: var(--surface2); border: 1px solid var(--border);
+      font-size: 0.75rem; font-weight: 600; color: var(--text2);
+      cursor: pointer; transition: all 0.14s;
+    }
+    .edit-btn:hover { border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow); }
+
+    /* LAST UPDATED */
+    .last-updated { font-size: 0.73rem; color: var(--text3); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(15,33,83,0.45); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000; padding: 20px;
+      animation: fadeIn 0.18s ease;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 18px; width: 100%; max-width: 640px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 80px rgba(15,33,83,0.18);
+      animation: fadeUp 0.22s ease;
+    }
+    .modal-head {
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; background: var(--surface); z-index: 1;
+    }
+    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: var(--navy); }
+    .modal-sub { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text3); padding: 4px; }
+    .modal-close:hover { color: var(--navy); }
+    .modal-body { padding: 20px 24px; }
+    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    /* MODAL TABS */
+    .modal-tabs { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; width: fit-content; }
+    .modal-tab { padding: 7px 16px; border-radius: 7px; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; font-weight: 600; color: var(--text3); background: transparent; cursor: pointer; transition: all 0.14s; }
+    .modal-tab.active { background: var(--surface); color: var(--navy); box-shadow: 0 1px 6px rgba(15,33,83,0.08); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.15s ease; }
+
+    /* PARSE AREA */
+    .parse-area {
+      width: 100%; min-height: 160px; padding: 12px 14px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: monospace; font-size: 0.8rem; color: var(--navy);
+      resize: vertical; outline: none; transition: border-color 0.15s;
+    }
+    .parse-area:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .parse-area::placeholder { color: var(--text3); font-family: 'DM Sans', sans-serif; }
+    .parse-hint { font-size: 0.75rem; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+
+    /* MANUAL INPUT GRID */
+    .manual-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .manual-field { display: flex; flex-direction: column; gap: 4px; }
+    .manual-label { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--text2); }
+    .manual-input {
+      width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--navy);
+      outline: none; transition: border-color 0.15s;
+      text-align: right;
+    }
+    .manual-input:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+    /* VILLAGE SELECT in modal */
+    .field-group { margin-bottom: 16px; }
+    .field-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+    .field-select {
+      width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--navy);
+      background: var(--surface); outline: none; cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a93bc' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+      transition: border-color 0.15s;
+    }
+    .field-select:focus { border-color: var(--blue2); }
+
+    /* PARSE RESULT PREVIEW */
+    .parse-preview {
+      margin-top: 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    }
+    .parse-preview-head { padding: 10px 14px; background: var(--surface2); font-size: 0.78rem; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); }
+    .parse-preview-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .parse-preview-table th, .parse-preview-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: center; }
+    .parse-preview-table th { background: var(--surface2); color: var(--text3); font-weight: 600; text-transform: uppercase; font-size: 0.68rem; }
+    .parse-preview-table td.village-name { text-align: left; font-weight: 600; color: var(--navy); }
+    .parse-preview-table tr:last-child td { border-bottom: none; }
+    .parse-error { padding: 12px 14px; font-size: 0.82rem; color: var(--red); display: flex; align-items: center; gap: 8px; }
+
+    /* TRIBE SELECTOR */
+    .tribe-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tribe-opt {
+      padding: 6px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+      font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.14s;
+      background: var(--surface); color: var(--text2);
+    }
+    .tribe-opt:hover { border-color: var(--blue2); color: var(--blue2); }
+    .tribe-opt.selected { border-color: var(--navy); background: var(--navy); color: #fff; }
+
+    /* TOAST */
+    .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+    .toast { padding: 11px 18px; border-radius: 11px; font-size: 0.84rem; font-weight: 500; color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.16); animation: fadeUp 0.22s ease; max-width: 300px; }
+    .toast.success { background: #065f46; }
+    .toast.error   { background: #7f1d1d; }
+    .toast.info    { background: var(--navy2); }
+
+    /* MINI SPIN */
+    .mini-spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
+
+    /* EMPTY TABLE */
+    .empty-row td { padding: 32px; text-align: center; color: var(--text3); font-size: 0.84rem; }
+
+    @media (max-width: 600px) {
+      .page-actions { width: 100%; }
+      .page-actions .btn { flex: 1; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="navbar-root"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- MODAL: Edit / Parse -->
+<div class="modal-overlay hidden" id="inputModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="modalTitle">Update Troops</div>
+        <div class="modal-sub" id="modalSub">Your villages</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Tabs -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" id="tabParse" onclick="switchTab('parse')">📋 Paste (Travian Plus)</button>
+        <button class="modal-tab" id="tabManual" onclick="switchTab('manual')">✏️ Manual Input</button>
+      </div>
+
+      <!-- PARSE TAB -->
+      <div class="tab-panel active" id="panelParse">
+        <div class="parse-hint" style="margin-bottom:10px;">
+          Go to <strong>Village Overview → Troops</strong> in Travian, press <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+A</kbd> then <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+C</kbd>, and paste below.
+        </div>
+        <textarea class="parse-area" id="parseInput" placeholder="Paste your Travian Plus troop overview here…" oninput="onParseInput()"></textarea>
+        <div id="parseResult"></div>
+      </div>
+
+      <!-- MANUAL TAB -->
+      <div class="tab-panel" id="panelManual">
+        <div class="field-group">
+          <label class="field-label">Village</label>
+          <select class="field-select" id="villageSelect" onchange="onVillageSelect()">
+            <option value="">— Select village —</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label">Tribe</label>
+          <div class="tribe-selector" id="tribeSelectorManual">
+            <div class="tribe-opt" data-tribe="roman"    onclick="selectTribe('roman')">🦅 Romans</div>
+            <div class="tribe-opt" data-tribe="teuton"   onclick="selectTribe('teuton')">⚒️ Teutons</div>
+            <div class="tribe-opt" data-tribe="gaul"     onclick="selectTribe('gaul')">🌿 Gauls</div>
+            <div class="tribe-opt" data-tribe="egyptian" onclick="selectTribe('egyptian')">🏺 Egyptians</div>
+            <div class="tribe-opt" data-tribe="hun"      onclick="selectTribe('hun')">🏹 Huns</div>
+          </div>
+        </div>
+
+        <div class="manual-grid" id="manualGrid">
+          <div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a tribe to see troop inputs.</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="handleSave()">💾 Save Troops</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/alliance/workspace/">Alliance</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Troop Summary</span>
+  </nav>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">🪖</div>
+      <div>
+        <div class="page-title">Troop Summary</div>
+        <div class="page-subtitle">Track and share your troops with the alliance.</div>
+      </div>
+    </div>
+    <div class="page-actions" id="pageActions" style="display:none;">
+      <button class="btn btn-amber" onclick="openModal()">📋 Paste / Edit Troops</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE CONTENT -->
+<div class="page-wrap">
+
+  <!-- Loading -->
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading workspace…</div>
+  </div>
+
+  <!-- No workspace gate -->
+  <div id="noWorkspace">
+    <div class="gate-box">
+      <div class="gate-icon">🏰</div>
+      <div class="gate-title">No Workspace Selected</div>
+      <div class="gate-desc">You need to be part of an alliance workspace to use Troop Summary.</div>
+      <a href="/alliance/workspace/" class="btn btn-primary">Go to Workspace</a>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div id="mainContent">
+    <!-- Workspace bar -->
+    <div class="ws-bar" id="wsBar">
+      <span class="ws-dot"></span>
+      <span>Workspace: <strong id="wsName">—</strong></span>
+      <span style="color:var(--text3);">·</span>
+      <span id="wsServer" style="color:var(--text3);">—</span>
+      <span style="color:var(--text3);">·</span>
+      <span id="wsRole" style="color:var(--text3);">—</span>
+    </div>
+
+    <!-- My Troops section -->
+    <div class="section-card" id="myTroopsSection">
+      <div class="section-head">
+        <div class="section-title">
+          🪖 My Troops
+          <span id="myTribeBadge"></span>
+          <span class="last-updated" id="lastUpdated"></span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Update</button>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="troops-table-wrap">
+          <table class="troops-table" id="myTroopsTable">
+            <thead id="myTroopsHead"></thead>
+            <tbody id="myTroopsBody">
+              <tr class="empty-row"><td colspan="20">No troop data yet. Click <strong>Update</strong> to add your troops.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /#mainContent -->
+</div><!-- /.page-wrap -->
+
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/data/troops.js"></script>
+<script src="/navbar.js"></script>
+
+<script>
+  const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+
+  // ── STATE ──
+  let currentWorkspace   = null;
+  let currentUser        = null;
+  let myVillages         = [];   // [{name, x, y}]
+  let myTroops           = {};   // {village_name: {tribe, troops:{key:val}}}
+  let parsedData         = null; // result of Travian Plus parse
+  let manualTribe        = null;
+  let activeTab          = 'parse';
+
+  // ── INIT ──
+  document.addEventListener('DOMContentLoaded', async () => {
+    await waitForSupabase();
+    const user = await window.getUser();
+    if (!user) { window.location.href = '/login/?redirect=/alliance/troop-summary/'; return; }
+    currentUser = user;
+
+    // Load workspace from sessionStorage (set by workspace page when user enters)
+    const ws = loadWorkspace();
+    if (!ws) { show('noWorkspace'); hide('loadingState'); return; }
+    currentWorkspace = ws;
+
+    // Show workspace info
+    document.getElementById('wsName').textContent   = ws.name;
+    document.getElementById('wsServer').textContent = ws.server;
+    document.getElementById('wsRole').textContent   = ws.role === 'founder' ? '👑 Founder' : ws.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member';
+
+    // Fetch villages from API
+    await fetchVillages();
+
+    // Fetch existing troop data
+    await fetchMyTroops();
+
+    hide('loadingState');
+    show('mainContent');
+    document.getElementById('pageActions').style.display = 'flex';
+  });
+
+  // ── WORKSPACE STORAGE ──
+  function loadWorkspace() {
+    try {
+      const raw = sessionStorage.getItem('tt_active_workspace');
+      if (raw) return JSON.parse(raw);
+      // fallback: last from list
+      const list = JSON.parse(localStorage.getItem('tt_workspaces') || 'null');
+      return list?.[0] || null;
+    } catch { return null; }
+  }
+
+  // ── FETCH VILLAGES ──
+  async function fetchVillages() {
+    if (!currentWorkspace?.player_name) return;
+    try {
+      const serverKey = currentWorkspace.server.split('.')[0];
+      const res  = await fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(currentWorkspace.player_name)}`);
+      const data = await res.json();
+      myVillages = (data.villages || []).map(v => ({
+        name: v.name || v.village_name || '',
+        x:    v.x ?? v.coord_x ?? 0,
+        y:    v.y ?? v.coord_y ?? 0,
+      })).filter(v => v.name);
+
+      // Populate village select
+      const sel = document.getElementById('villageSelect');
+      sel.innerHTML = '<option value="">— Select village —</option>';
+      myVillages.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v.name;
+        opt.textContent = `${v.name} (${v.x}|${v.y})`;
+        sel.appendChild(opt);
+      });
+    } catch(e) { console.error('fetchVillages:', e); }
+  }
+
+  // ── FETCH MY TROOPS ──
+  async function fetchMyTroops() {
+    try {
+      const db = window._supabase;
+      const { data, error } = await db
+        .from('workspace_troops')
+        .select('village_name, tribe, troops, updated_at')
+        .eq('workspace_id', currentWorkspace.id)
+        .eq('user_id', currentUser.id);
+
+      if (error) throw error;
+
+      myTroops = {};
+      (data || []).forEach(row => {
+        myTroops[row.village_name] = {
+          tribe:      row.tribe,
+          troops:     row.troops || {},
+          updated_at: row.updated_at,
+        };
+      });
+
+      renderMyTroops();
+    } catch(e) { console.error('fetchMyTroops:', e); }
+  }
+
+  // ── RENDER MY TROOPS ──
+  function renderMyTroops() {
+    const head = document.getElementById('myTroopsHead');
+    const body = document.getElementById('myTroopsBody');
+    const badgeEl = document.getElementById('myTribeBadge');
+    const updatedEl = document.getElementById('lastUpdated');
+
+    if (!Object.keys(myTroops).length) {
+      head.innerHTML = '';
+      body.innerHTML = '<tr class="empty-row"><td colspan="20">No troop data yet. Click <strong>Update</strong> to add your troops.</td></tr>';
+      badgeEl.innerHTML = '';
+      updatedEl.textContent = '';
+      return;
+    }
+
+    // Detect tribe (use first village's tribe)
+    const firstRow = Object.values(myTroops)[0];
+    const tribe = firstRow.tribe || 'teuton';
+
+    // Badge
+    badgeEl.innerHTML = `<span class="tribe-badge tribe-${tribe}">${tribeLabelMap[tribe] || tribe}</span>`;
+
+    // Updated at
+    const latestUpdate = Object.values(myTroops).map(r => r.updated_at).sort().reverse()[0];
+    if (latestUpdate) updatedEl.textContent = '· Updated ' + timeAgo(latestUpdate);
+
+    // Get troop list for this tribe (exclude settler/chief/nomarch)
+    const tribeData = TT ? TT.troopsByTribe[tribe] : [];
+    const troopCols = (tribeData || []).filter(t => t.slot < 9); // exclude settler
+    const heroCol = true; // always show hero
+
+    // Build header
+    head.innerHTML = `<tr>
+      <th class="village-col">Village</th>
+      ${troopCols.map(t => `
+        <th>
+          <div class="troop-icon-header">
+            <span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id) || ''}"></span>
+          </div>
+        </th>
+      `).join('')}
+      <th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle('uhero') || ''}"></span></div></th>
+    </tr>`;
+
+    // Villages to show: all in myVillages + any in myTroops not in myVillages
+    const allVillageNames = [
+      ...myVillages.map(v => v.name),
+      ...Object.keys(myTroops).filter(n => !myVillages.find(v => v.name === n))
+    ];
+
+    // Sum row
+    const sums = {};
+    troopCols.forEach(t => sums[t.name.toLowerCase()] = 0);
+    sums['hero'] = 0;
+
+    const rows = allVillageNames.map(vName => {
+      const data = myTroops[vName];
+      const troops = data?.troops || {};
+
+      const cells = troopCols.map(t => {
+        const key = t.name.toLowerCase();
+        const val = troops[key] || troops[t.class_id] || 0;
+        sums[key] = (sums[key] || 0) + Number(val);
+        return `<td class="${val ? '' : 'zero'}">${val ? Number(val).toLocaleString() : '0'}</td>`;
+      }).join('');
+
+      const hero = troops['hero'] || 0;
+      sums['hero'] += Number(hero);
+
+      const vData = myVillages.find(v => v.name === vName);
+      const coordStr = vData ? ` <span style="color:var(--text3);font-size:0.73rem;font-weight:400;">(${vData.x}|${vData.y})</span>` : '';
+
+      return `<tr>
+        <td class="village-col">${escHtml(vName)}${coordStr}</td>
+        ${cells}
+        <td class="${hero ? '' : 'zero'}">${hero ? Number(hero).toLocaleString() : '0'}</td>
+      </tr>`;
+    }).join('');
+
+    const sumCells = troopCols.map(t => {
+      const val = sums[t.name.toLowerCase()] || 0;
+      return `<td>${val ? Number(val).toLocaleString() : '—'}</td>`;
+    }).join('');
+
+    body.innerHTML = rows + `<tr class="sum-row">
+      <td class="village-col">Total</td>
+      ${sumCells}
+      <td>${sums['hero'] || '—'}</td>
+    </tr>`;
+  }
+
+  // ── MODAL ──
+  function openModal(villageName) {
+    document.getElementById('inputModal').classList.remove('hidden');
+    document.getElementById('parseInput').value = '';
+    document.getElementById('parseResult').innerHTML = '';
+    parsedData = null;
+    manualTribe = null;
+    switchTab('parse');
+
+    // Pre-select village in manual if given
+    if (villageName) {
+      switchTab('manual');
+      document.getElementById('villageSelect').value = villageName;
+      onVillageSelect();
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('inputModal').classList.add('hidden');
+  }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.getElementById('tabParse').classList.toggle('active', tab === 'parse');
+    document.getElementById('tabManual').classList.toggle('active', tab === 'manual');
+    document.getElementById('panelParse').classList.toggle('active', tab === 'parse');
+    document.getElementById('panelManual').classList.toggle('active', tab === 'manual');
+  }
+
+  // ── PARSE ──
+  function onParseInput() {
+    const raw = document.getElementById('parseInput').value.trim();
+    const resultEl = document.getElementById('parseResult');
+    if (!raw) { resultEl.innerHTML = ''; parsedData = null; return; }
+
+    const result = parseTravianPlus(raw);
+    parsedData = result;
+
+    if (!result || !result.rows.length) {
+      resultEl.innerHTML = `<div class="parse-preview"><div class="parse-error">⚠️ Could not parse troop data. Make sure you copied from Village Overview → Troops tab.</div></div>`;
+      return;
+    }
+
+    // Show preview
+    const tribe = result.tribe;
+    const troops = result.headers.slice(1); // skip Village column
+    const previewRows = result.rows.map(r =>
+      `<tr>
+        <td class="village-name">${escHtml(r.village)}</td>
+        ${r.values.map(v => `<td class="${v ? '' : 'zero'}">${v ? Number(v).toLocaleString() : '0'}</td>`).join('')}
+      </tr>`
+    ).join('');
+
+    resultEl.innerHTML = `
+      <div class="parse-preview">
+        <div class="parse-preview-head">
+          ✅ Detected <strong>${result.rows.length} villages</strong> · Tribe: <strong>${tribeLabelMap[tribe] || tribe}</strong>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="parse-preview-table">
+            <thead><tr>
+              <th style="text-align:left;">Village</th>
+              ${troops.map(t => `<th>${t}</th>`).join('')}
+            </tr></thead>
+            <tbody>${previewRows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  function parseTravianPlus(raw) {
+    // Clean up — remove non-table noise, split into lines
+    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+
+    // Find header line containing troop names
+    let headerIdx = -1;
+    let tribe = null;
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].toLowerCase();
+      // Look for known troop name keywords
+      if (
+        line.includes('clubswinger') || line.includes('legionnaire') ||
+        line.includes('phalanx') || line.includes('slave militia') ||
+        line.includes('mercenary') || line.includes('spearman') ||
+        line.includes('axeman') || line.includes('swordsman')
+      ) {
+        headerIdx = i;
+        // Detect tribe
+        if (line.includes('clubswinger') || line.includes('spearman') || line.includes('axeman') || line.includes('teutonic knight')) tribe = 'teuton';
+        else if (line.includes('legionnaire') || line.includes('praetorian') || line.includes('imperian')) tribe = 'roman';
+        else if (line.includes('phalanx') || line.includes('swordsman') || line.includes('druidrider')) tribe = 'gaul';
+        else if (line.includes('slave militia') || line.includes('ash warden') || line.includes('khopesh')) tribe = 'egyptian';
+        else if (line.includes('mercenary') || line.includes('bowman') || line.includes('marksman')) tribe = 'hun';
+        break;
+      }
+    }
+
+    if (headerIdx === -1 || !tribe) return null;
+
+    // Parse header — split by tabs or multiple spaces
+    const headerLine = lines[headerIdx];
+    const headers = headerLine.split(/\t+/).map(h => h.trim()).filter(Boolean);
+
+    // Parse data rows
+    const rows = [];
+    const sumKeywords = ['sum', 'total'];
+    for (let i = headerIdx + 1; i < lines.length; i++) {
+      const line = lines[i];
+      // Stop at sum row or end of table
+      const lower = line.toLowerCase();
+      if (sumKeywords.some(k => lower.startsWith(k))) break;
+      // Must start with village name pattern (digits or text)
+      const parts = line.split(/\t+/).map(p => p.trim()).filter(p => p !== '');
+      if (parts.length < 2) break;
+
+      // First part is village name, rest are numbers
+      const allNumeric = parts.slice(1).every(p => /^[\d,\s]+$/.test(p.replace(/[\u200b\u200e\u200f\u202a-\u202e]/g, '')));
+      if (!allNumeric && parts.length > 2) continue;
+
+      const village = parts[0];
+      const values  = parts.slice(1).map(p => {
+        const clean = p.replace(/[,\u200b\u200e\u200f\u202a-\u202e\s]/g, '');
+        return parseInt(clean) || 0;
+      });
+
+      if (village && values.length) rows.push({ village, values });
+    }
+
+    if (!rows.length) return null;
+    return { tribe, headers, rows };
+  }
+
+  // ── MANUAL INPUT ──
+  function onVillageSelect() {
+    const vName = document.getElementById('villageSelect').value;
+    if (!vName) return;
+    // Pre-fill tribe if known
+    const existing = myTroops[vName];
+    if (existing?.tribe) selectTribe(existing.tribe);
+    renderManualGrid(vName);
+  }
+
+  function selectTribe(tribe) {
+    manualTribe = tribe;
+    document.querySelectorAll('.tribe-opt').forEach(el => {
+      el.classList.toggle('selected', el.dataset.tribe === tribe);
+    });
+    const vName = document.getElementById('villageSelect').value;
+    renderManualGrid(vName);
+  }
+
+  function renderManualGrid(vName) {
+    const grid = document.getElementById('manualGrid');
+    if (!manualTribe) {
+      grid.innerHTML = '<div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a tribe to see troop inputs.</div>';
+      return;
+    }
+
+    const tribeData = TT?.troopsByTribe[manualTribe] || [];
+    const existing = (vName && myTroops[vName]) ? myTroops[vName].troops || {} : {};
+
+    grid.innerHTML = tribeData.filter(t => t.slot < 10).map(t => {
+      const key = t.name.toLowerCase();
+      const val = existing[key] || existing[t.class_id] || 0;
+      return `
+        <div class="manual-field">
+          <label class="manual-label">
+            <span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id) || 'width:18px;height:18px;'}"></span>
+            ${t.name}
+          </label>
+          <input type="number" class="manual-input" data-troop="${key}" data-classid="${t.class_id}" min="0" value="${val || ''}" placeholder="0" />
+        </div>`;
+    }).join('') + `
+      <div class="manual-field">
+        <label class="manual-label">
+          <span class="troop-sprite" style="${TT?.getSpriteStyle('uhero') || 'width:18px;height:18px;'}"></span>
+          Hero
+        </label>
+        <input type="number" class="manual-input" data-troop="hero" min="0" value="${existing['hero'] || ''}" placeholder="0" />
+      </div>`;
+  }
+
+  // ── SAVE ──
+  async function handleSave() {
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="mini-spin"></div> Saving…';
+
+    try {
+      const db = window._supabase;
+
+      if (activeTab === 'parse') {
+        if (!parsedData || !parsedData.rows.length) {
+          toast('Paste and parse your troop data first.', 'error');
+          btn.disabled = false; btn.innerHTML = '💾 Save Troops'; return;
+        }
+
+        const tribe = parsedData.tribe;
+        const headers = parsedData.headers.slice(1).map(h => h.toLowerCase().trim()); // troop names
+
+        // Build upsert rows
+        const upserts = parsedData.rows.map(row => {
+          const troops = {};
+          row.values.forEach((val, idx) => {
+            const header = headers[idx];
+            if (header && header !== 'hero') troops[header] = val;
+            else if (header === 'hero') troops['hero'] = val;
+          });
+          return {
+            workspace_id: currentWorkspace.id,
+            user_id:      currentUser.id,
+            village_name: row.village,
+            tribe,
+            troops,
+            updated_at:   new Date().toISOString(),
+          };
+        });
+
+        const { error } = await db.from('workspace_troops').upsert(upserts, {
+          onConflict: 'workspace_id,user_id,village_name'
+        });
+        if (error) throw error;
+
+        // Update local state
+        upserts.forEach(u => { myTroops[u.village_name] = { tribe: u.tribe, troops: u.troops, updated_at: u.updated_at }; });
+
+      } else {
+        // Manual
+        const vName = document.getElementById('villageSelect').value;
+        if (!vName) { toast('Select a village first.', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save Troops'; return; }
+        if (!manualTribe) { toast('Select a tribe first.', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save Troops'; return; }
+
+        const troops = {};
+        document.querySelectorAll('#manualGrid .manual-input').forEach(inp => {
+          const key = inp.dataset.troop;
+          const val = parseInt(inp.value) || 0;
+          if (key) troops[key] = val;
+        });
+
+        const upsert = {
+          workspace_id: currentWorkspace.id,
+          user_id:      currentUser.id,
+          village_name: vName,
+          tribe:        manualTribe,
+          troops,
+          updated_at:   new Date().toISOString(),
+        };
+        const { error } = await db.from('workspace_troops').upsert([upsert], {
+          onConflict: 'workspace_id,user_id,village_name'
+        });
+        if (error) throw error;
+        myTroops[vName] = { tribe: manualTribe, troops, updated_at: upsert.updated_at };
+      }
+
+      toast('✅ Troops saved!', 'success');
+      renderMyTroops();
+      closeModal();
+
+    } catch(e) {
+      console.error('handleSave:', e);
+      toast('Failed to save. Please try again.', 'error');
+    } finally {
+      btn.disabled = false; btn.innerHTML = '💾 Save Troops';
+    }
+  }
+
+  // ── HELPERS ──
+  const tribeLabelMap = { roman:'Romans', teuton:'Teutons', gaul:'Gauls', egyptian:'Egyptians', hun:'Huns' };
+
+  async function waitForSupabase(timeout = 6000) {
+    const start = Date.now();
+    while (typeof window._supabase === 'undefined' || typeof window.getUser !== 'function') {
+      if (Date.now() - start > timeout) throw new Error('Supabase timeout');
+      await sleep(50);
+    }
+  }
+
+  function show(id) { const el = document.getElementById(id); if (el) el.style.display = 'block'; }
+  function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function timeAgo(iso) {
+    const diff = Date.now() - new Date(iso).getTime();
+    const m = Math.floor(diff / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);
+    if (h < 24) return `${h}h ago`;
+    return `${Math.floor(h/24)}d ago`;
+  }
+
+  function toast(msg, type = 'info') {
+    const wrap = document.getElementById('toastWrap');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    wrap.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('inputModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+</script>
+</body>
+</html>
