@@ -1380,9 +1380,24 @@
       // }).select().single();
       // if (error) throw error;
 
-      await sleep(1100);
       const user = await window.getUser();
       const db   = window._supabase;
+
+      // Cek batas workspace untuk non-Pro
+      const isPro = typeof window.isPro === 'function' ? await window.isPro() : false;
+      if (!isPro) {
+        const { data: existingMemberships, error: countErr } = await db
+          .from('workspace_members')
+          .select('id')
+          .eq('user_id', user.id);
+
+        if (!countErr && existingMemberships && existingMemberships.length >= 2) {
+          toast('Free users can only be in up to 2 workspaces. Upgrade to Pro for unlimited.', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '🏰 Create Workspace';
+          return;
+        }
+      }
 
       // Generate UUID di client supaya tidak perlu SELECT setelah insert
       const wsId = crypto.randomUUID();
