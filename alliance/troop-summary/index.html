@@ -325,8 +325,9 @@
           </select>
         </div>
 
-        <div class="field-group">
-          <label class="field-label">Tribe</label>
+        <!-- Tribe shown as info only, or first-time picker -->
+        <div class="field-group" id="tribePickerGroup" style="display:none;">
+          <label class="field-label">Your Tribe <span style="color:var(--red);">*</span></label>
           <div class="tribe-selector" id="tribeSelectorManual">
             <div class="tribe-opt" data-tribe="roman"    onclick="selectTribe('roman')">🦅 Romans</div>
             <div class="tribe-opt" data-tribe="teuton"   onclick="selectTribe('teuton')">⚒️ Teutons</div>
@@ -334,6 +335,11 @@
             <div class="tribe-opt" data-tribe="egyptian" onclick="selectTribe('egyptian')">🏺 Egyptians</div>
             <div class="tribe-opt" data-tribe="hun"      onclick="selectTribe('hun')">🏹 Huns</div>
           </div>
+          <div style="font-size:0.73rem;color:var(--text3);margin-top:5px;">Only needed once — all your villages share the same tribe.</div>
+        </div>
+        <div class="field-group" id="tribeInfoGroup" style="display:none;">
+          <label class="field-label">Tribe</label>
+          <div id="tribeInfoBadge"></div>
         </div>
 
         <div class="manual-grid" id="manualGrid">
@@ -668,17 +674,45 @@
     document.getElementById('parseInput').value = '';
     document.getElementById('parseResult').innerHTML = '';
     parsedData = null;
-    manualTribe = null;
     switchTab('parse');
+
+    // Auto-detect tribe from existing data
+    const knownTribe = getKnownTribe();
+    manualTribe = knownTribe;
+
+    // Show/hide tribe picker vs tribe info
+    const hasTribe = !!knownTribe;
+    document.getElementById('tribePickerGroup').style.display = hasTribe ? 'none' : 'block';
+    document.getElementById('tribeInfoGroup').style.display   = hasTribe ? 'block' : 'none';
+    if (hasTribe) {
+      document.getElementById('tribeInfoBadge').innerHTML =
+        `<span class="tribe-badge tribe-${knownTribe}">${tribeLabelMap[knownTribe]}</span>`;
+    }
 
     if (tabOrVillage === 'manual') {
       switchTab('manual');
     } else if (tabOrVillage && tabOrVillage !== 'parse') {
-      // village name passed
       switchTab('manual');
+      // Set title to village name
+      const vData = myVillages.find(v => v.name === tabOrVillage);
+      document.getElementById('modalTitle').textContent = `Edit: ${tabOrVillage}`;
+      document.getElementById('modalSub').textContent   = vData ? `(${vData.x}|${vData.y})` : '';
+      // Hide village selector (already known)
+      document.querySelector('.field-group:has(#villageSelect)').style.display = 'none';
       document.getElementById('villageSelect').value = tabOrVillage;
       onVillageSelect();
+    } else {
+      document.getElementById('modalTitle').textContent = 'Update Troops';
+      document.getElementById('modalSub').textContent   = 'Your villages';
+      document.querySelector('.field-group:has(#villageSelect)').style.display = 'block';
     }
+  }
+
+  function getKnownTribe() {
+    // From existing troop data
+    const first = Object.values(myTroops)[0];
+    if (first?.tribe) return first.tribe;
+    return null;
   }
 
   function closeModal() {
@@ -801,9 +835,11 @@
   function onVillageSelect() {
     const vName = document.getElementById('villageSelect').value;
     if (!vName) return;
-    // Pre-fill tribe if known
-    const existing = myTroops[vName];
-    if (existing?.tribe) selectTribe(existing.tribe);
+    // tribe already set via getKnownTribe in openModal
+    if (!manualTribe) {
+      const existing = myTroops[vName];
+      if (existing?.tribe) { manualTribe = existing.tribe; }
+    }
     renderManualGrid(vName);
   }
 
