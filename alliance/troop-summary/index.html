@@ -283,6 +283,7 @@
       .page-actions .btn { flex: 1; justify-content: center; }
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -454,7 +455,11 @@
 
     // Load workspace from sessionStorage (set by workspace page when user enters)
     const ws = loadWorkspace();
-    if (!ws) { show('noWorkspace'); hide('loadingState'); return; }
+    if (!ws) {
+      // Redirect to workspace selector
+      window.location.href = '/alliance/workspace/';
+      return;
+    }
     currentWorkspace = ws;
 
     // Show workspace info
