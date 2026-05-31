@@ -572,7 +572,11 @@
           </div>
         </th>
       `).join('')}
-      <th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle('uhero') || ''}"></span></div></th>
+      <th title="Tournament Square level"><div class="troop-icon-header" style="font-size:0.7rem;font-weight:700;color:var(--text2);">TS</div></th>
+      <th title="Offensive strength" style="color:var(--red);border-left:2px solid var(--border);">⚔ Off</th>
+      <th title="Defense vs Infantry" style="color:var(--blue2);">🛡 Def</th>
+      <th title="Defense vs Cavalry" style="color:var(--blue2);">🐴 Def</th>
+      <th title="Actions"></th>
     </tr>`;
 
     // Villages: myVillages as base (from API), + any in myTroops not already listed
@@ -595,29 +599,48 @@
     // Sum row
     const sums = {};
     troopCols.forEach(t => sums[t.name.toLowerCase()] = 0);
-    sums['hero'] = 0;
+    sums['ts'] = 0;
+    sums['off'] = 0;
+    sums['defInf'] = 0;
+    sums['defCav'] = 0;
 
     const rows = allVillageNames.map(vName => {
       const data = myTroops[vName];
       const troops = data?.troops || {};
 
+      // Compute troop cells + combat strength
+      let offStr = 0, defInfStr = 0, defCavStr = 0;
       const cells = troopCols.map(t => {
         const key = t.name.toLowerCase();
-        const val = troops[key] || troops[t.class_id] || 0;
-        sums[key] = (sums[key] || 0) + Number(val);
+        const val = Number(troops[key] || troops[t.class_id] || 0);
+        sums[key] = (sums[key] || 0) + val;
+        // Add to combat strength
+        offStr    += val * (t.stats?.attack  || 0);
+        defInfStr += val * (t.stats?.def_inf || 0);
+        defCavStr += val * (t.stats?.def_cav || 0);
         return `<td class="${val ? '' : 'zero'}">${val ? Number(val).toLocaleString() : '0'}</td>`;
       }).join('');
 
-      const hero = troops['hero'] || 0;
-      sums['hero'] += Number(hero);
+      sums['off']    += offStr;
+      sums['defInf'] += defInfStr;
+      sums['defCav'] += defCavStr;
+
+      const ts    = Number(troops['ts'] || 0);
+      sums['ts'] += ts;
 
       const vData = myVillages.find(v => v.name === vName);
       const coordStr = vData ? ` <span style="color:var(--text3);font-size:0.73rem;font-weight:400;">(${vData.x}|${vData.y})</span>` : '';
 
+      const fmtK = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'k' : n ? String(n) : '0';
+
       return `<tr>
         <td class="village-col">${escHtml(vName)}${coordStr}</td>
         ${cells}
-        <td class="${hero ? '' : 'zero'}">${hero ? Number(hero).toLocaleString() : '0'}</td>
+        <td class="${ts ? '' : 'zero'}">${ts || '—'}</td>
+        <td style="border-left:2px solid var(--border);color:${offStr ? 'var(--red)' : 'var(--text3)'};font-weight:${offStr ? '600' : '400'};">${fmtK(offStr)}</td>
+        <td style="color:${defInfStr ? 'var(--blue2)' : 'var(--text3)'};font-weight:${defInfStr ? '600' : '400'};">${fmtK(defInfStr)}</td>
+        <td style="color:${defCavStr ? 'var(--blue2)' : 'var(--text3)'};font-weight:${defCavStr ? '600' : '400'};">${fmtK(defCavStr)}</td>
+        <td><button class="edit-btn" onclick="openModal('${escHtml(vName).replace(/'/g,"\'")}')">✏️</button></td>
       </tr>`;
     }).join('');
 
@@ -626,10 +649,16 @@
       return `<td>${val ? Number(val).toLocaleString() : '—'}</td>`;
     }).join('');
 
+    const fmtKs = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'k' : n ? String(n) : '—';
+
     body.innerHTML = rows + `<tr class="sum-row">
       <td class="village-col">Total</td>
       ${sumCells}
-      <td>${sums['hero'] || '—'}</td>
+      <td>—</td>
+      <td style="border-left:2px solid var(--border);color:var(--red);">${fmtKs(sums['off'])}</td>
+      <td style="color:var(--blue2);">${fmtKs(sums['defInf'])}</td>
+      <td style="color:var(--blue2);">${fmtKs(sums['defCav'])}</td>
+      <td></td>
     </tr>`;
   }
 
@@ -796,6 +825,7 @@
 
     const tribeData = TT?.troopsByTribe[manualTribe] || [];
     const existing = (vName && myTroops[vName]) ? myTroops[vName].troops || {} : {};
+    const tsVal = existing['ts'] || '';
 
     grid.innerHTML = tribeData.filter(t => t.slot < 10).map(t => {
       const key = t.name.toLowerCase();
@@ -806,15 +836,13 @@
             <span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id) || 'width:18px;height:18px;'}"></span>
             ${t.name}
           </label>
-          <input type="number" class="manual-input" data-troop="${key}" data-classid="${t.class_id}" min="0" value="${val || ''}" placeholder="0" />
+          <input type="number" class="manual-input" data-troop="${key}" min="0" value="${val || ''}" placeholder="0" />
         </div>`;
     }).join('') + `
-      <div class="manual-field">
-        <label class="manual-label">
-          <span class="troop-sprite" style="${TT?.getSpriteStyle('uhero') || 'width:18px;height:18px;'}"></span>
-          Hero
-        </label>
-        <input type="number" class="manual-input" data-troop="hero" min="0" value="${existing['hero'] || ''}" placeholder="0" />
+      <div class="manual-field" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+        <label class="manual-label" style="font-size:0.78rem;color:var(--text2);font-weight:700;">Tournament Square Level</label>
+        <input type="number" class="manual-input" data-troop="ts" min="0" max="20" value="${tsVal}" placeholder="0 (no TS)" style="max-width:140px;" />
+        <div style="font-size:0.72rem;color:var(--text3);margin-top:3px;">Level 0–20. Affects troop speed for attacks/support.</div>
       </div>`;
   }
 
