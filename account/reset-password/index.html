@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reset Password — Travian Tools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+    }
+
+    body {
+      background: #ffffff;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      top: -180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 440px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .auth-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 40px rgba(15,33,83,0.08), 0 2px 8px rgba(37,99,235,0.04);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin: 0 auto 18px;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.25);
+    }
+
+    .auth-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .auth-subtitle {
+      font-size: 0.875rem;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* Alert */
+    .alert {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.825rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+      border: 1px solid transparent;
+      line-height: 1.5;
+    }
+    .alert-error   { background: var(--red-bg);   border-color: rgba(220,38,38,0.2);  color: var(--red); }
+    .alert-success { background: var(--green-bg); border-color: rgba(5,150,105,0.2);  color: var(--green); }
+
+    /* Form */
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.01em;
+      margin-bottom: 6px;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      pointer-events: none;
+      opacity: 0.45;
+    }
+
+    input[type="password"],
+    input[type="text"].pw-input {
+      width: 100%;
+      height: 46px;
+      padding: 0 44px 0 40px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    }
+
+    input:focus {
+      border-color: var(--blue2);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+    }
+
+    input.input-error {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+    }
+
+    input::placeholder { color: var(--text3); }
+
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text3);
+      padding: 4px;
+      transition: color 0.15s;
+    }
+    .toggle-pw:hover { color: var(--text2); }
+
+    /* Password strength bar */
+    .strength-bar-wrap {
+      margin-top: 8px;
+      display: none;
+    }
+    .strength-bar-track {
+      height: 4px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .strength-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      width: 0%;
+      transition: width 0.3s, background 0.3s;
+    }
+    .strength-label {
+      font-size: 0.72rem;
+      margin-top: 5px;
+      font-weight: 500;
+      color: var(--text3);
+    }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background: var(--blue2);
+      color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.925rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(37,99,235,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      letter-spacing: 0.01em;
+      margin-top: 8px;
+    }
+    .btn-submit:hover:not(:disabled) {
+      background: var(--blue-light);
+      box-shadow: 0 6px 28px rgba(59,130,246,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .btn-submit.success {
+      background: var(--green) !important;
+      box-shadow: 0 4px 20px rgba(5,150,105,0.3) !important;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    .btn-submit.loading .spinner { display: block; }
+    .btn-submit.loading .btn-label { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Invalid token state */
+    .invalid-state {
+      display: none;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .invalid-state .invalid-icon { font-size: 2.2rem; margin-bottom: 14px; display: block; }
+    .invalid-state .invalid-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .invalid-state p { font-size: 0.83rem; color: var(--text2); line-height: 1.65; margin-bottom: 20px; }
+
+    /* Success state */
+    .success-state {
+      display: none;
+      text-align: center;
+      padding: 8px 0;
+    }
+    .success-state .success-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
+    .success-state .success-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .success-state p { font-size: 0.83rem; color: var(--text2); line-height: 1.65; margin-bottom: 20px; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      height: 44px;
+      background: var(--surface2);
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.18s;
+    }
+    .btn-secondary:hover {
+      background: var(--blue-glow);
+      border-color: var(--border2);
+      color: var(--blue2);
+    }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 0.75rem;
+      color: var(--text3);
+    }
+    footer a { color: var(--text3); text-decoration: none; }
+    footer a:hover { color: var(--text2); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-root"></div>
+
+  <div class="page-wrap">
+    <div class="auth-container">
+      <div class="auth-card">
+
+        <div class="auth-header">
+          <div class="auth-icon">🔐</div>
+          <h1 class="auth-title">Set new password</h1>
+          <p class="auth-subtitle">Choose a strong password for your account.</p>
+        </div>
+
+        <!-- Invalid / expired token -->
+        <div class="invalid-state" id="invalidState">
+          <span class="invalid-icon">⚠️</span>
+          <div class="invalid-title">Link expired or invalid</div>
+          <p>This reset link has expired or has already been used. Reset links are only valid for 1 hour.</p>
+          <a href="/login/" class="btn-secondary" style="margin-bottom:12px;">← Back to login</a>
+          <p style="font-size:0.78rem;color:var(--text3);">Need a new link? Use <a href="/login/" style="color:var(--blue2);font-weight:600;text-decoration:none;">Forgot password</a> on the login page.</p>
+        </div>
+
+        <!-- Form -->
+        <div id="formState">
+          <div class="alert" id="alertBox"></div>
+
+          <form id="resetForm" novalidate>
+            <div class="form-group">
+              <label for="newPassword">New password</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  id="newPassword"
+                  name="newPassword"
+                  class="pw-input"
+                  placeholder="Min. 8 characters"
+                  autocomplete="new-password"
+                  required
+                >
+                <button type="button" class="toggle-pw" onclick="togglePw('newPassword', this)" aria-label="Toggle password">👁</button>
+              </div>
+              <div class="strength-bar-wrap" id="strengthWrap">
+                <div class="strength-bar-track">
+                  <div class="strength-bar-fill" id="strengthFill"></div>
+                </div>
+                <div class="strength-label" id="strengthLabel"></div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="confirmPassword">Confirm new password</label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  class="pw-input"
+                  placeholder="Repeat your password"
+                  autocomplete="new-password"
+                  required
+                >
+                <button type="button" class="toggle-pw" onclick="togglePw('confirmPassword', this)" aria-label="Toggle confirm password">👁</button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+              <div class="spinner"></div>
+              <span class="btn-label">Set new password →</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Success state -->
+        <div class="success-state" id="successState">
+          <span class="success-icon">✅</span>
+          <div class="success-title">Password updated!</div>
+          <p>Your password has been changed successfully. You can now log in with your new password.</p>
+          <a href="/login/" class="btn-submit" style="text-decoration:none;">Go to login →</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <a href="/">travian.sonybukansoni.com</a> &nbsp;·&nbsp; Travian Tools
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/supabase.js"></script>
+  <script src="/servers.js"></script>
+  <script src="/navbar.js"></script>
+
+  <script>
+    // Toggle show/hide password
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.textContent = isHidden ? '🙈' : '👁';
+    }
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('alertBox');
+      box.textContent = msg;
+      box.className = `alert alert-${type}`;
+      box.style.display = 'block';
+    }
+
+    function hideAlert() {
+      document.getElementById('alertBox').style.display = 'none';
+    }
+
+    function setLoading(loading) {
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = loading;
+      btn.classList.toggle('loading', loading);
+    }
+
+    // ── Password strength checker ──
+    function checkStrength(pw) {
+      let score = 0;
+      if (pw.length >= 8)  score++;
+      if (pw.length >= 12) score++;
+      if (/[A-Z]/.test(pw)) score++;
+      if (/[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+      return score; // 0–5
+    }
+
+    document.getElementById('newPassword').addEventListener('input', function() {
+      const pw = this.value;
+      const wrap = document.getElementById('strengthWrap');
+      const fill = document.getElementById('strengthFill');
+      const label = document.getElementById('strengthLabel');
+
+      if (!pw) { wrap.style.display = 'none'; return; }
+      wrap.style.display = 'block';
+
+      const score = checkStrength(pw);
+      const levels = [
+        { pct: '20%', color: '#dc2626', text: 'Too weak' },
+        { pct: '40%', color: '#dc2626', text: 'Weak' },
+        { pct: '60%', color: '#d97706', text: 'Fair' },
+        { pct: '80%', color: '#059669', text: 'Strong' },
+        { pct: '100%', color: '#059669', text: 'Very strong' },
+      ];
+      const lvl = levels[Math.max(0, score - 1)] || levels[0];
+      fill.style.width = lvl.pct;
+      fill.style.background = lvl.color;
+      label.textContent = lvl.text;
+      label.style.color = lvl.color;
+
+      // Clear confirm error jika ada
+      document.getElementById('confirmPassword').classList.remove('input-error');
+      hideAlert();
+    });
+
+    document.getElementById('confirmPassword').addEventListener('input', function() {
+      this.classList.remove('input-error');
+      hideAlert();
+    });
+
+    // ── Cek token dari URL hash ──
+    // Supabase inject: #access_token=...&type=recovery
+    (async () => {
+      // Supabase client akan otomatis proses hash dan set session
+      // Tunggu sebentar supaya Supabase selesai exchange token
+      await new Promise(r => setTimeout(r, 300));
+
+      const { data: { session } } = await window._supabase.auth.getSession();
+
+      // Kalau tidak ada session recovery, berarti link invalid/expired
+      if (!session || session.user?.aud !== 'authenticated') {
+        // Cek apakah ini memang halaman recovery (ada hash di URL)
+        const hash = window.location.hash;
+        if (!hash.includes('access_token')) {
+          // Tidak ada token sama sekali — redirect ke login
+          window.location.replace('/login/');
+          return;
+        }
+        // Ada token tapi session gagal → link expired/invalid
+        showInvalidState();
+        return;
+      }
+
+      // Kalau session ada tapi bukan type recovery, redirect ke home
+      const params = new URLSearchParams(window.location.hash.slice(1));
+      const type = params.get('type');
+      if (type && type !== 'recovery') {
+        window.location.replace('/');
+        return;
+      }
+
+      // Oke, token valid — tampilkan form
+      document.getElementById('formState').style.display = 'block';
+    })();
+
+    function showInvalidState() {
+      document.getElementById('formState').style.display = 'none';
+      document.getElementById('invalidState').style.display = 'block';
+      // Update header
+      document.querySelector('.auth-icon').textContent = '⚠️';
+      document.querySelector('.auth-title').textContent = 'Link expired';
+      document.querySelector('.auth-subtitle').textContent = 'This reset link can no longer be used.';
+    }
+
+    // ── Submit form ──
+    document.getElementById('resetForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert();
+
+      const newPw  = document.getElementById('newPassword').value;
+      const confPw = document.getElementById('confirmPassword').value;
+
+      // Validasi
+      if (!newPw || !confPw) {
+        showAlert('Please fill in both fields.');
+        return;
+      }
+      if (newPw.length < 8) {
+        showAlert('Password must be at least 8 characters.');
+        document.getElementById('newPassword').classList.add('input-error');
+        return;
+      }
+      if (newPw !== confPw) {
+        showAlert('Passwords do not match.');
+        document.getElementById('confirmPassword').classList.add('input-error');
+        return;
+      }
+
+      setLoading(true);
+
+      const { error } = await window._supabase.auth.updateUser({ password: newPw });
+
+      setLoading(false);
+
+      if (error) {
+        let msg = 'Failed to update password. Please try again.';
+        if (error.message.includes('same password')) {
+          msg = 'Your new password cannot be the same as your current password.';
+        } else if (error.message.includes('weak')) {
+          msg = 'Password is too weak. Try adding numbers or symbols.';
+        }
+        showAlert(msg);
+        return;
+      }
+
+      // Sukses — logout session recovery, tampilkan success
+      await window._supabase.auth.signOut();
+      document.getElementById('formState').style.display = 'none';
+      document.getElementById('successState').style.display = 'block';
+      document.querySelector('.auth-icon').textContent = '✅';
+      document.querySelector('.auth-title').textContent = 'All done!';
+      document.querySelector('.auth-subtitle').textContent = 'Your password has been updated.';
+
+      // Auto redirect ke login setelah 3 detik
+      setTimeout(() => window.location.replace('/login/'), 3000);
+    });
+  </script>
+
+</body>
+</html>

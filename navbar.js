@@ -69,7 +69,6 @@
           { icon: '🕵️', title: 'Spy Productivity', desc: 'Estimate resource production',       badge: 'FREE', href: '/tools/spy-on-productivity/',     serverBased: false },
           { icon: '⚔️', title: 'Attack Planner',   desc: 'Plan multi-wave attacks',            badge: 'FREE', href: '/tools/attack-planner/',          serverBased: false },
           { icon: '🏘️', title: 'Village Tree',     desc: 'Visualize your expansion tree',      badge: 'FREE', href: '/tools/village-tree/',            serverBased: false },
-          { icon: '📊', title: 'Troop Simulator',  desc: 'Simulate battle outcomes',           badge: 'SOON', href: '#',                               serverBased: false },
         ],
       },
       {
@@ -77,8 +76,6 @@
         dropdown: [
           { icon: '📈', title: 'Server Statistics', desc: 'Track player & alliance growth',    badge: 'FREE', serverTool: 'statistics',                 serverBased: true  },
           { icon: '💤', title: 'Inactive Search',   desc: 'Find inactive players & villages',  badge: 'FREE', serverTool: 'statistics/inactive-search', serverBased: true  },
-          { icon: '🏰', title: 'Village Analyzer',  desc: 'Deep dive on enemy villages',       badge: 'SOON', href: '#',                               serverBased: false },
-          { icon: '🤝', title: 'Alliance Stats',    desc: 'Compare alliance performance',      badge: 'SOON', href: '#',                               serverBased: false },
         ],
       },
       {
@@ -94,7 +91,7 @@
         dropdown: [
           { icon: '🌾', title: 'Field Production', desc: 'Simulate resource output per hour', badge: 'FREE', href: '/simulators/field-production/',    serverBased: false },
           { icon: '🏘️', title: 'Village Planner',  desc: 'Plan buildings & upgrade path',    badge: 'FREE', href: '/simulators/village-planner/',     serverBased: false },
-          { icon: '⚔️', title: 'Battle Simulator', desc: 'Simulate attack vs defense',       badge: 'SOON', href: '#',                               serverBased: false },
+          { icon: '⚔️', title: 'Combat Simulator', desc: 'Simulate attack vs defense',       badge: 'SOON', href: '#',                               serverBased: false },
           { icon: '⏱️', title: 'Troop Training',   desc: 'Time & cost to build an army',     badge: 'SOON', href: '#',                               serverBased: false },
           { icon: '🌾', title: 'Crop Balance',     desc: 'Net crop after troop consumption', badge: 'SOON', href: '#',                               serverBased: false },
         ],

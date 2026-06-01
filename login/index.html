@@ -145,13 +145,6 @@
     /* Form */
     .form-group { margin-bottom: 18px; }
 
-    .form-label-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 6px;
-    }
-
     label {
       display: block;
       font-size: 0.8rem;
@@ -182,7 +175,8 @@
     }
 
     input[type="email"],
-    input[type="password"] {
+    input[type="password"],
+    input[type="text"].pw-input {
       width: 100%;
       height: 46px;
       padding: 0 14px 0 40px;
@@ -380,11 +374,134 @@
       .auth-card { padding: 28px 20px; }
       .auth-perks { gap: 14px; }
     }
+
+    /* ── Forgot Password Modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15,33,83,0.45);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease both;
+    }
+    .modal-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(15,33,83,0.18);
+      animation: fadeUp 0.25s ease both;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: none; border: none;
+      font-size: 1.1rem; cursor: pointer;
+      color: var(--text3); line-height: 1;
+      padding: 4px 6px; border-radius: 6px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .modal-close:hover { color: var(--text); background: var(--surface2); }
+    .modal-icon {
+      width: 44px; height: 44px;
+      background: var(--blue-glow);
+      border: 1px solid rgba(59,130,246,0.2);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .modal-desc {
+      font-size: 0.825rem; color: var(--text2);
+      line-height: 1.6; margin-bottom: 22px;
+    }
+    .modal-alert {
+      display: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem; font-weight: 500;
+      margin-bottom: 16px;
+      border: 1px solid transparent;
+      line-height: 1.5;
+    }
+    .modal-alert.error   { background: var(--red-bg);   border-color: rgba(220,38,38,0.2);  color: var(--red); }
+    .modal-alert.success { background: var(--green-bg); border-color: rgba(5,150,105,0.2);  color: var(--green); }
+    .modal-success-state { display: none; text-align: center; padding: 8px 0 4px; }
+    .modal-success-state .success-icon { font-size: 2.4rem; margin-bottom: 14px; display: block; }
+    .modal-success-state .success-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px;
+    }
+    .modal-success-state p { font-size: 0.83rem; color: var(--text2); line-height: 1.65; }
+    .modal-success-state strong { color: var(--text); }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   </style>
 </head>
 <body>
 
   <div id="navbar-root"></div>
+
+  <!-- ── Forgot Password Modal ── -->
+  <div class="modal-backdrop" id="forgotModal" role="dialog" aria-modal="true" aria-labelledby="forgotModalTitle">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeForgotModal()" aria-label="Close">✕</button>
+
+      <!-- Form state -->
+      <div id="forgotFormState">
+        <div class="modal-icon">🔑</div>
+        <div class="modal-title" id="forgotModalTitle">Reset your password</div>
+        <p class="modal-desc">Enter your account email and we'll send you a reset link.</p>
+
+        <div class="modal-alert" id="modalAlert"></div>
+
+        <div class="form-group" style="margin-bottom:16px;">
+          <label for="forgotEmail">Email</label>
+          <div class="input-wrap" style="margin-top:6px;">
+            <span class="input-icon">🛡️</span>
+            <input
+              type="email"
+              id="forgotEmail"
+              placeholder="your@email.com"
+              autocomplete="email"
+              style="width:100%;height:46px;padding:0 14px 0 40px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--text);background:var(--surface2);border:1.5px solid var(--border);border-radius:10px;outline:none;transition:border-color 0.18s,box-shadow 0.18s,background 0.18s;"
+              onfocus="this.style.borderColor='var(--blue2)';this.style.background='#fff';this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+              onblur="this.style.borderColor='';this.style.background='';this.style.boxShadow='';"
+            >
+          </div>
+        </div>
+
+        <button class="btn-submit" id="forgotSubmitBtn" onclick="submitForgotPassword()" style="margin-top:4px;">
+          <div class="spinner" id="forgotSpinner"></div>
+          <span id="forgotBtnLabel">Send reset link →</span>
+        </button>
+      </div>
+
+      <!-- Success state -->
+      <div class="modal-success-state" id="forgotSuccessState">
+        <span class="success-icon">📬</span>
+        <div class="success-title">Check your inbox!</div>
+        <p>We've sent a reset link to <strong id="forgotEmailSent"></strong>.<br>Click the link in the email to set a new password.</p>
+        <p style="margin-top:12px;font-size:0.78rem;color:var(--text3);">Didn't receive it? Check spam, or <a href="#" onclick="resetForgotModal();return false;" style="color:var(--blue2);font-weight:600;text-decoration:none;">try again</a>.</p>
+      </div>
+    </div>
+  </div>
 
   <div class="page-wrap">
     <div class="auth-container">
@@ -416,22 +533,21 @@
           </div>
 
           <div class="form-group">
-            <div class="form-label-row">
-              <label for="password">Password</label>
-              <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
-            </div>
+            <label for="password">Password</label>
             <div class="input-wrap">
               <span class="input-icon">🔒</span>
               <input
                 type="password"
                 id="password"
                 name="password"
+                class="pw-input"
                 placeholder="Your password"
                 autocomplete="current-password"
                 required
               >
               <button type="button" class="toggle-pw" onclick="togglePw('password', this)" aria-label="Toggle password">👁</button>
             </div>
+            <a href="#" class="forgot-link" id="forgotLink" style="display:inline-block;margin-top:6px;">Forgot password?</a>
           </div>
 
           <label class="form-check">
@@ -518,26 +634,94 @@
       btn.classList.toggle('loading', loading);
     }
 
-    // Forgot password
-    document.getElementById('forgotLink').addEventListener('click', async (e) => {
+    // Forgot password — buka modal
+    document.getElementById('forgotLink').addEventListener('click', (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value.trim();
+      // Pre-fill email dari form login kalau sudah diisi
+      const loginEmail = document.getElementById('email').value.trim();
+      if (loginEmail) document.getElementById('forgotEmail').value = loginEmail;
+      openForgotModal();
+    });
+
+    function openForgotModal() {
+      const modal = document.getElementById('forgotModal');
+      modal.classList.add('open');
+      // Fokus ke input email di modal
+      setTimeout(() => document.getElementById('forgotEmail').focus(), 100);
+    }
+
+    function closeForgotModal() {
+      document.getElementById('forgotModal').classList.remove('open');
+    }
+
+    function resetForgotModal() {
+      document.getElementById('forgotFormState').style.display = '';
+      document.getElementById('forgotSuccessState').style.display = 'none';
+      document.getElementById('modalAlert').style.display = 'none';
+      document.getElementById('forgotEmail').value = '';
+      document.getElementById('forgotBtnLabel').textContent = 'Send reset link →';
+      document.getElementById('forgotSubmitBtn').disabled = false;
+    }
+
+    // Tutup modal kalau klik backdrop
+    document.getElementById('forgotModal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('forgotModal')) closeForgotModal();
+    });
+
+    // Tutup modal dengan Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeForgotModal();
+    });
+
+    // Enter di input email modal = submit
+    document.getElementById('forgotEmail').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submitForgotPassword(); }
+    });
+
+    async function submitForgotPassword() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const alertBox = document.getElementById('modalAlert');
+      const btn = document.getElementById('forgotSubmitBtn');
+      const spinner = document.getElementById('forgotSpinner');
+      const label = document.getElementById('forgotBtnLabel');
+
+      // Reset alert
+      alertBox.style.display = 'none';
+      alertBox.className = 'modal-alert';
 
       if (!email) {
-        showAlert('Enter your email address first, then click "Forgot password?".');
+        alertBox.textContent = 'Please enter your email address.';
+        alertBox.classList.add('error');
+        alertBox.style.display = 'block';
+        document.getElementById('forgotEmail').focus();
         return;
       }
+
+      // Loading state
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      label.style.display = 'none';
 
       const { error } = await window._supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'https://travian.sonybukansoni.com/account/reset-password/',
       });
 
+      spinner.style.display = 'none';
+      label.style.display = '';
+      btn.disabled = false;
+
       if (error) {
-        showAlert('Failed to send reset email. Please try again.');
-      } else {
-        showAlert('Password reset link sent! Check your email inbox.', 'success');
+        alertBox.textContent = 'Something went wrong. Please try again.';
+        alertBox.classList.add('error');
+        alertBox.style.display = 'block';
+        return;
       }
-    });
+
+      // Sukses — tampilkan success state
+      document.getElementById('forgotEmailSent').textContent = email;
+      document.getElementById('forgotFormState').style.display = 'none';
+      document.getElementById('forgotSuccessState').style.display = 'block';
+    }
 
     // Login form submit
     document.getElementById('loginForm').addEventListener('submit', async (e) => {

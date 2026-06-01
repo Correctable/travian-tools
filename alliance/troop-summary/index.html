@@ -7,212 +7,186 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --navy:       #0f2153;
-      --navy2:      #1a3068;
-      --navy3:      #0b1a3d;
-      --blue:       #1d4ed8;
-      --blue2:      #2563eb;
-      --blue-light: #3b82f6;
-      --blue-glow:  rgba(59,130,246,0.10);
-      --surface:    #ffffff;
-      --surface2:   #f8faff;
-      --border:     #e2e8f3;
-      --border2:    rgba(37,99,235,0.25);
-      --text:       #0f2153;
-      --text2:      #3d5a8a;
-      --text3:      #7a93bc;
-      --green:      #059669;
-      --green-bg:   rgba(5,150,105,0.08);
-      --amber:      #d97706;
-      --amber-bg:   rgba(217,119,6,0.08);
-      --red:        #dc2626;
-      --red-bg:     rgba(220,38,38,0.08);
-      --purple:     #7c3aed;
-      --purple-bg:  rgba(124,58,237,0.08);
+      --navy:#0f2153;--navy2:#1a3068;--blue:#1d4ed8;--blue2:#2563eb;--blue-light:#3b82f6;
+      --blue-glow:rgba(59,130,246,0.10);--surface:#ffffff;--surface2:#f8faff;
+      --border:#e2e8f3;--border2:rgba(37,99,235,0.25);--text:#0f2153;--text2:#3d5a8a;--text3:#7a93bc;
+      --green:#059669;--green-bg:rgba(5,150,105,0.08);--amber:#d97706;--amber-bg:rgba(217,119,6,0.08);
+      --red:#dc2626;--red-bg:rgba(220,38,38,0.08);--purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
     }
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); line-height: 1.65; min-height: 100vh; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);line-height:1.65;min-height:100vh;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-    @keyframes spin   { to { transform: rotate(360deg); } }
+    .page-header{border-bottom:1px solid var(--border);background:var(--surface);padding:28px 40px 24px;position:relative;z-index:10;}
+    .breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--text3);margin-bottom:10px;}
+    .breadcrumb a{color:var(--text3);text-decoration:none;}.breadcrumb a:hover{color:var(--blue2);}
+    .breadcrumb-sep{font-size:0.65rem;opacity:0.5;}.breadcrumb-current{color:var(--text2);font-weight:500;}
+    .page-header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+    .page-title-group{display:flex;align-items:center;gap:14px;}
+    .page-icon{width:44px;height:44px;border-radius:12px;background:var(--amber-bg);border:1px solid rgba(217,119,6,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+    .page-title{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
+    .page-subtitle{font-size:0.8rem;color:var(--text3);margin-top:2px;}
+    .page-actions{display:flex;gap:8px;}
+    @media(max-width:768px){.page-header{padding:20px 16px 18px;}}
 
-    /* PAGE HEADER */
-    .page-header {
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-      padding: 28px 40px 24px;
-      position: relative; z-index: 10;
-    }
-    .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; }
-    .breadcrumb a { color: var(--text3); text-decoration: none; }
-    .breadcrumb a:hover { color: var(--blue2); }
-    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
-    .breadcrumb-current { color: var(--text2); font-weight: 500; }
-    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-    .page-title-group { display: flex; align-items: center; gap: 14px; }
-    .page-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--amber-bg); border: 1px solid rgba(217,119,6,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-    .page-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
-    .page-actions { display: flex; gap: 8px; }
-    @media (max-width: 768px) { .page-header { padding: 20px 16px 18px; } }
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer;border:none;transition:all 0.18s;text-decoration:none;white-space:nowrap;}
+    .btn-primary{background:var(--navy);color:#fff;}.btn-primary:hover{background:var(--navy2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,33,83,0.2);}
+    .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border);}.btn-secondary:hover{background:var(--border);}
+    .btn-amber{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,0.2);}.btn-amber:hover{background:rgba(217,119,6,0.15);}
+    .btn-sm{padding:6px 13px;font-size:0.8rem;border-radius:8px;}
+    .btn:disabled{opacity:0.45;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
 
-    /* BUTTONS */
-    .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; border: none; transition: all 0.18s; text-decoration: none; white-space: nowrap; }
-    .btn-primary { background: var(--navy); color: #fff; }
-    .btn-primary:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(15,33,83,0.2); }
-    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: var(--border); }
-    .btn-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
-    .btn-amber:hover { background: rgba(217,119,6,0.15); }
-    .btn-sm { padding: 6px 13px; font-size: 0.8rem; border-radius: 8px; }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+    #alliance-layout{display:flex;min-height:calc(100vh - 64px);}
+    #alliance-main{flex:1;min-width:0;overflow-x:hidden;}
+    .page-wrap{max-width:1200px;margin:0 auto;padding:32px 24px 72px;}
+    @media(max-width:768px){.page-wrap{padding:20px 16px 48px;}}
 
-    /* LAYOUT */
-    #alliance-layout { display: flex; min-height: calc(100vh - 64px); }
-    #alliance-main   { flex: 1; min-width: 0; overflow-x: hidden; }
+    .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:14px;}
+    .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.75s linear infinite;}
+    .loading-text{font-size:0.85rem;color:var(--text3);}
 
-    /* PAGE WRAP */
-    .page-wrap { max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; }
-    @media (max-width: 768px) { .page-wrap { padding: 20px 16px 48px; } }
+    #noWorkspace{display:none;}
+    .gate-box{max-width:480px;margin:60px auto;text-align:center;animation:fadeUp 0.4s ease;}
+    .gate-icon{font-size:2.8rem;margin-bottom:14px;}
+    .gate-title{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:8px;}
+    .gate-desc{font-size:0.875rem;color:var(--text2);margin-bottom:24px;}
 
-    /* LOADING */
-    .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; gap: 14px; }
-    .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--blue2); border-radius: 50%; animation: spin 0.75s linear infinite; }
-    .loading-text { font-size: 0.85rem; color: var(--text3); }
+    #viewMyTroops{display:none;animation:fadeUp 0.4s ease;}
+    #viewAllianceTroops{display:none;animation:fadeUp 0.4s ease;}
 
-    /* WORKSPACE GATE */
-    #noWorkspace { display: none; }
-    .gate-box { max-width: 480px; margin: 60px auto; text-align: center; animation: fadeUp 0.4s ease; }
-    .gate-icon { font-size: 2.8rem; margin-bottom: 14px; }
-    .gate-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
-    .gate-desc { font-size: 0.875rem; color: var(--text2); margin-bottom: 24px; }
+    .section-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+    .section-head{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;}
+    .section-title{font-family:'Space Grotesk',sans-serif;font-size:0.9rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+    .section-body{padding:0;}
 
-    /* VIEWS */
-    #viewMyTroops      { display: none; animation: fadeUp 0.4s ease; }
-    #viewAllianceTroops { display: none; animation: fadeUp 0.4s ease; }
+    /* TRIBE */
+    .tribe-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:0.72rem;font-weight:700;}
+    .tribe-roman{background:rgba(220,38,38,0.08);color:#dc2626;border:1px solid rgba(220,38,38,0.18);}
+    .tribe-teuton{background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.18);}
+    .tribe-gaul{background:rgba(5,150,105,0.08);color:#059669;border:1px solid rgba(5,150,105,0.18);}
+    .tribe-egyptian{background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid rgba(124,58,237,0.18);}
+    .tribe-hun{background:rgba(8,145,178,0.08);color:#0891b2;border:1px solid rgba(8,145,178,0.18);}
+    .tribe-unknown{background:var(--surface2);color:var(--text3);border:1px solid var(--border);}
 
-    /* SECTION CARD */
-    .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    .section-head { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: space-between; }
-    .section-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
-    .section-body { padding: 0; }
-
-    /* TRIBE BADGE */
-    .tribe-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
-    .tribe-roman    { background: rgba(220,38,38,0.08); color: #dc2626; border: 1px solid rgba(220,38,38,0.18); }
-    .tribe-teuton   { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.18); }
-    .tribe-gaul     { background: rgba(5,150,105,0.08); color: #059669; border: 1px solid rgba(5,150,105,0.18); }
-    .tribe-egyptian { background: rgba(124,58,237,0.08); color: #7c3aed; border: 1px solid rgba(124,58,237,0.18); }
-    .tribe-hun      { background: rgba(8,145,178,0.08); color: #0891b2; border: 1px solid rgba(8,145,178,0.18); }
-    .tribe-unknown  { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+    /* TRIBE ICON avatar */
+    .tribe-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;}
+    .tribe-avatar img{width:28px;height:28px;object-fit:contain;}
 
     /* TROOPS TABLE */
-    .troops-table-wrap { overflow-x: auto; }
-    .troops-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-    .troops-table th { padding: 8px 12px; text-align: center; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text3); background: var(--surface2); border-bottom: 1px solid var(--border); white-space: nowrap; }
-    .troops-table th.village-col { text-align: left; min-width: 160px; }
-    .troops-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: center; vertical-align: middle; }
-    .troops-table td.village-col { text-align: left; font-weight: 600; color: var(--navy); }
-    .troops-table tr:last-child td { border-bottom: none; }
-    .troops-table tbody tr:hover { background: var(--surface2); }
-    .troops-table .sum-row td { background: var(--surface2); font-weight: 700; color: var(--navy); border-top: 2px solid var(--border); }
-    .troops-table .zero { color: var(--text3); }
+    .troops-table-wrap{overflow-x:auto;}
+    .troops-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+    .troops-table th{padding:8px 12px;text-align:center;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);white-space:nowrap;}
+    .troops-table th.village-col{text-align:left;min-width:160px;}
+    .troops-table th.sortable{cursor:pointer;user-select:none;}
+    .troops-table th.sortable:hover{color:var(--navy);background:var(--border);}
+    .troops-table th.sort-asc::after{content:' ↑';opacity:0.7;}
+    .troops-table th.sort-desc::after{content:' ↓';opacity:0.7;}
+    .troops-table td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:center;vertical-align:middle;}
+    .troops-table td.village-col{text-align:left;font-weight:600;color:var(--navy);}
+    .troops-table tr:last-child td{border-bottom:none;}
+    .troops-table tbody tr:hover{background:var(--surface2);}
+    .troops-table .sum-row td{background:var(--surface2);font-weight:700;color:var(--navy);border-top:2px solid var(--border);}
+    .troops-table .zero{color:var(--text3);}
 
-    /* TROOP ICON */
-    .troop-icon-header { display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .troop-sprite { display: inline-block; width: 26px; height: 26px; background-repeat: no-repeat; image-rendering: pixelated; }
+    .troop-icon-header{display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .troop-sprite{display:inline-block;width:26px;height:26px;background-repeat:no-repeat;image-rendering:pixelated;}
+    .edit-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);font-size:0.75rem;font-weight:600;color:var(--text2);cursor:pointer;transition:all 0.14s;}
+    .edit-btn:hover{border-color:var(--blue2);color:var(--blue2);background:var(--blue-glow);}
+    .last-updated{font-size:0.73rem;color:var(--text3);}
 
-    /* EDIT BUTTON */
-    .edit-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); font-size: 0.75rem; font-weight: 600; color: var(--text2); cursor: pointer; transition: all 0.14s; }
-    .edit-btn:hover { border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow); }
-
-    .last-updated { font-size: 0.73rem; color: var(--text3); }
+    /* CHART */
+    .chart-wrap{padding:20px 24px;border-bottom:1px solid var(--border);background:var(--surface);}
+    .chart-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .chart-legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;}
+    .chart-legend-item{display:flex;align-items:center;gap:5px;font-size:0.73rem;color:var(--text2);font-weight:500;}
+    .chart-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+    canvas.troop-chart{width:100%!important;height:160px!important;display:block;}
+    .chart-empty{padding:24px;text-align:center;font-size:0.82rem;color:var(--text3);}
 
     /* MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15,33,83,0.45); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; animation: fadeIn 0.18s ease; }
-    .modal-overlay.hidden { display: none; }
-    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 80px rgba(15,33,83,0.18); animation: fadeUp 0.22s ease; }
-    .modal-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--surface); z-index: 1; }
-    .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: var(--navy); }
-    .modal-sub { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
-    .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text3); padding: 4px; }
-    .modal-close:hover { color: var(--navy); }
-    .modal-body { padding: 20px 24px; }
-    .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+    .modal-overlay{position:fixed;inset:0;background:rgba(15,33,83,0.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;animation:fadeIn 0.18s ease;}
+    .modal-overlay.hidden{display:none;}
+    .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:18px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(15,33,83,0.18);animation:fadeUp 0.22s ease;}
+    .modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);z-index:1;}
+    .modal-title{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--navy);}
+    .modal-sub{font-size:0.8rem;color:var(--text3);margin-top:2px;}
+    .modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--text3);padding:4px;}.modal-close:hover{color:var(--navy);}
+    .modal-body{padding:20px 24px;}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+    .modal-tabs{display:flex;gap:4px;margin-bottom:20px;padding:4px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;width:fit-content;}
+    .modal-tab{padding:7px 16px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:600;color:var(--text3);background:transparent;cursor:pointer;transition:all 0.14s;}
+    .modal-tab.active{background:var(--surface);color:var(--navy);box-shadow:0 1px 6px rgba(15,33,83,0.08);}
+    .tab-panel{display:none;}.tab-panel.active{display:block;animation:fadeIn 0.15s ease;}
+    .parse-area{width:100%;min-height:160px;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:monospace;font-size:0.8rem;color:var(--navy);resize:vertical;outline:none;transition:border-color 0.15s;}
+    .parse-area:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
+    .parse-area::placeholder{color:var(--text3);font-family:'DM Sans',sans-serif;}
+    .manual-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;}
+    .manual-field{display:flex;flex-direction:column;gap:4px;}
+    .manual-label{display:flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:600;color:var(--text2);}
+    .manual-input{width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.875rem;color:var(--navy);outline:none;transition:border-color 0.15s;text-align:right;}
+    .manual-input:focus{border-color:var(--blue2);box-shadow:0 0 0 3px rgba(37,99,235,0.1);}
+    .field-group{margin-bottom:16px;}
+    .field-label{display:block;font-size:0.78rem;font-weight:600;color:var(--text2);margin-bottom:6px;}
+    .field-select{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.875rem;color:var(--navy);background:var(--surface);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a93bc' d='M5 7L0 2h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;transition:border-color 0.15s;}
+    .field-select:focus{border-color:var(--blue2);}
+    .parse-preview{margin-top:14px;border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+    .parse-preview-head{padding:10px 14px;background:var(--surface2);font-size:0.78rem;font-weight:600;color:var(--text2);border-bottom:1px solid var(--border);}
+    .parse-preview-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+    .parse-preview-table th,.parse-preview-table td{padding:7px 10px;border-bottom:1px solid var(--border);text-align:center;}
+    .parse-preview-table th{background:var(--surface2);color:var(--text3);font-weight:600;text-transform:uppercase;font-size:0.68rem;}
+    .parse-preview-table td.village-name{text-align:left;font-weight:600;color:var(--navy);}
+    .parse-preview-table tr:last-child td{border-bottom:none;}
+    .parse-error{padding:12px 14px;font-size:0.82rem;color:var(--red);display:flex;align-items:center;gap:8px;}
 
-    .modal-tabs { display: flex; gap: 4px; margin-bottom: 20px; padding: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; width: fit-content; }
-    .modal-tab { padding: 7px 16px; border-radius: 7px; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; font-weight: 600; color: var(--text3); background: transparent; cursor: pointer; transition: all 0.14s; }
-    .modal-tab.active { background: var(--surface); color: var(--navy); box-shadow: 0 1px 6px rgba(15,33,83,0.08); }
-    .tab-panel { display: none; }
-    .tab-panel.active { display: block; animation: fadeIn 0.15s ease; }
+    /* ALLIANCE TROOPS */
+    .alliance-chip{display:inline-flex;align-items:center;gap:5px;font-size:0.73rem;font-weight:700;padding:4px 12px;border-radius:20px;}
+    .chip-off{background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,0.18);}
+    .chip-def{background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.18);}
+    .chip-members{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,0.18);}
 
-    .parse-area { width: 100%; min-height: 160px; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-family: monospace; font-size: 0.8rem; color: var(--navy); resize: vertical; outline: none; transition: border-color 0.15s; }
-    .parse-area:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    .parse-area::placeholder { color: var(--text3); font-family: 'DM Sans', sans-serif; }
-    .parse-hint { font-size: 0.75rem; color: var(--text3); margin-top: 6px; line-height: 1.5; }
+    /* SORT BAR */
+    .sort-bar{display:flex;align-items:center;gap:8px;padding:10px 20px;background:var(--surface2);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+    .sort-bar-label{font-size:0.72rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;}
+    .sort-btn{font-size:0.75rem;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.13s;display:inline-flex;align-items:center;gap:4px;}
+    .sort-btn:hover{border-color:var(--blue2);color:var(--blue2);}
+    .sort-btn.active{background:var(--blue-glow);border-color:var(--blue2);color:var(--blue2);}
+    .sort-btn.active.desc::after{content:'↓';margin-left:2px;}
+    .sort-btn.active.asc::after{content:'↑';margin-left:2px;}
 
-    .manual-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-    .manual-field { display: flex; flex-direction: column; gap: 4px; }
-    .manual-label { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--text2); }
-    .manual-input { width: 100%; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--navy); outline: none; transition: border-color 0.15s; text-align: right; }
-    .manual-input:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    /* COMBAT ROLE LABEL */
+    .role-atk{display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,0.2);}
+    .role-def{display:inline-flex;align-items:center;gap:3px;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.2);}
+    .role-toggle-btn{font-size:0.7rem;font-weight:600;padding:2px 8px;border-radius:20px;border:1px dashed var(--border);background:transparent;color:var(--text3);cursor:pointer;transition:all 0.14s;white-space:nowrap;}
+    .role-toggle-btn:hover{border-color:var(--blue2);color:var(--blue2);}
 
-    .field-group { margin-bottom: 16px; }
-    .field-label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
-    .field-select { width: 100%; padding: 10px 13px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--navy); background: var(--surface); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237a93bc' d='M5 7L0 2h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.15s; }
-    .field-select:focus { border-color: var(--blue2); }
+    .player-accordion-wrap{overflow:hidden;}
+    .player-row{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;background:var(--surface);border-bottom:1px solid var(--border);transition:background 0.14s;user-select:none;}
+    .player-row:hover{background:var(--surface2);}
+    .player-row.open{background:var(--blue-glow);}
+    .player-info{flex:1;min-width:0;}
+    .player-name{font-weight:700;font-size:0.875rem;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .player-meta{font-size:0.73rem;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+    .player-stats{display:flex;gap:8px;align-items:center;flex-shrink:0;}
+    .player-chevron{color:var(--text3);font-size:0.7rem;transition:transform 0.2s;flex-shrink:0;}
+    .player-chevron.open{transform:rotate(180deg);}
+    .player-detail{display:none;border-bottom:1px solid var(--border);background:var(--surface);}
+    .player-detail.open{display:block;animation:fadeIn 0.15s ease;}
 
-    .parse-preview { margin-top: 14px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .parse-preview-head { padding: 10px 14px; background: var(--surface2); font-size: 0.78rem; font-weight: 600; color: var(--text2); border-bottom: 1px solid var(--border); }
-    .parse-preview-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
-    .parse-preview-table th, .parse-preview-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: center; }
-    .parse-preview-table th { background: var(--surface2); color: var(--text3); font-weight: 600; text-transform: uppercase; font-size: 0.68rem; }
-    .parse-preview-table td.village-name { text-align: left; font-weight: 600; color: var(--navy); }
-    .parse-preview-table tr:last-child td { border-bottom: none; }
-    .parse-error { padding: 12px 14px; font-size: 0.82rem; color: var(--red); display: flex; align-items: center; gap: 8px; }
+    .stale-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,0.2);}
+    .you-badge{font-size:0.68rem;font-weight:600;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:20px;}
 
-    /* TOAST */
-    .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
-    .toast { padding: 11px 18px; border-radius: 11px; font-size: 0.84rem; font-weight: 500; color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.16); animation: fadeUp 0.22s ease; max-width: 300px; }
-    .toast.success { background: #065f46; }
-    .toast.error   { background: #7f1d1d; }
-    .toast.info    { background: var(--navy2); }
+    .toast-wrap{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:8px;z-index:9999;}
+    .toast{padding:11px 18px;border-radius:11px;font-size:0.84rem;font-weight:500;color:#fff;box-shadow:0 8px 24px rgba(15,33,83,0.16);animation:fadeUp 0.22s ease;max-width:300px;}
+    .toast.success{background:#065f46;}.toast.error{background:#7f1d1d;}.toast.info{background:var(--navy2);}
+    .mini-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+    .empty-row td{padding:32px;text-align:center;color:var(--text3);font-size:0.84rem;}
 
-    .mini-spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; }
-    .empty-row td { padding: 32px; text-align: center; color: var(--text3); font-size: 0.84rem; }
-
-    /* ALLIANCE TROOPS — player accordion */
-    .alliance-summary-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .alliance-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.73rem; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
-    .chip-off      { background: var(--red-bg);   color: var(--red);   border: 1px solid rgba(220,38,38,0.18); }
-    .chip-def      { background: var(--blue-glow); color: var(--blue2); border: 1px solid rgba(37,99,235,0.18); }
-    .chip-members  { background: var(--green-bg);  color: var(--green); border: 1px solid rgba(5,150,105,0.18); }
-
-    .player-accordion-wrap { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-    .player-row { display: flex; align-items: center; gap: 12px; padding: 13px 20px; cursor: pointer; background: var(--surface); border-bottom: 1px solid var(--border); transition: background 0.14s; user-select: none; }
-    .player-row:hover { background: var(--surface2); }
-    .player-row.open  { background: var(--blue-glow); }
-    .player-row:last-of-type { border-bottom: none; }
-    .player-avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; background: var(--navy2); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; }
-    .player-info { flex: 1; min-width: 0; }
-    .player-name { font-weight: 700; font-size: 0.875rem; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .player-meta { font-size: 0.73rem; color: var(--text3); margin-top: 1px; }
-    .player-stats { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
-    .player-chevron { color: var(--text3); font-size: 0.7rem; transition: transform 0.2s; flex-shrink: 0; }
-    .player-chevron.open { transform: rotate(180deg); }
-    .player-detail { display: none; border-bottom: 1px solid var(--border); background: var(--surface); }
-    .player-detail.open { display: block; animation: fadeIn 0.15s ease; }
-    .player-detail:last-child { border-bottom: none; }
-
-    .stale-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 0.68rem; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
-
-    @media (max-width: 600px) {
-      .page-actions { width: 100%; }
-      .page-actions .btn { flex: 1; justify-content: center; }
-    }
+    @media(max-width:600px){.page-actions{width:100%;}.page-actions .btn{flex:1;justify-content:center;}}
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -223,10 +197,7 @@
 <div class="modal-overlay hidden" id="inputModal">
   <div class="modal-box">
     <div class="modal-head">
-      <div>
-        <div class="modal-title" id="modalTitle">Update Troops</div>
-        <div class="modal-sub" id="modalSub">Your villages</div>
-      </div>
+      <div><div class="modal-title" id="modalTitle">Update Troops</div><div class="modal-sub" id="modalSub">Your villages</div></div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
@@ -235,22 +206,16 @@
         <button class="modal-tab" id="tabManual" onclick="switchTab('manual')">✏️ Manual Input</button>
       </div>
       <div class="tab-panel active" id="panelParse">
-        <div class="parse-hint" style="margin-bottom:10px;">
-          Go to <strong>Village Overview → Troops</strong> in Travian, press <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+A</kbd> then <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+C</kbd>, and paste below.
-        </div>
+        <div class="parse-hint" style="margin-bottom:10px;">Go to <strong>Village Overview → Troops</strong> in Travian, press <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+A</kbd> then <kbd style="background:var(--surface2);border:1px solid var(--border);padding:1px 5px;border-radius:4px;font-size:0.75rem;">Ctrl+C</kbd>, and paste below.</div>
         <textarea class="parse-area" id="parseInput" placeholder="Paste your Travian Plus troop overview here…" oninput="onParseInput()"></textarea>
         <div id="parseResult"></div>
       </div>
       <div class="tab-panel" id="panelManual">
         <div class="field-group" id="villageSelectGroup">
           <label class="field-label">Village</label>
-          <select class="field-select" id="villageSelect" onchange="onVillageSelect()">
-            <option value="">— Select village —</option>
-          </select>
+          <select class="field-select" id="villageSelect" onchange="onVillageSelect()"><option value="">— Select village —</option></select>
         </div>
-        <div class="manual-grid" id="manualGrid">
-          <div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div>
-        </div>
+        <div class="manual-grid" id="manualGrid"><div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -263,10 +228,8 @@
 <!-- PAGE HEADER -->
 <div class="page-header">
   <nav class="breadcrumb">
-    <a href="/">Home</a>
-    <span class="breadcrumb-sep">›</span>
-    <a href="/alliance/workspace/">Alliance</a>
-    <span class="breadcrumb-sep">›</span>
+    <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+    <a href="/alliance/workspace/">Alliance</a><span class="breadcrumb-sep">›</span>
     <span class="breadcrumb-current" id="breadcrumbCurrent">Troop Summary</span>
   </nav>
   <div class="page-header-inner">
@@ -284,17 +247,11 @@
 <!-- ALLIANCE LAYOUT -->
 <div id="alliance-layout">
   <div id="alliance-nav-root"></div>
-
   <main id="alliance-main">
     <div class="page-wrap">
 
-      <!-- Loading -->
-      <div class="loading-state" id="loadingState">
-        <div class="spinner"></div>
-        <div class="loading-text">Loading workspace…</div>
-      </div>
+      <div class="loading-state" id="loadingState"><div class="spinner"></div><div class="loading-text">Loading workspace…</div></div>
 
-      <!-- No workspace gate -->
       <div id="noWorkspace">
         <div class="gate-box">
           <div class="gate-icon">🏰</div>
@@ -308,30 +265,31 @@
       <div id="viewMyTroops">
         <div class="section-card">
           <div class="section-head">
-            <div class="section-title">
-              🪖 My Troops
-              <span id="myTribeBadge"></span>
-              <span class="last-updated" id="lastUpdated"></span>
-            </div>
+            <div class="section-title">🪖 My Troops <span id="myTribeBadge"></span><span class="last-updated" id="lastUpdated"></span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <button class="btn btn-sm btn-secondary" onclick="openModal('manual')">✏️ Edit Village</button>
               <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Paste Travian Plus</button>
             </div>
           </div>
+          <!-- My Troops chart -->
+          <div class="chart-wrap" id="myChartWrap">
+            <div class="chart-title">📈 Troop History
+              <span class="chart-legend" id="myChartLegend"></span>
+            </div>
+            <canvas id="myTroopChart" class="troop-chart"></canvas>
+          </div>
           <div class="section-body">
             <div class="troops-table-wrap">
               <table class="troops-table">
                 <thead id="myTroopsHead"></thead>
-                <tbody id="myTroopsBody">
-                  <tr class="empty-row"><td colspan="20">No troop data yet. Click <strong>Update</strong> to add your troops.</td></tr>
-                </tbody>
+                <tbody id="myTroopsBody"><tr class="empty-row"><td colspan="20">No troop data yet. Click <strong>Update</strong> to add your troops.</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- VIEW: Alliance Troops (coordinator only) -->
+      <!-- VIEW: Alliance Troops -->
       <div id="viewAllianceTroops">
         <div class="section-card">
           <div class="section-head">
@@ -341,20 +299,32 @@
             </div>
             <div style="display:flex;gap:8px;align-items:center;" id="allianceTotalChips"></div>
           </div>
+          <!-- Alliance chart -->
+          <div class="chart-wrap" id="allianceChartWrap">
+            <div class="chart-title">📈 Alliance Strength History</div>
+            <div class="chart-legend" id="allianceChartLegend"></div>
+            <canvas id="allianceTroopChart" class="troop-chart" style="height:180px!important;"></canvas>
+          </div>
+          <!-- Sort bar -->
+          <div class="sort-bar">
+            <span class="sort-bar-label">Sort:</span>
+            <button class="sort-btn active asc" id="sortName" onclick="setSortAlliance('name')">Name</button>
+            <button class="sort-btn" id="sortTribe" onclick="setSortAlliance('tribe')">Tribe</button>
+            <button class="sort-btn" id="sortOff" onclick="setSortAlliance('off')">⚔️ Off</button>
+            <button class="sort-btn" id="sortDef" onclick="setSortAlliance('def')">🛡️ Def</button>
+            <button class="sort-btn" id="sortUpdated" onclick="setSortAlliance('updated')">Updated</button>
+          </div>
           <div class="section-body">
             <div id="allianceAccordion">
-              <div class="loading-state" style="min-height:200px;">
-                <div class="spinner"></div>
-                <div class="loading-text">Loading member troops…</div>
-              </div>
+              <div class="loading-state" style="min-height:200px;"><div class="spinner"></div><div class="loading-text">Loading member troops…</div></div>
             </div>
           </div>
         </div>
       </div>
 
-    </div><!-- /.page-wrap -->
+    </div>
   </main>
-</div><!-- /#alliance-layout -->
+</div>
 
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
@@ -363,578 +333,793 @@
 <script src="/alliance-nav.js"></script>
 
 <script>
-  const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+const CDN_TRIBE_ICON = tribe => `/cdn/icons/misc/${tribe}_medium.png`;
 
-  // ── STATE ──
-  let currentWorkspace  = null;
-  let currentUser       = null;
-  let myVillages        = [];
-  let myTroops          = {};
-  let playerTribe       = null;
-  let parsedData        = null;
-  let activeTab         = 'parse';
-  let allianceTroops    = {};
-  let isCoord           = false;
+// ── STATE ──
+let currentWorkspace = null, currentUser = null;
+let myVillages = [], myTroops = {}, playerTribe = null;
+let parsedData = null, activeTab = 'parse';
+let allianceTroops = {}, isCoord = false;
+let myHistory = [], allianceHistory = [];
+let myChartInst = null, allianceChartInst = null;
 
-  // Detect which view to show from URL
-  const urlParams  = new URLSearchParams(window.location.search);
-  const activeView = urlParams.get('view') === 'alliance' ? 'alliance' : 'my';
+// Sort state for alliance
+let allianceSortField = 'name', allianceSortDir = 'asc';
 
-  // ── INIT ──
-  document.addEventListener('DOMContentLoaded', async () => {
-    await waitForSupabase();
-    const user = await window.getUser();
-    if (!user) { window.location.href = '/login/?redirect=/alliance/troop-summary/'; return; }
-    currentUser = user;
+// Sort state for my troops table
+let myTroopsSortField = null, myTroopsSortDir = 'desc';
 
-    const ws = loadWorkspace();
-    if (!ws) { window.location.href = '/alliance/workspace/'; return; }
-    currentWorkspace = ws;
-    isCoord = ws.role === 'founder' || ws.role === 'coordinator';
+const urlParams  = new URLSearchParams(window.location.search);
+const activeView = urlParams.get('view') === 'alliance' ? 'alliance' : 'my';
 
-    // Update page header for alliance view
-    if (activeView === 'alliance') {
-      document.getElementById('pageIcon').textContent      = '🏰';
-      document.getElementById('pageIcon').style.background = 'var(--green-bg)';
-      document.getElementById('pageIcon').style.border     = '1px solid rgba(5,150,105,0.2)';
-      document.getElementById('pageTitle').textContent     = 'Alliance Troops';
-      document.getElementById('pageSubtitle').textContent  = 'Troop data for all members in this workspace.';
-      document.getElementById('breadcrumbCurrent').textContent = 'Alliance Troops';
-    } else {
-      // Show edit buttons for my troops view
-      document.getElementById('pageActions').innerHTML = `
-        <button class="btn btn-sm btn-secondary" onclick="openModal('manual')">✏️ Edit Village</button>
-        <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Paste Travian Plus</button>
-      `;
-    }
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', async () => {
+  await waitForSupabase();
+  const user = await window.getUser();
+  if (!user) { window.location.href = '/login/?redirect=/alliance/troop-summary/'; return; }
+  currentUser = user;
 
-    hide('loadingState');
+  const ws = loadWorkspace();
+  if (!ws) { window.location.href = '/alliance/workspace/'; return; }
+  currentWorkspace = ws;
+  isCoord = ws.role === 'founder' || ws.role === 'coordinator';
 
-    if (activeView === 'alliance') {
-      // Guard: only coordinators can access this view
-      if (!isCoord) {
-        window.location.href = '/alliance/troop-summary/';
-        return;
-      }
-      show('viewAllianceTroops');
-      await fetchAllTroops();
-    } else {
-      show('viewMyTroops');
-      await fetchVillages();
-      renderMyTroops();
-      await fetchMyTroops();
-    }
-  });
-
-  // ── WORKSPACE STORAGE ──
-  function loadWorkspace() {
-    try {
-      const raw = sessionStorage.getItem('tt_active_workspace');
-      if (raw) return JSON.parse(raw);
-      const list = JSON.parse(localStorage.getItem('tt_workspaces') || 'null');
-      return list?.[0] || null;
-    } catch { return null; }
+  if (activeView === 'alliance') {
+    document.getElementById('pageIcon').textContent      = '🏰';
+    document.getElementById('pageIcon').style.background = 'var(--green-bg)';
+    document.getElementById('pageIcon').style.border     = '1px solid rgba(5,150,105,0.2)';
+    document.getElementById('pageTitle').textContent     = 'Alliance Troops';
+    document.getElementById('pageSubtitle').textContent  = 'Troop data for all members in this workspace.';
+    document.getElementById('breadcrumbCurrent').textContent = 'Alliance Troops';
+  } else {
+    document.getElementById('pageActions').innerHTML = `
+      <button class="btn btn-sm btn-secondary" onclick="openModal('manual')">✏️ Edit Village</button>
+      <button class="btn btn-sm btn-amber" onclick="openModal()">📋 Paste Travian Plus</button>`;
   }
 
-  // ── FETCH VILLAGES ──
-  async function fetchVillages() {
-    if (!currentWorkspace?.player_name) return;
-    try {
-      const serverKey = currentWorkspace.server.split('.')[0];
-      const res  = await fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(currentWorkspace.player_name)}`);
-      const data = await res.json();
-      const rawTribe = (data.tribe || data.race || data.player?.tribe || '').toLowerCase();
-      const tribeMap = { 'roman':'roman','romans':'roman','1':'roman','teuton':'teuton','teutons':'teuton','2':'teuton','gaul':'gaul','gauls':'gaul','3':'gaul','egyptian':'egyptian','egyptians':'egyptian','4':'egyptian','hun':'hun','huns':'hun','5':'hun' };
-      playerTribe = tribeMap[rawTribe] || 'teuton';
-      myVillages = (data.villages || []).map(v => ({ name: v.name || v.village_name || '', x: v.x ?? v.coord_x ?? 0, y: v.y ?? v.coord_y ?? 0 })).filter(v => v.name);
-      const sel = document.getElementById('villageSelect');
-      sel.innerHTML = '<option value="">— Select village —</option>';
-      myVillages.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v.name;
-        opt.textContent = `${v.name} (${v.x}|${v.y})`;
-        sel.appendChild(opt);
-      });
-    } catch(e) { console.error('fetchVillages:', e); }
+  hide('loadingState');
+
+  if (activeView === 'alliance') {
+    if (!isCoord) { window.location.href = '/alliance/troop-summary/'; return; }
+    show('viewAllianceTroops');
+    await Promise.all([fetchAllTroops(), fetchAllianceHistory()]);
+  } else {
+    show('viewMyTroops');
+    await fetchVillages();
+    renderMyTroops();
+    await Promise.all([fetchMyTroops(), fetchMyHistory()]);
   }
+});
 
-  // ── FETCH MY TROOPS ──
-  async function fetchMyTroops() {
-    try {
-      const db = window._supabase;
-      const { data, error } = await db
-        .from('workspace_troops')
-        .select('village_name, tribe, troops, updated_at')
-        .eq('workspace_id', currentWorkspace.id)
-        .eq('user_id', currentUser.id);
-      if (error) throw error;
-      myTroops = {};
-      (data || []).forEach(row => {
-        myTroops[row.village_name] = { tribe: row.tribe, troops: row.troops || {}, updated_at: row.updated_at };
-      });
-      renderMyTroops();
-    } catch(e) { console.error('fetchMyTroops:', e); }
-  }
+// ── WORKSPACE STORAGE ──
+function loadWorkspace() {
+  try {
+    const raw = sessionStorage.getItem('tt_active_workspace');
+    if (raw) return JSON.parse(raw);
+    const list = JSON.parse(localStorage.getItem('tt_workspaces') || 'null');
+    return list?.[0] || null;
+  } catch { return null; }
+}
 
-  // ── FETCH ALL TROOPS (coordinator) ──
-  async function fetchAllTroops() {
-    try {
-      const db = window._supabase;
-      const [troopRes, memberRes] = await Promise.all([
-        db.from('workspace_troops').select('user_id, village_name, tribe, troops, updated_at').eq('workspace_id', currentWorkspace.id),
-        db.from('workspace_members').select('user_id, player_name, role').eq('workspace_id', currentWorkspace.id),
-      ]);
-      if (troopRes.error) throw troopRes.error;
-      if (memberRes.error) throw memberRes.error;
-
-      const memberMap = {};
-      (memberRes.data || []).forEach(m => { memberMap[m.user_id] = { player_name: m.player_name, role: m.role }; });
-
-      allianceTroops = {};
-      (troopRes.data || []).forEach(row => {
-        if (!allianceTroops[row.user_id]) {
-          const m = memberMap[row.user_id] || {};
-          allianceTroops[row.user_id] = { player_name: m.player_name || 'Unknown', role: m.role || 'member', tribe: row.tribe, villages: {} };
-        }
-        allianceTroops[row.user_id].villages[row.village_name] = { troops: row.troops || {}, updated_at: row.updated_at, tribe: row.tribe };
-      });
-      (memberRes.data || []).forEach(m => {
-        if (!allianceTroops[m.user_id]) {
-          allianceTroops[m.user_id] = { player_name: m.player_name, role: m.role, tribe: null, villages: {} };
-        }
-      });
-
-      renderAllianceTroops();
-    } catch(e) {
-      console.error('fetchAllTroops:', e);
-      document.getElementById('allianceAccordion').innerHTML =
-        '<div style="padding:32px;text-align:center;font-size:0.84rem;color:var(--text3);">Failed to load alliance troops.</div>';
-    }
-  }
-
-  // ── RENDER MY TROOPS ──
-  function renderMyTroops() {
-    const head     = document.getElementById('myTroopsHead');
-    const body     = document.getElementById('myTroopsBody');
-    const badgeEl  = document.getElementById('myTribeBadge');
-    const updEl    = document.getElementById('lastUpdated');
-
-    const firstRow = Object.values(myTroops)[0];
-    const tribe    = playerTribe || firstRow?.tribe || 'teuton';
-    badgeEl.innerHTML = `<span class="tribe-badge tribe-${tribe}">${tribeLabelMap[tribe] || tribe}</span>`;
-
-    const latestUpdate = Object.values(myTroops).map(r => r.updated_at).sort().reverse()[0];
-    if (latestUpdate) updEl.textContent = '· Updated ' + timeAgo(latestUpdate);
-
-    const tribeData = TT ? TT.troopsByTribe[tribe] : [];
-    const troopCols = (tribeData || []).filter(t => t.slot < 9);
-
-    head.innerHTML = `<tr>
-      <th class="village-col">Village</th>
-      ${troopCols.map(t => `<th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id) || ''}"></span></div></th>`).join('')}
-      <th title="Tournament Square level"><div class="troop-icon-header" style="font-size:0.7rem;font-weight:700;color:var(--text2);">TS</div></th>
-      <th title="Offensive strength" style="color:var(--red);border-left:2px solid var(--border);"><img src="/cdn/icons/combat/offence_small.png" alt="Off" /> Off</th>
-      <th title="Defense vs Infantry" style="color:var(--blue2);"><img src="/cdn/icons/combat/defenceInfantry_small.png" alt="Def" /> Def</th>
-      <th title="Defense vs Cavalry" style="color:var(--blue2);"><img src="/cdn/icons/combat/defenceCavalry_small.png" alt="Def" /> Def</th>
-      <th></th>
-    </tr>`;
-
-    const allVillageNames = myVillages.length
-      ? [...myVillages.map(v => v.name), ...Object.keys(myTroops).filter(n => !myVillages.find(v => v.name === n))]
-      : Object.keys(myTroops);
-
-    if (!allVillageNames.length) {
-      head.innerHTML = '';
-      body.innerHTML = '<tr class="empty-row"><td colspan="20">Loading villages…</td></tr>';
-      badgeEl.innerHTML = ''; updEl.textContent = '';
-      return;
-    }
-
-    const sums = {};
-    troopCols.forEach(t => sums[t.name.toLowerCase()] = 0);
-    sums['ts'] = 0; sums['off'] = 0; sums['defInf'] = 0; sums['defCav'] = 0;
-    const fmtK  = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'k' : n ? String(n) : '0';
-    const fmtKs = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'') + 'k' : n ? String(n) : '—';
-
-    const rows = allVillageNames.map(vName => {
-      const data   = myTroops[vName];
-      const troops = data?.troops || {};
-      let offStr = 0, defInfStr = 0, defCavStr = 0;
-      const cells = troopCols.map(t => {
-        const key = t.name.toLowerCase();
-        const val = Number(troops[key] || troops[t.class_id] || 0);
-        sums[key] = (sums[key] || 0) + val;
-        offStr    += val * (t.stats?.attack  || 0);
-        defInfStr += val * (t.stats?.def_inf || 0);
-        defCavStr += val * (t.stats?.def_cav || 0);
-        return `<td class="${val ? '' : 'zero'}">${val ? Number(val).toLocaleString() : '0'}</td>`;
-      }).join('');
-      sums['off'] += offStr; sums['defInf'] += defInfStr; sums['defCav'] += defCavStr;
-      const ts = Number(troops['ts'] || 0);
-      sums['ts'] += ts;
-      const vData    = myVillages.find(v => v.name === vName);
-      const coordStr = vData ? ` <span style="color:var(--text3);font-size:0.73rem;font-weight:400;">(${vData.x}|${vData.y})</span>` : '';
-      return `<tr>
-        <td class="village-col">${escHtml(vName)}${coordStr}</td>
-        ${cells}
-        <td class="${ts ? '' : 'zero'}">${ts || '—'}</td>
-        <td style="border-left:2px solid var(--border);color:${offStr ? 'var(--red)' : 'var(--text3)'};font-weight:${offStr?'600':'400'};">${fmtK(offStr)}</td>
-        <td style="color:${defInfStr ? 'var(--blue2)' : 'var(--text3)'};font-weight:${defInfStr?'600':'400'};">${fmtK(defInfStr)}</td>
-        <td style="color:${defCavStr ? 'var(--blue2)' : 'var(--text3)'};font-weight:${defCavStr?'600':'400'};">${fmtK(defCavStr)}</td>
-        <td><button class="edit-btn" onclick="openModal('${escHtml(vName).replace(/'/g,"\\'")}')">✏️</button></td>
-      </tr>`;
-    }).join('');
-
-    const sumCells = troopCols.map(t => { const v = sums[t.name.toLowerCase()] || 0; return `<td>${v ? Number(v).toLocaleString() : '—'}</td>`; }).join('');
-    body.innerHTML = rows + `<tr class="sum-row">
-      <td class="village-col">Total</td>${sumCells}
-      <td>—</td>
-      <td style="border-left:2px solid var(--border);color:var(--red);">${fmtKs(sums['off'])}</td>
-      <td style="color:var(--blue2);">${fmtKs(sums['defInf'])}</td>
-      <td style="color:var(--blue2);">${fmtKs(sums['defCav'])}</td>
-      <td></td>
-    </tr>`;
-  }
-
-  // ── RENDER ALLIANCE TROOPS ──
-  function renderAllianceTroops() {
-    const accordion  = document.getElementById('allianceAccordion');
-    const totalChips = document.getElementById('allianceTotalChips');
-    const memberChip = document.getElementById('allianceMemberChip');
-
-    const entries = Object.entries(allianceTroops);
-    memberChip.textContent = `${entries.length} member${entries.length !== 1 ? 's' : ''}`;
-
-    if (!entries.length) {
-      accordion.innerHTML = '<div style="padding:40px;text-align:center;font-size:0.84rem;color:var(--text3);">No members have submitted troop data yet.</div>';
-      totalChips.innerHTML = '';
-      return;
-    }
-
-    const fmtK = n => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'k' : n ? String(n) : '—';
-
-    // Alliance totals
-    let totalOff = 0, totalDefInf = 0, totalDefCav = 0;
-    entries.forEach(([uid, data]) => {
-      const cols = (TT?.troopsByTribe[data.tribe] || []).filter(t => t.slot < 9);
-      Object.values(data.villages).forEach(vData => {
-        const troops = vData.troops || {};
-        cols.forEach(t => {
-          const val = Number(troops[t.name.toLowerCase()] || troops[t.class_id] || 0);
-          totalOff    += val * (t.stats?.attack  || 0);
-          totalDefInf += val * (t.stats?.def_inf || 0);
-          totalDefCav += val * (t.stats?.def_cav || 0);
-        });
-      });
+// ── FETCH VILLAGES ──
+async function fetchVillages() {
+  if (!currentWorkspace?.player_name) return;
+  try {
+    const serverKey = currentWorkspace.server.split('.')[0];
+    const res  = await fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(currentWorkspace.player_name)}`);
+    const data = await res.json();
+    const rawTribe = (data.tribe || data.race || data.player?.tribe || '').toLowerCase();
+    const tribeMap = {'roman':'roman','romans':'roman','1':'roman','teuton':'teuton','teutons':'teuton','2':'teuton','gaul':'gaul','gauls':'gaul','3':'gaul','egyptian':'egyptian','egyptians':'egyptian','4':'egyptian','hun':'hun','huns':'hun','5':'hun'};
+    playerTribe = tribeMap[rawTribe] || 'teuton';
+    myVillages = (data.villages || []).map(v => ({name:v.name||v.village_name||'',x:v.x??v.coord_x??0,y:v.y??v.coord_y??0})).filter(v=>v.name);
+    const sel = document.getElementById('villageSelect');
+    sel.innerHTML = '<option value="">— Select village —</option>';
+    myVillages.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v.name; opt.textContent = `${v.name} (${v.x}|${v.y})`;
+      sel.appendChild(opt);
     });
-    totalChips.innerHTML = `
-      <span class="alliance-chip chip-off" style="font-size:0.73rem;">⚔️ ${fmtK(totalOff)} off</span>
-      <span class="alliance-chip chip-def" style="font-size:0.73rem;">🛡️ ${fmtK(totalDefInf)} def</span>`;
+  } catch(e) { console.error('fetchVillages:', e); }
+}
 
-    // Per-player accordion
-    accordion.innerHTML = `<div class="player-accordion-wrap">` +
-      entries.map(([uid, data], idx) => {
-        const name     = data.player_name;
-        const tribe    = data.tribe;
-        const villages = Object.entries(data.villages);
-        const hasData  = villages.length > 0;
-        const isSelf   = uid === currentUser.id;
-        const latestTs = hasData ? Object.values(data.villages).map(v => v.updated_at).sort().reverse()[0] : null;
-        const isStale  = latestTs && (Date.now() - new Date(latestTs).getTime()) > 24 * 3600 * 1000;
+// ── FETCH MY TROOPS ──
+async function fetchMyTroops() {
+  try {
+    const db = window._supabase;
+    const { data, error } = await db.from('workspace_troops')
+      .select('village_name, tribe, troops, updated_at')
+      .eq('workspace_id', currentWorkspace.id).eq('user_id', currentUser.id);
+    if (error) throw error;
+    myTroops = {};
+    (data || []).forEach(row => { myTroops[row.village_name] = {tribe:row.tribe,troops:row.troops||{},updated_at:row.updated_at}; });
+    renderMyTroops();
+  } catch(e) { console.error('fetchMyTroops:', e); }
+}
 
-        let pOff = 0, pDefInf = 0, pDefCav = 0;
-        const cols = (TT?.troopsByTribe[tribe] || []).filter(t => t.slot < 9);
-        villages.forEach(([, vData]) => {
-          const troops = vData.troops || {};
-          cols.forEach(t => {
-            const val = Number(troops[t.name.toLowerCase()] || troops[t.class_id] || 0);
-            pOff += val * (t.stats?.attack || 0);
-            pDefInf += val * (t.stats?.def_inf || 0);
-            pDefCav += val * (t.stats?.def_cav || 0);
-          });
-        });
+// ── FETCH HISTORY (My Troops) ──
+async function fetchMyHistory() {
+  try {
+    const db = window._supabase;
+    const { data, error } = await db.from('workspace_troops_history')
+      .select('snapshot_date, total_upkeep, total_off, total_def_inf, total_def_cav')
+      .eq('workspace_id', currentWorkspace.id).eq('user_id', currentUser.id)
+      .order('snapshot_date', { ascending: true }).limit(30);
+    if (error) throw error;
+    myHistory = data || [];
+    renderMyChart();
+  } catch(e) { console.error('fetchMyHistory:', e); }
+}
 
-        return `<div>
-          <div class="player-row" id="prow-${idx}" onclick="togglePlayer(${idx})">
-            <div class="player-avatar">${escHtml(name).charAt(0).toUpperCase()}</div>
-            <div class="player-info">
-              <div class="player-name">${escHtml(name)}${isSelf ? ' <span style="font-size:0.68rem;font-weight:600;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:20px;">You</span>' : ''}</div>
-              <div class="player-meta">
-                ${tribe ? `<span class="tribe-badge tribe-${tribe}" style="font-size:0.68rem;padding:1px 7px;">${tribeLabelMap[tribe]||tribe}</span>` : '<span style="color:var(--text3);font-size:0.75rem;">No data yet</span>'}
-                ${hasData ? `<span style="margin-left:6px;">· ${villages.length} village${villages.length!==1?'s':''}</span>` : ''}
-                ${latestTs ? `<span style="margin-left:6px;">· ${timeAgo(latestTs)}</span>` : ''}
-                ${isStale ? `<span class="stale-badge" style="margin-left:6px;">⚠️ Stale</span>` : ''}
-              </div>
-            </div>
-            <div class="player-stats">
-              ${hasData ? `<span class="alliance-chip chip-off" style="font-size:0.7rem;">⚔️ ${fmtK(pOff)}</span><span class="alliance-chip chip-def" style="font-size:0.7rem;">🛡️ ${fmtK(pDefInf)}</span>` : ''}
-            </div>
-            <span class="player-chevron" id="pchev-${idx}">▼</span>
-          </div>
-          <div class="player-detail" id="pdetail-${idx}">
-            ${hasData ? renderPlayerTable(cols, villages) : '<div style="padding:24px;text-align:center;font-size:0.84rem;color:var(--text3);">No troop data submitted yet.</div>'}
-          </div>
-        </div>`;
-      }).join('') + `</div>`;
-  }
+// ── FETCH HISTORY (Alliance global) ──
+async function fetchAllianceHistory() {
+  try {
+    const db = window._supabase;
+    const { data, error } = await db.from('workspace_troops_history')
+      .select('snapshot_date, total_off, total_def_inf, total_def_cav, total_upkeep')
+      .eq('workspace_id', currentWorkspace.id)
+      .order('snapshot_date', { ascending: true }).limit(60);
+    if (error) throw error;
 
-  function renderPlayerTable(troopCols, villages) {
-    if (!troopCols.length) return '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.84rem;">Troop data unavailable for this tribe.</div>';
-    const fmtK = n => n >= 1000 ? (n/1000).toFixed(1).replace(/\.0$/,'')+'k' : n ? String(n) : '0';
-    const sums = {}; troopCols.forEach(t => sums[t.name.toLowerCase()] = 0);
-    sums['off'] = 0; sums['defInf'] = 0; sums['defCav'] = 0;
+    // Aggregate by date across all members
+    const byDate = {};
+    (data || []).forEach(row => {
+      if (!byDate[row.snapshot_date]) byDate[row.snapshot_date] = {off:0,def_inf:0,def_cav:0,upkeep:0};
+      byDate[row.snapshot_date].off     += row.total_off    || 0;
+      byDate[row.snapshot_date].def_inf += row.total_def_inf|| 0;
+      byDate[row.snapshot_date].def_cav += row.total_def_cav|| 0;
+      byDate[row.snapshot_date].upkeep  += row.total_upkeep || 0;
+    });
+    allianceHistory = Object.entries(byDate)
+      .sort(([a],[b]) => a.localeCompare(b))
+      .map(([date, vals]) => ({date, ...vals}));
+    renderAllianceChart();
+  } catch(e) { console.error('fetchAllianceHistory:', e); }
+}
 
-    const rows = villages.map(([vName, vData]) => {
-      const troops = vData.troops || {};
-      let offStr = 0, defInfStr = 0, defCavStr = 0;
-      const cells = troopCols.map(t => {
-        const key = t.name.toLowerCase();
-        const val = Number(troops[key] || troops[t.class_id] || 0);
-        sums[key] = (sums[key] || 0) + val;
-        offStr    += val * (t.stats?.attack  || 0);
-        defInfStr += val * (t.stats?.def_inf || 0);
-        defCavStr += val * (t.stats?.def_cav || 0);
-        return `<td class="${val?'':'zero'}">${val ? Number(val).toLocaleString() : '0'}</td>`;
-      }).join('');
-      sums['off'] += offStr; sums['defInf'] += defInfStr; sums['defCav'] += defCavStr;
-      return `<tr><td class="village-col">${escHtml(vName)}</td>${cells}
-        <td style="border-left:2px solid var(--border);color:${offStr?'var(--red)':'var(--text3)'};font-weight:${offStr?'600':'400'};">${fmtK(offStr)}</td>
-        <td style="color:${defInfStr?'var(--blue2)':'var(--text3)'};font-weight:${defInfStr?'600':'400'};">${fmtK(defInfStr)}</td>
-        <td style="color:${defCavStr?'var(--blue2)':'var(--text3)'};font-weight:${defCavStr?'600':'400'};">${fmtK(defCavStr)}</td>
-      </tr>`;
-    }).join('');
+// ── FETCH ALL TROOPS ──
+async function fetchAllTroops() {
+  try {
+    const db = window._supabase;
+    const [troopRes, memberRes] = await Promise.all([
+      db.from('workspace_troops').select('user_id, village_name, tribe, troops, updated_at').eq('workspace_id', currentWorkspace.id),
+      db.from('workspace_members').select('user_id, player_name, role, combat_role').eq('workspace_id', currentWorkspace.id),
+    ]);
+    if (troopRes.error) throw troopRes.error;
+    if (memberRes.error) throw memberRes.error;
 
-    const sumCells = troopCols.map(t => { const v = sums[t.name.toLowerCase()]||0; return `<td>${v?Number(v).toLocaleString():'—'}</td>`; }).join('');
-    return `<div class="troops-table-wrap" style="padding:0 0 4px;">
-      <table class="troops-table">
-        <thead><tr>
-          <th class="village-col">Village</th>
-          ${troopCols.map(t => `<th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id)||''}"></span></div></th>`).join('')}
-          <th style="border-left:2px solid var(--border);color:var(--red);">Off</th>
-          <th style="color:var(--blue2);">Def ⊥</th>
-          <th style="color:var(--blue2);">Def ↑</th>
-        </tr></thead>
-        <tbody>${rows}
-          <tr class="sum-row"><td class="village-col">Total</td>${sumCells}
-            <td style="border-left:2px solid var(--border);color:var(--red);">${fmtK(sums['off'])}</td>
-            <td style="color:var(--blue2);">${fmtK(sums['defInf'])}</td>
-            <td style="color:var(--blue2);">${fmtK(sums['defCav'])}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>`;
-  }
+    const memberMap = {};
+    (memberRes.data || []).forEach(m => { memberMap[m.user_id] = {player_name:m.player_name,role:m.role,combat_role:m.combat_role||null}; });
 
-  function togglePlayer(idx) {
-    const row    = document.getElementById(`prow-${idx}`);
-    const detail = document.getElementById(`pdetail-${idx}`);
-    const chev   = document.getElementById(`pchev-${idx}`);
-    const isOpen = detail.classList.contains('open');
-    detail.classList.toggle('open', !isOpen);
-    row.classList.toggle('open', !isOpen);
-    chev.classList.toggle('open', !isOpen);
-  }
-
-  // ── MODAL ──
-  function openModal(tabOrVillage) {
-    document.getElementById('inputModal').classList.remove('hidden');
-    document.getElementById('parseInput').value = '';
-    document.getElementById('parseResult').innerHTML = '';
-    parsedData = null;
-    switchTab('parse');
-    if (tabOrVillage === 'manual') {
-      switchTab('manual');
-      document.getElementById('villageSelectGroup').style.display = 'block';
-      document.getElementById('modalTitle').textContent = 'Edit Troops';
-      document.getElementById('modalSub').textContent   = 'Select a village to edit';
-      document.getElementById('manualGrid').innerHTML   = '<div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div>';
-    } else if (tabOrVillage && tabOrVillage !== 'parse') {
-      switchTab('manual');
-      const vData = myVillages.find(v => v.name === tabOrVillage);
-      document.getElementById('modalTitle').textContent = 'Edit: ' + tabOrVillage;
-      document.getElementById('modalSub').textContent   = vData ? `(${vData.x}|${vData.y})` : '';
-      document.getElementById('villageSelectGroup').style.display = 'none';
-      document.getElementById('villageSelect').value = tabOrVillage;
-      onVillageSelect();
-    } else {
-      document.getElementById('modalTitle').textContent = 'Update Troops';
-      document.getElementById('modalSub').textContent   = 'Paste from Travian Plus';
-      document.getElementById('villageSelectGroup').style.display = 'block';
-    }
-  }
-
-  function closeModal() { document.getElementById('inputModal').classList.add('hidden'); }
-
-  function switchTab(tab) {
-    activeTab = tab;
-    document.getElementById('tabParse').classList.toggle('active', tab === 'parse');
-    document.getElementById('tabManual').classList.toggle('active', tab === 'manual');
-    document.getElementById('panelParse').classList.toggle('active', tab === 'parse');
-    document.getElementById('panelManual').classList.toggle('active', tab === 'manual');
-  }
-
-  // ── PARSE ──
-  function onParseInput() {
-    const raw = document.getElementById('parseInput').value.trim();
-    const resultEl = document.getElementById('parseResult');
-    if (!raw) { resultEl.innerHTML = ''; parsedData = null; return; }
-    const result = parseTravianPlus(raw);
-    parsedData = result;
-    if (!result || !result.rows.length) {
-      resultEl.innerHTML = `<div class="parse-preview"><div class="parse-error">⚠️ Could not parse troop data. Make sure you copied from Village Overview → Troops tab.</div></div>`;
-      return;
-    }
-    const troops = result.headers.slice(1);
-    const previewRows = result.rows.map(r =>
-      `<tr><td class="village-name">${escHtml(r.village)}</td>${r.values.map(v => `<td class="${v?'':'zero'}">${v?Number(v).toLocaleString():'0'}</td>`).join('')}</tr>`
-    ).join('');
-    resultEl.innerHTML = `<div class="parse-preview">
-      <div class="parse-preview-head">✅ Detected <strong>${result.rows.length} villages</strong> · Tribe: <strong>${tribeLabelMap[result.tribe]||result.tribe}</strong></div>
-      <div style="overflow-x:auto;"><table class="parse-preview-table">
-        <thead><tr><th style="text-align:left;">Village</th>${troops.map(t=>`<th>${t}</th>`).join('')}</tr></thead>
-        <tbody>${previewRows}</tbody>
-      </table></div>
-    </div>`;
-  }
-
-  function parseTravianPlus(raw) {
-    const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
-    let headerIdx = -1, tribe = null;
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].toLowerCase();
-      if (line.includes('clubswinger')||line.includes('legionnaire')||line.includes('phalanx')||line.includes('slave militia')||line.includes('mercenary')||line.includes('spearman')||line.includes('axeman')||line.includes('swordsman')) {
-        headerIdx = i;
-        if (line.includes('clubswinger')||line.includes('spearman')||line.includes('axeman')||line.includes('teutonic knight')) tribe='teuton';
-        else if (line.includes('legionnaire')||line.includes('praetorian')||line.includes('imperian')) tribe='roman';
-        else if (line.includes('phalanx')||line.includes('swordsman')||line.includes('druidrider')) tribe='gaul';
-        else if (line.includes('slave militia')||line.includes('ash warden')||line.includes('khopesh')) tribe='egyptian';
-        else if (line.includes('mercenary')||line.includes('bowman')||line.includes('marksman')) tribe='hun';
-        break;
+    allianceTroops = {};
+    (troopRes.data || []).forEach(row => {
+      if (!allianceTroops[row.user_id]) {
+        const m = memberMap[row.user_id] || {};
+        allianceTroops[row.user_id] = {player_name:m.player_name||'Unknown',role:m.role||'member',combat_role:m.combat_role||null,tribe:row.tribe,villages:{}};
       }
-    }
-    if (headerIdx === -1 || !tribe) return null;
-    const headers = lines[headerIdx].split(/\t+/).map(h => h.trim()).filter(Boolean);
-    const rows = [];
-    for (let i = headerIdx + 1; i < lines.length; i++) {
-      const line = lines[i];
-      if (['sum','total'].some(k => line.toLowerCase().startsWith(k))) break;
-      const parts = line.split(/\t+/).map(p => p.trim()).filter(p => p !== '');
-      if (parts.length < 2) break;
-      const allNum = parts.slice(1).every(p => /^[\d,\s]+$/.test(p.replace(/[\u200b\u200e\u200f\u202a-\u202e]/g,'')));
-      if (!allNum && parts.length > 2) continue;
-      const village = parts[0];
-      const values  = parts.slice(1).map(p => parseInt(p.replace(/[,\u200b\u200e\u200f\u202a-\u202e\s]/g,''))||0);
-      if (village && values.length) rows.push({ village, values });
-    }
-    if (!rows.length) return null;
-    return { tribe, headers, rows };
-  }
-
-  // ── MANUAL INPUT ──
-  function onVillageSelect() {
-    const vName = document.getElementById('villageSelect').value;
-    if (!vName) return;
-    renderManualGrid(vName);
-  }
-
-  function renderManualGrid(vName) {
-    const grid = document.getElementById('manualGrid');
-    const tribe = playerTribe || 'teuton';
-    const tribeData = TT?.troopsByTribe[tribe] || [];
-    const existing = (vName && myTroops[vName]) ? myTroops[vName].troops || {} : {};
-    const tsVal = existing['ts'] || '';
-    grid.innerHTML = tribeData.filter(t => t.slot < 10).map(t => {
-      const key = t.name.toLowerCase();
-      const val = existing[key] || existing[t.class_id] || 0;
-      return `<div class="manual-field">
-        <label class="manual-label"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id)||'width:18px;height:18px;'}"></span>${t.name}</label>
-        <input type="number" class="manual-input" data-troop="${key}" min="0" value="${val||''}" placeholder="0" />
-      </div>`;
-    }).join('') + `<div class="manual-field" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
-      <label class="manual-label" style="font-size:0.78rem;color:var(--text2);font-weight:700;">Tournament Square Level</label>
-      <input type="number" class="manual-input" data-troop="ts" min="0" max="20" value="${tsVal}" placeholder="0 (no TS)" style="max-width:140px;" />
-      <div style="font-size:0.72rem;color:var(--text3);margin-top:3px;">Level 0–20. Affects troop speed for attacks/support.</div>
-    </div>`;
-  }
-
-  // ── SAVE ──
-  async function handleSave() {
-    const btn = document.getElementById('saveBtn');
-    btn.disabled = true;
-    btn.innerHTML = '<div class="mini-spin"></div> Saving…';
-    try {
-      const db = window._supabase;
-      if (activeTab === 'parse') {
-        if (!parsedData || !parsedData.rows.length) { toast('Paste and parse your troop data first.', 'error'); btn.disabled=false; btn.innerHTML='💾 Save Troops'; return; }
-        const tribe   = parsedData.tribe;
-        const headers = parsedData.headers.slice(1).map(h => h.toLowerCase().trim());
-        const upserts = parsedData.rows.map(row => {
-          const troops = {};
-          row.values.forEach((val, idx) => { const h = headers[idx]; if (h) troops[h] = val; });
-          return { workspace_id: currentWorkspace.id, user_id: currentUser.id, village_name: row.village, tribe, troops, updated_at: new Date().toISOString() };
-        });
-        const { error } = await db.from('workspace_troops').upsert(upserts, { onConflict: 'workspace_id,user_id,village_name' });
-        if (error) throw error;
-        upserts.forEach(u => { myTroops[u.village_name] = { tribe: u.tribe, troops: u.troops, updated_at: u.updated_at }; });
-      } else {
-        const vName = document.getElementById('villageSelect').value;
-        if (!vName) { toast('Select a village first.', 'error'); btn.disabled=false; btn.innerHTML='💾 Save Troops'; return; }
-        const troops = {};
-        document.querySelectorAll('#manualGrid .manual-input').forEach(inp => { if (inp.dataset.troop) troops[inp.dataset.troop] = parseInt(inp.value)||0; });
-        const upsert = { workspace_id: currentWorkspace.id, user_id: currentUser.id, village_name: vName, tribe: playerTribe||'teuton', troops, updated_at: new Date().toISOString() };
-        const { error } = await db.from('workspace_troops').upsert([upsert], { onConflict: 'workspace_id,user_id,village_name' });
-        if (error) throw error;
-        myTroops[vName] = { tribe: upsert.tribe, troops, updated_at: upsert.updated_at };
+      allianceTroops[row.user_id].villages[row.village_name] = {troops:row.troops||{},updated_at:row.updated_at,tribe:row.tribe};
+    });
+    (memberRes.data || []).forEach(m => {
+      if (!allianceTroops[m.user_id]) {
+        allianceTroops[m.user_id] = {player_name:m.player_name,role:m.role,combat_role:m.combat_role||null,tribe:null,villages:{}};
       }
-      toast('✅ Troops saved!', 'success');
-      renderMyTroops();
-      closeModal();
-    } catch(e) {
-      console.error('handleSave:', e);
-      toast('Failed to save. Please try again.', 'error');
-    } finally {
-      btn.disabled = false; btn.innerHTML = '💾 Save Troops';
-    }
+    });
+
+    renderAllianceTroops();
+  } catch(e) {
+    console.error('fetchAllTroops:', e);
+    document.getElementById('allianceAccordion').innerHTML = '<div style="padding:32px;text-align:center;font-size:0.84rem;color:var(--text3);">Failed to load alliance troops.</div>';
   }
+}
 
-  // ── HELPERS ──
-  const tribeLabelMap = { roman:'Romans', teuton:'Teutons', gaul:'Gauls', egyptian:'Egyptians', hun:'Huns' };
-
-  async function waitForSupabase(timeout = 6000) {
-    const start = Date.now();
-    while (typeof window._supabase === 'undefined' || typeof window.getUser !== 'function') {
-      if (Date.now() - start > timeout) throw new Error('Supabase timeout');
-      await sleep(50);
-    }
-  }
-
-  function show(id) { const el = document.getElementById(id); if (el) el.style.display = 'block'; }
-  function hide(id) { const el = document.getElementById(id); if (el) el.style.display = 'none'; }
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-  function escHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  function timeAgo(iso) {
-    const diff = Date.now() - new Date(iso).getTime();
-    const m = Math.floor(diff / 60000);
-    if (m < 1) return 'just now';
-    if (m < 60) return `${m}m ago`;
-    const h = Math.floor(m / 60);
-    if (h < 24) return `${h}h ago`;
-    return `${Math.floor(h/24)}d ago`;
-  }
-
-  function toast(msg, type = 'info') {
-    const wrap = document.getElementById('toastWrap');
-    const el   = document.createElement('div');
-    el.className   = `toast ${type}`;
-    el.textContent = msg;
-    wrap.appendChild(el);
-    setTimeout(() => el.remove(), 3500);
-  }
-
-  document.getElementById('inputModal').addEventListener('click', e => {
-    if (e.target === e.currentTarget) closeModal();
+// ── COMPUTE PLAYER STATS ──
+function computePlayerStats(data) {
+  const cols = (TT?.troopsByTribe[data.tribe] || []).filter(t => t.slot < 9);
+  let off=0, defInf=0, defCav=0, upkeep=0;
+  Object.values(data.villages).forEach(vData => {
+    const troops = vData.troops || {};
+    cols.forEach(t => {
+      const val = Number(troops[t.name.toLowerCase()] || troops[t.class_id] || 0);
+      off    += val * (t.stats?.attack  || 0);
+      defInf += val * (t.stats?.def_inf || 0);
+      defCav += val * (t.stats?.def_cav || 0);
+      upkeep += val * (t.stats?.upkeep  || 0);
+    });
   });
+  return {off, defInf, defCav, upkeep};
+}
+
+// ── COMPUTE MY TROOPS STATS per village ──
+function computeVillageStats(troops, troopCols) {
+  let off=0, defInf=0, defCav=0, upkeep=0;
+  troopCols.forEach(t => {
+    const val = Number(troops[t.name.toLowerCase()] || troops[t.class_id] || 0);
+    off    += val * (t.stats?.attack  || 0);
+    defInf += val * (t.stats?.def_inf || 0);
+    defCav += val * (t.stats?.def_cav || 0);
+    upkeep += val * (t.stats?.upkeep  || 0);
+  });
+  return {off, defInf, defCav, upkeep};
+}
+
+// ── SNAPSHOT HISTORY on save ──
+async function saveHistorySnapshot() {
+  try {
+    const db = window._supabase;
+    const tribe = playerTribe || 'teuton';
+    const cols  = (TT?.troopsByTribe[tribe] || []).filter(t => t.slot < 9);
+    let totalOff=0, totalDefInf=0, totalDefCav=0, totalUpkeep=0;
+    const villagesData = [];
+
+    Object.entries(myTroops).forEach(([vName, vData]) => {
+      const s = computeVillageStats(vData.troops || {}, cols);
+      totalOff     += s.off;
+      totalDefInf  += s.defInf;
+      totalDefCav  += s.defCav;
+      totalUpkeep  += s.upkeep;
+      villagesData.push({village_name: vName, ...s});
+    });
+
+    const today = new Date().toISOString().slice(0, 10);
+    await db.from('workspace_troops_history').upsert({
+      workspace_id: currentWorkspace.id,
+      user_id:      currentUser.id,
+      snapshot_date: today,
+      total_off:    Math.round(totalOff),
+      total_def_inf: Math.round(totalDefInf),
+      total_def_cav: Math.round(totalDefCav),
+      total_upkeep: Math.round(totalUpkeep),
+      villages_data: villagesData,
+    }, { onConflict: 'workspace_id,user_id,snapshot_date' });
+  } catch(e) { console.error('saveHistorySnapshot:', e); }
+}
+
+// ── CHART: My Troops ──
+function renderMyChart() {
+  const wrap = document.getElementById('myChartWrap');
+  if (!myHistory.length) {
+    document.getElementById('myTroopChart').style.display = 'none';
+    document.getElementById('myChartLegend').innerHTML = '<span style="font-size:0.75rem;color:var(--text3);font-weight:400;">Save troops at least twice to see history.</span>';
+    return;
+  }
+
+  const labels  = myHistory.map(r => r.snapshot_date.slice(5)); // MM-DD
+  const offData = myHistory.map(r => r.total_off);
+  const defData = myHistory.map(r => r.total_def_inf);
+  const upData  = myHistory.map(r => r.total_upkeep);
+
+  document.getElementById('myChartLegend').innerHTML = `
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#dc2626;"></span>Off</span>
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#2563eb;"></span>Def</span>
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#059669;"></span>Upkeep</span>`;
+
+  const canvas = document.getElementById('myTroopChart');
+  canvas.style.display = 'block';
+  if (myChartInst) myChartInst.destroy();
+
+  myChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {label:'Off',    data:offData, borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.07)',tension:0.35,pointRadius:3,fill:true},
+        {label:'Def',    data:defData, borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.07)',tension:0.35,pointRadius:3,fill:true},
+        {label:'Upkeep', data:upData,  borderColor:'#059669',backgroundColor:'rgba(5,150,105,0.07)',tension:0.35,pointRadius:3,fill:false,borderDash:[4,3]},
+      ],
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtK(ctx.parsed.y)}`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#7a93bc',maxTicksLimit:10}},
+        y:{grid:{color:'#e2e8f3'},ticks:{font:{size:10},color:'#7a93bc',callback:v=>fmtK(v)}},
+      },
+    },
+  });
+}
+
+// ── CHART: Alliance ──
+function renderAllianceChart() {
+  if (!allianceHistory.length) {
+    document.getElementById('allianceTroopChart').style.display = 'none';
+    document.getElementById('allianceChartLegend').innerHTML = '<span style="font-size:0.75rem;color:var(--text3);">History akan muncul setelah minimal 2 hari update data.</span>';
+    return;
+  }
+
+  const labels  = allianceHistory.map(r => r.date.slice(5));
+  const offData = allianceHistory.map(r => r.off);
+  const defData = allianceHistory.map(r => r.def_inf);
+  const upData  = allianceHistory.map(r => r.upkeep);
+
+  document.getElementById('allianceChartLegend').innerHTML = `
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#dc2626;"></span>Total Off</span>
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#2563eb;"></span>Total Def</span>
+    <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#059669;"></span>Total Upkeep</span>`;
+
+  const canvas = document.getElementById('allianceTroopChart');
+  canvas.style.display = 'block';
+  if (allianceChartInst) allianceChartInst.destroy();
+
+  allianceChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {label:'Total Off',    data:offData, borderColor:'#dc2626',backgroundColor:'rgba(220,38,38,0.06)',tension:0.35,pointRadius:3,fill:true},
+        {label:'Total Def',    data:defData, borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.06)',tension:0.35,pointRadius:3,fill:true},
+        {label:'Total Upkeep', data:upData,  borderColor:'#059669',backgroundColor:'transparent',tension:0.35,pointRadius:3,borderDash:[4,3]},
+      ],
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: ${fmtK(ctx.parsed.y)}`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:10},color:'#7a93bc',maxTicksLimit:14}},
+        y:{grid:{color:'#e2e8f3'},ticks:{font:{size:10},color:'#7a93bc',callback:v=>fmtK(v)}},
+      },
+    },
+  });
+}
+
+// ── RENDER MY TROOPS ──
+function renderMyTroops() {
+  const head = document.getElementById('myTroopsHead');
+  const body = document.getElementById('myTroopsBody');
+  const badgeEl = document.getElementById('myTribeBadge');
+  const updEl   = document.getElementById('lastUpdated');
+
+  const firstRow = Object.values(myTroops)[0];
+  const tribe    = playerTribe || firstRow?.tribe || 'teuton';
+  badgeEl.innerHTML = `<span class="tribe-badge tribe-${tribe}">${tribeLabelMap[tribe]||tribe}</span>`;
+
+  const latestUpdate = Object.values(myTroops).map(r => r.updated_at).sort().reverse()[0];
+  if (latestUpdate) updEl.textContent = '· Updated ' + timeAgo(latestUpdate);
+
+  const tribeData = TT ? TT.troopsByTribe[tribe] : [];
+  const troopCols = (tribeData || []).filter(t => t.slot < 9);
+
+  // Build sortable Off/Def headers
+  const offSortClass = myTroopsSortField==='off' ? (myTroopsSortDir==='desc'?' sort-desc':' sort-asc') : '';
+  const defSortClass = myTroopsSortField==='def' ? (myTroopsSortDir==='desc'?' sort-desc':' sort-asc') : '';
+
+  head.innerHTML = `<tr>
+    <th class="village-col">Village</th>
+    ${troopCols.map(t=>`<th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id)||''}"></span></div></th>`).join('')}
+    <th title="Tournament Square level"><div class="troop-icon-header" style="font-size:0.7rem;font-weight:700;color:var(--text2);">TS</div></th>
+    <th class="sortable${offSortClass}" style="color:var(--red);border-left:2px solid var(--border);cursor:pointer;" onclick="sortMyTroops('off')" title="Sort by Off"><img src="/cdn/icons/combat/offence_small.png" alt="Off" /> Off</th>
+    <th class="sortable${defSortClass}" style="color:var(--blue2);cursor:pointer;" onclick="sortMyTroops('def')" title="Sort by Def"><img src="/cdn/icons/combat/defenceInfantry_small.png" alt="Def" /> Def</th>
+    <th style="color:var(--blue2);"><img src="/cdn/icons/combat/defenceCavalry_small.png" alt="Def" /> Def</th>
+    <th></th>
+  </tr>`;
+
+  const allVillageNames = myVillages.length
+    ? [...myVillages.map(v=>v.name), ...Object.keys(myTroops).filter(n=>!myVillages.find(v=>v.name===n))]
+    : Object.keys(myTroops);
+
+  if (!allVillageNames.length) {
+    head.innerHTML = ''; body.innerHTML = '<tr class="empty-row"><td colspan="20">Loading villages…</td></tr>';
+    badgeEl.innerHTML = ''; updEl.textContent = ''; return;
+  }
+
+  const sums = {}; troopCols.forEach(t=>sums[t.name.toLowerCase()]=0);
+  sums['ts']=0; sums['off']=0; sums['defInf']=0; sums['defCav']=0;
+
+  // Build rows with stats for sorting
+  let villageRows = allVillageNames.map(vName => {
+    const data   = myTroops[vName];
+    const troops = data?.troops || {};
+    const s      = computeVillageStats(troops, troopCols);
+    const ts     = Number(troops['ts'] || 0);
+    const cells  = troopCols.map(t => {
+      const key = t.name.toLowerCase();
+      const val = Number(troops[key] || troops[t.class_id] || 0);
+      sums[key] = (sums[key]||0) + val;
+      return {val, cell:`<td class="${val?'':'zero'}">${val?Number(val).toLocaleString():'0'}</td>`};
+    });
+    sums['off']+=s.off; sums['defInf']+=s.defInf; sums['defCav']+=s.defCav; sums['ts']+=ts;
+    return {vName, cells, s, ts};
+  });
+
+  // Apply sort
+  if (myTroopsSortField === 'off') {
+    villageRows.sort((a,b) => myTroopsSortDir==='desc' ? b.s.off-a.s.off : a.s.off-b.s.off);
+  } else if (myTroopsSortField === 'def') {
+    villageRows.sort((a,b) => myTroopsSortDir==='desc' ? b.s.defInf-a.s.defInf : a.s.defInf-b.s.defInf);
+  }
+
+  const sumCells = troopCols.map(t => { const v=sums[t.name.toLowerCase()]||0; return `<td>${v?Number(v).toLocaleString():'—'}</td>`; }).join('');
+
+  body.innerHTML = villageRows.map(({vName, cells, s, ts}) => {
+    const vData    = myVillages.find(v=>v.name===vName);
+    const coordStr = vData ? ` <span style="color:var(--text3);font-size:0.73rem;font-weight:400;">(${vData.x}|${vData.y})</span>` : '';
+    return `<tr>
+      <td class="village-col">${escHtml(vName)}${coordStr}</td>
+      ${cells.map(c=>c.cell).join('')}
+      <td class="${ts?'':'zero'}">${ts||'—'}</td>
+      <td style="border-left:2px solid var(--border);color:${s.off?'var(--red)':'var(--text3)'};font-weight:${s.off?'600':'400'};">${fmtK(s.off)}</td>
+      <td style="color:${s.defInf?'var(--blue2)':'var(--text3)'};font-weight:${s.defInf?'600':'400'};">${fmtK(s.defInf)}</td>
+      <td style="color:${s.defCav?'var(--blue2)':'var(--text3)'};font-weight:${s.defCav?'600':'400'};">${fmtK(s.defCav)}</td>
+      <td><button class="edit-btn" onclick="openModal('${escHtml(vName).replace(/'/g,"\\'")}')">✏️</button></td>
+    </tr>`;
+  }).join('') + `<tr class="sum-row">
+    <td class="village-col">Total</td>${sumCells}
+    <td>—</td>
+    <td style="border-left:2px solid var(--border);color:var(--red);">${fmtK(sums['off'])}</td>
+    <td style="color:var(--blue2);">${fmtK(sums['defInf'])}</td>
+    <td style="color:var(--blue2);">${fmtK(sums['defCav'])}</td>
+    <td></td>
+  </tr>`;
+}
+
+function sortMyTroops(field) {
+  if (myTroopsSortField === field) {
+    myTroopsSortDir = myTroopsSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    myTroopsSortField = field;
+    myTroopsSortDir   = 'desc';
+  }
+  renderMyTroops();
+}
+
+// ── RENDER ALLIANCE TROOPS ──
+function renderAllianceTroops() {
+  const accordion  = document.getElementById('allianceAccordion');
+  const totalChips = document.getElementById('allianceTotalChips');
+  const memberChip = document.getElementById('allianceMemberChip');
+
+  let entries = Object.entries(allianceTroops);
+  memberChip.textContent = `${entries.length} member${entries.length!==1?'s':''}`;
+
+  if (!entries.length) {
+    accordion.innerHTML = '<div style="padding:40px;text-align:center;font-size:0.84rem;color:var(--text3);">No members have submitted troop data yet.</div>';
+    totalChips.innerHTML = '';
+    return;
+  }
+
+  // Compute stats per player
+  const statsMap = {};
+  entries.forEach(([uid, data]) => { statsMap[uid] = computePlayerStats(data); });
+
+  // Alliance totals
+  let totalOff=0, totalDefInf=0;
+  entries.forEach(([uid]) => { totalOff+=statsMap[uid].off; totalDefInf+=statsMap[uid].defInf; });
+  totalChips.innerHTML = `
+    <span class="alliance-chip chip-off" style="font-size:0.73rem;">⚔️ ${fmtK(totalOff)} off</span>
+    <span class="alliance-chip chip-def" style="font-size:0.73rem;">🛡️ ${fmtK(totalDefInf)} def</span>`;
+
+  // Sort
+  entries = sortAllianceEntries(entries, statsMap);
+
+  // Render
+  accordion.innerHTML = `<div class="player-accordion-wrap">` +
+    entries.map(([uid, data], idx) => {
+      const s       = statsMap[uid];
+      const name    = data.player_name;
+      const tribe   = data.tribe;
+      const villages= Object.entries(data.villages);
+      const hasData = villages.length > 0;
+      const isSelf  = uid === currentUser.id;
+      const latestTs= hasData ? Object.values(data.villages).map(v=>v.updated_at).sort().reverse()[0] : null;
+      const isStale = latestTs && (Date.now() - new Date(latestTs).getTime()) > 24*3600*1000;
+      const cols    = (TT?.troopsByTribe[tribe]||[]).filter(t=>t.slot<9);
+
+      // Tribe icon
+      const avatarHtml = tribe
+        ? `<div class="tribe-avatar"><img src="${CDN_TRIBE_ICON(tribe)}" alt="${tribe}" onerror="this.parentElement.innerHTML='${escHtml(name).charAt(0).toUpperCase()}'"></div>`
+        : `<div class="tribe-avatar" style="background:var(--navy2);color:#fff;font-size:0.8rem;font-weight:700;">${escHtml(name).charAt(0).toUpperCase()}</div>`;
+
+      // Combat role
+      const roleHtml = isCoord ? renderCombatRoleBtn(uid, data.combat_role, idx) : (
+        data.combat_role === 'attack' ? '<span class="role-atk">⚔️ Attack</span>' :
+        data.combat_role === 'defense' ? '<span class="role-def">🛡️ Defense</span>' : ''
+      );
+
+      return `<div>
+        <div class="player-row" id="prow-${idx}" onclick="togglePlayer(${idx})">
+          ${avatarHtml}
+          <div class="player-info">
+            <div class="player-name">${escHtml(name)}${isSelf?` <span class="you-badge">You</span>`:''} ${roleHtml}</div>
+            <div class="player-meta">
+              ${tribe ? `<span class="tribe-badge tribe-${tribe}" style="font-size:0.68rem;padding:1px 7px;">${tribeLabelMap[tribe]||tribe}</span>` : '<span style="color:var(--text3);font-size:0.75rem;">No data yet</span>'}
+              ${hasData ? `<span>· ${villages.length} village${villages.length!==1?'s':''}</span>` : ''}
+              ${latestTs ? `<span>· ${timeAgo(latestTs)}</span>` : ''}
+              ${isStale ? `<span class="stale-badge">⚠️ Stale</span>` : ''}
+            </div>
+          </div>
+          <div class="player-stats">
+            ${hasData ? `<span class="alliance-chip chip-off" style="font-size:0.7rem;">⚔️ ${fmtK(s.off)}</span><span class="alliance-chip chip-def" style="font-size:0.7rem;">🛡️ ${fmtK(s.defInf)}</span>` : ''}
+          </div>
+          <span class="player-chevron" id="pchev-${idx}">▼</span>
+        </div>
+        <div class="player-detail" id="pdetail-${idx}">
+          ${hasData ? renderPlayerTable(cols, villages) : '<div style="padding:24px;text-align:center;font-size:0.84rem;color:var(--text3);">No troop data submitted yet.</div>'}
+        </div>
+      </div>`;
+    }).join('') + `</div>`;
+}
+
+function renderCombatRoleBtn(uid, currentRole, idx) {
+  if (currentRole === 'attack') {
+    return `<span class="role-atk">⚔️ Attack</span> <button class="role-toggle-btn" onclick="event.stopPropagation();setCombatRole('${uid}','defense',${idx})">→ Def</button>`;
+  } else if (currentRole === 'defense') {
+    return `<span class="role-def">🛡️ Defense</span> <button class="role-toggle-btn" onclick="event.stopPropagation();setCombatRole('${uid}','attack',${idx})">→ Atk</button>`;
+  } else {
+    return `<button class="role-toggle-btn" onclick="event.stopPropagation();setCombatRole('${uid}','attack',${idx})">⚔️ Label</button>`;
+  }
+}
+
+async function setCombatRole(uid, role, idx) {
+  try {
+    const db = window._supabase;
+    const newRole = allianceTroops[uid]?.combat_role === role ? null : role; // toggle off if same
+    const { error } = await db.from('workspace_members')
+      .update({ combat_role: newRole })
+      .eq('workspace_id', currentWorkspace.id)
+      .eq('user_id', uid);
+    if (error) throw error;
+    if (allianceTroops[uid]) allianceTroops[uid].combat_role = newRole;
+    renderAllianceTroops();
+  } catch(e) { console.error('setCombatRole:', e); toast('Failed to update label.', 'error'); }
+}
+
+// ── SORT ALLIANCE ──
+function setSortAlliance(field) {
+  const btns = ['sortName','sortTribe','sortOff','sortDef','sortUpdated'];
+  const fieldMap = {name:'sortName',tribe:'sortTribe',off:'sortOff',def:'sortDef',updated:'sortUpdated'};
+  if (allianceSortField === field) {
+    allianceSortDir = allianceSortDir === 'asc' ? 'desc' : 'asc';
+  } else {
+    allianceSortField = field;
+    allianceSortDir   = field === 'updated' ? 'desc' : 'asc';
+  }
+  btns.forEach(id => {
+    const btn = document.getElementById(id);
+    btn.classList.remove('active','asc','desc');
+  });
+  const activeBtn = document.getElementById(fieldMap[field]);
+  if (activeBtn) { activeBtn.classList.add('active', allianceSortDir); }
+  renderAllianceTroops();
+}
+
+function sortAllianceEntries(entries, statsMap) {
+  return entries.slice().sort(([aUid, aData], [bUid, bData]) => {
+    let av, bv;
+    switch (allianceSortField) {
+      case 'name':    av=aData.player_name.toLowerCase(); bv=bData.player_name.toLowerCase(); break;
+      case 'tribe':   av=aData.tribe||''; bv=bData.tribe||''; break;
+      case 'off':     av=statsMap[aUid].off;    bv=statsMap[bUid].off;    break;
+      case 'def':     av=statsMap[aUid].defInf; bv=statsMap[bUid].defInf; break;
+      case 'updated': {
+        const aTs = Object.values(aData.villages).map(v=>v.updated_at).sort().reverse()[0]||'';
+        const bTs = Object.values(bData.villages).map(v=>v.updated_at).sort().reverse()[0]||'';
+        av=aTs; bv=bTs; break;
+      }
+      default: return 0;
+    }
+    if (av < bv) return allianceSortDir==='asc' ? -1 : 1;
+    if (av > bv) return allianceSortDir==='asc' ?  1 : -1;
+    return 0;
+  });
+}
+
+// ── RENDER PLAYER TABLE ──
+function renderPlayerTable(troopCols, villages) {
+  if (!troopCols.length) return '<div style="padding:20px;text-align:center;color:var(--text3);font-size:0.84rem;">Troop data unavailable for this tribe.</div>';
+  const sums={}; troopCols.forEach(t=>sums[t.name.toLowerCase()]=0);
+  sums['off']=0; sums['defInf']=0; sums['defCav']=0;
+
+  const rows = villages.map(([vName, vData]) => {
+    const troops=vData.troops||{};
+    let offStr=0,defInfStr=0,defCavStr=0;
+    const cells = troopCols.map(t => {
+      const key=t.name.toLowerCase(); const val=Number(troops[key]||troops[t.class_id]||0);
+      sums[key]=(sums[key]||0)+val; offStr+=val*(t.stats?.attack||0); defInfStr+=val*(t.stats?.def_inf||0); defCavStr+=val*(t.stats?.def_cav||0);
+      return `<td class="${val?'':'zero'}">${val?Number(val).toLocaleString():'0'}</td>`;
+    }).join('');
+    sums['off']+=offStr; sums['defInf']+=defInfStr; sums['defCav']+=defCavStr;
+    return `<tr><td class="village-col">${escHtml(vName)}</td>${cells}
+      <td style="border-left:2px solid var(--border);color:${offStr?'var(--red)':'var(--text3)'};font-weight:${offStr?'600':'400'};">${fmtK(offStr)}</td>
+      <td style="color:${defInfStr?'var(--blue2)':'var(--text3)'};font-weight:${defInfStr?'600':'400'};">${fmtK(defInfStr)}</td>
+      <td style="color:${defCavStr?'var(--blue2)':'var(--text3)'};font-weight:${defCavStr?'600':'400'};">${fmtK(defCavStr)}</td>
+    </tr>`;
+  }).join('');
+
+  const sumCells = troopCols.map(t=>{const v=sums[t.name.toLowerCase()]||0;return`<td>${v?Number(v).toLocaleString():'—'}</td>`;}).join('');
+  return `<div class="troops-table-wrap" style="padding:0 0 4px;">
+    <table class="troops-table">
+      <thead><tr>
+        <th class="village-col">Village</th>
+        ${troopCols.map(t=>`<th><div class="troop-icon-header"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id)||''}"></span></div></th>`).join('')}
+        <th title="Offensive strength" style="color:var(--red);border-left:2px solid var(--border);"><img src="/cdn/icons/combat/offence_small.png" alt="Off" /> Off</th>
+        <th title="Defense vs Infantry" style="color:var(--blue2);"><img src="/cdn/icons/combat/defenceInfantry_small.png" alt="Def" /> Def</th>
+        <th title="Defense vs Cavalry" style="color:var(--blue2);"><img src="/cdn/icons/combat/defenceCavalry_small.png" alt="Def" /> Def</th>
+      </tr></thead>
+      <tbody>${rows}
+        <tr class="sum-row"><td class="village-col">Total</td>${sumCells}
+          <td style="border-left:2px solid var(--border);color:var(--red);">${fmtK(sums['off'])}</td>
+          <td style="color:var(--blue2);">${fmtK(sums['defInf'])}</td>
+          <td style="color:var(--blue2);">${fmtK(sums['defCav'])}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function togglePlayer(idx) {
+  const row=document.getElementById(`prow-${idx}`);
+  const detail=document.getElementById(`pdetail-${idx}`);
+  const chev=document.getElementById(`pchev-${idx}`);
+  const isOpen=detail.classList.contains('open');
+  detail.classList.toggle('open',!isOpen); row.classList.toggle('open',!isOpen); chev.classList.toggle('open',!isOpen);
+}
+
+// ── MODAL ──
+function openModal(tabOrVillage) {
+  document.getElementById('inputModal').classList.remove('hidden');
+  document.getElementById('parseInput').value = '';
+  document.getElementById('parseResult').innerHTML = '';
+  parsedData = null; switchTab('parse');
+  if (tabOrVillage === 'manual') {
+    switchTab('manual');
+    document.getElementById('villageSelectGroup').style.display = 'block';
+    document.getElementById('modalTitle').textContent = 'Edit Troops';
+    document.getElementById('modalSub').textContent   = 'Select a village to edit';
+    document.getElementById('manualGrid').innerHTML   = '<div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div>';
+  } else if (tabOrVillage && tabOrVillage !== 'parse') {
+    switchTab('manual');
+    const vData = myVillages.find(v=>v.name===tabOrVillage);
+    document.getElementById('modalTitle').textContent = 'Edit: ' + tabOrVillage;
+    document.getElementById('modalSub').textContent   = vData ? `(${vData.x}|${vData.y})` : '';
+    document.getElementById('villageSelectGroup').style.display = 'none';
+    document.getElementById('villageSelect').value = tabOrVillage;
+    onVillageSelect();
+  } else {
+    document.getElementById('modalTitle').textContent = 'Update Troops';
+    document.getElementById('modalSub').textContent   = 'Paste from Travian Plus';
+    document.getElementById('villageSelectGroup').style.display = 'block';
+  }
+}
+function closeModal() { document.getElementById('inputModal').classList.add('hidden'); }
+function switchTab(tab) {
+  activeTab=tab;
+  document.getElementById('tabParse').classList.toggle('active',tab==='parse');
+  document.getElementById('tabManual').classList.toggle('active',tab==='manual');
+  document.getElementById('panelParse').classList.toggle('active',tab==='parse');
+  document.getElementById('panelManual').classList.toggle('active',tab==='manual');
+}
+
+// ── PARSE ──
+function onParseInput() {
+  const raw=document.getElementById('parseInput').value.trim();
+  const resultEl=document.getElementById('parseResult');
+  if (!raw) { resultEl.innerHTML=''; parsedData=null; return; }
+  const result=parseTravianPlus(raw); parsedData=result;
+  if (!result||!result.rows.length) { resultEl.innerHTML=`<div class="parse-preview"><div class="parse-error">⚠️ Could not parse troop data.</div></div>`; return; }
+  const troops=result.headers.slice(1);
+  const previewRows=result.rows.map(r=>`<tr><td class="village-name">${escHtml(r.village)}</td>${r.values.map(v=>`<td class="${v?'':'zero'}">${v?Number(v).toLocaleString():'0'}</td>`).join('')}</tr>`).join('');
+  resultEl.innerHTML=`<div class="parse-preview"><div class="parse-preview-head">✅ Detected <strong>${result.rows.length} villages</strong> · Tribe: <strong>${tribeLabelMap[result.tribe]||result.tribe}</strong></div><div style="overflow-x:auto;"><table class="parse-preview-table"><thead><tr><th style="text-align:left;">Village</th>${troops.map(t=>`<th>${t}</th>`).join('')}</tr></thead><tbody>${previewRows}</tbody></table></div></div>`;
+}
+
+function parseTravianPlus(raw) {
+  const lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  let headerIdx=-1,tribe=null;
+  for (let i=0;i<lines.length;i++) {
+    const line=lines[i].toLowerCase();
+    if (line.includes('clubswinger')||line.includes('legionnaire')||line.includes('phalanx')||line.includes('slave militia')||line.includes('mercenary')||line.includes('spearman')||line.includes('axeman')||line.includes('swordsman')) {
+      headerIdx=i;
+      if (line.includes('clubswinger')||line.includes('spearman')||line.includes('axeman')||line.includes('teutonic knight')) tribe='teuton';
+      else if (line.includes('legionnaire')||line.includes('praetorian')||line.includes('imperian')) tribe='roman';
+      else if (line.includes('phalanx')||line.includes('swordsman')||line.includes('druidrider')) tribe='gaul';
+      else if (line.includes('slave militia')||line.includes('ash warden')||line.includes('khopesh')) tribe='egyptian';
+      else if (line.includes('mercenary')||line.includes('bowman')||line.includes('marksman')) tribe='hun';
+      break;
+    }
+  }
+  if (headerIdx===-1||!tribe) return null;
+  const headers=lines[headerIdx].split(/\t+/).map(h=>h.trim()).filter(Boolean);
+  const rows=[];
+  for (let i=headerIdx+1;i<lines.length;i++) {
+    const line=lines[i];
+    if (['sum','total'].some(k=>line.toLowerCase().startsWith(k))) break;
+    const parts=line.split(/\t+/).map(p=>p.trim()).filter(p=>p!=='');
+    if (parts.length<2) break;
+    const allNum=parts.slice(1).every(p=>/^[\d,\s]+$/.test(p.replace(/[\u200b\u200e\u200f\u202a-\u202e]/g,'')));
+    if (!allNum&&parts.length>2) continue;
+    const village=parts[0];
+    const values=parts.slice(1).map(p=>parseInt(p.replace(/[,\u200b\u200e\u200f\u202a-\u202e\s]/g,''))||0);
+    if (village&&values.length) rows.push({village,values});
+  }
+  if (!rows.length) return null;
+  return {tribe,headers,rows};
+}
+
+// ── MANUAL INPUT ──
+function onVillageSelect() {
+  const vName=document.getElementById('villageSelect').value;
+  if (!vName) return;
+  renderManualGrid(vName);
+}
+function renderManualGrid(vName) {
+  const grid=document.getElementById('manualGrid');
+  const tribe=playerTribe||'teuton';
+  const tribeData=TT?.troopsByTribe[tribe]||[];
+  const existing=(vName&&myTroops[vName])?myTroops[vName].troops||{}:{};
+  const tsVal=existing['ts']||'';
+  grid.innerHTML=tribeData.filter(t=>t.slot<10).map(t=>{
+    const key=t.name.toLowerCase(); const val=existing[key]||existing[t.class_id]||0;
+    return `<div class="manual-field"><label class="manual-label"><span class="troop-sprite" style="${TT?.getSpriteStyle(t.class_id)||'width:18px;height:18px;'}"></span>${t.name}</label><input type="number" class="manual-input" data-troop="${key}" min="0" value="${val||''}" placeholder="0" /></div>`;
+  }).join('')+`<div class="manual-field" style="grid-column:1/-1;border-top:1px solid var(--border);padding-top:12px;margin-top:4px;"><label class="manual-label" style="font-size:0.78rem;color:var(--text2);font-weight:700;">Tournament Square Level</label><input type="number" class="manual-input" data-troop="ts" min="0" max="20" value="${tsVal}" placeholder="0 (no TS)" style="max-width:140px;" /><div style="font-size:0.72rem;color:var(--text3);margin-top:3px;">Level 0–20. Affects troop speed for attacks/support.</div></div>`;
+}
+
+// ── SAVE ──
+async function handleSave() {
+  const btn=document.getElementById('saveBtn');
+  btn.disabled=true; btn.innerHTML='<div class="mini-spin"></div> Saving…';
+  try {
+    const db=window._supabase;
+    if (activeTab==='parse') {
+      if (!parsedData||!parsedData.rows.length) { toast('Paste and parse your troop data first.','error'); btn.disabled=false; btn.innerHTML='💾 Save Troops'; return; }
+      const tribe=parsedData.tribe;
+      const headers=parsedData.headers.slice(1).map(h=>h.toLowerCase().trim());
+      const upserts=parsedData.rows.map(row=>{
+        const troops={}; row.values.forEach((val,idx)=>{const h=headers[idx];if(h)troops[h]=val;});
+        return {workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:row.village,tribe,troops,updated_at:new Date().toISOString()};
+      });
+      const {error}=await db.from('workspace_troops').upsert(upserts,{onConflict:'workspace_id,user_id,village_name'});
+      if (error) throw error;
+      upserts.forEach(u=>{myTroops[u.village_name]={tribe:u.tribe,troops:u.troops,updated_at:u.updated_at};});
+    } else {
+      const vName=document.getElementById('villageSelect').value;
+      if (!vName) { toast('Select a village first.','error'); btn.disabled=false; btn.innerHTML='💾 Save Troops'; return; }
+      const troops={};
+      document.querySelectorAll('#manualGrid .manual-input').forEach(inp=>{if(inp.dataset.troop)troops[inp.dataset.troop]=parseInt(inp.value)||0;});
+      const upsert={workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:vName,tribe:playerTribe||'teuton',troops,updated_at:new Date().toISOString()};
+      const {error}=await db.from('workspace_troops').upsert([upsert],{onConflict:'workspace_id,user_id,village_name'});
+      if (error) throw error;
+      myTroops[vName]={tribe:upsert.tribe,troops,updated_at:upsert.updated_at};
+    }
+    // ── Snapshot history setelah save ──
+    await saveHistorySnapshot();
+
+    toast('✅ Troops saved!','success');
+    renderMyTroops();
+    // Refresh chart
+    await fetchMyHistory();
+    closeModal();
+  } catch(e) {
+    console.error('handleSave:',e);
+    toast('Failed to save. Please try again.','error');
+  } finally { btn.disabled=false; btn.innerHTML='💾 Save Troops'; }
+}
+
+// ── HELPERS ──
+const tribeLabelMap={roman:'Romans',teuton:'Teutons',gaul:'Gauls',egyptian:'Egyptians',hun:'Huns'};
+const fmtK=n=>n>=1000000?(n/1000000).toFixed(1)+'M':n>=1000?(n/1000).toFixed(1).replace(/\.0$/,'')+'k':n?String(Math.round(n)):'0';
+
+async function waitForSupabase(timeout=6000) {
+  const start=Date.now();
+  while (typeof window._supabase==='undefined'||typeof window.getUser!=='function') {
+    if (Date.now()-start>timeout) throw new Error('Supabase timeout');
+    await sleep(50);
+  }
+}
+function show(id){const el=document.getElementById(id);if(el)el.style.display='block';}
+function hide(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function timeAgo(iso){
+  const diff=Date.now()-new Date(iso).getTime(),m=Math.floor(diff/60000);
+  if(m<1)return'just now';if(m<60)return`${m}m ago`;
+  const h=Math.floor(m/60);if(h<24)return`${h}h ago`;return`${Math.floor(h/24)}d ago`;
+}
+function toast(msg,type='info'){
+  const wrap=document.getElementById('toastWrap');
+  const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;
+  wrap.appendChild(el);setTimeout(()=>el.remove(),3500);
+}
+document.getElementById('inputModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeModal();});
 </script>
 </body>
 </html>
