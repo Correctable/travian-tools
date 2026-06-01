@@ -58,7 +58,7 @@
 
   // ─── KONFIGURASI NAVBAR (menu statis — tampil untuk semua user) ────────────
   const NAVBAR_CONFIG = {
-    logo: { icon: '⚔️', name: 'TravianTools', href: '/' },
+    logo: { icon: '<img src="/cdn/icons/building/academy.png" alt="TravianTools" width="30" align="absmiddle"/>', name: 'TravianTools', href: '/' },
 
     menuItems: [
       {
