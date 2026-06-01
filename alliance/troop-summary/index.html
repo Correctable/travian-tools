@@ -318,32 +318,14 @@
 
       <!-- MANUAL TAB -->
       <div class="tab-panel" id="panelManual">
-        <div class="field-group">
+        <div class="field-group" id="villageSelectGroup">
           <label class="field-label">Village</label>
           <select class="field-select" id="villageSelect" onchange="onVillageSelect()">
             <option value="">— Select village —</option>
           </select>
         </div>
-
-        <!-- Tribe shown as info only, or first-time picker -->
-        <div class="field-group" id="tribePickerGroup" style="display:none;">
-          <label class="field-label">Your Tribe <span style="color:var(--red);">*</span></label>
-          <div class="tribe-selector" id="tribeSelectorManual">
-            <div class="tribe-opt" data-tribe="roman"    onclick="selectTribe('roman')">🦅 Romans</div>
-            <div class="tribe-opt" data-tribe="teuton"   onclick="selectTribe('teuton')">⚒️ Teutons</div>
-            <div class="tribe-opt" data-tribe="gaul"     onclick="selectTribe('gaul')">🌿 Gauls</div>
-            <div class="tribe-opt" data-tribe="egyptian" onclick="selectTribe('egyptian')">🏺 Egyptians</div>
-            <div class="tribe-opt" data-tribe="hun"      onclick="selectTribe('hun')">🏹 Huns</div>
-          </div>
-          <div style="font-size:0.73rem;color:var(--text3);margin-top:5px;">Only needed once — all your villages share the same tribe.</div>
-        </div>
-        <div class="field-group" id="tribeInfoGroup" style="display:none;">
-          <label class="field-label">Tribe</label>
-          <div id="tribeInfoBadge"></div>
-        </div>
-
         <div class="manual-grid" id="manualGrid">
-          <div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a tribe to see troop inputs.</div>
+          <div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div>
         </div>
       </div>
     </div>
@@ -447,8 +429,8 @@
   let currentUser        = null;
   let myVillages         = [];   // [{name, x, y}]
   let myTroops           = {};   // {village_name: {tribe, troops:{key:val}}}
+  let playerTribe        = null; // detected from /api/player response
   let parsedData         = null; // result of Travian Plus parse
-  let manualTribe        = null;
   let activeTab          = 'parse';
 
   // ── INIT ──
@@ -502,6 +484,18 @@
       const serverKey = currentWorkspace.server.split('.')[0];
       const res  = await fetch(`${API_BASE}/api/player?server=${serverKey}&name=${encodeURIComponent(currentWorkspace.player_name)}`);
       const data = await res.json();
+
+      // Detect tribe from API response
+      const rawTribe = (data.tribe || data.race || data.player?.tribe || '').toLowerCase();
+      const tribeMap = {
+        'roman': 'roman', 'romans': 'roman', '1': 'roman',
+        'teuton': 'teuton', 'teutons': 'teuton', '2': 'teuton',
+        'gaul': 'gaul', 'gauls': 'gaul', '3': 'gaul',
+        'egyptian': 'egyptian', 'egyptians': 'egyptian', '4': 'egyptian',
+        'hun': 'hun', 'huns': 'hun', '5': 'hun',
+      };
+      playerTribe = tribeMap[rawTribe] || 'teuton';
+
       myVillages = (data.villages || []).map(v => ({
         name: v.name || v.village_name || '',
         x:    v.x ?? v.coord_x ?? 0,
@@ -552,9 +546,9 @@
     const badgeEl = document.getElementById('myTribeBadge');
     const updatedEl = document.getElementById('lastUpdated');
 
-    // Detect tribe from existing data, default to teuton if none
+    // Use playerTribe (from API), fallback to existing data, then teuton
     const firstRow = Object.values(myTroops)[0];
-    const tribe = firstRow?.tribe || 'teuton';
+    const tribe = playerTribe || firstRow?.tribe || 'teuton';
 
     // Badge
     badgeEl.innerHTML = `<span class="tribe-badge tribe-${tribe}">${tribeLabelMap[tribe] || tribe}</span>`;
@@ -676,43 +670,27 @@
     parsedData = null;
     switchTab('parse');
 
-    // Auto-detect tribe from existing data
-    const knownTribe = getKnownTribe();
-    manualTribe = knownTribe;
-
-    // Show/hide tribe picker vs tribe info
-    const hasTribe = !!knownTribe;
-    document.getElementById('tribePickerGroup').style.display = hasTribe ? 'none' : 'block';
-    document.getElementById('tribeInfoGroup').style.display   = hasTribe ? 'block' : 'none';
-    if (hasTribe) {
-      document.getElementById('tribeInfoBadge').innerHTML =
-        `<span class="tribe-badge tribe-${knownTribe}">${tribeLabelMap[knownTribe]}</span>`;
-    }
-
     if (tabOrVillage === 'manual') {
+      // Open manual tab, show village selector
       switchTab('manual');
+      document.getElementById('villageSelectGroup').style.display = 'block';
+      document.getElementById('modalTitle').textContent = 'Edit Troops';
+      document.getElementById('modalSub').textContent   = 'Select a village to edit';
+      document.getElementById('manualGrid').innerHTML   = '<div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a village to edit troops.</div>';
     } else if (tabOrVillage && tabOrVillage !== 'parse') {
+      // Opened from row edit button — go straight to that village
       switchTab('manual');
-      // Set title to village name
       const vData = myVillages.find(v => v.name === tabOrVillage);
-      document.getElementById('modalTitle').textContent = `Edit: ${tabOrVillage}`;
-      document.getElementById('modalSub').textContent   = vData ? `(${vData.x}|${vData.y})` : '';
-      // Hide village selector (already known)
-      document.querySelector('.field-group:has(#villageSelect)').style.display = 'none';
+      document.getElementById('modalTitle').textContent = 'Edit: ' + tabOrVillage;
+      document.getElementById('modalSub').textContent   = vData ? '(' + vData.x + '|' + vData.y + ')' : '';
+      document.getElementById('villageSelectGroup').style.display = 'none';
       document.getElementById('villageSelect').value = tabOrVillage;
       onVillageSelect();
     } else {
       document.getElementById('modalTitle').textContent = 'Update Troops';
-      document.getElementById('modalSub').textContent   = 'Your villages';
-      document.querySelector('.field-group:has(#villageSelect)').style.display = 'block';
+      document.getElementById('modalSub').textContent   = 'Paste from Travian Plus';
+      document.getElementById('villageSelectGroup').style.display = 'block';
     }
-  }
-
-  function getKnownTribe() {
-    // From existing troop data
-    const first = Object.values(myTroops)[0];
-    if (first?.tribe) return first.tribe;
-    return null;
   }
 
   function closeModal() {
@@ -835,31 +813,15 @@
   function onVillageSelect() {
     const vName = document.getElementById('villageSelect').value;
     if (!vName) return;
-    // tribe already set via getKnownTribe in openModal
-    if (!manualTribe) {
-      const existing = myTroops[vName];
-      if (existing?.tribe) { manualTribe = existing.tribe; }
-    }
     renderManualGrid(vName);
   }
 
-  function selectTribe(tribe) {
-    manualTribe = tribe;
-    document.querySelectorAll('.tribe-opt').forEach(el => {
-      el.classList.toggle('selected', el.dataset.tribe === tribe);
-    });
-    const vName = document.getElementById('villageSelect').value;
-    renderManualGrid(vName);
-  }
+  // selectTribe removed — tribe is now auto-detected from API
 
   function renderManualGrid(vName) {
     const grid = document.getElementById('manualGrid');
-    if (!manualTribe) {
-      grid.innerHTML = '<div style="color:var(--text3);font-size:0.84rem;grid-column:1/-1;">Select a tribe to see troop inputs.</div>';
-      return;
-    }
-
-    const tribeData = TT?.troopsByTribe[manualTribe] || [];
+    const tribe = playerTribe || 'teuton';
+    const tribeData = TT?.troopsByTribe[tribe] || [];
     const existing = (vName && myTroops[vName]) ? myTroops[vName].troops || {} : {};
     const tsVal = existing['ts'] || '';
 
@@ -930,7 +892,6 @@
         // Manual
         const vName = document.getElementById('villageSelect').value;
         if (!vName) { toast('Select a village first.', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save Troops'; return; }
-        if (!manualTribe) { toast('Select a tribe first.', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save Troops'; return; }
 
         const troops = {};
         document.querySelectorAll('#manualGrid .manual-input').forEach(inp => {
@@ -943,7 +904,7 @@
           workspace_id: currentWorkspace.id,
           user_id:      currentUser.id,
           village_name: vName,
-          tribe:        manualTribe,
+          tribe:        playerTribe || 'teuton',
           troops,
           updated_at:   new Date().toISOString(),
         };
