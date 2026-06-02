@@ -538,7 +538,7 @@
           password,
           options: {
             data: { username },
-            emailRedirectTo: window.location.origin + '/',
+            emailRedirectTo: window.location.origin + '/pricing/',
           },
         });
 
@@ -559,7 +559,7 @@
 
         /* Supabase returns session immediately if email confirmation is OFF */
         if (data.session) {
-          window.location.replace('/');
+          window.location.replace('/pricing/');
         } else {
           showSuccess(email);
         }
