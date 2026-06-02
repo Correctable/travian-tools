@@ -1435,8 +1435,10 @@
       });
       if (memberError) throw memberError;
 
+      // Simpan data lokal sebelum reset form
+      const newWs = { id: wsId, name: alias, server: slug, alliance_tag: selectedAlliance.name, player_name: selectedPlayer.name, role: 'founder' };
+
       toast('🏰 Alliance workspace created!', 'success');
-      resetForm();
 
       const { data: allMembers, error: fetchErr } = await db
         .from('workspace_members')
@@ -1448,9 +1450,11 @@
           id: d.workspaces.id, name: d.workspaces.name, server: d.workspaces.server,
           alliance_tag: d.workspaces.alliance_tag, player_name: d.player_name, role: d.role,
         }));
+        resetForm();
         showWorkspace(list);
       } else {
-        showWorkspace([{ id: wsId, name: alias, server: slug, alliance_tag: selectedAlliance.name, player_name: selectedPlayer.name, role: 'founder' }]);
+        resetForm();
+        showWorkspace([newWs]);
       }
     } catch (err) {
       console.error(err);
