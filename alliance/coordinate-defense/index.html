@@ -714,8 +714,8 @@ function renderCard(plan) {
 
   // Travian send-def link
   const serverDomain = (currentWs?.server || 'ts5') + '.x1.asia.travian.com';
-  const sendUrl = plan.target_mapid
-    ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=5&targetMapId=${plan.target_mapid}`
+  const sendUrl = plan.target_map_id
+    ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=5&targetMapId=${plan.target_map_id}`
     : null;
 
   // Priority chips
@@ -1150,7 +1150,7 @@ async function submitPlan() {
     target_village: targetVName || `${targetX}|${targetY}`,
     target_x:       targetX,
     target_y:       targetY,
-    target_mapid:   targetMapId || null,
+    target_map_id:  targetMapId || null,
     eta:            formType === 'incidental' ? (document.getElementById('inputEta').value || null) : null,
     crop_needed:    crop,
     crop_committed: 0,
