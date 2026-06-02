@@ -593,6 +593,14 @@
   <script>
     // Kalau sudah login, redirect ke return URL atau home
     (async () => {
+      // Tunggu sampai supabase.js selesai inisialisasi (async IIFE)
+      let waited = 0;
+      while (typeof window.getSession !== 'function' && waited < 3000) {
+        await new Promise(r => setTimeout(r, 50));
+        waited += 50;
+      }
+      if (typeof window.getSession !== 'function') return;
+
       const session = await window.getSession();
       if (session) {
         const params  = new URLSearchParams(window.location.search);

@@ -1065,7 +1065,8 @@ async function handleSave() {
       const headers=parsedData.headers.slice(1).map(h=>h.toLowerCase().trim());
       const upserts=parsedData.rows.map(row=>{
         const troops={}; row.values.forEach((val,idx)=>{const h=headers[idx];if(h)troops[h]=val;});
-        return {workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:row.village,tribe,troops,updated_at:new Date().toISOString()};
+        const vCoord=myVillages.find(v=>v.name===row.village);
+        return {workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:row.village,tribe,troops,updated_at:new Date().toISOString(),village_x:vCoord?.x??null,village_y:vCoord?.y??null};
       });
       const {error}=await db.from('workspace_troops').upsert(upserts,{onConflict:'workspace_id,user_id,village_name'});
       if (error) throw error;
@@ -1075,7 +1076,8 @@ async function handleSave() {
       if (!vName) { toast('Select a village first.','error'); btn.disabled=false; btn.innerHTML='💾 Save Troops'; return; }
       const troops={};
       document.querySelectorAll('#manualGrid .manual-input').forEach(inp=>{if(inp.dataset.troop)troops[inp.dataset.troop]=parseInt(inp.value)||0;});
-      const upsert={workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:vName,tribe:playerTribe||'teuton',troops,updated_at:new Date().toISOString()};
+      const vCoord=myVillages.find(v=>v.name===vName);
+      const upsert={workspace_id:currentWorkspace.id,user_id:currentUser.id,village_name:vName,tribe:playerTribe||'teuton',troops,updated_at:new Date().toISOString(),village_x:vCoord?.x??null,village_y:vCoord?.y??null};
       const {error}=await db.from('workspace_troops').upsert([upsert],{onConflict:'workspace_id,user_id,village_name'});
       if (error) throw error;
       myTroops[vName]={tribe:upsert.tribe,troops,updated_at:upsert.updated_at};

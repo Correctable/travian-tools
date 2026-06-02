@@ -941,23 +941,53 @@ function populateMemberSelect() {
   });
 }
 
-function onMemberChange() {
-  const uid      = document.getElementById('selectMember').value;
-  const villages = troopRows.filter(t => t.user_id === uid);
-  const wrap     = document.getElementById('villageWrap');
-  const sel      = document.getElementById('selectVillage');
+async function onMemberChange() {
+  const uid        = document.getElementById('selectMember').value;
+  const wrap       = document.getElementById('villageWrap');
+  const sel        = document.getElementById('selectVillage');
+  const resolveEl  = document.getElementById('resolveChip');
 
-  sel.innerHTML = '<option value="">— Select village —</option>';
-  if (!villages.length) { wrap.style.display = 'none'; document.getElementById('proxSection').style.display = 'none'; return; }
-
-  villages.forEach(v => {
-    const o = document.createElement('option');
-    o.value = JSON.stringify({ name: v.village_name, x: v.village_x, y: v.village_y });
-    o.textContent = `${v.village_name} · ${v.village_x}|${v.village_y}`;
-    sel.appendChild(o);
-  });
+  sel.innerHTML = '<option value="">— Loading villages… —</option>';
   wrap.style.display = '';
   document.getElementById('proxSection').style.display = 'none';
+  resolveEl.innerHTML = '';
+  targetX = targetY = targetMapId = null;
+
+  if (!uid) { wrap.style.display = 'none'; sel.innerHTML = '<option value="">— Select village —</option>'; return; }
+
+  const member = members.find(m => m.user_id === uid);
+  if (!member?.player_name) {
+    sel.innerHTML = '<option value="">— No player name set —</option>';
+    return;
+  }
+
+  try {
+    const server = currentWs?.server || 'ts5';
+    const res    = await fetch(`${API_BASE}/api/player?server=${server}&name=${encodeURIComponent(member.player_name)}`);
+    const data   = await res.json();
+    const villages = (data.villages || []).map(v => ({
+      name: v.village_name || v.name || '',
+      x:    v.x ?? v.coord_x ?? null,
+      y:    v.y ?? v.coord_y ?? null,
+    })).filter(v => v.name && v.x != null && v.y != null);
+
+    sel.innerHTML = '<option value="">— Select village —</option>';
+    if (!villages.length) {
+      sel.innerHTML = '<option value="">— No villages found —</option>';
+      wrap.style.display = '';
+      return;
+    }
+
+    villages.forEach(v => {
+      const o = document.createElement('option');
+      o.value = JSON.stringify({ name: v.name, x: v.x, y: v.y });
+      o.textContent = `${v.name} · ${v.x}|${v.y}`;
+      sel.appendChild(o);
+    });
+    wrap.style.display = '';
+  } catch {
+    sel.innerHTML = '<option value="">— Failed to load villages —</option>';
+  }
 }
 
 function onVillageChange() {

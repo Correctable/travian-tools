@@ -421,6 +421,19 @@
   <script src="/supabase.js"></script>
   <script>
 
+    // Kalau sudah login, redirect ke home
+    (async () => {
+      let waited = 0;
+      while (typeof window.getSession !== 'function' && waited < 3000) {
+        await new Promise(r => setTimeout(r, 50));
+        waited += 50;
+      }
+      if (typeof window.getSession !== 'function') return;
+
+      const session = await window.getSession();
+      if (session) window.location.replace('/');
+    })();
+
     /* ── UI HELPERS ── */
     function togglePw(id, btn) {
       const input = document.getElementById(id);
