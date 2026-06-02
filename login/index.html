@@ -591,18 +591,41 @@
   <script src="/navbar.js"></script>
 
   <script>
-    // Kalau sudah login, redirect ke home
+    // Kalau sudah login, redirect ke return URL atau home
     (async () => {
       const session = await window.getSession();
-      if (session) window.location.replace('/');
+      if (session) {
+        const params  = new URLSearchParams(window.location.search);
+        const returnParam = params.get('return') || params.get('next');
+        if (returnParam && returnParam.startsWith('/') && !returnParam.startsWith('//')) {
+          sessionStorage.removeItem('tt_login_return');
+          window.location.replace(returnParam);
+          return;
+        }
+        const stored = sessionStorage.getItem('tt_login_return');
+        if (stored && stored.startsWith('/') && !stored.startsWith('//')) {
+          sessionStorage.removeItem('tt_login_return');
+          window.location.replace(stored);
+          return;
+        }
+        window.location.replace('/');
+      }
     })();
 
-    // Ambil redirect target dari query param ?next=
+    // Ambil redirect target dari query param ?return= atau ?next=, fallback sessionStorage
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
-      const next = params.get('next');
-      // Validasi: hanya path internal (diawali /)
-      if (next && next.startsWith('/') && !next.startsWith('//')) return next;
+      // Cek ?return= (dari join page) lalu ?next= (legacy), lalu sessionStorage
+      const returnParam = params.get('return') || params.get('next');
+      if (returnParam && returnParam.startsWith('/') && !returnParam.startsWith('//')) {
+        sessionStorage.removeItem('tt_login_return');
+        return returnParam;
+      }
+      const stored = sessionStorage.getItem('tt_login_return');
+      if (stored && stored.startsWith('/') && !stored.startsWith('//')) {
+        sessionStorage.removeItem('tt_login_return');
+        return stored;
+      }
       return '/';
     }
 

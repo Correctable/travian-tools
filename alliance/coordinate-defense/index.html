@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defense Plan — TravianTools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:         #0f2153;
+  --navy2:        #1a3068;
+  --blue:         #1d4ed8;
+  --blue2:        #2563eb;
+  --blue-light:   #3b82f6;
+  --blue-glow:    rgba(59,130,246,0.10);
+  --surface:      #ffffff;
+  --surface2:     #f8faff;
+  --border:       #e2e8f3;
+  --border2:      rgba(37,99,235,0.25);
+  --text:         #0f2153;
+  --text2:        #3d5a8a;
+  --text3:        #7a93bc;
+  --green:        #059669;
+  --green-bg:     rgba(5,150,105,0.08);
+  --green-border: rgba(5,150,105,0.2);
+  --amber:        #d97706;
+  --amber-bg:     rgba(217,119,6,0.08);
+  --amber-border: rgba(217,119,6,0.2);
+  --red:          #dc2626;
+  --red-bg:       rgba(220,38,38,0.08);
+  --red-border:   rgba(220,38,38,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: var(--surface2); line-height: 1.6; }
+
+/* Alliance layout — injected by alliance-nav.js */
+#alliance-layout { display: flex; min-height: calc(100vh - 64px); }
+#alliance-main   { flex: 1; min-width: 0; overflow-x: hidden; }
+
+/* ── PAGE HEADER ── */
+.page-header {
+  position: relative; z-index: 1;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  padding: 28px 40px 24px;
+}
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--blue2); }
+.breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+.breadcrumb-current { color: var(--text2); font-weight: 500; }
+.page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.page-title-group  { display: flex; align-items: center; gap: 14px; }
+.page-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.page-title    { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+.page-badges   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.page-badge    { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 100px; }
+.page-badge.free  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+.page-badge.coord { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+
+/* ── PAGE WRAP ── */
+.page-wrap { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 36px 32px 72px; }
+@media (max-width: 768px) { .page-header { padding: 20px 16px 16px; } .page-wrap { padding: 24px 16px 48px; } }
+
+/* ── GATE SCREENS ── */
+.gate { text-align: center; padding: 72px 24px; }
+.gate-icon { font-size: 2.2rem; margin-bottom: 14px; }
+.gate h3   { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+.gate p    { font-size: 0.83rem; color: var(--text3); margin-bottom: 20px; }
+.btn-gate  { padding: 9px 22px; border-radius: 10px; background: var(--blue2); color: #fff; font-size: 0.84rem; font-weight: 600; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+
+/* ═══════════════════════════════════
+   LIST VIEW
+═══════════════════════════════════ */
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.tabs { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.tab-btn { padding: 6px 16px; border-radius: 7px; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--text3); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.tab-btn.active { background: var(--navy); color: #fff; }
+.tab-btn:hover:not(.active) { color: var(--text2); background: var(--surface2); }
+
+.btn-new { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 10px; background: var(--blue2); color: #fff; font-size: 0.82rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-new:hover { background: var(--blue); }
+.btn-new.hidden { display: none; }
+
+.plan-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* plan card */
+.plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; transition: border-color 0.15s, box-shadow 0.15s; animation: fadeUp 0.22s ease both; }
+.plan-card:hover { border-color: var(--border2); box-shadow: 0 4px 20px rgba(15,33,83,0.06); }
+.plan-card.urgent { border-left: 3px solid var(--red); }
+.plan-card.dimmed { opacity: 0.6; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.card-top    { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.card-left   { display: flex; align-items: flex-start; gap: 12px; }
+.card-type-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.type-incidental { background: var(--red-bg); }
+.type-permanent  { background: var(--green-bg); }
+.card-title  { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+.card-meta   { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.badge       { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 100px; }
+.badge-incidental { background: var(--red-bg);    color: var(--red);   border: 1px solid var(--red-border); }
+.badge-permanent  { background: var(--green-bg);  color: var(--green); border: 1px solid var(--green-border); }
+.badge-open       { background: var(--blue-glow); color: var(--blue2); border: 1px solid rgba(37,99,235,0.2); }
+.badge-fulfilled  { background: var(--green-bg);  color: var(--green); border: 1px solid var(--green-border); }
+.badge-closed     { background: var(--surface2);  color: var(--text3); border: 1px solid var(--border); }
+.coord-chip  { font-size: 0.72rem; color: var(--text3); font-variant-numeric: tabular-nums; font-family: monospace; }
+.creator-meta { font-size: 0.72rem; color: var(--text3); margin-top: 3px; }
+
+.card-right  { flex-shrink: 0; text-align: right; }
+.eta-label   { font-size: 0.68rem; color: var(--text3); margin-bottom: 2px; }
+.eta-value   { font-size: 0.85rem; font-weight: 600; color: var(--red); }
+.eta-value.safe { color: var(--text3); }
+
+/* progress */
+.progress-wrap { margin-bottom: 12px; }
+.progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.progress-label { font-size: 0.75rem; color: var(--text3); }
+.progress-count { font-size: 0.78rem; font-weight: 600; }
+.progress-count .filled { color: var(--green); }
+.progress-bar  { height: 5px; background: var(--surface2); border-radius: 100px; border: 1px solid var(--border); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, #059669, #34d399); transition: width 0.4s ease; }
+
+/* card bottom */
+.card-bottom { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.priority-row  { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.priority-label { font-size: 0.72rem; color: var(--text3); flex-shrink: 0; }
+.unit-chips    { display: flex; gap: 4px; flex-wrap: wrap; }
+.unit-chip     { font-size: 0.7rem; padding: 2px 8px; border-radius: 100px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+.proximity-hint { display: flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 0.72rem; color: var(--text3); padding: 5px 9px; background: var(--surface2); border-radius: 7px; border: 1px solid var(--border); }
+.card-actions  { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+.btn-icon { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 1rem; transition: all 0.15s; }
+.btn-icon:hover { border-color: var(--border2); color: var(--text); }
+.btn-send-def { display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 9px; background: var(--blue-glow); color: var(--blue2); border: 1px solid rgba(37,99,235,0.25); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; white-space: nowrap; text-decoration: none; }
+.btn-send-def:hover { background: rgba(37,99,235,0.15); }
+.btn-commit { display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 9px; background: var(--navy); color: #fff; border: none; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-commit:hover { background: var(--navy2); }
+.btn-commit:disabled { background: var(--border); color: var(--text3); cursor: default; }
+.btn-committed { background: var(--green) !important; }
+
+/* commit panel */
+.commit-panel { display: none; margin-top: 14px; padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
+.commit-panel.open { display: block; }
+.commit-panel h4 { font-size: 0.82rem; font-weight: 600; margin-bottom: 10px; }
+.commit-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.commit-input { padding: 7px 11px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text); background: var(--surface); width: 150px; }
+.commit-input:focus { outline: none; border-color: var(--blue2); }
+.commit-note  { flex: 1; min-width: 160px; padding: 7px 11px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: var(--text); background: var(--surface); }
+.commit-note:focus { outline: none; border-color: var(--blue2); }
+.commit-remaining { font-size: 0.75rem; color: var(--text3); white-space: nowrap; }
+.commit-remaining span { font-weight: 600; color: var(--green); }
+.btn-commit-save   { padding: 7px 14px; border-radius: 8px; background: var(--green); color: #fff; border: none; font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-commit-cancel { padding: 7px 10px; border-radius: 8px; background: transparent; color: var(--text3); border: 1px solid var(--border); font-size: 0.78rem; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* commitment list */
+.commit-list    { margin-top: 10px; }
+.commit-item    { display: flex; align-items: center; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+.commit-item:last-child { border-bottom: none; }
+.commit-user    { font-weight: 500; }
+.you-chip       { font-size: 0.65rem; padding: 1px 5px; border-radius: 100px; background: var(--blue-glow); color: var(--blue2); margin-left: 4px; font-weight: 600; }
+.commit-crop    { font-weight: 600; color: var(--green); }
+.commit-heading { font-size: 0.72rem; color: var(--text3); margin-bottom: 6px; font-weight: 500; }
+
+/* empty + skeleton */
+.empty-state { text-align: center; padding: 64px 24px; color: var(--text3); }
+.empty-state-icon { font-size: 2.2rem; margin-bottom: 12px; }
+.empty-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.empty-state p  { font-size: 0.82rem; }
+.skeleton { background: linear-gradient(90deg, var(--surface2) 25%, #edf2fb 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 10px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.history-note { font-size: 0.8rem; color: var(--text3); padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 16px; }
+
+/* ═══════════════════════════════════
+   CREATE VIEW
+═══════════════════════════════════ */
+.form-grid      { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+.form-section   { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+.section-title  { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
+
+.field         { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label   { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text2); margin-bottom: 5px; }
+.field input,
+.field select,
+.field textarea { width: 100%; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); background: var(--surface); transition: border-color 0.15s; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue2); }
+.field .hint   { font-size: 0.72rem; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+.field .opt    { color: var(--text3); font-weight: 400; }
+
+/* type selector */
+.type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.type-opt      { padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; transition: all 0.15s; }
+.type-opt:hover { border-color: var(--border2); }
+.type-opt.selected { border-color: var(--blue2); background: var(--blue-glow); }
+.type-opt-icon  { font-size: 1.2rem; margin-bottom: 4px; }
+.type-opt-label { font-size: 0.82rem; font-weight: 700; color: var(--text); }
+.type-opt-desc  { font-size: 0.72rem; color: var(--text3); margin-top: 2px; line-height: 1.35; }
+.type-opt.selected .type-opt-label { color: var(--blue2); }
+
+/* target toggle */
+.target-toggle { display: flex; gap: 6px; margin-bottom: 10px; }
+.toggle-btn { padding: 5px 12px; border-radius: 7px; font-size: 0.78rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.toggle-btn.active { background: var(--blue-glow); color: var(--blue2); border-color: var(--border2); }
+.target-pane { display: none; }
+.target-pane.visible { display: block; }
+.coord-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* resolve chip */
+.resolve-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 100px; margin-top: 6px; }
+.resolve-chip.ok      { background: var(--green-bg);  color: var(--green); border: 1px solid var(--green-border); }
+.resolve-chip.loading { background: var(--blue-glow); color: var(--blue2); border: 1px solid var(--border2); }
+.resolve-chip.error   { background: var(--red-bg);    color: var(--red);   border: 1px solid var(--red-border); }
+
+/* unit picker */
+.unit-picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.unit-pill   { padding: 4px 11px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface2); font-size: 0.75rem; font-weight: 500; color: var(--text3); cursor: pointer; transition: all 0.15s; }
+.unit-pill:hover   { border-color: var(--border2); color: var(--text2); }
+.unit-pill.selected { background: var(--blue-glow); color: var(--blue2); border-color: var(--border2); }
+
+/* proximity table */
+.prox-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; display: none; }
+.prox-header  { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.prox-title   { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; }
+.prox-target  { font-size: 0.75rem; color: var(--text3); }
+.prox-table   { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.prox-table th { text-align: left; color: var(--text3); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; padding: 5px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+.prox-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.prox-table tr:last-child td { border-bottom: none; }
+.prox-table tr.highlight td { background: var(--blue-glow); }
+.rank-badge { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; }
+.rank-1 { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.rank-n { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+.dist-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.dist-bar  { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; width: 60px; }
+.dist-fill { height: 100%; background: var(--blue2); border-radius: 100px; opacity: 0.5; }
+.dist-val  { font-size: 0.75rem; font-variant-numeric: tabular-nums; font-weight: 500; min-width: 28px; }
+.prox-note { display: flex; align-items: flex-start; gap: 7px; font-size: 0.75rem; color: var(--text3); line-height: 1.5; margin-top: 12px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; }
+
+/* form actions */
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.btn-cancel { padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border); background: transparent; font-size: 0.85rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; }
+.btn-submit { display: flex; align-items: center; gap: 8px; padding: 9px 22px; border-radius: 10px; background: var(--blue2); color: #fff; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-submit:hover { background: var(--blue); }
+.btn-submit:disabled { background: var(--border); color: var(--text3); cursor: default; }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,33,83,0.45); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 24px 28px; max-width: 420px; width: 100%; transform: translateY(10px); transition: transform 0.2s; box-shadow: 0 20px 60px rgba(15,33,83,0.15); }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+.modal-sub   { font-size: 0.8rem; color: var(--text3); margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.btn-modal-cancel  { padding: 8px 16px; border-radius: 9px; border: 1px solid var(--border); background: transparent; font-size: 0.82rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; }
+.btn-modal-danger  { padding: 8px 16px; border-radius: 9px; border: none; background: var(--red);   color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-modal-primary { padding: 8px 16px; border-radius: 9px; border: none; background: var(--blue2); color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* ── TOAST ── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; background: var(--navy); color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.2); animation: toastIn 0.25s ease; display: flex; align-items: center; gap: 8px; min-width: 200px; }
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--red); }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+/* ── MISC ── */
+#etaField.hidden { display: none; }
+@media (max-width: 600px) { .card-top { flex-direction: column; } .card-actions { width: 100%; justify-content: flex-end; } .toolbar { flex-direction: column; align-items: flex-start; } }
+</style>
+</head>
+<body>
+
+<div id="navbar-root"></div>
+
+<!-- Page header — full width, outside layout -->
+<div class="page-header" id="pageHeader">
+  <div class="breadcrumb" id="breadcrumb">
+    <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+    <a href="/alliance/workspace/">Alliance</a><span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current" id="bcCurrent">Defense Plan</span>
+  </div>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">🛡️</div>
+      <div>
+        <div class="page-title" id="pageTitle">Defense Plan</div>
+        <div class="page-subtitle" id="pageSubtitle">Coordinate alliance defense</div>
+      </div>
+    </div>
+    <div class="page-badges" id="pageBadges">
+      <span class="page-badge free">FREE VIEW</span>
+      <span class="page-badge coord">COORD CREATE</span>
+    </div>
+  </div>
+</div>
+
+<div id="alliance-layout">
+  <div id="alliance-nav-root"></div>
+  <main id="alliance-main">
+    <div class="page-wrap">
+
+      <!-- ── GATES ── -->
+      <div id="gateAuth" class="gate" style="display:none">
+        <div class="gate-icon">🔐</div>
+        <h3>Login required</h3>
+        <p>You need to be logged in and part of an alliance workspace to view defense plans.</p>
+        <a href="/login/" class="btn-gate">Log In / Sign Up</a>
+      </div>
+
+      <div id="gateWorkspace" class="gate" style="display:none">
+        <div class="gate-icon">🏰</div>
+        <h3>No active workspace</h3>
+        <p>Select or create an alliance workspace first.</p>
+        <a href="/alliance/workspace/" class="btn-gate">Go to Workspace</a>
+      </div>
+
+      <div id="gateAccess" class="gate" style="display:none">
+        <div class="gate-icon">🚫</div>
+        <h3>Access denied</h3>
+        <p>Only coordinators and founders can create defense plans.</p>
+        <a href="/alliance/coordinate-defense/" class="btn-gate">Back to Defense Plan</a>
+      </div>
+
+      <!-- ══════════════════════════════════
+           LIST VIEW
+      ══════════════════════════════════ -->
+      <div id="viewList" style="display:none">
+        <div class="toolbar">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="active"  onclick="switchTab('active')">Active</button>
+            <button class="tab-btn"        data-tab="history" onclick="switchTab('history')">History</button>
+          </div>
+          <button class="btn-new hidden" id="btnNew" onclick="goCreate()">＋ New Defense Plan</button>
+        </div>
+
+        <div id="tabActive">
+          <div id="listActive" class="plan-list">
+            <div class="plan-card skeleton" style="height:140px"></div>
+            <div class="plan-card skeleton" style="height:140px;animation-delay:.1s"></div>
+          </div>
+        </div>
+
+        <div id="tabHistory" style="display:none">
+          <div class="history-note">📋 Showing plans closed in the last 30 days.</div>
+          <div id="listHistory" class="plan-list"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           CREATE VIEW
+      ══════════════════════════════════ -->
+      <div id="viewCreate" style="display:none">
+
+        <!-- Row 1: Type + Target -->
+        <div class="form-grid">
+
+          <div class="form-section">
+            <div class="section-title">⚙️ Defense Type</div>
+            <div class="type-selector">
+              <div class="type-opt selected" data-type="incidental" onclick="selectType('incidental')">
+                <div class="type-opt-icon">⚡</div>
+                <div class="type-opt-label">Incidental</div>
+                <div class="type-opt-desc">Detected attack — needs immediate defense with an ETA</div>
+              </div>
+              <div class="type-opt" data-type="permanent" onclick="selectType('permanent')">
+                <div class="type-opt-icon">🛡️</div>
+                <div class="type-opt-label">Permanent</div>
+                <div class="type-opt-desc">Standing defense, no time limit</div>
+              </div>
+            </div>
+
+            <div class="field" id="etaField">
+              <label>Attack ETA</label>
+              <input type="datetime-local" id="inputEta">
+              <div class="hint">Estimated time the attack lands. Plan auto-closes after this time.</div>
+            </div>
+
+            <div class="field">
+              <label>Plan Title <span class="opt">(optional)</span></label>
+              <input type="text" id="inputTitle" placeholder="e.g. Def Aldric — June 12 night">
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">📍 Defense Target</div>
+            <div class="target-toggle">
+              <button class="toggle-btn active" id="btnMember" onclick="setTargetMode('member')">Alliance Member</button>
+              <button class="toggle-btn"        id="btnManual" onclick="setTargetMode('manual')">Manual Coordinates</button>
+            </div>
+
+            <div id="paneMember" class="target-pane visible">
+              <div class="field">
+                <label>Select Member</label>
+                <select id="selectMember" onchange="onMemberChange()">
+                  <option value="">— Select a member —</option>
+                </select>
+              </div>
+              <div class="field" id="villageWrap" style="display:none">
+                <label>Target Village</label>
+                <select id="selectVillage" onchange="onVillageChange()">
+                  <option value="">— Select village —</option>
+                </select>
+              </div>
+              <div id="resolveChip"></div>
+            </div>
+
+            <div id="paneManual" class="target-pane">
+              <div class="field">
+                <label>Village Name <span class="opt">(optional)</span></label>
+                <input type="text" id="manualName" placeholder="e.g. Midnight Grove">
+              </div>
+              <div class="coord-row">
+                <div class="field">
+                  <label>X Coordinate</label>
+                  <input type="number" id="manualX" placeholder="-131" onchange="resolveManual()">
+                </div>
+                <div class="field">
+                  <label>Y Coordinate</label>
+                  <input type="number" id="manualY" placeholder="177" onchange="resolveManual()">
+                </div>
+              </div>
+              <div id="resolveChipManual"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Row 2: Crop + Units -->
+        <div class="form-grid">
+
+          <div class="form-section">
+            <div class="section-title">🌾 Crop Required</div>
+            <div class="field">
+              <label>Total crop / upkeep requested</label>
+              <input type="number" id="inputCrop" min="100" step="100" placeholder="e.g. 10000">
+              <div class="hint">Members cannot over-commit. You can raise this limit anytime after the plan is created.</div>
+            </div>
+            <div class="field">
+              <label>Note for Members <span class="opt">(optional)</span></label>
+              <textarea id="inputNote" rows="2" style="resize:vertical" placeholder="Tactical notes, urgency level, etc…"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <div class="section-title">⚔️ Troop Priority</div>
+            <div class="field">
+              <label>Preferred unit types <span class="opt">(optional)</span></label>
+              <div class="unit-picker" id="unitPicker"></div>
+              <div class="hint" style="margin-top:8px">Leave empty to accept all def units. Members will see this as a guideline.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Row 3: Proximity Table -->
+        <div class="prox-section" id="proxSection">
+          <div class="prox-header">
+            <div class="prox-title">📡 Member Proximity to Target</div>
+            <div class="prox-target" id="proxTargetLabel"></div>
+          </div>
+          <div id="proxTableWrap"></div>
+          <div class="prox-note">
+            ℹ️ Distances use Chebyshev (Travian standard). Proximity does not indicate available def troops — use this as a guide only.
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="goList()">Cancel</button>
+          <button class="btn-submit" id="btnSubmit" onclick="submitPlan()">🛡️ Create Defense Plan</button>
+        </div>
+
+      </div><!-- /viewCreate -->
+
+    </div><!-- /page-wrap -->
+  </main>
+</div>
+
+<!-- Close plan modal -->
+<div class="modal-overlay" id="modalClose">
+  <div class="modal">
+    <div class="modal-title" id="modalCloseTitle">Close this plan?</div>
+    <div class="modal-sub" id="modalCloseSub">The plan will be marked as closed. Members will no longer be able to commit.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modalClose')">Cancel</button>
+      <button class="btn-modal-danger" id="modalCloseConfirm">Close Plan</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/data/troops.js"></script>
+<script src="/navbar.js"></script>
+<script src="/alliance-nav.js"></script>
+
+<script>
+/* ════════════════════════════════════════
+   CONSTANTS & STATE
+════════════════════════════════════════ */
+const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+
+let currentUser  = null;
+let currentWs    = null;
+let userRole     = null;
+let isCoord      = false;
+let members      = [];
+let troopRows    = [];
+let activePlans  = [];
+let historyPlans = [];
+let commitments  = {};
+
+// create-form state
+let formType     = 'incidental';
+let targetMode   = 'member';
+let targetX      = null;
+let targetY      = null;
+let targetMapId  = null;
+let targetVName  = '';
+let selectedUnits = new Set();
+
+/* ════════════════════════════════════════
+   ROUTING
+════════════════════════════════════════ */
+function getAction() {
+  return new URLSearchParams(location.search).get('action');
+}
+
+function goCreate() {
+  history.pushState({}, '', '?action=create');
+  showCreate();
+}
+
+function goList() {
+  history.pushState({}, '', location.pathname);
+  showList();
+}
+
+window.addEventListener('popstate', () => {
+  getAction() === 'create' ? showCreate() : showList();
+});
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+async function init() {
+  const user = await window.getUser?.();
+  if (!user) { showGate('gateAuth'); return; }
+  currentUser = user;
+
+  const wsRaw = sessionStorage.getItem('tt_active_workspace');
+  if (!wsRaw) { showGate('gateWorkspace'); return; }
+  currentWs = JSON.parse(wsRaw);
+
+  const { data: mem } = await _supabase
+    .from('workspace_members')
+    .select('role, player_name')
+    .eq('workspace_id', currentWs.id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!mem) { showGate('gateWorkspace'); return; }
+
+  userRole = mem.role;
+  isCoord  = ['founder', 'coordinator'].includes(userRole);
+
+  await loadMembers();
+  await loadTroops();
+
+  if (getAction() === 'create') {
+    if (!isCoord) { showGate('gateAccess'); return; }
+    showCreate();
+  } else {
+    showList();
+  }
+}
+
+/* ════════════════════════════════════════
+   DATA LOADING
+════════════════════════════════════════ */
+async function loadMembers() {
+  const { data } = await _supabase
+    .from('workspace_members')
+    .select('user_id, role, player_name')
+    .eq('workspace_id', currentWs.id);
+  members = data || [];
+}
+
+async function loadTroops() {
+  const { data } = await _supabase
+    .from('workspace_troops')
+    .select('user_id, village_name, village_x, village_y')
+    .eq('workspace_id', currentWs.id);
+  troopRows = data || [];
+}
+
+async function loadPlans() {
+  const { data: plans, error } = await _supabase
+    .from('defense_plans')
+    .select('*')
+    .eq('workspace_id', currentWs.id)
+    .order('created_at', { ascending: false });
+
+  if (error) { showToast('Failed to load plans', 'error'); return; }
+
+  activePlans  = (plans || []).filter(p => ['open','fulfilled'].includes(p.status));
+  historyPlans = (plans || []).filter(p => p.status === 'closed');
+
+  // Auto-close expired incidental plans
+  const now = new Date().toISOString();
+  const expired = activePlans.filter(p => p.type === 'incidental' && p.eta && p.eta < now);
+  for (const p of expired) {
+    await _supabase.from('defense_plans').update({ status: 'closed' }).eq('id', p.id);
+    p.status = 'closed';
+  }
+  activePlans  = activePlans.filter(p => p.status !== 'closed');
+  historyPlans = [...historyPlans, ...expired];
+
+  // Load commitments for active plans
+  if (activePlans.length > 0) {
+    const ids = activePlans.map(p => p.id);
+    const { data: coms } = await _supabase
+      .from('defense_commitments')
+      .select('*')
+      .in('plan_id', ids);
+    commitments = {};
+    (coms || []).forEach(c => {
+      if (!commitments[c.plan_id]) commitments[c.plan_id] = [];
+      commitments[c.plan_id].push(c);
+    });
+  }
+
+  renderPlanList('listActive',  activePlans);
+  renderPlanList('listHistory', historyPlans);
+}
+
+/* ════════════════════════════════════════
+   VIEW SWITCHING
+════════════════════════════════════════ */
+function showGate(id) {
+  ['gateAuth','gateWorkspace','gateAccess','viewList','viewCreate'].forEach(el => {
+    const e = document.getElementById(el);
+    if (e) e.style.display = el === id ? '' : 'none';
+  });
+}
+
+function showList() {
+  document.getElementById('gateAuth').style.display      = 'none';
+  document.getElementById('gateWorkspace').style.display = 'none';
+  document.getElementById('gateAccess').style.display    = 'none';
+  document.getElementById('viewCreate').style.display    = 'none';
+  document.getElementById('viewList').style.display      = '';
+
+  // Header
+  document.getElementById('bcCurrent').textContent  = 'Defense Plan';
+  document.getElementById('pageTitle').textContent   = 'Defense Plan';
+  document.getElementById('pageSubtitle').textContent = 'Coordinate alliance defense';
+  document.getElementById('pageBadges').style.display = '';
+
+  if (isCoord) document.getElementById('btnNew').classList.remove('hidden');
+  loadPlans();
+}
+
+function showCreate() {
+  document.getElementById('gateAuth').style.display      = 'none';
+  document.getElementById('gateWorkspace').style.display = 'none';
+  document.getElementById('gateAccess').style.display    = 'none';
+  document.getElementById('viewList').style.display      = 'none';
+  document.getElementById('viewCreate').style.display    = '';
+
+  // Header
+  document.getElementById('bcCurrent').textContent   = 'New Defense Plan';
+  document.getElementById('pageTitle').textContent    = 'Create Defense Plan';
+  document.getElementById('pageSubtitle').textContent = 'Coordinator & founder only';
+  document.getElementById('pageBadges').style.display = 'none';
+
+  buildUnitPicker();
+  populateMemberSelect();
+}
+
+/* ════════════════════════════════════════
+   LIST — RENDER
+════════════════════════════════════════ */
+function renderPlanList(containerId, plans) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+
+  if (plans.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">🛡️</div>
+      <h3>${containerId === 'listActive' ? 'No active plans' : 'No history yet'}</h3>
+      <p>${containerId === 'listActive' ? 'No defense plans have been created yet.' : 'Closed plans will appear here.'}</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = plans.map(renderCard).join('');
+}
+
+function renderCard(plan) {
+  const coms      = commitments[plan.id] || [];
+  const totalCom  = coms.reduce((s, c) => s + (c.crop_amount || 0), 0);
+  const pct       = plan.crop_needed ? Math.min(100, Math.round(totalCom / plan.crop_needed * 100)) : 0;
+  const remaining = Math.max(0, plan.crop_needed - totalCom);
+  const minsLeft  = plan.eta ? getMinutesLeft(plan.eta) : Infinity;
+  const isUrgent  = plan.type === 'incidental' && minsLeft < 120;
+  const isDimmed  = ['closed','fulfilled'].includes(plan.status);
+  const myCommit  = coms.find(c => c.user_id === currentUser?.id);
+  const isFull    = remaining === 0;
+
+  // Travian send-def link
+  const serverDomain = (currentWs?.server || 'ts5') + '.x1.asia.travian.com';
+  const sendUrl = plan.target_mapid
+    ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=5&targetMapId=${plan.target_mapid}`
+    : null;
+
+  // Priority chips
+  const priorities = (plan.troop_priority || [])
+    .map(u => `<span class="unit-chip">${escHtml(u.unit || u)}</span>`).join('');
+
+  // ETA block
+  let etaHtml = '';
+  if (plan.type === 'incidental' && plan.eta) {
+    const past = minsLeft <= 0;
+    const label = past ? 'Attack landed' : 'Attack in';
+    const val   = past
+      ? new Date(plan.eta).toLocaleString('en-GB', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+      : formatCountdown(minsLeft);
+    etaHtml = `<div class="card-right">
+      <div class="eta-label">${label}</div>
+      <div class="eta-value${minsLeft > 120 ? ' safe' : ''}">${val}</div>
+    </div>`;
+  }
+
+  // Commitment list (top 3)
+  const comHtml = coms.length > 0 ? `
+    <div class="commit-list">
+      <div class="commit-heading">Commitments (${coms.length})</div>
+      ${coms.slice(0,3).map(c => {
+        const name = members.find(m => m.user_id === c.user_id)?.player_name || 'Member';
+        const me   = c.user_id === currentUser?.id;
+        return `<div class="commit-item">
+          <span class="commit-user">${escHtml(name)}${me ? '<span class="you-chip">You</span>' : ''}</span>
+          <span class="commit-crop">${c.crop_amount.toLocaleString()} crop</span>
+        </div>`;
+      }).join('')}
+      ${coms.length > 3 ? `<div style="font-size:.72rem;color:var(--text3);padding-top:4px">+${coms.length - 3} more</div>` : ''}
+    </div>` : '';
+
+  // Proximity hint (user's closest village)
+  let proxHtml = '';
+  if (plan.target_x != null) {
+    const myVillages = troopRows.filter(t => t.user_id === currentUser?.id && t.village_x != null);
+    if (myVillages.length > 0) {
+      const closest = myVillages.reduce((best, v) => {
+        const d = chebyshev(plan.target_x, plan.target_y, v.village_x, v.village_y);
+        return d < best.dist ? { ...v, dist: d } : best;
+      }, { dist: Infinity });
+      if (closest.dist < Infinity) {
+        proxHtml = `<div class="proximity-hint">📍 Your closest village to target: ${escHtml(closest.village_name)} (${closest.dist} tiles)</div>`;
+      }
+    }
+  }
+
+  // Action buttons
+  let actionsHtml = '';
+  if (!isDimmed) {
+    const sendBtn = sendUrl
+      ? `<a href="${sendUrl}" target="_blank" class="btn-send-def">🏹 Send Def</a>`
+      : `<button class="btn-send-def" onclick="copyCoord(${plan.target_x},${plan.target_y})" title="map_id unavailable — click to copy coordinates">📋 ${plan.target_x}|${plan.target_y}</button>`;
+
+    const commitBtn = myCommit
+      ? `<button class="btn-commit btn-committed" disabled>✓ Committed</button>`
+      : isFull
+        ? `<button class="btn-commit" disabled>Quota Full</button>`
+        : `<button class="btn-commit" onclick="toggleCommit('${plan.id}')">Commit</button>`;
+
+    const moreBtn = isCoord
+      ? `<button class="btn-icon" title="Coordinator options" onclick="openCloseModal('${plan.id}','${escHtml(plan.title || 'Defense Plan')}')">⋯</button>`
+      : '';
+
+    actionsHtml = `${moreBtn}${sendBtn}${commitBtn}`;
+  }
+
+  const creatorName = members.find(m => m.user_id === plan.created_by)?.player_name || '—';
+
+  return `
+<div class="plan-card${isUrgent ? ' urgent' : ''}${isDimmed ? ' dimmed' : ''}" id="card-${plan.id}">
+  <div class="card-top">
+    <div class="card-left">
+      <div class="card-type-icon ${plan.type === 'incidental' ? 'type-incidental' : 'type-permanent'}">
+        ${plan.type === 'incidental' ? '⚡' : '🛡️'}
+      </div>
+      <div>
+        <div class="card-title">${escHtml(plan.title || `Def ${plan.target_village}`)}</div>
+        <div class="card-meta">
+          <span class="coord-chip">${plan.target_x}|${plan.target_y}</span>
+          <span class="badge badge-${plan.type}">${plan.type === 'incidental' ? 'Incidental' : 'Permanent'}</span>
+          <span class="badge badge-${plan.status}">${statusLabel(plan.status)}</span>
+        </div>
+        <div class="creator-meta">Created by ${escHtml(creatorName)} · ${relativeTime(plan.created_at)}</div>
+      </div>
+    </div>
+    ${etaHtml}
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span class="progress-label">🌾 Crop committed</span>
+      <span class="progress-count"><span class="filled">${totalCom.toLocaleString()}</span> / ${plan.crop_needed.toLocaleString()} crop</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" style="width:${pct}%"></div>
+    </div>
+  </div>
+
+  ${comHtml}
+
+  <div class="card-bottom">
+    <div>
+      ${priorities ? `<div class="priority-row"><span class="priority-label">Priority:</span><div class="unit-chips">${priorities}</div></div>` : ''}
+      ${proxHtml}
+    </div>
+    <div class="card-actions">${actionsHtml}</div>
+  </div>
+
+  <div class="commit-panel" id="commit-${plan.id}">
+    <h4>Commit defense to this plan</h4>
+    <div class="commit-row">
+      <input class="commit-input" type="number" min="1" max="${remaining}" step="100"
+        placeholder="Crop amount" id="commitCrop-${plan.id}"
+        oninput="updateRemaining('${plan.id}',${remaining})">
+      <input class="commit-note" type="text" placeholder="Note (optional)" id="commitNote-${plan.id}">
+      <span class="commit-remaining">Remaining: <span id="remain-${plan.id}">${remaining.toLocaleString()}</span> crop</span>
+      <button class="btn-commit-save" onclick="submitCommit('${plan.id}',${plan.crop_needed})">Save</button>
+      <button class="btn-commit-cancel" onclick="toggleCommit('${plan.id}')">Cancel</button>
+    </div>
+  </div>
+</div>`;
+}
+
+/* ════════════════════════════════════════
+   LIST — TABS
+════════════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabActive').style.display  = tab === 'active'  ? '' : 'none';
+  document.getElementById('tabHistory').style.display = tab === 'history' ? '' : 'none';
+}
+
+/* ════════════════════════════════════════
+   COMMIT HANDLERS
+════════════════════════════════════════ */
+function toggleCommit(planId) {
+  document.getElementById(`commit-${planId}`)?.classList.toggle('open');
+}
+
+function updateRemaining(planId, original) {
+  const val = parseInt(document.getElementById(`commitCrop-${planId}`)?.value) || 0;
+  const el  = document.getElementById(`remain-${planId}`);
+  if (el) el.textContent = Math.max(0, original - val).toLocaleString();
+}
+
+async function submitCommit(planId, cropNeeded) {
+  const amount = parseInt(document.getElementById(`commitCrop-${planId}`)?.value);
+  const note   = document.getElementById(`commitNote-${planId}`)?.value || null;
+
+  if (!amount || amount < 1) { showToast('Enter a valid crop amount', 'error'); return; }
+
+  const coms      = commitments[planId] || [];
+  const totalSoFar = coms.reduce((s,c) => s + c.crop_amount, 0);
+  const remaining  = cropNeeded - totalSoFar;
+  if (amount > remaining) { showToast(`Maximum ${remaining.toLocaleString()} crop remaining`, 'error'); return; }
+
+  const { error } = await _supabase.from('defense_commitments').insert({
+    plan_id: planId, user_id: currentUser.id,
+    crop_amount: amount, note,
+    committed_at: new Date().toISOString(),
+  });
+  if (error) { showToast('Failed to save commit', 'error'); return; }
+
+  const newTotal  = totalSoFar + amount;
+  const newStatus = newTotal >= cropNeeded ? 'fulfilled' : 'open';
+  await _supabase.from('defense_plans')
+    .update({ crop_committed: newTotal, status: newStatus })
+    .eq('id', planId);
+
+  showToast('Committed! 🛡️', 'success');
+  await loadPlans();
+}
+
+/* ════════════════════════════════════════
+   COORDINATOR ACTIONS
+════════════════════════════════════════ */
+function openCloseModal(planId, title) {
+  document.getElementById('modalCloseTitle').textContent = `Close "${title}"?`;
+  document.getElementById('modalCloseSub').textContent   = 'Members will no longer be able to commit to this plan.';
+  document.getElementById('modalCloseConfirm').onclick   = () => closePlan(planId);
+  document.getElementById('modalClose').classList.add('open');
+}
+
+async function closePlan(planId) {
+  await _supabase.from('defense_plans').update({ status: 'closed' }).eq('id', planId);
+  closeModal('modalClose');
+  showToast('Plan closed', 'success');
+  await loadPlans();
+}
+
+/* ════════════════════════════════════════
+   CREATE — TYPE & TARGET
+════════════════════════════════════════ */
+function selectType(type) {
+  formType = type;
+  document.querySelectorAll('.type-opt').forEach(el => el.classList.toggle('selected', el.dataset.type === type));
+  document.getElementById('etaField').classList.toggle('hidden', type === 'permanent');
+}
+
+function setTargetMode(mode) {
+  targetMode = mode;
+  document.getElementById('btnMember').classList.toggle('active', mode === 'member');
+  document.getElementById('btnManual').classList.toggle('active', mode === 'manual');
+  document.getElementById('paneMember').classList.toggle('visible', mode === 'member');
+  document.getElementById('paneManual').classList.toggle('visible', mode === 'manual');
+  targetX = targetY = targetMapId = null;
+  targetVName = '';
+  document.getElementById('proxSection').style.display = 'none';
+}
+
+function populateMemberSelect() {
+  const sel = document.getElementById('selectMember');
+  sel.innerHTML = '<option value="">— Select a member —</option>';
+  members.filter(m => m.player_name).forEach(m => {
+    const o = document.createElement('option');
+    o.value = m.user_id;
+    o.textContent = m.player_name;
+    sel.appendChild(o);
+  });
+}
+
+function onMemberChange() {
+  const uid      = document.getElementById('selectMember').value;
+  const villages = troopRows.filter(t => t.user_id === uid);
+  const wrap     = document.getElementById('villageWrap');
+  const sel      = document.getElementById('selectVillage');
+
+  sel.innerHTML = '<option value="">— Select village —</option>';
+  if (!villages.length) { wrap.style.display = 'none'; document.getElementById('proxSection').style.display = 'none'; return; }
+
+  villages.forEach(v => {
+    const o = document.createElement('option');
+    o.value = JSON.stringify({ name: v.village_name, x: v.village_x, y: v.village_y });
+    o.textContent = `${v.village_name} · ${v.village_x}|${v.village_y}`;
+    sel.appendChild(o);
+  });
+  wrap.style.display = '';
+  document.getElementById('proxSection').style.display = 'none';
+}
+
+function onVillageChange() {
+  const raw = document.getElementById('selectVillage').value;
+  if (!raw) return;
+  const v = JSON.parse(raw);
+  targetX = v.x; targetY = v.y; targetVName = v.name;
+  resolveCoord(v.x, v.y, 'resolveChip');
+  buildProxTable(v.x, v.y);
+}
+
+function resolveManual() {
+  const x = parseInt(document.getElementById('manualX').value);
+  const y = parseInt(document.getElementById('manualY').value);
+  if (isNaN(x) || isNaN(y)) return;
+  targetX = x; targetY = y;
+  targetVName = document.getElementById('manualName').value || `${x}|${y}`;
+  resolveCoord(x, y, 'resolveChipManual');
+  buildProxTable(x, y);
+}
+
+async function resolveCoord(x, y, chipId) {
+  const el = document.getElementById(chipId);
+  el.innerHTML = `<span class="resolve-chip loading">⏳ Looking up map ID…</span>`;
+  targetMapId = null;
+
+  try {
+    const server = currentWs?.server || 'ts5';
+    const res  = await fetch(`${API_BASE}/api/village-by-coord?server=${server}&x=${x}&y=${y}`);
+    const data = await res.json();
+
+    if (data?.mapid) {
+      targetMapId = data.mapid;
+      el.innerHTML = `<span class="resolve-chip ok">✓ map ID: ${data.mapid} — ${escHtml(data.village_name || `${x}|${y}`)}</span>`;
+    } else {
+      el.innerHTML = `<span class="resolve-chip error">⚠ Village not found in database — Send Def link unavailable</span>`;
+    }
+  } catch {
+    el.innerHTML = `<span class="resolve-chip error">⚠ Failed to resolve map ID</span>`;
+  }
+}
+
+/* ════════════════════════════════════════
+   CREATE — PROXIMITY TABLE
+════════════════════════════════════════ */
+function chebyshev(x1, y1, x2, y2) {
+  return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2));
+}
+
+function buildProxTable(tx, ty) {
+  if (!troopRows.length) return;
+
+  const byUser = {};
+  troopRows.forEach(v => {
+    if (v.village_x == null || v.village_y == null) return;
+    const dist = chebyshev(tx, ty, v.village_x, v.village_y);
+    if (!byUser[v.user_id] || dist < byUser[v.user_id].dist) {
+      byUser[v.user_id] = { ...v, dist };
+    }
+  });
+
+  const sorted  = Object.values(byUser).sort((a, b) => a.dist - b.dist);
+  const maxDist = Math.max(sorted.at(-1)?.dist || 1, 1);
+
+  const rows = sorted.map((v, i) => {
+    const mem    = members.find(m => m.user_id === v.user_id);
+    const name   = mem?.player_name || '—';
+    const isMe   = v.user_id === currentUser?.id;
+    const barPct = Math.round((v.dist / maxDist) * 100);
+
+    return `<tr${isMe ? ' class="highlight"' : ''}>
+      <td><span class="rank-badge ${i === 0 ? 'rank-1' : 'rank-n'}">${i+1}</span></td>
+      <td><span style="font-weight:600">${escHtml(name)}</span>${isMe ? '<span class="you-chip">You</span>' : ''}</td>
+      <td style="color:var(--text2)">${escHtml(v.village_name || '—')}</td>
+      <td style="font-family:monospace;font-size:0.75rem;color:var(--text3)">${v.village_x}|${v.village_y}</td>
+      <td>
+        <div class="dist-bar-wrap">
+          <span class="dist-val">${v.dist}</span>
+          <div class="dist-bar"><div class="dist-fill" style="width:${barPct}%"></div></div>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('proxTableWrap').innerHTML = `
+    <table class="prox-table">
+      <thead>
+        <tr><th>#</th><th>Member</th><th>Closest Village</th><th>Coordinates</th><th>Distance (tiles)</th></tr>
+      </thead>
+      <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">No village data available</td></tr>'}</tbody>
+    </table>`;
+
+  document.getElementById('proxTargetLabel').textContent = `→ ${tx}|${ty}`;
+  document.getElementById('proxSection').style.display = '';
+}
+
+/* ════════════════════════════════════════
+   CREATE — UNIT PICKER
+════════════════════════════════════════ */
+function buildUnitPicker() {
+  const container = document.getElementById('unitPicker');
+  if (!container || container.children.length > 0) return;
+
+  const allPill = Object.assign(document.createElement('span'), { className: 'unit-pill', textContent: 'All def units' });
+  allPill.dataset.unit = '__all__';
+  allPill.onclick = () => toggleUnit('__all__', allPill);
+  container.appendChild(allPill);
+
+  if (!window.TT) return;
+  ['roman','teuton','gaul','egyptian','hun'].forEach(tribe => {
+    (TT.troopsByTribe[tribe] || [])
+      .filter(u => !u.isNPC && !u.isHero && u.stats.def_inf > 0)
+      .forEach(u => {
+        const pill = Object.assign(document.createElement('span'), { className: 'unit-pill', textContent: u.name, title: `${u.tribe} — ${u.name}` });
+        pill.dataset.unit = u.class_id;
+        pill.onclick = () => toggleUnit(u.class_id, pill);
+        container.appendChild(pill);
+      });
+  });
+}
+
+function toggleUnit(uid, el) {
+  if (uid === '__all__') {
+    selectedUnits.clear();
+    el.classList.toggle('selected');
+    if (el.classList.contains('selected')) selectedUnits.add('__all__');
+    return;
+  }
+  document.querySelector('[data-unit="__all__"]')?.classList.remove('selected');
+  selectedUnits.delete('__all__');
+  if (selectedUnits.has(uid)) { selectedUnits.delete(uid); el.classList.remove('selected'); }
+  else { selectedUnits.add(uid); el.classList.add('selected'); }
+}
+
+/* ════════════════════════════════════════
+   CREATE — SUBMIT
+════════════════════════════════════════ */
+async function submitPlan() {
+  if (targetX == null || targetY == null) { showToast('Select a target first', 'error'); return; }
+  const crop = parseInt(document.getElementById('inputCrop').value);
+  if (!crop || crop < 100) { showToast('Enter a valid crop amount (min 100)', 'error'); return; }
+  if (formType === 'incidental' && !document.getElementById('inputEta').value) {
+    showToast('ETA is required for incidental plans', 'error'); return;
+  }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  const troop_priority = Array.from(selectedUnits).map(uid => {
+    if (uid === '__all__') return { unit: 'All def units', class_id: '__all__' };
+    const t = TT?.troopByClass?.[uid];
+    return t ? { unit: t.name, class_id: uid, tribe: t.tribe } : { unit: uid, class_id: uid };
+  });
+
+  const payload = {
+    workspace_id:   currentWs.id,
+    created_by:     currentUser.id,
+    type:           formType,
+    target_type:    targetMode,
+    target_village: targetVName || `${targetX}|${targetY}`,
+    target_x:       targetX,
+    target_y:       targetY,
+    target_mapid:   targetMapId || null,
+    eta:            formType === 'incidental' ? (document.getElementById('inputEta').value || null) : null,
+    crop_needed:    crop,
+    crop_committed: 0,
+    troop_priority,
+    title:          document.getElementById('inputTitle').value || null,
+    note:           document.getElementById('inputNote').value  || null,
+    status:         'open',
+  };
+
+  if (targetMode === 'member') {
+    payload.target_user_id = document.getElementById('selectMember').value || null;
+  }
+
+  const { error } = await _supabase.from('defense_plans').insert(payload);
+  if (error) {
+    showToast('Failed to create plan: ' + error.message, 'error');
+    btn.disabled = false; btn.innerHTML = '🛡️ Create Defense Plan';
+    return;
+  }
+
+  showToast('Defense plan created! 🛡️', 'success');
+  setTimeout(() => goList(), 1200);
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function getMinutesLeft(eta) { return Math.floor((new Date(eta) - Date.now()) / 60000); }
+function formatCountdown(m)  { const h = Math.floor(m/60); return h > 0 ? `${h}h ${m%60}m` : `${m}m`; }
+function relativeTime(iso) {
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  return h < 24 ? `${h}h ago` : `${Math.floor(h/24)}d ago`;
+}
+function statusLabel(s) { return { open:'Open', fulfilled:'Fulfilled', closed:'Closed' }[s] || s; }
+function escHtml(str) {
+  const d = document.createElement('div'); d.appendChild(document.createTextNode(str||'')); return d.innerHTML;
+}
+function copyCoord(x, y) {
+  navigator.clipboard?.writeText(`${x}|${y}`);
+  showToast(`Coordinates ${x}|${y} copied`, 'success');
+}
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+function showToast(msg, type='') {
+  const t = Object.assign(document.createElement('div'), { className: `toast ${type}`, textContent: msg });
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+document.getElementById('modalClose')?.addEventListener('click', function(e) {
+  if (e.target === this) closeModal('modalClose');
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

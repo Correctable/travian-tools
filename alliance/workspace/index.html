@@ -336,6 +336,193 @@
     }
     .ws-new-btn:hover { border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow); }
 
+    /* ══════════════════════════════════════
+       DASHBOARD STATE
+    ══════════════════════════════════════ */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      max-width: 900px;
+    }
+    @media (max-width: 640px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    .dash-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+      background: var(--surface);
+      animation: fadeUp 0.3s ease both;
+    }
+    .dash-card-full { max-width: 900px; }
+
+    .dash-card-label {
+      font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text3); margin-bottom: 12px;
+    }
+    .dash-card-label-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .dash-member-count {
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--text3);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; padding: 2px 10px;
+    }
+
+    .dash-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .dash-icon {
+      width: 42px; height: 42px; border-radius: 11px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+    }
+    .dash-icon.green { background: var(--green-bg); border: 1px solid rgba(5,150,105,0.2); }
+
+    .dash-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: var(--navy2); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700;
+    }
+    .dash-card-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 700; color: var(--navy);
+    }
+    .dash-card-sub { font-size: 0.78rem; color: var(--text3); margin-top: 2px; }
+
+    .role-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.72rem; font-weight: 700;
+      padding: 2px 9px; border-radius: 20px; margin-top: 4px;
+    }
+    .role-badge.founder     { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .role-badge.coordinator { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .role-badge.member      { background: var(--blue-glow); color: var(--blue2); border: 1px solid rgba(37,99,235,0.18); }
+
+    .dash-stats { display: flex; flex-direction: column; gap: 7px; }
+    .dash-stat-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.82rem;
+    }
+    .dash-stat-label { color: var(--text3); }
+    .dash-stat-value { color: var(--navy); font-weight: 600; }
+    .dash-stat-loading {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.8rem; color: var(--text3);
+    }
+
+    /* Members list */
+    .member-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      animation: fadeIn 0.2s ease both;
+    }
+    .member-row:last-child { border-bottom: none; }
+    .member-avatar {
+      width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.8rem; font-weight: 700; color: var(--text2);
+    }
+    .member-name {
+      flex: 1; font-size: 0.875rem; font-weight: 600; color: var(--navy);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .member-name .you-tag {
+      font-size: 0.68rem; font-weight: 600; color: var(--blue2);
+      background: var(--blue-glow); border: 1px solid rgba(37,99,235,0.15);
+      border-radius: 20px; padding: 1px 7px; margin-left: 6px;
+    }
+    .member-role-chip {
+      font-size: 0.7rem; font-weight: 600; padding: 2px 9px; border-radius: 20px; flex-shrink: 0;
+    }
+    .chip-founder     { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .chip-coordinator { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .chip-member      { background: var(--surface2);  color: var(--text3); border: 1px solid var(--border); }
+
+    /* ══════════════════════════════════════
+       SETTINGS STATE
+    ══════════════════════════════════════ */
+    .settings-wrap { max-width: 680px; animation: fadeUp 0.3s ease both; }
+
+    .settings-section { margin-bottom: 8px; }
+    .settings-section-head {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: 16px; margin-bottom: 18px; flex-wrap: wrap;
+    }
+    .settings-section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--navy);
+      letter-spacing: -0.01em; margin-bottom: 4px;
+    }
+    .settings-section-sub { font-size: 0.8rem; color: var(--text3); line-height: 1.55; max-width: 420px; }
+    .settings-divider { height: 1px; background: var(--border); margin: 28px 0; }
+
+    .btn-regen {
+      flex-shrink: 0;
+      padding: 8px 14px; border-radius: 9px;
+      background: var(--surface2); border: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-regen:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-bg); }
+    .btn-regen:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .invite-cards { display: flex; flex-direction: column; gap: 12px; }
+    .invite-card {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 18px; background: var(--surface);
+    }
+    .invite-card-top { margin-bottom: 12px; }
+    .invite-type-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 6px;
+    }
+    .member-badge { background: var(--blue-glow); color: var(--blue2); border: 1px solid rgba(37,99,235,0.2); }
+    .coord-badge  { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
+    .invite-type-desc { font-size: 0.8rem; color: var(--text3); line-height: 1.5; }
+
+    .invite-link-row { display: flex; gap: 8px; align-items: center; }
+    .invite-link-input {
+      flex: 1; padding: 9px 12px;
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.8rem;
+      color: var(--text2); background: var(--surface2);
+      outline: none; min-width: 0;
+    }
+    .btn-copy {
+      flex-shrink: 0; padding: 9px 16px; border-radius: 9px;
+      background: var(--navy); border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600;
+      color: #fff; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-copy:hover { background: var(--navy2); }
+    .btn-copy.copied { background: var(--green); }
+
+    /* Manage members table */
+    .manage-member-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .manage-member-row:last-child { border-bottom: none; }
+    .manage-member-info { flex: 1; min-width: 0; }
+    .manage-member-name {
+      font-size: 0.875rem; font-weight: 600; color: var(--navy);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .manage-member-joined { font-size: 0.75rem; color: var(--text3); margin-top: 2px; }
+    .btn-kick {
+      flex-shrink: 0; padding: 6px 13px; border-radius: 8px;
+      background: transparent; border: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.78rem; font-weight: 600;
+      color: var(--text3); cursor: pointer; transition: all 0.15s;
+    }
+    .btn-kick:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
+
     /* ── TOAST ── */
     .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
     .toast { padding: 11px 18px; border-radius: 11px; font-size: 0.84rem; font-weight: 500; color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.16); animation: fadeUp 0.22s ease; max-width: 300px; }
@@ -357,6 +544,8 @@
     <span class="breadcrumb-sep">›</span>
     <span class="breadcrumb-current">Alliance</span>
     <span class="breadcrumb-sep">›</span>
+    <span id="breadcrumbWs" style="display:none;cursor:pointer;color:var(--text3);" onclick="goOverview()"></span>
+    <span id="breadcrumbWsSep" class="breadcrumb-sep" style="display:none;">›</span>
     <span class="breadcrumb-current" id="breadcrumbLast">Workspace</span>
   </nav>
   <div class="page-header-inner">
@@ -491,7 +680,111 @@
       <div id="workspaceState"></div>
 
       <!-- STATE: Dashboard (overview) -->
-      <div id="dashboardState" style="display:none;"></div>
+      <div id="dashboardState" style="display:none;">
+        <div class="dash-grid">
+
+          <!-- Alliance card -->
+          <div class="dash-card" id="allianceCard">
+            <div class="dash-card-label">Alliance</div>
+            <div class="dash-card-header">
+              <div class="dash-icon green">🏰</div>
+              <div>
+                <div class="dash-card-name" id="dash-alliance-name">—</div>
+                <div class="dash-card-sub" id="dash-alliance-server">—</div>
+              </div>
+            </div>
+            <div class="dash-stats" id="allianceStats">
+              <div class="dash-stat-loading"><div class="mini-spin"></div> Loading…</div>
+            </div>
+          </div>
+
+          <!-- Player card -->
+          <div class="dash-card" id="playerCard">
+            <div class="dash-card-label">Your Account</div>
+            <div class="dash-card-header">
+              <div class="dash-avatar" id="dash-player-avatar">?</div>
+              <div>
+                <div class="dash-card-name" id="dash-player-name">—</div>
+                <div id="dash-role-badge" class="role-badge member">👤 Member</div>
+              </div>
+            </div>
+            <div class="dash-stats" id="playerStats">
+              <div class="dash-stat-loading"><div class="mini-spin"></div> Loading…</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Members section -->
+        <div class="dash-card dash-card-full" id="membersCard" style="margin-top:16px;">
+          <div class="dash-card-label-row">
+            <div class="dash-card-label">Members</div>
+            <div class="dash-member-count" id="memberCount">—</div>
+          </div>
+          <div id="membersList">
+            <div class="dash-stat-loading"><div class="mini-spin"></div> Loading members…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATE: Settings -->
+      <div id="settingsState" style="display:none;">
+        <div class="settings-wrap">
+
+          <!-- Invite Links section -->
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div>
+                <div class="settings-section-title">🔗 Invite Links</div>
+                <div class="settings-section-sub">Share these links with your alliance members. Regenerating a link immediately invalidates the old one.</div>
+              </div>
+              <button class="btn-regen" id="btnRegen">🔄 Regenerate All</button>
+            </div>
+
+            <div class="invite-cards">
+              <!-- Member link -->
+              <div class="invite-card">
+                <div class="invite-card-top">
+                  <div class="invite-type-badge member-badge">👤 Member Link</div>
+                  <div class="invite-type-desc">Anyone with this link joins as a regular member. They can view plans and input their own troops.</div>
+                </div>
+                <div class="invite-link-row">
+                  <input type="text" class="invite-link-input" id="memberLinkInput" readonly placeholder="Generating link…" />
+                  <button class="btn-copy" id="btnCopyMember" onclick="copyLink('member')">Copy</button>
+                </div>
+              </div>
+
+              <!-- Coordinator link -->
+              <div class="invite-card">
+                <div class="invite-card-top">
+                  <div class="invite-type-badge coord-badge">⚔️ Coordinator Link</div>
+                  <div class="invite-type-desc">Use with care — coordinators can create/edit plans and manage members.</div>
+                </div>
+                <div class="invite-link-row">
+                  <input type="text" class="invite-link-input" id="coordLinkInput" readonly placeholder="Generating link…" />
+                  <button class="btn-copy" id="btnCopyCoord" onclick="copyLink('coordinator')">Copy</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <!-- Manage Members section -->
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div>
+                <div class="settings-section-title">👥 Manage Members</div>
+                <div class="settings-section-sub">Remove members from the workspace. This does not affect their TravianTools account.</div>
+              </div>
+            </div>
+            <div id="manageMembersList">
+              <div class="dash-stat-loading"><div class="mini-spin"></div> Loading members…</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
 
     </div><!-- /.page-wrap -->
   </main>
@@ -571,13 +864,13 @@
 
   // ── VIEW SWITCHERS ──
   function showEmpty() {
-    hide('loadingState'); hide('createState'); hide('workspaceState'); hide('dashboardState');
+    hide('loadingState'); hide('createState'); hide('workspaceState'); hide('dashboardState'); hide('settingsState');
     show('emptyState');
     resetForm();
   }
 
   function showCreate() {
-    hide('loadingState'); hide('emptyState'); hide('workspaceState'); hide('dashboardState');
+    hide('loadingState'); hide('emptyState'); hide('workspaceState'); hide('dashboardState'); hide('settingsState');
     show('createState');
   }
 
@@ -622,109 +915,72 @@
   function enterWorkspace(ws) {
     currentWorkspace = ws;
     try { sessionStorage.setItem('tt_active_workspace', JSON.stringify(ws)); } catch(e) {}
-
-    // Re-init alliance-nav sekarang workspace sudah tersimpan
     if (typeof AllianceNav !== 'undefined') AllianceNav.init();
-
     hide('workspaceState');
-    show('dashboardState');
-    renderOverview(document.getElementById('dashboardState'));
+
+    // Check if URL has ?page=settings
+    const page = new URLSearchParams(window.location.search).get('page');
+    if (page === 'settings') {
+      showSettings();
+    } else {
+      showDashboard();
+    }
   }
 
-  function renderOverview(el) {
-    const ws      = currentWorkspace;
-    const isAdmin = ws.role === 'founder' || ws.role === 'coordinator';
+  function goOverview() {
+    history.replaceState(null, '', '/alliance/workspace/');
+    showDashboard();
+  }
 
-    el.innerHTML = `
-      <div style="max-width:900px;">
+  function showDashboard() {
+    hide('settingsState');
+    hide('loadingState'); hide('emptyState'); hide('createState'); hide('workspaceState');
+    const ws = currentWorkspace;
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+    // Breadcrumb
+    document.getElementById('breadcrumbWs').style.display = 'none';
+    document.getElementById('breadcrumbWsSep').style.display = 'none';
+    document.getElementById('breadcrumbLast').textContent = 'Workspace';
 
-          <!-- Alliance card -->
-          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
-            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Alliance</div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-              <div style="width:42px;height:42px;border-radius:11px;background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;">🏰</div>
-              <div>
-                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.name)}</div>
-                <div style="font-size:0.78rem;color:var(--text3);margin-top:2px;">${esc2(ws.server)}</div>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;" id="allianceStats">
-              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
-                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
-                Loading alliance data…
-              </div>
-            </div>
-          </div>
+    // Populate static fields
+    document.getElementById('dash-alliance-name').textContent   = ws.name;
+    document.getElementById('dash-alliance-server').textContent = ws.server;
+    document.getElementById('dash-player-name').textContent     = ws.player_name || '—';
+    document.getElementById('dash-player-avatar').textContent   = (ws.player_name || '?').charAt(0).toUpperCase();
 
-          <!-- Player card -->
-          <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);">
-            <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:12px;">Your Account</div>
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-              <div style="width:42px;height:42px;border-radius:50%;background:var(--navy2);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:700;flex-shrink:0;">${esc2(ws.player_name).charAt(0).toUpperCase()}</div>
-              <div>
-                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--navy);">${esc2(ws.player_name)}</div>
-                <div style="margin-top:3px;">
-                  <span style="display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:2px 9px;border-radius:20px;${isAdmin ? 'background:rgba(217,119,6,0.08);color:#d97706;border:1px solid rgba(217,119,6,0.2);' : 'background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.18);'}">
-                    ${ws.role === 'founder' ? '👑 Founder' : ws.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member'}
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:6px;" id="playerStats">
-              <div style="font-size:0.8rem;color:var(--text3);display:flex;align-items:center;gap:6px;">
-                <div style="width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--blue2);border-radius:50%;animation:spin 0.7s linear infinite;"></div>
-                Loading player data…
-              </div>
-            </div>
-          </div>
-        </div>
+    const roleBadge = document.getElementById('dash-role-badge');
+    const roleLabels = { founder: '👑 Founder', coordinator: '⚔️ Coordinator', member: '👤 Member' };
+    roleBadge.textContent  = roleLabels[ws.role] || '👤 Member';
+    roleBadge.className    = 'role-badge ' + (ws.role || 'member');
 
-        <!-- Quick Access -->
-        <div style="border:1px solid var(--border);border-radius:14px;padding:20px 22px;background:var(--surface);margin-bottom:${isAdmin ? '16px' : '0'};">
-          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);margin-bottom:14px;">Quick Access</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;">
-            ${[
-              { icon:'🪖', label:'Troop Summary',    href:'/alliance/troop-summary/' },
-              { icon:'🗡️', label:'Attack Plan',      href:'/alliance/coordinate-attack/' },
-              { icon:'🛡️', label:'Defense Plan',     href:'/alliance/coordinate-defense/' },
-              { icon:'🏺', label:'Artifact Plan',    href:'/alliance/artifact-tracker/' },
-              { icon:'🌟', label:'World Wonder',     href:'/alliance/world-wonder/' },
-            ].map(item => `
-              <a href="${item.href}"
-                style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:all 0.15s;text-align:left;font-family:'DM Sans',sans-serif;text-decoration:none;"
-                onmouseover="this.style.borderColor='var(--blue2)';this.style.background='var(--blue-glow)'"
-                onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
-                <span style="font-size:1.3rem;">${item.icon}</span>
-                <span style="font-size:0.82rem;font-weight:600;color:var(--navy);">${item.label}</span>
-              </a>
-            `).join('')}
-          </div>
-        </div>
+    // Reset stats to loading
+    document.getElementById('allianceStats').innerHTML  = '<div class="dash-stat-loading"><div class="mini-spin"></div> Loading…</div>';
+    document.getElementById('playerStats').innerHTML    = '<div class="dash-stat-loading"><div class="mini-spin"></div> Loading…</div>';
+    document.getElementById('membersList').innerHTML    = '<div class="dash-stat-loading"><div class="mini-spin"></div> Loading members…</div>';
+    document.getElementById('memberCount').textContent  = '—';
 
-        ${isAdmin ? `
-        <div style="border:1px solid rgba(217,119,6,0.25);border-radius:14px;padding:20px 22px;background:var(--surface);">
-          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--amber);margin-bottom:14px;">⚙️ Workspace Settings</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">
-            ${[
-              { icon:'🔗', label:'Invite Members' },
-              { icon:'👥', label:'Manage Members' },
-              { icon:'🔄', label:'Regenerate Links' },
-            ].map(item => `
-              <button style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.855rem;font-weight:600;color:var(--navy);transition:all 0.15s;"
-                onmouseover="this.style.borderColor='var(--amber)';this.style.background='var(--amber-bg)'"
-                onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface2)'">
-                ${item.icon} ${item.label}
-              </button>
-            `).join('')}
-          </div>
-        </div>` : ''}
-
-      </div>
-    `;
-
+    show('dashboardState');
     fetchOverviewData(ws);
+    fetchMembers(ws);
+  }
+
+  function showSettings() {
+    hide('dashboardState');
+    hide('loadingState'); hide('emptyState'); hide('createState'); hide('workspaceState');
+    const ws = currentWorkspace;
+
+    history.replaceState(null, '', '/alliance/workspace/?page=settings');
+
+    // Breadcrumb
+    const breadWs = document.getElementById('breadcrumbWs');
+    breadWs.textContent = ws.name;
+    breadWs.style.display = 'inline';
+    document.getElementById('breadcrumbWsSep').style.display = 'inline';
+    document.getElementById('breadcrumbLast').textContent = 'Settings';
+
+    show('settingsState');
+    loadInviteLinks(ws);
+    loadManageMembers(ws);
   }
 
   async function fetchOverviewData(ws) {
@@ -737,34 +993,204 @@
       const [allianceData, playerData] = await Promise.all([allianceRes.json(), playerRes.json()]);
 
       const a = allianceData.alliance || allianceData;
-      const allianceEl = document.getElementById('allianceStats');
-      if (allianceEl && a) {
-        allianceEl.innerHTML = [
-          { label:'Rank',       value: a.rank        ? `#${a.rank}`                          : '—' },
-          { label:'Population', value: a.population  ? Number(a.population).toLocaleString() : '—' },
-          { label:'Members',    value: a.member_count ?? a.members ?? '—' },
-        ].map(r => `
-          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
-            <span style="color:var(--text3);">${r.label}</span>
-            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
-          </div>`).join('');
-      }
+      document.getElementById('allianceStats').innerHTML = [
+        { label: 'Rank',       value: a.rank         ? `#${a.rank}`                          : '—' },
+        { label: 'Population', value: a.population   ? Number(a.population).toLocaleString() : '—' },
+        { label: 'Members',    value: a.member_count ?? a.members ?? '—' },
+      ].map(r => `<div class="dash-stat-row"><span class="dash-stat-label">${r.label}</span><span class="dash-stat-value">${r.value}</span></div>`).join('');
 
       const p = playerData.player || playerData;
-      const playerEl = document.getElementById('playerStats');
-      if (playerEl && p) {
-        playerEl.innerHTML = [
-          { label:'Population', value: p.population ? Number(p.population).toLocaleString() : '—' },
-          { label:'Villages',   value: p.villages   ? (Array.isArray(p.villages) ? p.villages.length : p.villages) : '—' },
-          { label:'Rank',       value: p.rank        ? `#${p.rank}`                          : '—' },
-        ].map(r => `
-          <div style="display:flex;justify-content:space-between;font-size:0.82rem;">
-            <span style="color:var(--text3);">${r.label}</span>
-            <span style="color:var(--navy);font-weight:600;">${r.value}</span>
-          </div>`).join('');
-      }
-    } catch(err) { console.error('fetchOverviewData error:', err); }
+      document.getElementById('playerStats').innerHTML = [
+        { label: 'Population', value: p.population ? Number(p.population).toLocaleString() : '—' },
+        { label: 'Villages',   value: p.villages   ? (Array.isArray(p.villages) ? p.villages.length : p.villages) : '—' },
+        { label: 'Rank',       value: p.rank        ? `#${p.rank}` : '—' },
+      ].map(r => `<div class="dash-stat-row"><span class="dash-stat-label">${r.label}</span><span class="dash-stat-value">${r.value}</span></div>`).join('');
+    } catch(err) {
+      console.error('fetchOverviewData error:', err);
+    }
   }
+
+  async function fetchMembers(ws) {
+    try {
+      const user = await window.getUser();
+      const { data, error } = await window._supabase
+        .from('workspace_members')
+        .select('user_id, role, player_name, joined_at')
+        .eq('workspace_id', ws.id)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+
+      document.getElementById('memberCount').textContent = data.length + ' member' + (data.length !== 1 ? 's' : '');
+
+      document.getElementById('membersList').innerHTML = data.map(m => {
+        const isMe = m.user_id === user.id;
+        const initials = (m.player_name || '?').charAt(0).toUpperCase();
+        const chipClass = 'member-role-chip chip-' + m.role;
+        const roleLabel = m.role === 'founder' ? '👑 Founder' : m.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member';
+        return `
+          <div class="member-row">
+            <div class="member-avatar">${initials}</div>
+            <div class="member-name">
+              ${esc2(m.player_name || 'Unknown')}
+              ${isMe ? '<span class="you-tag">you</span>' : ''}
+            </div>
+            <span class="${chipClass}">${roleLabel}</span>
+          </div>`;
+      }).join('');
+    } catch(err) {
+      console.error('fetchMembers error:', err);
+      document.getElementById('membersList').innerHTML = '<div class="dash-stat-loading" style="color:var(--red)">Failed to load members.</div>';
+    }
+  }
+
+  // ── SETTINGS ──
+
+  async function loadInviteLinks(ws) {
+    const memberInput = document.getElementById('memberLinkInput');
+    const coordInput  = document.getElementById('coordLinkInput');
+    memberInput.value = 'Loading…';
+    coordInput.value  = 'Loading…';
+
+    try {
+      const { data, error } = await window._supabase
+        .from('workspace_tokens')
+        .select('token, role')
+        .eq('workspace_id', ws.id)
+        .eq('is_active', true);
+
+      if (error) throw error;
+
+      const base = window.location.origin + '/alliance/join/';
+      const memberToken = data.find(t => t.role === 'member');
+      const coordToken  = data.find(t => t.role === 'coordinator');
+
+      memberInput.value = memberToken ? `${base}?token=${memberToken.token}&role=member`      : '— No link yet —';
+      coordInput.value  = coordToken  ? `${base}?token=${coordToken.token}&role=coordinator`  : '— No link yet —';
+
+      // If no tokens exist yet, generate them
+      if (!memberToken || !coordToken) {
+        await generateTokens(ws, !memberToken, !coordToken);
+        return loadInviteLinks(ws);
+      }
+    } catch(err) {
+      console.error('loadInviteLinks error:', err);
+      memberInput.value = 'Error loading link';
+      coordInput.value  = 'Error loading link';
+    }
+  }
+
+  async function generateTokens(ws, genMember = true, genCoord = true) {
+    const toInsert = [];
+    const randomToken = () => Array.from(crypto.getRandomValues(new Uint8Array(24))).map(b => b.toString(36).padStart(2,'0')).join('').slice(0, 32);
+    const user = await window.getUser();
+
+    if (genMember) toInsert.push({ workspace_id: ws.id, token: randomToken(), role: 'member',      is_active: true, created_by: user.id });
+    if (genCoord)  toInsert.push({ workspace_id: ws.id, token: randomToken(), role: 'coordinator', is_active: true, created_by: user.id });
+
+    if (toInsert.length) {
+      const { error } = await window._supabase.from('workspace_tokens').insert(toInsert);
+      if (error) throw error;
+    }
+  }
+
+  async function regenAllTokens() {
+    const ws  = currentWorkspace;
+    const btn = document.getElementById('btnRegen');
+    btn.disabled = true;
+    btn.textContent = '⏳ Regenerating…';
+
+    try {
+      // Revoke all existing active tokens
+      await window._supabase
+        .from('workspace_tokens')
+        .update({ is_active: false, revoked_at: new Date().toISOString() })
+        .eq('workspace_id', ws.id)
+        .eq('is_active', true);
+
+      // Generate new ones
+      await generateTokens(ws, true, true);
+      await loadInviteLinks(ws);
+      toast('🔄 Links regenerated — old links are now invalid.', 'info');
+    } catch(err) {
+      console.error('regenAllTokens error:', err);
+      toast('Failed to regenerate links.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🔄 Regenerate All';
+    }
+  }
+
+  function copyLink(role) {
+    const inputId = role === 'member' ? 'memberLinkInput' : 'coordLinkInput';
+    const btnId   = role === 'member' ? 'btnCopyMember'   : 'btnCopyCoord';
+    const val = document.getElementById(inputId).value;
+    if (!val || val.startsWith('—') || val === 'Loading…') return;
+    navigator.clipboard.writeText(val).then(() => {
+      const btn = document.getElementById(btnId);
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+    });
+  }
+
+  async function loadManageMembers(ws) {
+    try {
+      const user = await window.getUser();
+      const { data, error } = await window._supabase
+        .from('workspace_members')
+        .select('id, user_id, role, player_name, joined_at')
+        .eq('workspace_id', ws.id)
+        .order('joined_at', { ascending: true });
+
+      if (error) throw error;
+
+      const isFounder = ws.role === 'founder';
+
+      document.getElementById('manageMembersList').innerHTML = data.map(m => {
+        const isMe = m.user_id === user.id;
+        const isProtected = m.role === 'founder' || isMe;
+        const chipClass = 'member-role-chip chip-' + m.role;
+        const roleLabel = m.role === 'founder' ? '👑 Founder' : m.role === 'coordinator' ? '⚔️ Coordinator' : '👤 Member';
+        const joined = m.joined_at ? new Date(m.joined_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '';
+        return `
+          <div class="manage-member-row">
+            <div class="member-avatar" style="width:32px;height:32px;font-size:0.8rem;">${(m.player_name||'?').charAt(0).toUpperCase()}</div>
+            <div class="manage-member-info">
+              <div class="manage-member-name">${esc2(m.player_name || 'Unknown')}${isMe ? ' <span style="font-size:0.68rem;font-weight:600;color:var(--blue2);background:var(--blue-glow);border:1px solid rgba(37,99,235,0.15);border-radius:20px;padding:1px 7px;margin-left:4px;">you</span>' : ''}</div>
+              <div class="manage-member-joined">Joined ${joined}</div>
+            </div>
+            <span class="${chipClass}">${roleLabel}</span>
+            ${!isProtected ? `<button class="btn-kick" onclick="kickMember('${m.id}', '${esc2(m.player_name)}')">Remove</button>` : '<div style="width:67px;"></div>'}
+          </div>`;
+      }).join('');
+    } catch(err) {
+      console.error('loadManageMembers error:', err);
+      document.getElementById('manageMembersList').innerHTML = '<div style="font-size:0.82rem;color:var(--red);padding:12px 0;">Failed to load members.</div>';
+    }
+  }
+
+  async function kickMember(memberId, playerName) {
+    if (!confirm(`Remove "${playerName}" from this workspace?`)) return;
+    try {
+      const { error } = await window._supabase
+        .from('workspace_members')
+        .delete()
+        .eq('id', memberId);
+      if (error) throw error;
+      toast(`👤 ${playerName} removed from workspace.`, 'info');
+      loadManageMembers(currentWorkspace);
+      // Also refresh overview member count if dashboard was previously shown
+    } catch(err) {
+      console.error('kickMember error:', err);
+      toast('Failed to remove member.', 'error');
+    }
+  }
+
+  // Wire up regen button after DOM ready
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btnRegen').addEventListener('click', regenAllTokens);
+  });
 
   // ── HELPERS ──
   function saveActiveWorkspace() {

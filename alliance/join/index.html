@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Join Workspace — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Navbar placeholder ── */
+    #navbar-root { position: sticky; top: 0; z-index: 100; }
+
+    /* ── Join page layout ── */
+    .join-page {
+      min-height: calc(100vh - 64px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      background: var(--surface2);
+    }
+
+    .join-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 48px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 4px 24px rgba(15,33,83,0.06);
+      animation: fadeUp 0.3s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── States ── */
+    .state { display: none; }
+    .state.active { display: block; }
+
+    /* ── Loading state ── */
+    .loading-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 24px;
+    }
+    .spinner {
+      width: 32px; height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--blue2);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      margin-top: 20px;
+    }
+    .loading-sub {
+      font-size: 0.85rem;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* ── Workspace info card (inside join card) ── */
+    .ws-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid rgba(5,150,105,0.2);
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+    .ws-badge.coord {
+      background: var(--amber-bg);
+      color: var(--amber);
+      border-color: rgba(217,119,6,0.2);
+    }
+
+    .ws-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+
+    .ws-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .ws-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .ws-meta-item {
+      font-size: 0.8rem;
+      color: var(--text3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ws-meta-sep { color: var(--border); font-size: 0.7rem; }
+
+    .role-info {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 28px;
+    }
+    .role-info-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text3);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .role-info-body {
+      font-size: 0.85rem;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+
+    /* ── Already member state ── */
+    .already-badge {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      margin: 0 auto 20px;
+    }
+
+    /* ── Error state ── */
+    .error-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--red-bg);
+      border: 1px solid rgba(220,38,38,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+      margin: 0 auto 20px;
+    }
+
+    .state-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .state-sub {
+      font-size: 0.875rem;
+      color: var(--text3);
+      text-align: center;
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      background: var(--blue2);
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 13px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+      text-decoration: none;
+    }
+    .btn-primary:hover {
+      background: var(--blue);
+      box-shadow: 0 4px 16px rgba(37,99,235,0.35);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-ghost {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%;
+      background: transparent;
+      color: var(--text2);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 11px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.18s, color 0.18s, background 0.18s;
+      text-decoration: none;
+      margin-top: 10px;
+    }
+    .btn-ghost:hover {
+      border-color: var(--blue-light);
+      color: var(--blue2);
+      background: var(--blue-glow);
+    }
+
+    .btn-gap { display: flex; flex-direction: column; gap: 0; }
+
+    /* ── Login prompt ── */
+    .login-notice {
+      background: var(--blue-glow);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 0.82rem;
+      color: var(--text2);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .login-notice-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Success state ── */
+    .success-icon {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--green-bg);
+      border: 1px solid rgba(5,150,105,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+      margin: 0 auto 20px;
+      animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .countdown {
+      font-size: 0.8rem;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 14px;
+    }
+    .countdown span {
+      color: var(--blue2);
+      font-weight: 600;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 24px 0;
+    }
+
+    /* ── Footer ── */
+    .join-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.78rem;
+      color: var(--text3);
+    }
+    .join-footer a {
+      color: var(--blue2);
+      text-decoration: none;
+    }
+    .join-footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 540px) {
+      .join-card { padding: 32px 24px; }
+      .ws-name { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="navbar-root"></div>
+
+<div class="join-page">
+  <div class="join-card">
+
+    <!-- STATE: loading -->
+    <div id="state-loading" class="state active">
+      <div class="spinner"></div>
+      <div class="loading-text">Checking invite link…</div>
+      <div class="loading-sub">Please wait a moment</div>
+    </div>
+
+    <!-- STATE: invalid / expired token -->
+    <div id="state-invalid" class="state">
+      <div class="error-icon">🔗</div>
+      <div class="state-title">Invalid Invite Link</div>
+      <div class="state-sub">This invite link is invalid or has been revoked. Ask your coordinator for a new link.</div>
+      <div class="btn-gap">
+        <a href="/" class="btn-primary">Go to Homepage</a>
+      </div>
+    </div>
+
+    <!-- STATE: need login (shown before validating, or after) -->
+    <div id="state-login" class="state">
+      <div class="ws-icon">🏰</div>
+      <div id="login-ws-badge" class="ws-badge">MEMBER INVITE</div>
+      <div id="login-ws-name" class="ws-name">Workspace Name</div>
+      <div id="login-ws-meta" class="ws-meta">
+        <span class="ws-meta-item">📡 Server</span>
+        <span class="ws-meta-sep">·</span>
+        <span class="ws-meta-item" id="login-ws-tag">[TAG]</span>
+      </div>
+      <div class="login-notice">
+        <span class="login-notice-icon">ℹ️</span>
+        <span>You need to be logged in to join this workspace. After logging in, you'll be redirected back here automatically.</span>
+      </div>
+      <div class="btn-gap">
+        <button class="btn-primary" id="btn-go-login">Log In to Join</button>
+        <a href="/register/" class="btn-ghost">Create free account</a>
+      </div>
+      <div class="join-footer">
+        <a href="/">Back to TravianTools</a>
+      </div>
+    </div>
+
+    <!-- STATE: confirm join -->
+    <div id="state-confirm" class="state">
+      <div class="ws-icon">🏰</div>
+      <div id="confirm-ws-badge" class="ws-badge">MEMBER INVITE</div>
+      <div id="confirm-ws-name" class="ws-name">Workspace Name</div>
+      <div id="confirm-ws-meta" class="ws-meta">
+        <span class="ws-meta-item" id="confirm-ws-server">📡 Server</span>
+        <span class="ws-meta-sep">·</span>
+        <span class="ws-meta-item" id="confirm-ws-tag">[TAG]</span>
+      </div>
+      <div id="confirm-role-info" class="role-info">
+        <div class="role-info-title">Your role</div>
+        <div id="confirm-role-body" class="role-info-body">Member — you can view coordination plans and input your own troop summary.</div>
+      </div>
+      <div class="btn-gap">
+        <button class="btn-primary" id="btn-join">Join Workspace</button>
+        <a href="/" class="btn-ghost">Cancel</a>
+      </div>
+    </div>
+
+    <!-- STATE: already member -->
+    <div id="state-already" class="state">
+      <div class="already-badge">✅</div>
+      <div class="state-title">You're already in!</div>
+      <div id="already-sub" class="state-sub">You are already a member of this workspace.</div>
+      <div class="btn-gap">
+        <a href="/alliance/workspace/" class="btn-primary">Go to Workspace</a>
+      </div>
+    </div>
+
+    <!-- STATE: success -->
+    <div id="state-success" class="state">
+      <div class="success-icon">🎉</div>
+      <div class="state-title">Welcome to the alliance!</div>
+      <div id="success-sub" class="state-sub">You've joined the workspace successfully. Redirecting you now…</div>
+      <div class="countdown">Redirecting in <span id="countdown-n">3</span>s</div>
+    </div>
+
+    <!-- STATE: error -->
+    <div id="state-error" class="state">
+      <div class="error-icon">⚠️</div>
+      <div class="state-title">Something went wrong</div>
+      <div id="error-sub" class="state-sub">An unexpected error occurred. Please try again.</div>
+      <div class="btn-gap">
+        <button class="btn-primary" id="btn-retry">Try Again</button>
+        <a href="/" class="btn-ghost">Go to Homepage</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Load order wajib -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+
+<script>
+(async function () {
+
+  // ── Helpers ──────────────────────────────────────────────────────────────
+
+  const $ = id => document.getElementById(id);
+
+  function showState(name) {
+    document.querySelectorAll('.state').forEach(el => el.classList.remove('active'));
+    $('state-' + name).classList.add('active');
+  }
+
+  // Parse query params
+  const params  = new URLSearchParams(window.location.search);
+  const TOKEN   = params.get('token');
+  const ROLE_QP = params.get('role'); // 'coord' | 'member' (hint only, DB is authoritative)
+
+  // Store the current URL so we can redirect back after login
+  const RETURN_URL = window.location.pathname + window.location.search;
+
+  // ── Token missing immediately ─────────────────────────────────────────────
+
+  if (!TOKEN) {
+    showState('invalid');
+    return;
+  }
+
+  // ── Validate token via Supabase RPC ──────────────────────────────────────
+
+  let tokenData = null;
+
+  async function validateToken() {
+    const { data, error } = await window._supabase
+      .rpc('validate_invite_token', { p_token: TOKEN });
+
+    if (error || !data || data.length === 0) return null;
+    return data[0]; // { workspace_id, workspace_name, workspace_server, alliance_tag, role, is_valid }
+  }
+
+  // ── Populate UI helpers ───────────────────────────────────────────────────
+
+  function populateWorkspaceInfo(prefix, td) {
+    const roleLabelRaw = td.role === 'coordinator' ? 'COORDINATOR INVITE' : 'MEMBER INVITE';
+    $(prefix + '-ws-badge').textContent = roleLabelRaw;
+    $(prefix + '-ws-badge').className   = 'ws-badge' + (td.role === 'coordinator' ? ' coord' : '');
+    $(prefix + '-ws-name').textContent  = td.workspace_name;
+    if ($(prefix + '-ws-server')) $(prefix + '-ws-server').textContent = '📡 ' + td.workspace_server.toUpperCase();
+    if ($(prefix + '-ws-tag'))    $(prefix + '-ws-tag').textContent    = td.alliance_tag ? '[' + td.alliance_tag + ']' : '—';
+  }
+
+  function populateRoleInfo(td) {
+    if (td.role === 'coordinator') {
+      $('confirm-role-body').textContent =
+        'Coordinator — you can create and manage attack/defense plans, view alliance troops, and manage members.';
+    } else {
+      $('confirm-role-body').textContent =
+        'Member — you can view coordination plans and input your own troop summary.';
+    }
+  }
+
+  // ── Main flow ─────────────────────────────────────────────────────────────
+
+  try {
+    // 1. Validate token first (can be done before auth check)
+    tokenData = await validateToken();
+
+    if (!tokenData || !tokenData.is_valid) {
+      showState('invalid');
+      return;
+    }
+
+    // 2. Check auth
+    const user = await window.getUser();
+
+    if (!user) {
+      // Not logged in → show login prompt with workspace preview
+      populateWorkspaceInfo('login', tokenData);
+      showState('login');
+
+      $('btn-go-login').addEventListener('click', () => {
+        // Save return URL in sessionStorage so login page can redirect back
+        sessionStorage.setItem('tt_login_return', RETURN_URL);
+        window.location.href = '/login/?return=' + encodeURIComponent(RETURN_URL);
+      });
+      return;
+    }
+
+    // 3. Check if already a member
+    const { data: existing } = await window._supabase
+      .from('workspace_members')
+      .select('id, role')
+      .eq('workspace_id', tokenData.workspace_id)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (existing) {
+      $('already-sub').textContent =
+        'You are already a ' + existing.role + ' of "' + tokenData.workspace_name + '".';
+      showState('already');
+      return;
+    }
+
+    // 4. Show confirm screen
+    populateWorkspaceInfo('confirm', tokenData);
+    populateRoleInfo(tokenData);
+    showState('confirm');
+
+    // 5. Join button
+    $('btn-join').addEventListener('click', async () => {
+      const btn = $('btn-join');
+      btn.disabled = true;
+      btn.textContent = 'Joining…';
+
+      try {
+        // Determine member role: 'coordinator' or 'member'
+        // (always trust what DB says, not query param)
+        const memberRole = tokenData.role === 'coordinator' ? 'coordinator' : 'member';
+
+        // Get player_name from user metadata if available
+        const playerName = user.user_metadata?.player_name || null;
+
+        const { error: insertError } = await window._supabase
+          .from('workspace_members')
+          .insert({
+            workspace_id: tokenData.workspace_id,
+            user_id:      user.id,
+            role:         memberRole,
+            player_name:  playerName
+          });
+
+        if (insertError) {
+          // Could be duplicate (race condition) — treat as already member
+          if (insertError.code === '23505') {
+            showState('already');
+            return;
+          }
+          throw insertError;
+        }
+
+        // 6. Save workspace to sessionStorage so alliance pages have context
+        sessionStorage.setItem('tt_active_workspace', JSON.stringify({
+          id:           tokenData.workspace_id,
+          name:         tokenData.workspace_name,
+          server:       tokenData.workspace_server,
+          alliance_tag: tokenData.alliance_tag,
+          player_name:  playerName,
+          role:         memberRole
+        }));
+
+        // 7. Success — countdown redirect
+        $('success-sub').textContent =
+          'You\'ve joined "' + tokenData.workspace_name + '" as ' + memberRole + '. Redirecting you now…';
+        showState('success');
+
+        let n = 3;
+        const ticker = setInterval(() => {
+          n--;
+          $('countdown-n').textContent = n;
+          if (n <= 0) {
+            clearInterval(ticker);
+            window.location.href = '/alliance/workspace/';
+          }
+        }, 1000);
+
+      } catch (err) {
+        console.error('Join error:', err);
+        $('error-sub').textContent = err.message || 'Failed to join workspace. Please try again.';
+        showState('error');
+      }
+    });
+
+  } catch (err) {
+    console.error('Init error:', err);
+    $('error-sub').textContent = err.message || 'Failed to validate invite link. Please try again.';
+    showState('error');
+  }
+
+  // ── Retry button ──────────────────────────────────────────────────────────
+
+  $('btn-retry').addEventListener('click', () => {
+    window.location.reload();
+  });
+
+})();
+</script>
+
+</body>
+</html>
