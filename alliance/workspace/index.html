@@ -523,6 +523,15 @@
     }
     .btn-kick:hover { border-color: var(--red); color: var(--red); background: var(--red-bg); }
 
+    .btn-delete-ws {
+      padding: 10px 18px; border-radius: 9px;
+      background: transparent; border: 1.5px solid var(--red);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: var(--red); cursor: pointer; transition: all 0.18s;
+    }
+    .btn-delete-ws:hover { background: var(--red-bg); }
+    .btn-delete-ws:disabled { opacity: 0.5; cursor: not-allowed; }
+
     /* ── TOAST ── */
     .toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
     .toast { padding: 11px 18px; border-radius: 11px; font-size: 0.84rem; font-weight: 500; color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.16); animation: fadeUp 0.22s ease; max-width: 300px; }
@@ -781,6 +790,19 @@
             <div id="manageMembersList">
               <div class="dash-stat-loading"><div class="mini-spin"></div> Loading members…</div>
             </div>
+          </div>
+
+          <div class="settings-divider"></div>
+
+          <!-- Danger Zone -->
+          <div class="settings-section">
+            <div class="settings-section-head">
+              <div>
+                <div class="settings-section-title" style="color:var(--red);">⚠️ Danger Zone</div>
+                <div class="settings-section-sub">Permanently delete this workspace and all its data — plans, troops, members, and invite links. This cannot be undone.</div>
+              </div>
+            </div>
+            <button class="btn-delete-ws" id="btnDeleteWorkspace">🗑️ Delete Workspace</button>
           </div>
 
         </div>
@@ -1187,9 +1209,45 @@
     }
   }
 
+  async function deleteWorkspace() {
+    const ws  = currentWorkspace;
+    if (ws.role !== 'founder') { toast('Only the founder can delete this workspace.', 'error'); return; }
+
+    const confirmed = confirm(`Delete "${ws.name}"? This will permanently remove all members, plans, troops, and invite links. This cannot be undone.`);
+    if (!confirmed) return;
+
+    // Double confirm
+    const input = prompt(`Type the workspace name "${ws.name}" to confirm deletion:`);
+    if (input !== ws.name) { toast('Workspace name did not match. Deletion cancelled.', 'error'); return; }
+
+    const btn = document.getElementById('btnDeleteWorkspace');
+    btn.disabled = true;
+    btn.textContent = '⏳ Deleting…';
+
+    try {
+      const { error } = await window._supabase
+        .from('workspaces')
+        .delete()
+        .eq('id', ws.id);
+
+      if (error) throw error;
+
+      // Clear session and redirect
+      sessionStorage.removeItem('tt_active_workspace');
+      toast('Workspace deleted.', 'info');
+      setTimeout(() => window.location.href = '/alliance/workspace/', 1200);
+    } catch(err) {
+      console.error('deleteWorkspace error:', err);
+      toast('Failed to delete workspace. Please try again.', 'error');
+      btn.disabled = false;
+      btn.textContent = '🗑️ Delete Workspace';
+    }
+  }
+
   // Wire up regen button after DOM ready
   document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnRegen').addEventListener('click', regenAllTokens);
+    document.getElementById('btnDeleteWorkspace').addEventListener('click', deleteWorkspace);
   });
 
   // ── HELPERS ──
