@@ -341,6 +341,124 @@
       .join-card { padding: 32px 24px; }
       .ws-name { font-size: 1.35rem; }
     }
+
+    /* ── Player picker modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(15,33,83,0.35);
+      backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 24px;
+      animation: fadeIn 0.18s ease;
+    }
+    .modal-backdrop.open { display: flex; }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 32px;
+      width: 100%; max-width: 420px;
+      box-shadow: 0 16px 48px rgba(15,33,83,0.14);
+      animation: fadeUp 0.22s ease both;
+    }
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .modal-sub {
+      font-size: 0.82rem; color: var(--text3);
+      line-height: 1.55; margin-bottom: 20px;
+    }
+
+    /* Searchable dropdown (reuse pattern dari workspace) */
+    .pd-wrap { position: relative; margin-bottom: 20px; }
+    .pd-trigger {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+      color: var(--text3); background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .pd-trigger.open {
+      border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+      border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom-color: transparent;
+    }
+    .pd-trigger.has-value { color: var(--navy); font-weight: 500; }
+    .pd-trigger.loading   { opacity: 0.6; cursor: not-allowed; pointer-events: none; }
+    .pd-chevron { font-size: 0.65rem; color: var(--text3); transition: transform 0.18s; }
+    .pd-chevron.flipped { transform: rotate(180deg); }
+
+    .pd-panel {
+      display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 60;
+      background: var(--surface);
+      border: 1.5px solid var(--blue2); border-top: none;
+      border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;
+      box-shadow: 0 14px 36px rgba(15,33,83,0.1); overflow: hidden;
+    }
+    .pd-panel.open { display: block; }
+
+    .pd-search-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 12px; border-bottom: 1px solid var(--border);
+    }
+    .pd-search-icon { font-size: 0.8rem; color: var(--text3); flex-shrink: 0; }
+    .pd-search-input {
+      flex: 1; border: none; outline: none; background: transparent;
+      font-family: 'DM Sans', sans-serif; font-size: 0.855rem; color: var(--navy);
+    }
+    .pd-search-input::placeholder { color: var(--text3); }
+
+    .pd-list { max-height: 200px; overflow-y: auto; }
+    .pd-list::-webkit-scrollbar { width: 4px; }
+    .pd-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .pd-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 13px; cursor: pointer; font-size: 0.855rem;
+      transition: background 0.1s;
+    }
+    .pd-item:hover  { background: var(--surface2); }
+    .pd-item.active { background: var(--blue-glow); color: var(--blue2); font-weight: 600; }
+    .pd-item-pop    { font-size: 0.74rem; color: var(--text3); }
+    .pd-status {
+      padding: 14px 13px; text-align: center;
+      font-size: 0.82rem; color: var(--text3);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .mini-spin {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border); border-top-color: var(--blue2);
+      border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+
+    .modal-actions { display: flex; gap: 10px; }
+    .btn-modal-cancel {
+      flex: 1; padding: 11px; border-radius: 10px;
+      background: var(--surface2); border: 1px solid var(--border);
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: var(--text2); cursor: pointer; transition: background 0.14s;
+    }
+    .btn-modal-cancel:hover { background: var(--border); }
+    .btn-modal-confirm {
+      flex: 2; padding: 11px; border-radius: 10px;
+      background: var(--blue2); border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      color: #fff; cursor: pointer;
+      transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.25);
+    }
+    .btn-modal-confirm:hover:not(:disabled) {
+      background: var(--blue);
+      box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+      transform: translateY(-1px);
+    }
+    .btn-modal-confirm:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   </style>
 </head>
 <body>
@@ -442,6 +560,35 @@
   </div>
 </div>
 
+<!-- Player picker modal -->
+<div class="modal-backdrop" id="playerModal">
+  <div class="modal">
+    <div class="modal-title">Select your Travian account</div>
+    <div class="modal-sub" id="modal-sub">Choose your player name on <strong id="modal-server">this server</strong>. This is how you'll appear in the workspace.</div>
+
+    <div class="pd-wrap" id="pdWrap">
+      <div class="pd-trigger loading" id="pdTrigger" onclick="togglePd()">
+        <span id="pdTriggerText">Loading players…</span>
+        <span class="pd-chevron" id="pdChevron">▼</span>
+      </div>
+      <div class="pd-panel" id="pdPanel">
+        <div class="pd-search-row">
+          <span class="pd-search-icon">🔍</span>
+          <input type="text" class="pd-search-input" id="pdSearch" placeholder="Search player name…" oninput="filterPd()" autocomplete="off" />
+        </div>
+        <div class="pd-list" id="pdList">
+          <div class="pd-status"><div class="mini-spin"></div> Loading…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" id="btnModalCancel">Cancel</button>
+      <button class="btn-modal-confirm" id="btnModalConfirm" disabled>Join Workspace</button>
+    </div>
+  </div>
+</div>
+
 <!-- Load order wajib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
@@ -451,7 +598,7 @@
 <script>
 (async function () {
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
+  const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
 
   const $ = id => document.getElementById(id);
 
@@ -460,34 +607,25 @@
     $('state-' + name).classList.add('active');
   }
 
-  // Parse query params
   const params  = new URLSearchParams(window.location.search);
   const TOKEN   = params.get('token');
-  const ROLE_QP = params.get('role'); // 'coord' | 'member' (hint only, DB is authoritative)
-
-  // Store the current URL so we can redirect back after login
   const RETURN_URL = window.location.pathname + window.location.search;
 
-  // ── Token missing immediately ─────────────────────────────────────────────
+  if (!TOKEN) { showState('invalid'); return; }
 
-  if (!TOKEN) {
-    showState('invalid');
-    return;
-  }
+  let tokenData       = null;
+  let allPlayers      = [];
+  let renderedPlayers = [];
+  let selectedPlayer  = null;
+  let pdOpen          = false;
 
-  // ── Validate token via Supabase RPC ──────────────────────────────────────
-
-  let tokenData = null;
-
+  // ── Validate token ────────────────────────────────────────────────────────
   async function validateToken() {
     const { data, error } = await window._supabase
       .rpc('validate_invite_token', { p_token: TOKEN });
-
     if (error || !data || data.length === 0) return null;
-    return data[0]; // { workspace_id, workspace_name, workspace_server, alliance_tag, role, is_valid }
+    return data[0];
   }
-
-  // ── Populate UI helpers ───────────────────────────────────────────────────
 
   function populateWorkspaceInfo(prefix, td) {
     const roleLabelRaw = td.role === 'coordinator' ? 'COORDINATOR INVITE' : 'MEMBER INVITE';
@@ -499,43 +637,185 @@
   }
 
   function populateRoleInfo(td) {
-    if (td.role === 'coordinator') {
-      $('confirm-role-body').textContent =
-        'Coordinator — you can create and manage attack/defense plans, view alliance troops, and manage members.';
-    } else {
-      $('confirm-role-body').textContent =
-        'Member — you can view coordination plans and input your own troop summary.';
+    $('confirm-role-body').textContent = td.role === 'coordinator'
+      ? 'Coordinator — you can create and manage attack/defense plans, view alliance troops, and manage members.'
+      : 'Member — you can view coordination plans and input your own troop summary.';
+  }
+
+  // ── Player dropdown ───────────────────────────────────────────────────────
+  async function loadPlayers(serverKey) {
+    try {
+      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&page=1`);
+      const data = await res.json();
+      allPlayers = (data.rows || []).map(p => ({
+        id:         String(p.player_id || p.id || ''),
+        name:       String(p.player_name || p.name || ''),
+        population: Number(p.population || 0),
+      }));
+      const trigger = $('pdTrigger');
+      trigger.classList.remove('loading');
+      $('pdTriggerText').textContent = 'Search your account…';
+    } catch (err) {
+      console.error('loadPlayers error:', err);
+      $('pdTriggerText').textContent = 'Failed to load — try again';
     }
   }
 
-  // ── Main flow ─────────────────────────────────────────────────────────────
+  window.togglePd = function () {
+    if ($('pdTrigger').classList.contains('loading')) return;
+    pdOpen ? closePd() : openPd();
+  };
 
+  function openPd() {
+    pdOpen = true;
+    $('pdPanel').classList.add('open');
+    $('pdTrigger').classList.add('open');
+    $('pdChevron').classList.add('flipped');
+    renderPdList(allPlayers);
+    setTimeout(() => $('pdSearch').focus(), 40);
+  }
+
+  function closePd() {
+    pdOpen = false;
+    $('pdPanel').classList.remove('open');
+    $('pdTrigger').classList.remove('open');
+    $('pdChevron').classList.remove('flipped');
+    $('pdSearch').value = '';
+  }
+
+  window.filterPd = function () {
+    const q = $('pdSearch').value.toLowerCase().trim();
+    renderPdList(q ? allPlayers.filter(p => p.name.toLowerCase().includes(q)) : allPlayers);
+  };
+
+  function renderPdList(players) {
+    const list = $('pdList');
+    if (!players.length) { list.innerHTML = '<div class="pd-status">No players found</div>'; renderedPlayers = []; return; }
+    renderedPlayers = players.slice(0, 200);
+    list.innerHTML = renderedPlayers.map((p, i) =>
+      `<div class="pd-item${selectedPlayer?.id === p.id ? ' active' : ''}" data-idx="${i}">
+        <span>${p.name}</span>
+        <span class="pd-item-pop">pop ${p.population.toLocaleString()}</span>
+      </div>`
+    ).join('');
+    list.querySelectorAll('.pd-item[data-idx]').forEach(el => {
+      el.addEventListener('mousedown', e => {
+        e.preventDefault();
+        const p = renderedPlayers[parseInt(el.dataset.idx)];
+        if (p) selectPlayer(p);
+      });
+    });
+    if (players.length > 200) {
+      list.innerHTML += `<div class="pd-status" style="border-top:1px solid var(--border);font-size:0.74rem;">Showing 200 of ${players.length} — type to narrow down</div>`;
+    }
+  }
+
+  function selectPlayer(p) {
+    selectedPlayer = p;
+    $('pdTriggerText').textContent = p.name;
+    $('pdTrigger').classList.add('has-value');
+    $('btnModalConfirm').disabled = false;
+    closePd();
+  }
+
+  document.addEventListener('click', e => {
+    const wrap = $('pdWrap');
+    if (wrap && !wrap.contains(e.target)) closePd();
+  });
+
+  // ── Open modal ────────────────────────────────────────────────────────────
+  function openPlayerModal(td) {
+    const serverKey = td.workspace_server.split('.')[0];
+    $('modal-server').textContent = td.workspace_server;
+    $('playerModal').classList.add('open');
+    loadPlayers(serverKey);
+  }
+
+  $('btnModalCancel').addEventListener('click', () => {
+    $('playerModal').classList.remove('open');
+    selectedPlayer = null;
+    $('pdTriggerText').textContent = 'Search your account…';
+    $('pdTrigger').classList.remove('has-value');
+    $('btnModalConfirm').disabled = true;
+  });
+
+  // Close modal on backdrop click
+  $('playerModal').addEventListener('click', e => {
+    if (e.target === $('playerModal')) $('btnModalCancel').click();
+  });
+
+  // ── Do the actual join ────────────────────────────────────────────────────
+  $('btnModalConfirm').addEventListener('click', async () => {
+    if (!selectedPlayer) return;
+    const btn = $('btnModalConfirm');
+    btn.disabled = true;
+    btn.textContent = 'Joining…';
+
+    try {
+      const user       = await window.getUser();
+      const memberRole = tokenData.role === 'coordinator' ? 'coordinator' : 'member';
+
+      const { error: insertError } = await window._supabase
+        .from('workspace_members')
+        .insert({
+          workspace_id: tokenData.workspace_id,
+          user_id:      user.id,
+          role:         memberRole,
+          player_name:  selectedPlayer.name,
+        });
+
+      if (insertError) {
+        if (insertError.code === '23505') { showState('already'); $('playerModal').classList.remove('open'); return; }
+        throw insertError;
+      }
+
+      sessionStorage.setItem('tt_active_workspace', JSON.stringify({
+        id:           tokenData.workspace_id,
+        name:         tokenData.workspace_name,
+        server:       tokenData.workspace_server,
+        alliance_tag: tokenData.alliance_tag,
+        player_name:  selectedPlayer.name,
+        role:         memberRole,
+      }));
+
+      $('playerModal').classList.remove('open');
+      $('success-sub').textContent = `You've joined "${tokenData.workspace_name}" as ${memberRole}. Redirecting you now…`;
+      showState('success');
+
+      let n = 3;
+      const ticker = setInterval(() => {
+        n--;
+        $('countdown-n').textContent = n;
+        if (n <= 0) { clearInterval(ticker); window.location.href = '/alliance/workspace/'; }
+      }, 1000);
+
+    } catch (err) {
+      console.error('Join error:', err);
+      $('playerModal').classList.remove('open');
+      $('error-sub').textContent = err.message || 'Failed to join workspace. Please try again.';
+      showState('error');
+    }
+  });
+
+  // ── Main flow ─────────────────────────────────────────────────────────────
   try {
-    // 1. Validate token first (can be done before auth check)
     tokenData = await validateToken();
 
-    if (!tokenData || !tokenData.is_valid) {
-      showState('invalid');
-      return;
-    }
+    if (!tokenData || !tokenData.is_valid) { showState('invalid'); return; }
 
-    // 2. Check auth
     const user = await window.getUser();
 
     if (!user) {
-      // Not logged in → show login prompt with workspace preview
       populateWorkspaceInfo('login', tokenData);
       showState('login');
-
       $('btn-go-login').addEventListener('click', () => {
-        // Save return URL in sessionStorage so login page can redirect back
         sessionStorage.setItem('tt_login_return', RETURN_URL);
         window.location.href = '/login/?return=' + encodeURIComponent(RETURN_URL);
       });
       return;
     }
 
-    // 3. Check if already a member
+    // Check already member
     const { data: existing } = await window._supabase
       .from('workspace_members')
       .select('id, role')
@@ -544,80 +824,17 @@
       .maybeSingle();
 
     if (existing) {
-      $('already-sub').textContent =
-        'You are already a ' + existing.role + ' of "' + tokenData.workspace_name + '".';
+      $('already-sub').textContent = `You are already a ${existing.role} of "${tokenData.workspace_name}".`;
       showState('already');
       return;
     }
 
-    // 4. Show confirm screen
+    // Show confirm screen — "Join Workspace" opens modal
     populateWorkspaceInfo('confirm', tokenData);
     populateRoleInfo(tokenData);
     showState('confirm');
 
-    // 5. Join button
-    $('btn-join').addEventListener('click', async () => {
-      const btn = $('btn-join');
-      btn.disabled = true;
-      btn.textContent = 'Joining…';
-
-      try {
-        // Determine member role: 'coordinator' or 'member'
-        // (always trust what DB says, not query param)
-        const memberRole = tokenData.role === 'coordinator' ? 'coordinator' : 'member';
-
-        // Get player_name from user metadata if available
-        const playerName = user.user_metadata?.player_name || null;
-
-        const { error: insertError } = await window._supabase
-          .from('workspace_members')
-          .insert({
-            workspace_id: tokenData.workspace_id,
-            user_id:      user.id,
-            role:         memberRole,
-            player_name: playerName || user.email?.split('@')[0] || 'Unknown',
-          });
-
-        if (insertError) {
-          // Could be duplicate (race condition) — treat as already member
-          if (insertError.code === '23505') {
-            showState('already');
-            return;
-          }
-          throw insertError;
-        }
-
-        // 6. Save workspace to sessionStorage so alliance pages have context
-        sessionStorage.setItem('tt_active_workspace', JSON.stringify({
-          id:           tokenData.workspace_id,
-          name:         tokenData.workspace_name,
-          server:       tokenData.workspace_server,
-          alliance_tag: tokenData.alliance_tag,
-          player_name:  playerName,
-          role:         memberRole
-        }));
-
-        // 7. Success — countdown redirect
-        $('success-sub').textContent =
-          'You\'ve joined "' + tokenData.workspace_name + '" as ' + memberRole + '. Redirecting you now…';
-        showState('success');
-
-        let n = 3;
-        const ticker = setInterval(() => {
-          n--;
-          $('countdown-n').textContent = n;
-          if (n <= 0) {
-            clearInterval(ticker);
-            window.location.href = '/alliance/workspace/';
-          }
-        }, 1000);
-
-      } catch (err) {
-        console.error('Join error:', err);
-        $('error-sub').textContent = err.message || 'Failed to join workspace. Please try again.';
-        showState('error');
-      }
-    });
+    $('btn-join').addEventListener('click', () => openPlayerModal(tokenData));
 
   } catch (err) {
     console.error('Init error:', err);
@@ -625,11 +842,7 @@
     showState('error');
   }
 
-  // ── Retry button ──────────────────────────────────────────────────────────
-
-  $('btn-retry').addEventListener('click', () => {
-    window.location.reload();
-  });
+  $('btn-retry').addEventListener('click', () => window.location.reload());
 
 })();
 </script>
