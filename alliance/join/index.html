@@ -643,18 +643,18 @@
   }
 
   // ── Player dropdown ───────────────────────────────────────────────────────
-  async function loadPlayers(serverKey) {
+  async function loadPlayers(serverKey, allianceTag) {
     try {
-      const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=players&page=1`);
+      const res  = await fetch(`${API_BASE}/api/alliance?server=${serverKey}&name=${encodeURIComponent(allianceTag)}`);
       const data = await res.json();
-      allPlayers = (data.rows || []).map(p => ({
+      allPlayers = (data.members || []).map(p => ({
         id:         String(p.player_id || p.id || ''),
         name:       String(p.player_name || p.name || ''),
-        population: Number(p.population || 0),
+        population: Number(p.population || p.pop || 0),
       }));
       const trigger = $('pdTrigger');
       trigger.classList.remove('loading');
-      $('pdTriggerText').textContent = 'Search your account…';
+      $('pdTriggerText').textContent = allPlayers.length ? 'Search your account…' : 'No members found';
     } catch (err) {
       console.error('loadPlayers error:', err);
       $('pdTriggerText').textContent = 'Failed to load — try again';
@@ -728,13 +728,13 @@
     const serverKey = td.workspace_server.split('.')[0];
     $('modal-server').textContent = td.workspace_server;
     $('playerModal').classList.add('open');
-    loadPlayers(serverKey);
+    loadPlayers(serverKey, td.alliance_tag);
   }
 
   $('btnModalCancel').addEventListener('click', () => {
     $('playerModal').classList.remove('open');
     selectedPlayer = null;
-    $('pdTriggerText').textContent = 'Search your account…';
+    $('pdTriggerText').textContent = allPlayers.length ? 'Search your account…' : 'No members found';
     $('pdTrigger').classList.remove('has-value');
     $('btnModalConfirm').disabled = true;
   });
