@@ -564,10 +564,12 @@
         <li><span class="fi yes">✓</span> Battle report share (7–30d TTL)</li>
         <li class="feature-section-label">Intelligence</li>
         <li><span class="fi yes">✓</span> Player / alliance dossier</li>
-        <li class="feature-section-label">Map</li>
+        <li class="feature-section-label">Explore</li>
         <li><span class="fi yes">✓</span> Map view</li>
         <li><span class="fi no">–</span><span class="muted">Alliance filter max 5</span></li>
         <li><span class="fi no">–</span><span class="muted">Player filter max 10</span></li>
+        <li><span class="fi yes">✓</span> Oasis Database — preview 1,000 · 5×/day</li>
+        <li><span class="fi yes">✓</span> Village Finder — preview 500 · single filter · 5×/day</li>
         <li class="feature-section-label">Alliance</li>
         <li><span class="fi yes">✓</span> Join alliance workspace</li>
         <li><span class="fi yes">✓</span> View coordinate plans</li>
@@ -590,9 +592,9 @@
       <div class="plan-divider"></div>
       <ul class="plan-features">
         <li class="feature-section-label">Everything in Free, plus:</li>
-        <li><span class="fi yes">✓</span> Unlimited map filters</li>
-        <li><span class="fi yes">✓</span> Export map coordinates</li>
-        <li><span class="fi yes">✓</span> Oasis Data — full + CSV export</li>
+        <li><span class="fi yes">✓</span> Unlimited map filters (alliance & player)</li>
+        <li><span class="fi yes">✓</span> Oasis Database — full data · 50×/day</li>
+        <li><span class="fi yes">✓</span> Village Finder — full data · multi-filter · 50×/day</li>
         <li><span class="fi yes">✓</span> Battle reports history</li>
         <li><span class="fi yes">✓</span> Permanent share links</li>
         <li class="feature-section-label">Alliance (Commander)</li>
@@ -793,6 +795,8 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
 <script>
