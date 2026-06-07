@@ -24,12 +24,22 @@ body{font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface
 
 main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 24px 80px;}
 
-.page-header{margin-bottom:28px;animation:fadeDown 0.35s ease both;}
-.page-header-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
-.page-icon{width:38px;height:38px;border-radius:10px;background:var(--green-bg);display:flex;align-items:center;justify-content:center;font-size:18px;}
-.badge-free{background:var(--green-bg);color:var(--green);font-size:0.6rem;font-weight:700;border-radius:100px;padding:3px 8px;letter-spacing:0.04em;}
-.page-header h1{font-family:'Space Grotesk',sans-serif;font-size:1.65rem;font-weight:700;color:var(--navy);letter-spacing:-0.02em;}
-.page-header p{color:var(--text2);font-size:0.9rem;line-height:1.6;}
+/* ── PAGE HEADER (canonical) ── */
+.page-header{position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:28px 40px 24px;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--text3);margin-bottom:10px;}
+.breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s;}
+.breadcrumb a:hover{color:var(--blue2);}
+.breadcrumb-sep{font-size:0.65rem;opacity:0.5;}
+.breadcrumb-current{color:var(--text2);font-weight:500;}
+.page-header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.page-title-group{display:flex;align-items:center;gap:14px;}
+.page-icon{width:44px;height:44px;border-radius:12px;background:var(--green-bg);border:1px solid rgba(5,150,105,0.2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;}
+.page-title{font-family:'Space Grotesk',sans-serif;font-size:1.4rem;font-weight:700;color:var(--text);letter-spacing:-0.02em;}
+.page-subtitle{font-size:0.8rem;color:var(--text3);margin-top:2px;}
+.page-badges{display:flex;align-items:center;gap:8px;}
+.page-badge{font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:4px 10px;border-radius:100px;}
+.page-badge.free{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,0.2);}
+.page-badge.login-req{background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,0.2);}
 
 /* ── Filter panel ── */
 .filter-panel{background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:24px;animation:fadeUp 0.35s ease 0.05s both;}
@@ -214,27 +224,32 @@ td{padding:10px 14px;vertical-align:middle;}
 
 <div id="navbar-root"></div>
 
-<!-- BREADCRUMB -->
-<div style="position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:7px 40px;display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text3);flex-shrink:0;">
-  <a href="/" style="color:var(--text3);text-decoration:none;">Home</a>
-  <span style="opacity:.4;font-size:.6rem">›</span>
-  <a href="/s/" style="color:var(--text3);text-decoration:none;">Servers</a>
-  <span style="opacity:.4;font-size:.6rem">›</span>
-  <a href="/s/ts5.x1.asia/village-finder/" style="color:var(--text3);text-decoration:none;">ts5.x1.asia</a>
-  <span style="opacity:.4;font-size:.6rem">›</span>
-  <span style="color:var(--text2);font-weight:500;">Village Finder</span>
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/s/">Servers</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/s/ts5.x1.asia/village-finder/">ts5.x1.asia</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Village Finder</span>
+  </div>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">🌾</div>
+      <div>
+        <div class="page-title">Village Finder</div>
+        <div class="page-subtitle">Find villages by crop field type, tile status, and number of claimable oases within 5×5.</div>
+      </div>
+    </div>
+    <div class="page-badges">
+      <span class="page-badge login-req">Login Required</span>
+      <span id="quota-badge" style="display:none;font-size:0.7rem;font-weight:600;letter-spacing:0.05em;padding:4px 10px;border-radius:100px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,.2);"></span>
+    </div>
+  </div>
 </div>
 
 <main>
-  <div class="page-header">
-    <div class="page-header-top">
-      <div class="page-icon">🌾</div>
-      <span class="badge-free">LOGIN REQUIRED</span>
-      <span id="quota-badge" style="display:none;font-size:0.6rem;font-weight:700;border-radius:100px;padding:3px 8px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,.2);"></span>
-    </div>
-    <h1>Village Finder</h1>
-    <p>Find villages by crop field type, tile status, and number of claimable oases within 5×5.</p>
-  </div>
 
   <!-- Filter Panel -->
   <div class="filter-panel">
@@ -518,12 +533,18 @@ async function runSearch() {
   if (!currentUser) { document.getElementById('auth-gate').style.display='block'; return; }
   if (!activeCrops.size) { alert('Select at least one field type.'); return; }
 
+  // ── FREE USER: hanya boleh 1 crop type ──
+  if (!isPlus && activeCrops.size > 1) {
+    alert('Free plan: select only one field type per search.\nUpgrade to Plus for multi-crop search.');
+    return;
+  }
+
   const cx       = parseInt(document.getElementById('cx').value) || 0;
   const cy       = parseInt(document.getElementById('cy').value) || 0;
   const minOasis = parseInt(document.getElementById('minOasis').value) || 0;
   const status   = document.querySelector('input[name=status]:checked').value;
 
-  // Collect selected crops (support multi-crop)
+  // Collect selected crops
   const selectedFTs    = [...document.querySelectorAll('.ft-check:checked')];
   const selectedLabels = selectedFTs.map(el => el.dataset.label);
   const singleVariants = {18:'0-0-0-18', 15:'1-1-1-15', 9:'3-3-3-9'};
@@ -532,12 +553,10 @@ async function runSearch() {
   }
   if (!selectedLabels.length) { alert('Select at least one field type variant.'); return; }
 
-  // Multi-crop: kirim semua crops yang aktif sekaligus
   const crops = [...activeCrops];
-
-  const oasisTypes  = [...document.querySelectorAll('.oasis-check:checked')].map(el=>el.value);
+  const oasisTypes    = [...document.querySelectorAll('.oasis-check:checked')].map(el=>el.value);
   const filterByOasis = oasisTypes.length > 0;
-  const minBonus    = parseInt(document.getElementById('minBonus').value) || 0;
+  const minBonus      = parseInt(document.getElementById('minBonus').value) || 0;
 
   const btn = document.getElementById('searchBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Searching…';
@@ -600,7 +619,6 @@ async function runSearch() {
         ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
         : oasisCount.total;
 
-      // Sort utama: distance dari center
       const dist = Math.sqrt((tx-cx)**2 + (ty-cy)**2);
 
       return {
@@ -625,17 +643,20 @@ async function runSearch() {
     // Apply filters
     let filtered = scored.filter(t => {
       if (!selectedLabels.includes(t.field_label)) return false;
+      // minOasis selalu diterapkan terhadap total (bukan hanya saat oasis type dicentang)
+      if (t.oasisCount.total < minOasis) return false;
+      // filter tambahan per oasis type kalau dicentang
       if (filterByOasis && t.selectedCount < minOasis) return false;
       if (status === 'free'     && t.isOccupied)  return false;
       if (status === 'occupied' && !t.isOccupied) return false;
       return true;
     });
 
-    // Sort by distance dulu sebelum preview cap
+    // Sort by distance sebelum preview cap
     filtered.sort((a, b) => a.dist - b.dist);
 
     // Preview cap — Free: 500, Plus/Pro: semua
-    const total = filtered.length;
+    const total    = filtered.length;
     const isCapped = !isPlus && total > PREVIEW_CAP;
     if (isCapped) filtered = filtered.slice(0, PREVIEW_CAP);
 
@@ -658,21 +679,21 @@ async function runSearch() {
     document.getElementById('statsBar').style.display = 'flex';
     document.getElementById('infoNote').style.display = 'block';
 
-    // Paywall banner
+    // Paywall banner — tambahkan setelah table-wrap, bukan di dalamnya
     let paywall = document.getElementById('paywall-banner');
     if (!paywall) {
       paywall = document.createElement('div');
       paywall.id = 'paywall-banner';
-      paywall.style.cssText = 'margin-top:2px;background:linear-gradient(135deg,#0b1a3d,#1a3068);border:1px solid rgba(37,99,235,.25);border-radius:14px;padding:24px 22px;display:flex;align-items:center;gap:20px;';
-      document.getElementById('tableWrap').appendChild(paywall);
+      paywall.style.cssText = 'margin-top:12px;background:linear-gradient(135deg,#0b1a3d,#1a3068);border:1px solid rgba(37,99,235,.25);border-radius:14px;padding:24px 22px;display:none;align-items:center;gap:20px;';
+      document.getElementById('tableWrap').insertAdjacentElement('afterend', paywall);
     }
     if (isCapped) {
       paywall.style.display = 'flex';
       paywall.innerHTML = `
         <div style="font-size:1.5rem">🔒</div>
         <div style="flex:1">
-          <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:4px;">Showing ${PREVIEW_CAP} of ${total.toLocaleString()} results</div>
-          <div style="font-size:0.8rem;color:rgba(255,255,255,.6);">Upgrade to <strong style="color:rgba(255,255,255,.85)">Plus</strong> to see all results — $1.50/month</div>
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:4px;">Showing ${PREVIEW_CAP.toLocaleString()} of ${total.toLocaleString()} results</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.6);">Upgrade to <strong style="color:rgba(255,255,255,.85)">Plus</strong> to unlock all results — $1.50/month</div>
         </div>
         <a href="/pricing/" style="height:38px;padding:0 18px;border-radius:9px;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;flex-shrink:0;">Upgrade to Plus →</a>`;
     } else {
@@ -860,6 +881,11 @@ function toggleCropCount(btn) {
     btn.classList.remove('active', colorMap[crop]);
     document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = false);
   } else {
+    // Free user: hanya boleh 1 crop
+    if (!isPlus && activeCrops.size >= 1) {
+      // Deselect semua dulu, baru pilih yang baru
+      clearAllFT();
+    }
     activeCrops.add(crop);
     btn.classList.add('active', colorMap[crop]);
     if (crop !== 7 && crop !== 6) {
@@ -867,6 +893,7 @@ function toggleCropCount(btn) {
     }
   }
   updateVariantVisibility();
+  updateCropHint();
 }
 
 function updateVariantVisibility() {
@@ -876,7 +903,23 @@ function updateVariantVisibility() {
   document.getElementById('ftvg6').style.display = has6 ? 'flex' : 'none';
 }
 
+function updateCropHint() {
+  let hint = document.getElementById('crop-free-hint');
+  if (!isPlus) {
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = 'crop-free-hint';
+      hint.style.cssText = 'font-size:0.7rem;color:var(--amber);margin-top:6px;';
+      document.getElementById('ftCounts').insertAdjacentElement('afterend', hint);
+    }
+    hint.textContent = activeCrops.size > 0
+      ? 'Free plan: 1 field type per search. Upgrade to Plus for multi-crop.'
+      : '';
+  }
+}
+
 function selectAllFT() {
+  if (!isPlus) { alert('Free plan: select only one field type per search.\nUpgrade to Plus for multi-crop search.'); return; }
   document.querySelectorAll('.ft-count-btn').forEach(btn => { if (!btn.classList.contains('active')) toggleCropCount(btn); });
   document.querySelectorAll('.ft-check').forEach(el => el.checked = true);
 }
