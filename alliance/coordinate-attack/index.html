@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attack Plan — TravianTools</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:         #0f2153;
+  --navy2:        #1a3068;
+  --blue:         #1d4ed8;
+  --blue2:        #2563eb;
+  --blue-light:   #3b82f6;
+  --blue-glow:    rgba(59,130,246,0.10);
+  --surface:      #ffffff;
+  --surface2:     #f8faff;
+  --border:       #e2e8f3;
+  --border2:      rgba(37,99,235,0.25);
+  --text:         #0f2153;
+  --text2:        #3d5a8a;
+  --text3:        #7a93bc;
+  --green:        #059669;
+  --green-bg:     rgba(5,150,105,0.08);
+  --green-border: rgba(5,150,105,0.2);
+  --amber:        #d97706;
+  --amber-bg:     rgba(217,119,6,0.08);
+  --amber-border: rgba(217,119,6,0.2);
+  --red:          #dc2626;
+  --red-bg:       rgba(220,38,38,0.08);
+  --red-border:   rgba(220,38,38,0.2);
+  --orange:       #ea580c;
+  --orange-bg:    rgba(234,88,12,0.08);
+  --orange-border:rgba(234,88,12,0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); background: var(--surface2); line-height: 1.6; }
+
+#alliance-layout { display: flex; min-height: calc(100vh - 64px); }
+#alliance-main   { flex: 1; min-width: 0; overflow-x: hidden; }
+
+/* ── PAGE HEADER ── */
+.page-header { position: relative; z-index: 1; border-bottom: 1px solid var(--border); background: var(--surface); padding: 28px 40px 24px; }
+.breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; flex-wrap: wrap; }
+.breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--blue2); }
+.breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+.breadcrumb-current { color: var(--text2); font-weight: 500; }
+.page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.page-title-group  { display: flex; align-items: center; gap: 14px; }
+.page-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--red-bg); border: 1px solid var(--red-border); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.page-title    { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+.page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+.page-badges   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.page-badge    { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 100px; }
+.page-badge.free  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+.page-badge.coord { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+
+/* ── PAGE WRAP ── */
+.page-wrap { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 36px 32px 72px; }
+@media (max-width: 768px) { .page-header { padding: 20px 16px 16px; } .page-wrap { padding: 24px 16px 48px; } }
+
+/* ── GATE ── */
+.gate { text-align: center; padding: 72px 24px; }
+.gate-icon { font-size: 2.2rem; margin-bottom: 14px; }
+.gate h3   { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+.gate p    { font-size: 0.83rem; color: var(--text3); margin-bottom: 20px; }
+.btn-gate  { padding: 9px 22px; border-radius: 10px; background: var(--blue2); color: #fff; font-size: 0.84rem; font-weight: 600; border: none; cursor: pointer; text-decoration: none; display: inline-block; }
+
+/* ═══════════════════════════════════
+   LIST VIEW
+═══════════════════════════════════ */
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+.tabs { display: flex; gap: 2px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 3px; }
+.tab-btn { padding: 6px 16px; border-radius: 7px; font-size: 0.82rem; font-weight: 500; cursor: pointer; border: none; background: transparent; color: var(--text3); transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.tab-btn.active { background: var(--navy); color: #fff; }
+.tab-btn:hover:not(.active) { color: var(--text2); background: var(--surface2); }
+
+.btn-new { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 10px; background: var(--red); color: #fff; font-size: 0.82rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-new:hover { background: #b91c1c; }
+.btn-new.hidden { display: none; }
+
+.plan-list { display: flex; flex-direction: column; gap: 12px; }
+
+/* plan card */
+.plan-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.15s, box-shadow 0.15s; animation: fadeUp 0.22s ease both; }
+.plan-card:hover { border-color: var(--border2); box-shadow: 0 4px 20px rgba(15,33,83,0.06); }
+.plan-card.urgent { border-left: 3px solid var(--red); }
+.plan-card.dimmed { opacity: 0.6; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+.card-header { padding: 16px 20px; cursor: pointer; }
+.card-header:hover { background: var(--surface2); }
+.card-top    { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.card-left   { display: flex; align-items: flex-start; gap: 12px; flex: 1; min-width: 0; }
+.card-icon   { width: 38px; height: 38px; border-radius: 9px; background: var(--red-bg); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.card-title  { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+.card-meta   { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.badge       { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 100px; }
+.badge-open    { background: var(--blue-glow); color: var(--blue2);  border: 1px solid rgba(37,99,235,0.2); }
+.badge-closed  { background: var(--surface2);  color: var(--text3);  border: 1px solid var(--border); }
+.badge-real    { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+.badge-fake    { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+.creator-meta  { font-size: 0.72rem; color: var(--text3); margin-top: 3px; }
+.card-right    { flex-shrink: 0; text-align: right; }
+.eta-label     { font-size: 0.68rem; color: var(--text3); margin-bottom: 2px; }
+.eta-value     { font-size: 0.85rem; font-weight: 600; color: var(--red); font-variant-numeric: tabular-nums; }
+.eta-value.safe { color: var(--text3); }
+
+/* target summary strip */
+.target-strip { display: flex; gap: 6px; flex-wrap: wrap; padding: 0 20px 14px; }
+.target-pill  { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px 3px 6px; border-radius: 100px; font-size: 0.72rem; font-weight: 600; border: 1px solid var(--border); background: var(--surface2); color: var(--text2); }
+.target-pill .pill-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.target-pill .pill-dot.real { background: var(--red); }
+.target-pill .pill-dot.fake { background: var(--amber); }
+
+/* card actions row */
+.card-actions-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 20px 14px; gap: 10px; flex-wrap: wrap; border-top: 1px solid var(--border); }
+.card-stats   { display: flex; align-items: center; gap: 14px; }
+.stat-item    { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; color: var(--text3); }
+.stat-item b  { color: var(--text2); font-weight: 600; }
+.stat-dot     { width: 6px; height: 6px; border-radius: 50%; }
+.stat-dot.real { background: var(--red); }
+.stat-dot.fake { background: var(--amber); }
+.card-btns    { display: flex; gap: 6px; align-items: center; }
+.btn-icon     { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 1rem; transition: all 0.15s; }
+.btn-icon:hover { border-color: var(--border2); color: var(--text); }
+.btn-expand   { display: flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 9px; background: var(--surface2); color: var(--text2); border: 1px solid var(--border); font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.btn-expand:hover { background: var(--blue-glow); color: var(--blue2); border-color: var(--border2); }
+
+/* expanded targets */
+.targets-wrap { display: none; border-top: 1px solid var(--border); }
+.targets-wrap.open { display: block; }
+.target-row   { padding: 14px 20px; border-bottom: 1px solid var(--border); }
+.target-row:last-child { border-bottom: none; }
+.target-row-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.target-info  { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.target-coord { font-family: monospace; font-size: 0.85rem; font-weight: 700; color: var(--text); cursor: pointer; }
+.target-coord:hover { color: var(--blue2); }
+.target-name  { font-size: 0.78rem; color: var(--text2); }
+.target-player { font-size: 0.72rem; color: var(--text3); }
+.target-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.btn-send-atk { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; text-decoration: none; white-space: nowrap; }
+.btn-send-atk:hover { background: rgba(220,38,38,0.15); }
+.btn-commit-atk { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; background: var(--navy); color: #fff; border: none; font-size: 0.75rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; }
+.btn-commit-atk:hover { background: var(--navy2); }
+.btn-commit-atk.committed { background: var(--green); cursor: default; }
+
+/* commitments list per target */
+.target-commits { margin-top: 8px; }
+.commit-chips   { display: flex; gap: 5px; flex-wrap: wrap; }
+.commit-chip    { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 6px; border-radius: 100px; font-size: 0.7rem; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); }
+.commit-chip .chip-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.commit-chip .chip-dot.real { background: var(--red); }
+.commit-chip .chip-dot.fake { background: var(--amber); }
+.commit-chip.mine { background: var(--blue-glow); border-color: var(--border2); color: var(--blue2); }
+.commit-empty { font-size: 0.75rem; color: var(--text3); font-style: italic; }
+
+/* proximity hint */
+.proximity-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text3); padding: 4px 9px; background: var(--surface2); border-radius: 7px; border: 1px solid var(--border); margin-top: 6px; }
+.send-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; padding: 4px 9px; background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); border-radius: 7px; margin-top: 6px; font-weight: 600; }
+
+/* empty + skeleton */
+.empty-state { text-align: center; padding: 64px 24px; color: var(--text3); }
+.empty-state-icon { font-size: 2.2rem; margin-bottom: 12px; }
+.empty-state h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+.empty-state p  { font-size: 0.82rem; }
+.skeleton { background: linear-gradient(90deg, var(--surface2) 25%, #edf2fb 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 10px; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.history-note { font-size: 0.8rem; color: var(--text3); padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; margin-bottom: 16px; }
+
+/* ═══════════════════════════════════
+   CREATE VIEW
+═══════════════════════════════════ */
+.form-section   { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; }
+.section-title  { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.01em; }
+.form-grid      { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+.field          { margin-bottom: 12px; }
+.field:last-child { margin-bottom: 0; }
+.field label    { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text2); margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); background: var(--surface); transition: border-color 0.15s; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--blue2); }
+.field .hint    { font-size: 0.72rem; color: var(--text3); margin-top: 4px; line-height: 1.4; }
+.field .opt     { color: var(--text3); font-weight: 400; }
+.coord-row      { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+/* resolve chip */
+.resolve-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 100px; margin-top: 6px; }
+.resolve-chip.ok      { background: var(--green-bg);  color: var(--green); border: 1px solid var(--green-border); }
+.resolve-chip.loading { background: var(--blue-glow); color: var(--blue2); border: 1px solid var(--border2); }
+.resolve-chip.error   { background: var(--red-bg);    color: var(--red);   border: 1px solid var(--red-border); }
+
+/* target builder */
+.target-builder { margin-bottom: 16px; }
+.target-input-row { display: grid; grid-template-columns: 80px 80px 1fr auto auto; gap: 8px; align-items: end; }
+@media (max-width: 600px) { .target-input-row { grid-template-columns: 1fr 1fr; } }
+.attack-type-toggle { display: flex; gap: 4px; }
+.atk-type-btn { padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; font-weight: 600; border: 1.5px solid var(--border); background: var(--surface2); color: var(--text3); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.atk-type-btn.real.selected { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.atk-type-btn.fake.selected { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-border); }
+.btn-add-target { padding: 8px 14px; border-radius: 8px; background: var(--navy); color: #fff; font-size: 0.82rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; white-space: nowrap; }
+.btn-add-target:hover { background: var(--navy2); }
+
+.target-build-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.target-build-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; }
+.tbi-coord  { font-family: monospace; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+.tbi-name   { font-size: 0.78rem; color: var(--text2); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tbi-type   { font-size: 0.72rem; font-weight: 600; padding: 2px 8px; border-radius: 100px; flex-shrink: 0; }
+.tbi-type.real { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.tbi-type.fake { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.tbi-note   { font-size: 0.75rem; color: var(--text3); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-tbi-del { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: all 0.15s; flex-shrink: 0; }
+.btn-tbi-del:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
+.target-add-resolve { margin-top: 6px; min-height: 22px; }
+
+/* proximity table */
+.prox-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; display: none; }
+.prox-header  { display: flex; align-items: baseline; gap: 10px; margin-bottom: 14px; }
+.prox-title   { font-family: 'Space Grotesk', sans-serif; font-size: 0.88rem; font-weight: 700; }
+.prox-target  { font-size: 0.75rem; color: var(--text3); }
+.prox-table   { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.prox-table th { text-align: left; color: var(--text3); font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em; padding: 5px 10px; border-bottom: 1px solid var(--border); text-transform: uppercase; }
+.prox-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.prox-table tr:last-child td { border-bottom: none; }
+.prox-table tr.highlight td { background: var(--blue-glow); }
+.rank-badge { width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.68rem; font-weight: 700; }
+.rank-1 { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.rank-n { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
+.dist-bar-wrap { display: flex; align-items: center; gap: 6px; }
+.dist-bar  { height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; width: 60px; }
+.dist-fill { height: 100%; background: var(--red); border-radius: 100px; opacity: 0.5; }
+.dist-val  { font-size: 0.75rem; font-variant-numeric: tabular-nums; font-weight: 500; min-width: 28px; }
+.prox-note { display: flex; align-items: flex-start; gap: 7px; font-size: 0.75rem; color: var(--text3); line-height: 1.5; margin-top: 12px; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; }
+
+/* form actions */
+.form-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 8px; }
+.btn-cancel { padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border); background: transparent; font-size: 0.85rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; }
+.btn-submit { display: flex; align-items: center; gap: 8px; padding: 9px 22px; border-radius: 10px; background: var(--red); color: #fff; font-size: 0.85rem; font-weight: 600; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.15s; }
+.btn-submit:hover { background: #b91c1c; }
+.btn-submit:disabled { background: var(--border); color: var(--text3); cursor: default; }
+
+/* ── MODAL ── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(15,33,83,0.45); display: flex; align-items: center; justify-content: center; z-index: 999; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 24px 28px; max-width: 480px; width: 100%; transform: translateY(10px); transition: transform 0.2s; box-shadow: 0 20px 60px rgba(15,33,83,0.15); }
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
+.modal-sub   { font-size: 0.8rem; color: var(--text3); margin-bottom: 18px; }
+.modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.btn-modal-cancel  { padding: 8px 16px; border-radius: 9px; border: 1px solid var(--border); background: transparent; font-size: 0.82rem; cursor: pointer; color: var(--text2); font-family: 'DM Sans', sans-serif; }
+.btn-modal-danger  { padding: 8px 16px; border-radius: 9px; border: none; background: var(--red);   color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-modal-primary { padding: 8px 16px; border-radius: 9px; border: none; background: var(--blue2); color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+/* commit modal specifics */
+.commit-modal { max-width: 520px; }
+.commit-target-info { padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 16px; }
+.commit-target-info .coord { font-family: monospace; font-size: 0.9rem; font-weight: 700; }
+.commit-target-info .vname { font-size: 0.8rem; color: var(--text2); margin-top: 2px; }
+.commit-type-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 600; padding: 2px 9px; border-radius: 100px; margin-top: 6px; }
+.commit-type-badge.real { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.commit-type-badge.fake { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.send-time-hint { padding: 10px 14px; background: var(--orange-bg); border: 1px solid var(--orange-border); border-radius: 10px; margin-bottom: 16px; font-size: 0.8rem; color: var(--orange); }
+.send-time-hint strong { display: block; font-size: 1rem; margin-bottom: 2px; font-family: 'Space Grotesk', sans-serif; }
+.troops-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; margin-top: 8px; }
+.troop-input-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; }
+.troop-sprite { width: 26px; height: 26px; flex-shrink: 0; }
+.troop-name-small { font-size: 0.65rem; color: var(--text3); text-align: center; line-height: 1.2; }
+.troop-count-input { width: 100%; padding: 4px 6px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.8rem; text-align: center; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--surface); }
+.troop-count-input:focus { outline: none; border-color: var(--blue2); }
+.village-select-field { margin-bottom: 14px; }
+
+/* ── TOAST ── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 500; background: var(--navy); color: #fff; box-shadow: 0 8px 24px rgba(15,33,83,0.2); animation: toastIn 0.25s ease; display: flex; align-items: center; gap: 8px; min-width: 200px; }
+.toast.success { background: var(--green); }
+.toast.error   { background: var(--red); }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+
+@media (max-width: 600px) {
+  .card-top { flex-direction: column; }
+  .card-actions-row { flex-direction: column; align-items: flex-start; }
+  .toolbar { flex-direction: column; align-items: flex-start; }
+  .target-row-header { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div id="navbar-root"></div>
+
+<div class="page-header" id="pageHeader">
+  <div class="breadcrumb">
+    <a href="/">Home</a><span class="breadcrumb-sep">›</span>
+    <a href="/alliance/workspace/">Alliance</a><span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current" id="bcCurrent">Attack Plan</span>
+  </div>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">⚔️</div>
+      <div>
+        <div class="page-title" id="pageTitle">Attack Plan</div>
+        <div class="page-subtitle" id="pageSubtitle">Coordinate alliance attacks</div>
+      </div>
+    </div>
+    <div class="page-badges" id="pageBadges">
+      <span class="page-badge free">FREE VIEW</span>
+      <span class="page-badge coord">COORD CREATE</span>
+    </div>
+  </div>
+</div>
+
+<div id="alliance-layout">
+  <div id="alliance-nav-root"></div>
+  <main id="alliance-main">
+    <div class="page-wrap">
+
+      <!-- ── GATES ── -->
+      <div id="gateAuth" class="gate" style="display:none">
+        <div class="gate-icon">🔐</div>
+        <h3>Login required</h3>
+        <p>You need to be logged in and part of an alliance workspace to view attack plans.</p>
+        <a href="/login/" class="btn-gate">Log In / Sign Up</a>
+      </div>
+
+      <div id="gateWorkspace" class="gate" style="display:none">
+        <div class="gate-icon">🏰</div>
+        <h3>No active workspace</h3>
+        <p>Select or create an alliance workspace first.</p>
+        <a href="/alliance/workspace/" class="btn-gate">Go to Workspace</a>
+      </div>
+
+      <div id="gateAccess" class="gate" style="display:none">
+        <div class="gate-icon">🚫</div>
+        <h3>Access denied</h3>
+        <p>Only coordinators and founders can create attack plans.</p>
+        <a href="/alliance/coordinate-attack/" class="btn-gate">Back to Attack Plan</a>
+      </div>
+
+      <!-- ══════════════════════════════════
+           LIST VIEW
+      ══════════════════════════════════ -->
+      <div id="viewList" style="display:none">
+        <div class="toolbar">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="active"  onclick="switchTab('active')">Active</button>
+            <button class="tab-btn"        data-tab="history" onclick="switchTab('history')">History</button>
+          </div>
+          <button class="btn-new hidden" id="btnNew" onclick="goCreate()">⚔️ New Attack Plan</button>
+        </div>
+
+        <div id="tabActive">
+          <div id="listActive" class="plan-list">
+            <div class="plan-card skeleton" style="height:120px"></div>
+            <div class="plan-card skeleton" style="height:120px;animation-delay:.1s"></div>
+          </div>
+        </div>
+
+        <div id="tabHistory" style="display:none">
+          <div class="history-note">📋 Showing plans closed in the last 30 days.</div>
+          <div id="listHistory" class="plan-list"></div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════
+           CREATE VIEW
+      ══════════════════════════════════ -->
+      <div id="viewCreate" style="display:none">
+
+        <!-- Row 1: Plan Info -->
+        <div class="form-grid">
+          <div class="form-section" style="margin-bottom:0">
+            <div class="section-title">📋 Plan Info</div>
+            <div class="field">
+              <label>Operation Title</label>
+              <input type="text" id="inputTitle" placeholder="e.g. Op Nightfall — June 14">
+            </div>
+            <div class="field">
+              <label>Landing ETA</label>
+              <input type="datetime-local" id="inputEta">
+              <div class="hint">All attacks in this plan should land at this time. Members calculate their own send time.</div>
+            </div>
+            <div class="field">
+              <label>Note for Members <span class="opt">(optional)</span></label>
+              <textarea id="inputNote" rows="2" style="resize:vertical" placeholder="Tactical notes, priority targets, etc…"></textarea>
+            </div>
+          </div>
+
+          <div class="form-section" style="margin-bottom:0">
+            <div class="section-title">🎯 Add Attack Targets</div>
+            <div class="target-builder">
+              <div class="target-input-row">
+                <div class="field" style="margin-bottom:0">
+                  <label>X</label>
+                  <input type="number" id="newTargetX" placeholder="-131" oninput="resolveNewTarget()">
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <label>Y</label>
+                  <input type="number" id="newTargetY" placeholder="177" oninput="resolveNewTarget()">
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <label>Attack Type</label>
+                  <div class="attack-type-toggle">
+                    <button class="atk-type-btn real selected" id="btnTypeReal" onclick="selectNewTargetType('real')">⚔️ Real</button>
+                    <button class="atk-type-btn fake"          id="btnTypeFake" onclick="selectNewTargetType('fake')">🎭 Fake</button>
+                  </div>
+                </div>
+                <div class="field" style="margin-bottom:0">
+                  <label>Note <span class="opt">(opt)</span></label>
+                  <input type="text" id="newTargetNote" placeholder="e.g. Main off">
+                </div>
+                <div class="field" style="margin-bottom:0; align-self:flex-end">
+                  <button class="btn-add-target" onclick="addTarget()">＋ Add</button>
+                </div>
+              </div>
+              <div class="target-add-resolve" id="newTargetResolve"></div>
+            </div>
+
+            <div class="target-build-list" id="targetBuildList">
+              <div style="text-align:center;padding:20px;color:var(--text3);font-size:0.8rem">No targets added yet. Add at least one target above.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proximity Table -->
+        <div class="prox-section" id="proxSection">
+          <div class="prox-header">
+            <div class="prox-title">📡 Member Proximity to Last Target</div>
+            <div class="prox-target" id="proxTargetLabel"></div>
+          </div>
+          <div id="proxTableWrap"></div>
+          <div class="prox-note">
+            ℹ️ Distances use Chebyshev (Travian standard). Use as a guide for who is best placed to hit each target.
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="goList()">Cancel</button>
+          <button class="btn-submit" id="btnSubmit" onclick="submitPlan()">⚔️ Create Attack Plan</button>
+        </div>
+
+      </div><!-- /viewCreate -->
+
+    </div><!-- /page-wrap -->
+  </main>
+</div>
+
+<!-- Close plan modal -->
+<div class="modal-overlay" id="modalClose">
+  <div class="modal">
+    <div class="modal-title" id="modalCloseTitle">Close this plan?</div>
+    <div class="modal-sub">The plan will be marked as closed. Members will no longer be able to commit to targets.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modalClose')">Cancel</button>
+      <button class="btn-modal-danger" id="modalCloseConfirm">Close Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Commit modal -->
+<div class="modal-overlay" id="modalCommit">
+  <div class="modal commit-modal">
+    <div class="modal-title" id="commitModalTitle">Commit to Target</div>
+    <div class="modal-sub" id="commitModalSub"></div>
+
+    <div class="commit-target-info" id="commitTargetInfo"></div>
+
+    <div id="sendTimeHintWrap"></div>
+
+    <div class="village-select-field">
+      <div class="field" style="margin-bottom:0">
+        <label>Your attacking village</label>
+        <select id="commitVillageSelect" onchange="onCommitVillageChange()">
+          <option value="">— Select village —</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="troopsSection" style="display:none">
+      <div style="font-size:0.75rem;font-weight:600;color:var(--text2);margin-bottom:6px;">Troops to send <span style="font-weight:400;color:var(--text3)">(optional — real attack)</span></div>
+      <div class="troops-grid" id="troopsGrid"></div>
+    </div>
+
+    <div class="field" style="margin-top:12px;margin-bottom:0">
+      <label>Note <span class="opt">(optional)</span></label>
+      <input type="text" id="commitNote" placeholder="e.g. catapult on granary">
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeModal('modalCommit')">Cancel</button>
+      <button class="btn-modal-primary" id="btnCommitSave" onclick="submitCommit()">Confirm Commit</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/data/troops.js"></script>
+<script src="/navbar.js"></script>
+<script src="/alliance-nav.js"></script>
+
+<script>
+/* ════════════════════════════════════════
+   CONSTANTS & STATE
+════════════════════════════════════════ */
+const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+
+let currentUser = null;
+let currentWs   = null;
+let userRole    = null;
+let isCoord     = false;
+let members     = [];
+let troopRows   = [];
+let activePlans = [];
+let historyPlans = [];
+
+// commitments keyed by target_id
+let commitsByTarget = {};
+
+// create form state
+let newTargetType      = 'real';
+let pendingTargets     = [];   // [{x,y,map_id,village_name,player_name,alliance_tag,attack_type,note}]
+let newTargetResolved  = null; // resolved data for current input
+
+// commit modal state
+let commitTargetId   = null;
+let commitPlanId     = null;
+let commitTargetType = 'real';
+let commitEta        = null;
+
+/* ════════════════════════════════════════
+   ROUTING
+════════════════════════════════════════ */
+function getAction() { return new URLSearchParams(location.search).get('action'); }
+function goCreate() { history.pushState({}, '', '?action=create'); showCreate(); }
+function goList()   { history.pushState({}, '', location.pathname); showList(); }
+window.addEventListener('popstate', () => { getAction() === 'create' ? showCreate() : showList(); });
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+async function init() {
+  const user = await window.getUser?.();
+  if (!user) { showGate('gateAuth'); return; }
+  currentUser = user;
+
+  const wsRaw = sessionStorage.getItem('tt_active_workspace');
+  if (!wsRaw) { showGate('gateWorkspace'); return; }
+  currentWs = JSON.parse(wsRaw);
+
+  const { data: mem } = await _supabase
+    .from('workspace_members')
+    .select('role, player_name')
+    .eq('workspace_id', currentWs.id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!mem) { showGate('gateWorkspace'); return; }
+
+  userRole = mem.role;
+  isCoord  = ['founder', 'coordinator'].includes(userRole);
+
+  await loadMembers();
+  await loadTroops();
+
+  if (getAction() === 'create') {
+    if (!isCoord) { showGate('gateAccess'); return; }
+    showCreate();
+  } else {
+    showList();
+  }
+}
+
+/* ════════════════════════════════════════
+   DATA LOADING
+════════════════════════════════════════ */
+async function loadMembers() {
+  const { data } = await _supabase
+    .from('workspace_members')
+    .select('user_id, role, player_name')
+    .eq('workspace_id', currentWs.id);
+  members = data || [];
+}
+
+async function loadTroops() {
+  const { data } = await _supabase
+    .from('workspace_troops')
+    .select('user_id, village_name, village_x, village_y, tribe')
+    .eq('workspace_id', currentWs.id);
+  troopRows = data || [];
+}
+
+async function loadPlans() {
+  const { data: plans, error } = await _supabase
+    .from('attack_plans')
+    .select('*')
+    .eq('workspace_id', currentWs.id)
+    .order('created_at', { ascending: false });
+
+  if (error) { showToast('Failed to load plans', 'error'); return; }
+
+  // Auto-close plans past ETA
+  const now = new Date().toISOString();
+  const expired = (plans || []).filter(p => p.status === 'active' && p.eta && p.eta < now);
+  for (const p of expired) {
+    await _supabase.from('attack_plans').update({ status: 'closed' }).eq('id', p.id);
+    p.status = 'closed';
+  }
+
+  activePlans  = (plans || []).filter(p => p.status === 'active');
+  historyPlans = (plans || []).filter(p => p.status === 'closed');
+
+  // Load targets for all plans
+  const allIds = (plans || []).map(p => p.id);
+  let targets = [];
+  if (allIds.length > 0) {
+    const { data: t } = await _supabase
+      .from('attack_targets')
+      .select('*')
+      .in('plan_id', allIds);
+    targets = t || [];
+  }
+
+  // Load commitments for active targets
+  const activeTargetIds = targets
+    .filter(t => activePlans.find(p => p.id === t.plan_id))
+    .map(t => t.id);
+
+  commitsByTarget = {};
+  if (activeTargetIds.length > 0) {
+    const { data: coms } = await _supabase
+      .from('attack_commitments')
+      .select('*')
+      .in('target_id', activeTargetIds);
+    (coms || []).forEach(c => {
+      if (!commitsByTarget[c.target_id]) commitsByTarget[c.target_id] = [];
+      commitsByTarget[c.target_id].push(c);
+    });
+  }
+
+  // Attach targets to plans
+  activePlans.forEach(p  => { p._targets = targets.filter(t => t.plan_id === p.id); });
+  historyPlans.forEach(p => { p._targets = targets.filter(t => t.plan_id === p.id); });
+
+  renderPlanList('listActive',  activePlans);
+  renderPlanList('listHistory', historyPlans);
+}
+
+/* ════════════════════════════════════════
+   VIEW SWITCHING
+════════════════════════════════════════ */
+function showGate(id) {
+  ['gateAuth','gateWorkspace','gateAccess','viewList','viewCreate'].forEach(el => {
+    const e = document.getElementById(el);
+    if (e) e.style.display = el === id ? '' : 'none';
+  });
+}
+
+function showList() {
+  ['gateAuth','gateWorkspace','gateAccess','viewCreate'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.style.display = 'none';
+  });
+  document.getElementById('viewList').style.display = '';
+  document.getElementById('bcCurrent').textContent   = 'Attack Plan';
+  document.getElementById('pageTitle').textContent    = 'Attack Plan';
+  document.getElementById('pageSubtitle').textContent = 'Coordinate alliance attacks';
+  document.getElementById('pageBadges').style.display = '';
+  if (isCoord) document.getElementById('btnNew').classList.remove('hidden');
+  loadPlans();
+}
+
+function showCreate() {
+  ['gateAuth','gateWorkspace','gateAccess','viewList'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.style.display = 'none';
+  });
+  document.getElementById('viewCreate').style.display = '';
+  document.getElementById('bcCurrent').textContent    = 'New Attack Plan';
+  document.getElementById('pageTitle').textContent    = 'Create Attack Plan';
+  document.getElementById('pageSubtitle').textContent = 'Coordinator & founder only';
+  document.getElementById('pageBadges').style.display = 'none';
+
+  // Reset form state
+  pendingTargets    = [];
+  newTargetResolved = null;
+  document.getElementById('inputTitle').value = '';
+  document.getElementById('inputEta').value   = '';
+  document.getElementById('inputNote').value  = '';
+  document.getElementById('newTargetX').value = '';
+  document.getElementById('newTargetY').value = '';
+  document.getElementById('newTargetNote').value = '';
+  document.getElementById('newTargetResolve').innerHTML = '';
+  selectNewTargetType('real');
+  renderTargetBuildList();
+}
+
+/* ════════════════════════════════════════
+   LIST — RENDER
+════════════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('tabActive').style.display  = tab === 'active'  ? '' : 'none';
+  document.getElementById('tabHistory').style.display = tab === 'history' ? '' : 'none';
+}
+
+function renderPlanList(containerId, plans) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (plans.length === 0) {
+    el.innerHTML = `<div class="empty-state">
+      <div class="empty-state-icon">⚔️</div>
+      <h3>${containerId === 'listActive' ? 'No active attack plans' : 'No history yet'}</h3>
+      <p>${containerId === 'listActive' ? 'No attack plans have been created yet.' : 'Closed plans will appear here.'}</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = plans.map(renderCard).join('');
+}
+
+function renderCard(plan) {
+  const targets  = plan._targets || [];
+  const minsLeft = plan.eta ? getMinutesLeft(plan.eta) : Infinity;
+  const isUrgent = minsLeft < 120 && minsLeft > 0;
+  const isDimmed = plan.status === 'closed';
+  const creatorName = members.find(m => m.user_id === plan.created_by)?.player_name || '—';
+
+  // Target strip pills
+  const pillsHtml = targets.map(t => `
+    <span class="target-pill">
+      <span class="pill-dot ${t.attack_type}"></span>
+      ${t.target_x}|${t.target_y}
+      <span style="opacity:0.55">${t.attack_type === 'real' ? '⚔️' : '🎭'}</span>
+    </span>`).join('');
+
+  // ETA
+  let etaHtml = '';
+  if (plan.eta) {
+    const past  = minsLeft <= 0;
+    const label = past ? 'Landed' : 'Landing in';
+    const val   = past
+      ? new Date(plan.eta).toLocaleString('en-GB', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })
+      : formatCountdown(minsLeft);
+    etaHtml = `<div class="card-right">
+      <div class="eta-label">${label}</div>
+      <div class="eta-value${minsLeft > 120 ? ' safe' : ''}">${val}</div>
+    </div>`;
+  }
+
+  // Stats
+  const realTargets = targets.filter(t => t.attack_type === 'real').length;
+  const fakeTargets = targets.filter(t => t.attack_type === 'fake').length;
+  const totalCommits = targets.reduce((s, t) => s + (commitsByTarget[t.id]?.length || 0), 0);
+
+  const statsHtml = `
+    <div class="card-stats">
+      ${realTargets > 0 ? `<span class="stat-item"><span class="stat-dot real"></span><b>${realTargets}</b> real</span>` : ''}
+      ${fakeTargets > 0 ? `<span class="stat-item"><span class="stat-dot fake"></span><b>${fakeTargets}</b> fake</span>` : ''}
+      <span class="stat-item">👥 <b>${totalCommits}</b> committed</span>
+    </div>`;
+
+  // Action buttons
+  const moreBtn = isCoord && !isDimmed
+    ? `<button class="btn-icon" title="Close plan" onclick="openCloseModal('${plan.id}','${escHtml(plan.title || 'Attack Plan')}')">⋯</button>`
+    : '';
+
+  const expandBtn = !isDimmed
+    ? `<button class="btn-expand" onclick="toggleTargets('${plan.id}')">Join Plan ▾</button>`
+    : '';
+
+  return `
+<div class="plan-card${isUrgent ? ' urgent' : ''}${isDimmed ? ' dimmed' : ''}" id="card-${plan.id}">
+  <div class="card-header" onclick="toggleTargets('${plan.id}')">
+    <div class="card-top">
+      <div class="card-left">
+        <div class="card-icon">⚔️</div>
+        <div>
+          <div class="card-title">${escHtml(plan.title || 'Attack Plan')}</div>
+          <div class="card-meta">
+            <span class="badge badge-${plan.status}">${plan.status === 'active' ? 'Active' : 'Closed'}</span>
+            <span style="font-size:.72rem;color:var(--text3)">${targets.length} target${targets.length !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="creator-meta">By ${escHtml(creatorName)} · ${relativeTime(plan.created_at)}</div>
+        </div>
+      </div>
+      ${etaHtml}
+    </div>
+  </div>
+
+  ${pillsHtml ? `<div class="target-strip">${pillsHtml}</div>` : ''}
+
+  <div class="card-actions-row">
+    ${statsHtml}
+    <div class="card-btns">${moreBtn}${expandBtn}</div>
+  </div>
+
+  <div class="targets-wrap" id="targets-${plan.id}">
+    ${targets.map(t => renderTargetRow(t, plan, isDimmed)).join('') || '<div style="padding:16px 20px;color:var(--text3);font-size:0.8rem">No targets in this plan.</div>'}
+  </div>
+</div>`;
+}
+
+function renderTargetRow(target, plan, isDimmed) {
+  const coms     = commitsByTarget[target.id] || [];
+  const myComs   = coms.filter(c => c.user_id === currentUser?.id);
+  const myCommit = myComs.length > 0;
+
+  // Proximity hint (user's closest village)
+  let proxHtml = '';
+  const myVillages = troopRows.filter(t => t.user_id === currentUser?.id && t.village_x != null);
+  if (myVillages.length > 0 && target.target_x != null) {
+    const best = myVillages.reduce((b, v) => {
+      const d = chebyshev(target.target_x, target.target_y, v.village_x, v.village_y);
+      return d < b.dist ? { ...v, dist: d } : b;
+    }, { dist: Infinity });
+    if (best.dist < Infinity) {
+      proxHtml = `<div class="proximity-hint">📍 Closest: ${escHtml(best.village_name)} (${best.dist} tiles)</div>`;
+
+      // send time hint if plan has ETA
+      if (plan.eta) {
+        const etaMs  = new Date(plan.eta).getTime();
+        const travelSec = Math.ceil(best.dist * 3600 / getTroopSpeed(best.tribe));
+        const sendMs = etaMs - travelSec * 1000;
+        const sendIn = Math.floor((sendMs - Date.now()) / 60000);
+        if (sendIn > 0) {
+          const h = Math.floor(sendIn / 60), m = sendIn % 60;
+          proxHtml += `<div class="send-hint">⏱ Send in ${h > 0 ? h + 'h ' : ''}${m}m (based on fastest village)</div>`;
+        }
+      }
+    }
+  }
+
+  // Commit chips
+  const chipsHtml = coms.length > 0
+    ? `<div class="commit-chips">${coms.slice(0,6).map(c => {
+        const name = members.find(m => m.user_id === c.user_id)?.player_name || 'Member';
+        const me   = c.user_id === currentUser?.id;
+        return `<span class="commit-chip${me ? ' mine' : ''}">
+          <span class="chip-dot ${c.attack_type || target.attack_type}"></span>
+          ${escHtml(c.village_name || name)}${me ? ' (you)' : ''}
+        </span>`;
+      }).join('')}${coms.length > 6 ? `<span style="font-size:.72rem;color:var(--text3)">+${coms.length-6}</span>` : ''}</div>`
+    : `<div class="commit-empty">No commitments yet — be the first!</div>`;
+
+  // Send link (Travian Rally Point)
+  const serverDomain = (currentWs?.server || 'ts5') + '.x1.asia.travian.com';
+  const sendUrl = target.target_map_id
+    ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=4&targetMapId=${target.target_map_id}`
+    : null;
+  const sendBtn = sendUrl
+    ? `<a href="${sendUrl}" target="_blank" class="btn-send-atk">🏹 Send Attack</a>`
+    : `<button class="btn-send-atk" onclick="copyCoord(${target.target_x},${target.target_y})">📋 ${target.target_x}|${target.target_y}</button>`;
+
+  const commitBtn = !isDimmed
+    ? myCommit
+      ? `<button class="btn-commit-atk committed" onclick="openCommitModal('${target.id}','${plan.id}','${plan.eta || ''}')">✓ Committed</button>`
+      : `<button class="btn-commit-atk" onclick="openCommitModal('${target.id}','${plan.id}','${plan.eta || ''}')">Commit</button>`
+    : '';
+
+  return `
+<div class="target-row" id="trow-${target.id}">
+  <div class="target-row-header">
+    <div class="target-info">
+      <span class="target-coord" onclick="copyCoord(${target.target_x},${target.target_y})" title="Click to copy">${target.target_x}|${target.target_y}</span>
+      <span class="badge badge-${target.attack_type}">${target.attack_type === 'real' ? '⚔️ Real' : '🎭 Fake'}</span>
+      ${target.village_name ? `<span class="target-name">${escHtml(target.village_name)}</span>` : ''}
+      ${target.player_name  ? `<span class="target-player">👤 ${escHtml(target.player_name)}${target.alliance_tag ? ` [${escHtml(target.alliance_tag)}]` : ''}</span>` : ''}
+      ${target.notes        ? `<span style="font-size:.72rem;color:var(--text3);font-style:italic">${escHtml(target.notes)}</span>` : ''}
+    </div>
+    <div class="target-actions">
+      ${sendBtn}
+      ${commitBtn}
+    </div>
+  </div>
+  <div class="target-commits">${chipsHtml}</div>
+  ${proxHtml}
+</div>`;
+}
+
+function toggleTargets(planId) {
+  const el = document.getElementById(`targets-${planId}`);
+  if (!el) return;
+  el.classList.toggle('open');
+  // Update button text
+  const btn = document.querySelector(`#card-${planId} .btn-expand`);
+  if (btn) btn.textContent = el.classList.contains('open') ? 'Collapse ▴' : 'Join Plan ▾';
+}
+
+/* ════════════════════════════════════════
+   COMMIT MODAL
+════════════════════════════════════════ */
+function openCommitModal(targetId, planId, eta) {
+  // Find target data
+  const allTargets = [...activePlans, ...historyPlans].flatMap(p => p._targets || []);
+  const target = allTargets.find(t => t.id === targetId);
+  if (!target) return;
+
+  commitTargetId   = targetId;
+  commitPlanId     = planId;
+  commitTargetType = target.attack_type;
+  commitEta        = eta || null;
+
+  document.getElementById('commitModalTitle').textContent = `Commit to ${target.target_x}|${target.target_y}`;
+  document.getElementById('commitModalSub').textContent   = `Attack type: ${target.attack_type === 'real' ? 'Real attack' : 'Fake attack'}`;
+
+  // Target info panel
+  document.getElementById('commitTargetInfo').innerHTML = `
+    <div class="coord">${target.target_x}|${target.target_y}</div>
+    ${target.village_name ? `<div class="vname">${escHtml(target.village_name)}${target.player_name ? ` — 👤 ${escHtml(target.player_name)}` : ''}</div>` : ''}
+    <span class="commit-type-badge ${target.attack_type}">${target.attack_type === 'real' ? '⚔️ Real Attack' : '🎭 Fake Attack'}</span>
+  `;
+
+  // Populate village select
+  const myVillages = troopRows.filter(t => t.user_id === currentUser?.id);
+  const sel = document.getElementById('commitVillageSelect');
+  sel.innerHTML = '<option value="">— Select your village —</option>';
+  myVillages.forEach(v => {
+    const d = (v.village_x != null && target.target_x != null)
+      ? chebyshev(target.target_x, target.target_y, v.village_x, v.village_y)
+      : null;
+    const opt = document.createElement('option');
+    opt.value = JSON.stringify({ name: v.village_name, x: v.village_x, y: v.village_y, tribe: v.tribe });
+    opt.textContent = d != null ? `${v.village_name} (${d} tiles)` : v.village_name;
+    sel.appendChild(opt);
+  });
+
+  // Reset fields
+  document.getElementById('commitNote').value = '';
+  document.getElementById('sendTimeHintWrap').innerHTML = '';
+  document.getElementById('troopsSection').style.display = target.attack_type === 'real' ? '' : 'none';
+  if (target.attack_type === 'real') buildTroopsGrid(null);
+
+  document.getElementById('modalCommit').classList.add('open');
+}
+
+function onCommitVillageChange() {
+  const raw = document.getElementById('commitVillageSelect').value;
+  if (!raw) { document.getElementById('sendTimeHintWrap').innerHTML = ''; return; }
+  const v = JSON.parse(raw);
+
+  // Show troop grid for user's tribe
+  if (commitTargetType === 'real') buildTroopsGrid(v.tribe);
+
+  // Send time hint
+  if (commitEta && v.x != null) {
+    const allTargets = [...activePlans, ...historyPlans].flatMap(p => p._targets || []);
+    const target     = allTargets.find(t => t.id === commitTargetId);
+    if (!target) return;
+    const dist       = chebyshev(target.target_x, target.target_y, v.x, v.y);
+    const speed      = getTroopSpeed(v.tribe);
+    const travelSec  = Math.ceil(dist * 3600 / speed);
+    const etaMs      = new Date(commitEta).getTime();
+    const sendMs     = etaMs - travelSec * 1000;
+    const sendDate   = new Date(sendMs);
+    const diff       = Math.floor((sendMs - Date.now()) / 60000);
+    const sendStr    = sendDate.toLocaleString('en-GB', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const wrap       = document.getElementById('sendTimeHintWrap');
+    if (diff > 0) {
+      const h = Math.floor(diff/60), m = diff % 60;
+      wrap.innerHTML = `<div class="send-time-hint">
+        <strong>⏱ Send by: ${sendStr}</strong>
+        ${h > 0 ? h + 'h ' : ''}${m}m from now · ${dist} tiles · based on slowest infantry speed
+      </div>`;
+    } else {
+      wrap.innerHTML = `<div class="send-time-hint" style="background:var(--red-bg);border-color:var(--red-border);color:var(--red)">
+        <strong>⚠️ Too late to send from this village</strong>
+        Attack would land ${Math.abs(diff)}m after ETA
+      </div>`;
+    }
+  }
+}
+
+function buildTroopsGrid(tribe) {
+  const grid = document.getElementById('troopsGrid');
+  grid.innerHTML = '';
+  if (!window.TT) return;
+
+  const tribes = tribe
+    ? [tribe]
+    : ['roman','teuton','gaul','egyptian','hun'];
+
+  tribes.forEach(tr => {
+    (TT.troopsByTribe[tr] || [])
+      .filter(u => !u.isNPC && !u.isHero && u.stats.attack > 0)
+      .forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'troop-input-item';
+        const spriteStyle = TT.getSpriteStyle?.(u.class_id) || '';
+        item.innerHTML = `
+          <div class="troop-sprite" style="${spriteStyle}" title="${u.name}"></div>
+          <div class="troop-name-small">${u.name}</div>
+          <input class="troop-count-input" type="number" min="0" placeholder="0" data-unit="${u.class_id}" data-tribe="${tr}">
+        `;
+        grid.appendChild(item);
+      });
+  });
+}
+
+async function submitCommit() {
+  const villageRaw = document.getElementById('commitVillageSelect').value;
+  if (!villageRaw) { showToast('Select a village first', 'error'); return; }
+  const village = JSON.parse(villageRaw);
+
+  // Collect troops if real
+  let troops = null;
+  if (commitTargetType === 'real') {
+    troops = {};
+    document.querySelectorAll('#troopsGrid .troop-count-input').forEach(inp => {
+      const v = parseInt(inp.value);
+      if (v > 0) troops[inp.dataset.unit] = v;
+    });
+    if (Object.keys(troops).length === 0) troops = null;
+  }
+
+  const note = document.getElementById('commitNote').value || null;
+
+  const btn = document.getElementById('btnCommitSave');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  // Upsert — unique(target_id, user_id, village_name)
+  const { error } = await _supabase.from('attack_commitments').upsert({
+    target_id:   commitTargetId,
+    user_id:     currentUser.id,
+    village_name: village.name,
+    village_x:   village.x,
+    village_y:   village.y,
+    attack_type: commitTargetType,
+    troops:      troops,
+    note:        note,
+    committed_at: new Date().toISOString(),
+  }, { onConflict: 'target_id,user_id,village_name' });
+
+  btn.disabled = false; btn.textContent = 'Confirm Commit';
+
+  if (error) { showToast('Failed to save commit: ' + error.message, 'error'); return; }
+  showToast('Committed! ⚔️', 'success');
+  closeModal('modalCommit');
+  await loadPlans();
+}
+
+/* ════════════════════════════════════════
+   COORDINATOR ACTIONS
+════════════════════════════════════════ */
+function openCloseModal(planId, title) {
+  document.getElementById('modalCloseTitle').textContent = `Close "${title}"?`;
+  document.getElementById('modalCloseConfirm').onclick = async () => {
+    await _supabase.from('attack_plans').update({ status: 'closed' }).eq('id', planId);
+    closeModal('modalClose');
+    showToast('Plan closed', 'success');
+    await loadPlans();
+  };
+  document.getElementById('modalClose').classList.add('open');
+}
+
+/* ════════════════════════════════════════
+   CREATE — TARGET INPUT
+════════════════════════════════════════ */
+let resolveTimer = null;
+
+function resolveNewTarget() {
+  clearTimeout(resolveTimer);
+  newTargetResolved = null;
+  const x = parseInt(document.getElementById('newTargetX').value);
+  const y = parseInt(document.getElementById('newTargetY').value);
+  if (isNaN(x) || isNaN(y)) { document.getElementById('newTargetResolve').innerHTML = ''; return; }
+
+  document.getElementById('newTargetResolve').innerHTML =
+    `<span class="resolve-chip loading">⏳ Resolving…</span>`;
+
+  resolveTimer = setTimeout(async () => {
+    try {
+      const server = (currentWs?.server || 'ts5').split('.')[0];
+      const res    = await fetch(`${API_BASE}/api/village-by-coord?server=${server}&x=${x}&y=${y}`);
+      const data   = await res.json();
+      if (data?.mapid) {
+        newTargetResolved = { x, y, map_id: data.mapid, village_name: data.village_name || '', player_name: data.player_name || '', alliance_tag: data.alliance_tag || '' };
+        document.getElementById('newTargetResolve').innerHTML =
+          `<span class="resolve-chip ok">✓ ${escHtml(data.village_name || `${x}|${y}`)} — ${escHtml(data.player_name || 'Unknown')}</span>`;
+        renderProximityTable(x, y);
+      } else {
+        newTargetResolved = { x, y, map_id: null, village_name: '', player_name: '', alliance_tag: '' };
+        document.getElementById('newTargetResolve').innerHTML =
+          `<span class="resolve-chip error">⚠️ Village not found — will add coords only</span>`;
+      }
+    } catch {
+      newTargetResolved = { x, y, map_id: null, village_name: '', player_name: '', alliance_tag: '' };
+      document.getElementById('newTargetResolve').innerHTML =
+        `<span class="resolve-chip error">⚠️ Lookup failed — coords saved</span>`;
+    }
+  }, 600);
+}
+
+function selectNewTargetType(type) {
+  newTargetType = type;
+  document.getElementById('btnTypeReal').classList.toggle('selected', type === 'real');
+  document.getElementById('btnTypeFake').classList.toggle('selected', type === 'fake');
+}
+
+function addTarget() {
+  const x = parseInt(document.getElementById('newTargetX').value);
+  const y = parseInt(document.getElementById('newTargetY').value);
+  if (isNaN(x) || isNaN(y)) { showToast('Enter valid coordinates', 'error'); return; }
+
+  // Check duplicate
+  if (pendingTargets.find(t => t.x === x && t.y === y)) {
+    showToast(`${x}|${y} is already in the list`, 'error'); return;
+  }
+
+  const resolved = newTargetResolved && newTargetResolved.x === x && newTargetResolved.y === y
+    ? newTargetResolved : { x, y, map_id: null, village_name: '', player_name: '', alliance_tag: '' };
+
+  pendingTargets.push({
+    ...resolved,
+    attack_type: newTargetType,
+    note: document.getElementById('newTargetNote').value || '',
+  });
+
+  // Reset input
+  document.getElementById('newTargetX').value    = '';
+  document.getElementById('newTargetY').value    = '';
+  document.getElementById('newTargetNote').value = '';
+  document.getElementById('newTargetResolve').innerHTML = '';
+  newTargetResolved = null;
+
+  renderTargetBuildList();
+  showToast(`Target ${x}|${y} added`, 'success');
+}
+
+function removeTarget(idx) {
+  pendingTargets.splice(idx, 1);
+  renderTargetBuildList();
+}
+
+function renderTargetBuildList() {
+  const el = document.getElementById('targetBuildList');
+  if (pendingTargets.length === 0) {
+    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:0.8rem">No targets added yet. Add at least one target above.</div>`;
+    return;
+  }
+  el.innerHTML = pendingTargets.map((t, i) => `
+    <div class="target-build-item">
+      <span class="tbi-coord">${t.x}|${t.y}</span>
+      ${t.village_name ? `<span class="tbi-name">${escHtml(t.village_name)}${t.player_name ? ` — ${escHtml(t.player_name)}` : ''}</span>` : '<span class="tbi-name" style="color:var(--text3)">Unknown village</span>'}
+      <span class="tbi-type ${t.attack_type}">${t.attack_type === 'real' ? '⚔️ Real' : '🎭 Fake'}</span>
+      ${t.note ? `<span class="tbi-note">${escHtml(t.note)}</span>` : ''}
+      <button class="btn-tbi-del" onclick="removeTarget(${i})" title="Remove">✕</button>
+    </div>`).join('');
+}
+
+/* ════════════════════════════════════════
+   CREATE — PROXIMITY TABLE
+════════════════════════════════════════ */
+function renderProximityTable(tx, ty) {
+  const memberMap = {};
+  members.forEach(m => { memberMap[m.user_id] = m.player_name || 'Unknown'; });
+
+  const byMember = {};
+  troopRows.forEach(v => {
+    if (v.village_x == null) return;
+    const d = chebyshev(tx, ty, v.village_x, v.village_y);
+    if (!byMember[v.user_id] || d < byMember[v.user_id].dist) {
+      byMember[v.user_id] = { ...v, dist: d };
+    }
+  });
+
+  const sorted = Object.values(byMember).sort((a, b) => a.dist - b.dist);
+  const maxDist = sorted.length > 0 ? sorted[sorted.length - 1].dist : 1;
+
+  const rows = sorted.map((v, i) => {
+    const isMe = v.user_id === currentUser?.id;
+    const pct  = Math.round(v.dist / Math.max(maxDist, 1) * 100);
+    return `<tr class="${isMe ? 'highlight' : ''}">
+      <td><span class="rank-badge ${i === 0 ? 'rank-1' : 'rank-n'}">${i+1}</span></td>
+      <td>${escHtml(memberMap[v.user_id] || 'Unknown')}${isMe ? ' <span class="you-chip" style="font-size:.65rem;padding:1px 5px;border-radius:100px;background:var(--blue-glow);color:var(--blue2);margin-left:4px;font-weight:600">You</span>' : ''}</td>
+      <td>${escHtml(v.village_name)}</td>
+      <td><span style="font-family:monospace;font-size:.8rem">${v.village_x}|${v.village_y}</span></td>
+      <td>
+        <div class="dist-bar-wrap">
+          <div class="dist-bar"><div class="dist-fill" style="width:${pct}%"></div></div>
+          <span class="dist-val">${v.dist}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('proxTableWrap').innerHTML = `
+    <table class="prox-table">
+      <thead><tr><th>#</th><th>Member</th><th>Closest Village</th><th>Coordinates</th><th>Distance (tiles)</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">No village data available</td></tr>'}</tbody>
+    </table>`;
+
+  document.getElementById('proxTargetLabel').textContent = `→ ${tx}|${ty}`;
+  document.getElementById('proxSection').style.display = '';
+}
+
+/* ════════════════════════════════════════
+   CREATE — SUBMIT
+════════════════════════════════════════ */
+async function submitPlan() {
+  const title = document.getElementById('inputTitle').value.trim();
+  const eta   = document.getElementById('inputEta').value;
+  const note  = document.getElementById('inputNote').value.trim() || null;
+
+  if (!title) { showToast('Enter an operation title', 'error'); return; }
+  if (!eta)   { showToast('Landing ETA is required', 'error'); return; }
+  if (pendingTargets.length === 0) { showToast('Add at least one target', 'error'); return; }
+
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true; btn.textContent = 'Saving…';
+
+  // Insert plan
+  const { data: plan, error: planErr } = await _supabase
+    .from('attack_plans')
+    .insert({
+      workspace_id: currentWs.id,
+      created_by:   currentUser.id,
+      title,
+      eta,
+      note,
+      status: 'active',
+    })
+    .select()
+    .single();
+
+  if (planErr) {
+    showToast('Failed to create plan: ' + planErr.message, 'error');
+    btn.disabled = false; btn.innerHTML = '⚔️ Create Attack Plan';
+    return;
+  }
+
+  // Insert targets
+  const targetPayloads = pendingTargets.map(t => ({
+    plan_id:        plan.id,
+    target_x:       t.x,
+    target_y:       t.y,
+    target_map_id:  t.map_id || null,
+    village_name:   t.village_name || null,
+    player_name:    t.player_name  || null,
+    alliance_tag:   t.alliance_tag || null,
+    attack_type:    t.attack_type,
+    notes:          t.note || null,
+  }));
+
+  const { error: targErr } = await _supabase.from('attack_targets').insert(targetPayloads);
+  if (targErr) {
+    showToast('Plan saved but targets failed: ' + targErr.message, 'error');
+    btn.disabled = false; btn.innerHTML = '⚔️ Create Attack Plan';
+    return;
+  }
+
+  showToast('Attack plan created! ⚔️', 'success');
+  setTimeout(() => goList(), 1200);
+}
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function chebyshev(x1, y1, x2, y2) { return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)); }
+function getMinutesLeft(eta) { return Math.floor((new Date(eta) - Date.now()) / 60000); }
+function formatCountdown(m)  { const h = Math.floor(m/60); return h > 0 ? `${h}h ${m%60}m` : `${m}m`; }
+function relativeTime(iso) {
+  const m = Math.floor((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m/60);
+  return h < 24 ? `${h}h ago` : `${Math.floor(h/24)}d ago`;
+}
+function escHtml(str) {
+  const d = document.createElement('div'); d.appendChild(document.createTextNode(str||'')); return d.innerHTML;
+}
+function copyCoord(x, y) {
+  navigator.clipboard?.writeText(`${x}|${y}`);
+  showToast(`Coordinates ${x}|${y} copied`, 'success');
+}
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+function showToast(msg, type='') {
+  const t = Object.assign(document.createElement('div'), { className: `toast ${type}`, textContent: msg });
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3200);
+}
+
+// Estimate slowest troop speed per tribe (infantry, slowest non-settler)
+function getTroopSpeed(tribe) {
+  if (!tribe || !window.TT) return 5; // fallback
+  const troops = (TT.troopsByTribe[tribe] || []).filter(u => !u.isNPC && !u.isHero && u.stats.attack > 0);
+  if (!troops.length) return 5;
+  return Math.min(...troops.map(u => u.stats.speed));
+}
+
+// Click outside modals to close
+['modalClose','modalCommit'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(id);
+  });
+});
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -106,8 +106,8 @@
 
     allianceItems: [
       { icon: '🏰', title: 'Workspace',       desc: 'Alliance dashboard & overview',      badge: 'FREE', href: '/alliance/workspace/'           },
-      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PLUS',  href: '/alliance/troop-summary/'    },
-      { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'SOON',  href: '#'    },
+      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'FREE',  href: '/alliance/troop-summary/'    },
+      { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'FREE',  href: '/alliance/coordinate-attack/'    },
       { icon: '🛡️', title: 'Defense Plan',    desc: 'Organize defensive assignments',     badge: 'FREE',  href: '/alliance/coordinate-defense/'   },
       { icon: '🏺', title: 'Artifact Tracker',desc: 'Track alliance artifacts',           badge: 'SOON',  href: '#' },
       { icon: '🌟', title: 'World Wonder',    desc: 'WW build progress tracker',          badge: 'SOON',  href: '#'        },
