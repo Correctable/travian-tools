@@ -723,7 +723,10 @@
 
   // ── SEARCH ────────────────────────────────────────────────────────
   async function doSearch() {
-    currentUser = await window.getUser(); // refresh — jangan pakai cache
+    currentUser = await window.getUser();
+    console.log('[debug] currentUser:', currentUser);
+    const session = await window.getSession();
+    console.log('[debug] session token:', session?.access_token?.slice(0, 20));
     if (!currentUser) { hideAll(); show('auth-gate'); return; }
 
     const btn = document.getElementById('search-btn');
