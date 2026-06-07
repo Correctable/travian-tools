@@ -723,6 +723,7 @@
 
   // ── SEARCH ────────────────────────────────────────────────────────
   async function doSearch() {
+    currentUser = await window.getUser(); // refresh — jangan pakai cache
     if (!currentUser) { hideAll(); show('auth-gate'); return; }
 
     const btn = document.getElementById('search-btn');
