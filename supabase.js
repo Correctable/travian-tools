@@ -53,6 +53,18 @@
     return session ? session.user : null;
   };
 
+  // Helper: ambil role string ('free' | 'plus' | 'pro')
+  window.getRole = async function () {
+    const user = await window.getUser();
+    return user?.user_metadata?.role || 'free';
+  };
+
+  // Helper: cek apakah user Plus atau Pro
+  window.isPlus = async function () {
+    const role = await window.getRole();
+    return role === 'plus' || role === 'pro';
+  };
+
   // Helper: cek apakah user Pro
   window.isPro = async function () {
     const user = await window.getUser();

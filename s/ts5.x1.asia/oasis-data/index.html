@@ -112,33 +112,6 @@
     .page-badge.preview { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
     .page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
 
-    /* SERVER SELECTOR */
-    .server-section {
-      background: #fff; border: 1px solid var(--border); border-radius: 14px;
-      padding: 24px; margin-bottom: 24px;
-      animation: fadeUp 0.4s 0.05s ease both;
-    }
-    .server-section-title {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.875rem; font-weight: 700;
-      color: var(--text); margin-bottom: 14px; letter-spacing: -0.01em;
-    }
-    .server-grid { display: flex; flex-wrap: wrap; gap: 10px; }
-    .server-btn {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 16px; border-radius: 10px; border: 1.5px solid var(--border);
-      background: var(--surface2); cursor: pointer; transition: all 0.18s;
-      font-family: 'DM Sans', sans-serif; font-size: 0.825rem; font-weight: 500; color: var(--text2);
-    }
-    .server-btn:hover { border-color: var(--blue-light); color: var(--navy); background: var(--blue-glow); }
-    .server-btn.active { border-color: var(--green); background: var(--green-bg); color: var(--green); font-weight: 600; }
-    .server-btn .server-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
-    .server-unavail-note {
-      margin-top: 12px; font-size: 0.775rem; color: var(--text3);
-      display: none; align-items: center; gap: 8px;
-    }
-    .server-unavail-note a { color: var(--blue2); font-weight: 600; text-decoration: none; }
-    .server-unavail-note a:hover { text-decoration: underline; }
-
     /* CONTROLS */
     #controls {
       display: none;
@@ -335,91 +308,6 @@
     #error-state h3 { font-family: 'Space Grotesk', sans-serif; color: var(--red); font-size: 1rem; margin-bottom: 6px; }
     #error-state p { font-size: 0.825rem; color: var(--text3); }
 
-    /* REQUEST SECTION */
-    .request-section {
-      margin-top: 64px;
-      animation: fadeUp 0.4s 0.1s ease both;
-    }
-    .section-divider { height: 1px; background: var(--border); margin-bottom: 48px; }
-    .request-header { margin-bottom: 32px; }
-    .request-tag {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--blue-light); background: var(--blue-glow);
-      border: 1px solid rgba(59,130,246,0.2); padding: 4px 12px; border-radius: 100px; margin-bottom: 14px;
-    }
-    .request-title {
-      font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700;
-      color: var(--text); letter-spacing: -0.02em; margin-bottom: 8px;
-    }
-    .request-desc { font-size: 0.9rem; color: var(--text2); line-height: 1.7; max-width: 560px; }
-
-    .request-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
-
-    .info-card {
-      background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px;
-      margin-bottom: 16px;
-    }
-    .info-card-title {
-      font-size: 0.775rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--text3); margin-bottom: 12px;
-    }
-    .info-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
-    .info-step:last-child { margin-bottom: 0; }
-    .info-step-num {
-      width: 20px; height: 20px; border-radius: 50%; background: var(--blue2); color: #fff;
-      font-size: 0.65rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; margin-top: 1px;
-    }
-    .info-step-text { font-size: 0.8rem; color: var(--text2); line-height: 1.55; }
-
-    .avail-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.8rem;
-    }
-    .avail-row:last-child { border-bottom: none; }
-    .avail-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .avail-dot.live { background: var(--green); }
-    .avail-dot.pending { background: var(--amber); }
-    .avail-name { flex: 1; color: var(--text2); }
-    .avail-badge {
-      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-      padding: 2px 7px; border-radius: 100px;
-    }
-    .avail-badge.live { background: var(--green-bg); color: var(--green); }
-    .avail-badge.pending { background: var(--amber-bg); color: var(--amber); }
-
-    .request-form-card {
-      background: #fff; border: 1px solid var(--border); border-radius: 14px;
-      padding: 28px; box-shadow: 0 2px 12px rgba(15,33,83,0.04);
-    }
-    .form-title {
-      font-family: 'Space Grotesk', sans-serif; font-size: 0.975rem; font-weight: 700;
-      color: var(--text); letter-spacing: -0.01em; margin-bottom: 20px;
-    }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-    .form-input, .form-textarea {
-      width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 9px;
-      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
-      padding: 0 14px; height: 42px; outline: none; transition: border-color 0.18s, box-shadow 0.18s;
-    }
-    .form-input::placeholder, .form-textarea::placeholder { color: var(--text3); }
-    .form-textarea { height: 90px; padding: 10px 14px; resize: vertical; line-height: 1.6; }
-    .form-hint { font-size: 0.7rem; color: var(--text3); margin-top: 4px; }
-
-    .btn-request {
-      width: 100%; height: 44px; border-radius: 10px; border: 1.5px solid var(--border);
-      background: var(--surface2); color: var(--text3); font-family: 'DM Sans', sans-serif;
-      font-size: 0.875rem; font-weight: 600; cursor: not-allowed; opacity: 0.7;
-      display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px;
-    }
-    .btn-request-badge {
-      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-      background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2);
-      padding: 2px 7px; border-radius: 100px;
-    }
-    .form-submit-note { font-size: 0.72rem; color: var(--text3); text-align: center; margin-top: 8px; }
 
     /* FOOTER */
     footer {
@@ -444,7 +332,6 @@
 
     @media (max-width: 768px) {
       footer { flex-direction: column; gap: 20px; text-align: center; padding: 24px 16px; }
-      .request-layout { grid-template-columns: 1fr; }
       .paywall-banner { flex-direction: column; text-align: center; }
       .paywall-actions { align-items: center; }
     }
@@ -462,32 +349,71 @@
   <div class="breadcrumb">
     <a href="/">Home</a>
     <span class="breadcrumb-sep">›</span>
-    <a href="/tools/">Tools</a>
+    <a href="/s/">Servers</a>
     <span class="breadcrumb-sep">›</span>
-    <span class="breadcrumb-current">Oasis Database</span>
+    <a href="/s/ts5.x1.asia/oasis-data/" id="bc-server">ts5.x1.asia</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Oasis Data</span>
   </div>
   <div class="page-header-inner">
     <div class="page-title-group">
       <div class="page-icon">🌿</div>
       <div>
-        <div class="page-title">Oasis Database</div>
+        <div class="page-title">Oasis Data</div>
         <div class="page-subtitle">Find every oasis near your village. Filter by resource type, bonus percentage, and radius.</div>
       </div>
     </div>
     <div class="page-badges">
-      <span class="page-badge preview">PLUS</span>
-      <span class="page-badge no-login">Login to Access Full Data</span>
+      <span class="page-badge preview">LOGIN REQUIRED</span>
     </div>
   </div>
 </div>
 
 <div class="page-wrap">
 
-  <!-- Default state -->
-  <div id="default-state" style="text-align:center;padding:64px 20px;">
+  <!-- Default state / auth gate -->
+  <div id="auth-gate" style="display:none;text-align:center;padding:72px 20px;">
+    <div style="font-size:2.5rem;margin-bottom:16px">🔐</div>
+    <h3 style="font-family:'Space Grotesk',sans-serif;color:var(--navy);font-size:1.15rem;margin-bottom:8px">Login required</h3>
+    <p style="font-size:0.875rem;color:var(--text3);margin-bottom:24px;max-width:360px;margin-left:auto;margin-right:auto">Create a free account to search oasis data. Free users get 5 searches/day.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="/login/?redirect=/s/ts5.x1.asia/oasis-data/" id="gate-login-link" style="
+        height:42px;padding:0 24px;border-radius:10px;border:1.5px solid var(--border);
+        background:var(--surface2);color:var(--text2);font-family:'DM Sans',sans-serif;
+        font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:none;
+        display:inline-flex;align-items:center;transition:all 0.18s;
+      ">Log In</a>
+      <a href="/register/?redirect=/s/ts5.x1.asia/oasis-data/" id="gate-register-link" style="
+        height:42px;padding:0 24px;border-radius:10px;border:none;
+        background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;
+        font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:none;
+        display:inline-flex;align-items:center;transition:background 0.18s;
+      ">Sign Up Free →</a>
+    </div>
+  </div>
+
+  <!-- Rate limit exhausted -->
+  <div id="rate-limit-gate" style="display:none;text-align:center;padding:72px 20px;">
+    <div style="font-size:2.5rem;margin-bottom:16px">⏳</div>
+    <h3 style="font-family:'Space Grotesk',sans-serif;color:var(--navy);font-size:1.15rem;margin-bottom:8px">Daily limit reached</h3>
+    <p style="font-size:0.875rem;color:var(--text3);margin-bottom:6px;max-width:380px;margin-left:auto;margin-right:auto">
+      You've used all <strong id="rl-limit-num" style="color:var(--text2)">5</strong> searches for today.
+    </p>
+    <p style="font-size:0.8rem;color:var(--text3);margin-bottom:24px">Resets at midnight UTC · <span id="rl-reset-time"></span></p>
+    <a href="/pricing/" style="
+      height:42px;padding:0 24px;border-radius:10px;border:none;
+      background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;
+      font-size:0.875rem;font-weight:600;cursor:pointer;text-decoration:none;
+      display:inline-flex;align-items:center;gap:8px;
+    ">Upgrade to Plus — 50 searches/day →</a>
+  </div>
+
+  <!-- Default state after login -->
+  <div id="default-state" style="display:none;text-align:center;padding:64px 20px;">
     <div style="font-size:2rem;margin-bottom:12px">🌿</div>
     <h3 style="font-family:'Space Grotesk',sans-serif;color:var(--navy);margin-bottom:6px">Enter your coordinates</h3>
     <p style="font-size:0.875rem;color:var(--text3)">Input your village coordinates and click Search to find nearby oases.</p>
+    <p style="font-size:0.775rem;color:var(--text3);margin-top:8px" id="quota-info"></p>
   </div>
 
   <!-- Loading -->
@@ -631,87 +557,18 @@
     <div class="paywall-banner" id="paywall-banner" style="display:none">
       <div class="paywall-icon">🔒</div>
       <div class="paywall-text">
-        <div class="paywall-title">You're seeing the free preview — 1,000 of 20,000+ oases</div>
+        <div class="paywall-title">You're seeing the free preview — 1,000 of <span id="paywall-total">20,000+</span> oases</div>
         <div class="paywall-desc">
-          Sign up for a <strong>Pro account</strong> to unlock the full database, export to farmlist, and access all servers.
+          Upgrade to <strong>Plus</strong> to unlock the full database on all servers. Just <strong>$1.50/month</strong>.
         </div>
       </div>
       <div class="paywall-actions">
-        <a href="/register/" class="btn-unlock">Unlock Full Access →</a>
-        <span class="paywall-note">Free to try · No credit card required</span>
+        <a href="/pricing/" class="btn-unlock">Upgrade to Plus →</a>
+        <span class="paywall-note">$1.50/month · Rp 15.000/month</span>
       </div>
     </div>
   </div>
 
-  <!-- REQUEST SECTION -->
-  <div class="request-section" id="request-section">
-    <div class="section-divider"></div>
-    <div class="request-header">
-      <div class="request-tag">📡 Database Requests</div>
-      <h2 class="request-title">Request a Server</h2>
-      <p class="request-desc">Oasis data is pulled live from Turso for each game world. If your server isn't listed, request it here — we'll prioritize based on demand.</p>
-    </div>
-
-    <div class="request-layout">
-      <div class="request-info">
-        <div class="info-card">
-          <div class="info-card-title">How it works</div>
-          <div class="info-step">
-            <div class="info-step-num">1</div>
-            <div class="info-step-text">Submit a request with your server's URL and details</div>
-          </div>
-          <div class="info-step">
-            <div class="info-step-num">2</div>
-            <div class="info-step-text">We run the scraper and load the dataset into Turso</div>
-          </div>
-          <div class="info-step">
-            <div class="info-step-num">3</div>
-            <div class="info-step-text">Server goes live on the selector above, usually within a few days</div>
-          </div>
-        </div>
-
-        <div class="info-card">
-          <div class="info-card-title">Current Servers</div>
-          <div class="avail-row">
-            <div class="avail-dot live"></div>
-            <span class="avail-name">Asia 5 · x1 — ts5.x1.asia.travian.com</span>
-            <span class="avail-badge live">Live</span>
-          </div>
-          <div class="avail-row">
-            <div class="avail-dot pending"></div>
-            <span class="avail-name">More servers</span>
-            <span class="avail-badge pending">Pending</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="request-form-card">
-        <div class="form-title">Request Form</div>
-        <div class="form-group">
-          <label class="form-label">Server / World Name <span style="color:var(--red)">*</span></label>
-          <input type="text" class="form-input" placeholder="e.g. Asia 1 x1, COM3, Arabia 2…" disabled>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Server URL</label>
-          <input type="text" class="form-input" placeholder="e.g. ts1.x1.asia.travian.com" disabled>
-          <span class="form-hint">Find it in your browser's address bar when logged in</span>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Your In-Game Name / Contact <span style="color:var(--red)">*</span></label>
-          <input type="text" class="form-input" placeholder="IGN or email address" disabled>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Notes</label>
-          <textarea class="form-textarea" placeholder="Anything else we should know — server start date, speed, etc." disabled></textarea>
-        </div>
-        <button class="btn-request" disabled>
-          📨 Submit Request
-          <span class="btn-request-badge">Coming Soon</span>
-        </button>
-        <div class="form-submit-note">Request system launching soon — check back shortly</div>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -730,70 +587,16 @@
 </footer>
 
 <script>
-  const PREVIEW_CAP = 1000;
-  const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
-  const CDN         = '/cdn/icons/resource/';
+  // ── CONSTANTS ─────────────────────────────────────────────────────
+  const PREVIEW_CAP  = 1000;
+  const API_BASE     = 'https://travian-api.sonybukansoni.workers.dev';
+  const SERVER       = 'ts5';
+  const SERVER_SLUG  = 'ts5.x1.asia';
+  const SERVER_DOMAIN = 'ts5.x1.asia.travian.com';
+  const CDN          = '/cdn/icons/resource/';
 
-  const RES_KEY = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
+  const RES_KEY   = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
   const RES_COLOR = { wood: 'var(--wood)', clay: 'var(--clay)', iron: 'var(--iron)', crop: 'var(--crop)' };
-
-  // ── OASIS ICON ────────────────────────────────────────────────────
-  function oasisIcon(resources, maxBonus) {
-    const res = (resources || []).filter(r => RES_KEY[r]);
-    if (!res.length) return '';
-
-    // 50% double → lumber-lumber_medium
-    if (maxBonus >= 50 && res.length === 1) {
-      const k = RES_KEY[res[0]];
-      return `<img src="${CDN}${k}-${k}_medium.png" style="height:22px;vertical-align:middle" title="+50% ${res[0]}">`;
-    }
-
-    // Mixed 25%+25% → lumber-crop_medium (crop always last)
-    if (res.length >= 2) {
-      const sorted = [...res].sort((a, b) => (a === 'crop' ? 1 : b === 'crop' ? -1 : 0));
-      const a = RES_KEY[sorted[0]], b = RES_KEY[sorted[1]];
-      return `<img src="${CDN}${a}-${b}_medium.png" style="height:22px;vertical-align:middle" title="${sorted[0]}+${sorted[1]}">`;
-    }
-
-    // Single 25% → lumber_tiny
-    const k = RES_KEY[res[0]];
-    return `<img src="${CDN}${k}_tiny.png" style="height:16px;vertical-align:middle" title="+25% ${res[0]}">`;
-  }
-
-  // ── OASIS BONUS TEXT ──────────────────────────────────────────────
-  function oasisBonusText(resources, maxBonus) {
-    const res = (resources || []).filter(r => RES_KEY[r]);
-    if (!res.length) return '<span style="color:var(--text3)">—</span>';
-
-    // 50% single
-    if (maxBonus >= 50 && res.length === 1) {
-      const c = RES_COLOR[res[0]];
-      return `<span style="color:${c};font-weight:700">50%</span>`;
-    }
-
-    // Mixed 25%+25%
-    if (res.length >= 2) {
-      const sorted = [...res].sort((a, b) => (a === 'crop' ? 1 : b === 'crop' ? -1 : 0));
-      const parts = sorted.slice(0, 2).map(r =>
-        `<span style="color:${RES_COLOR[r]};font-weight:700">25%</span>`
-      );
-      return parts.join('<span style="color:var(--text3);margin:0 4px">+</span>');
-    }
-
-    // Single 25%
-    const c = RES_COLOR[res[0]];
-    return `<span style="color:${c};font-weight:700">+25%</span>`;
-  }
-
-  // ── QUADRANT ──────────────────────────────────────────────────────
-  function getQuadrant(ox, oy, cx, cy) {
-    const dx = ox - cx, dy = oy - cy;
-    if (dx === 0 && dy === 0) return '<span class="quadrant-cell q-center">—</span>';
-    const ns = dy > 0 ? 'N' : 'S';
-    const ew = dx > 0 ? 'E' : 'W';
-    const q  = ns + ew;
-    return `<span class="quadrant-cell q-${q}">${q}</span>`;
-  }
 
   let allOases    = [];
   let filtered    = [];
@@ -802,65 +605,144 @@
   let pageSize    = 50;
   let sortKey     = 'distance';
   let sortDir     = 'asc';
+  let currentUser = null;
+  let userRole    = 'free';  // 'free' | 'plus' | 'pro'
+  let isPlus      = false;
+
+  // ── SHOW/HIDE HELPERS ────────────────────────────────────────────
+  function show(id, display = 'block') { document.getElementById(id).style.display = display; }
+  function hide(id)                    { document.getElementById(id).style.display = 'none'; }
+  function hideAll() {
+    ['auth-gate','rate-limit-gate','default-state','loading-state',
+     'error-state','controls','stats-bar','table-section'].forEach(hide);
+  }
+
+  // ── INIT: CEK AUTH ───────────────────────────────────────────────
+  async function init() {
+    // Update breadcrumb link
+    const bcServer = document.getElementById('bc-server');
+    if (bcServer) {
+      bcServer.textContent = SERVER_SLUG;
+      bcServer.href = `/s/${SERVER_SLUG}/oasis-data/`;
+    }
+    // Update auth gate redirect links
+    const encodedRedirect = encodeURIComponent(`/s/${SERVER_SLUG}/oasis-data/`);
+    const loginLink = document.getElementById('gate-login-link');
+    const regLink   = document.getElementById('gate-register-link');
+    if (loginLink) loginLink.href = `/login/?redirect=${encodedRedirect}`;
+    if (regLink)   regLink.href   = `/register/?redirect=${encodedRedirect}`;
+
+    // Cek session Supabase via supabase.js
+    currentUser = await window.getUser();
+
+    if (!currentUser) {
+      hideAll();
+      show('auth-gate');
+      return;
+    }
+
+    // Ambil role dari user_metadata
+    userRole = currentUser.user_metadata?.role || 'free';
+    isPlus   = userRole === 'plus' || userRole === 'pro';
+
+    // Tampilkan default state + quota info
+    hideAll();
+    show('default-state');
+    show('controls', 'grid');
+    updateQuotaInfo();
+  }
+
+  // ── QUOTA INFO ───────────────────────────────────────────────────
+  function updateQuotaInfo(used) {
+    const el = document.getElementById('quota-info');
+    if (!el) return;
+    if (isPlus) {
+      el.textContent = userRole === 'pro'
+        ? '✓ Unlimited searches · Full data'
+        : '✓ 50 searches/day · Full data';
+      el.style.color = 'var(--green)';
+    } else {
+      const remaining = used !== undefined ? (5 - used) : 5;
+      el.textContent = `${remaining} of 5 free searches remaining today`;
+      el.style.color = remaining <= 1 ? 'var(--amber)' : 'var(--text3)';
+    }
+  }
 
   // ── API HELPER ────────────────────────────────────────────────────
   async function apiGet(endpoint, params = {}) {
+    const session = await window.getSession();
+    const token   = session?.access_token;
+
     const url = new URL(`${API_BASE}/api/${endpoint}`);
     Object.entries(params).forEach(([k, v]) => {
       if (v !== null && v !== undefined) url.searchParams.set(k, v);
     });
-    const res = await fetch(url.toString());
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(url.toString(), { headers });
+
+    // Rate limit exceeded
+    if (res.status === 429) {
+      const json = await res.json().catch(() => ({}));
+      handleRateLimit(json);
+      throw new Error('rate_limit_exceeded');
+    }
+
+    // Auth required
+    if (res.status === 401) {
+      hideAll();
+      show('auth-gate');
+      throw new Error('unauthorized');
+    }
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     if (!json.ok) throw new Error(json.error || 'API error');
     return json;
   }
 
-  // ── SERVER SELECTOR ───────────────────────────────────────────────
-  function selectServer(btn, serverId) {
-    document.querySelectorAll('.server-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const note = document.getElementById('unavail-note');
-    if (!serverId) {
-      note.style.display = 'flex';
-      hideToolUI();
-    } else {
-      note.style.display = 'none';
-      loadDatabase(serverId);
-    }
+  // ── RATE LIMIT HANDLER ────────────────────────────────────────────
+  function handleRateLimit(json) {
+    hideAll();
+    const limitNum = document.getElementById('rl-limit-num');
+    if (limitNum) limitNum.textContent = json.limit || 5;
+
+    // Waktu reset: tengah malam UTC
+    const now      = new Date();
+    const resetUTC = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+    const diff     = resetUTC - now;
+    const hh       = Math.floor(diff / 3600000);
+    const mm       = Math.floor((diff % 3600000) / 60000);
+    const resetEl  = document.getElementById('rl-reset-time');
+    if (resetEl) resetEl.textContent = `resets in ${hh}h ${mm}m`;
+
+    show('rate-limit-gate');
   }
 
-  function hideToolUI() {
-    ['controls','stats-bar','table-section','loading-state','error-state']
-      .forEach(id => document.getElementById(id).style.display = 'none');
-  }
-
-  // ── LOAD DATABASE ─────────────────────────────────────────────────
+  // ── SEARCH ────────────────────────────────────────────────────────
   async function doSearch() {
+    if (!currentUser) { hideAll(); show('auth-gate'); return; }
+
     const btn = document.getElementById('search-btn');
     btn.textContent = 'Searching…'; btn.disabled = true;
-    loadDatabase();
-  }
 
-  async function loadDatabase() {
-    const serverSel = document.getElementById('serverSel');
-    const server    = serverSel ? serverSel.value : 'ts5';
-    const cx        = document.getElementById('cx').value;
-    const cy        = document.getElementById('cy').value;
-    const radius    = document.getElementById('radius').value || 30;
+    const cx     = document.getElementById('cx').value;
+    const cy     = document.getElementById('cy').value;
+    const radius = document.getElementById('radius').value || 30;
 
-    document.getElementById('default-state').style.display  = 'none';
-    document.getElementById('loading-state').style.display  = 'block';
-    document.getElementById('error-state').style.display    = 'none';
-    document.getElementById('stats-bar').style.display      = 'none';
-    document.getElementById('table-section').style.display  = 'none';
+    hideAll();
+    show('controls', 'grid');
+    show('loading-state');
 
     try {
-      const data = await apiGet('oasis', { server, cx, cy, radius });
+      const data = await apiGet('oasis', { server: SERVER, cx, cy, radius });
       const rows = data.rows || [];
-
       const total = data.total || rows.length;
-      const isCapped = data.is_preview && total > PREVIEW_CAP;
+
+      // Update quota counter jika ada di response
+      if (data.quota_used !== undefined) updateQuotaInfo(data.quota_used);
 
       allOases = rows.map(o => {
         let resources = [];
@@ -874,33 +756,36 @@
         }
         const maxBonus = Number(o.max_bonus) || 0;
         return {
-          x:        Number(o.x),
-          y:        Number(o.y),
+          x: Number(o.x), y: Number(o.y),
           typeName: o.type_name || '—',
           bonusStr: o.bonus_str || (maxBonus ? `+${maxBonus}%` : '—'),
-          resources,
-          maxBonus,
+          resources, maxBonus,
           isDouble: maxBonus >= 50,
         };
       });
 
+      const isCapped = !isPlus && total > PREVIEW_CAP;
       document.getElementById('stat-total').textContent = isCapped
         ? `${allOases.length.toLocaleString()} (preview of ${total.toLocaleString()})`
         : allOases.length.toLocaleString();
-      document.getElementById('loading-state').style.display  = 'none';
-      document.getElementById('controls').style.display       = 'grid';
-      document.getElementById('stats-bar').style.display      = 'flex';
-      document.getElementById('table-section').style.display  = 'block';
-      const btn = document.getElementById('search-btn');
-      if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
 
+      if (isCapped) {
+        document.getElementById('paywall-total').textContent = total.toLocaleString() + '+';
+      }
+
+      hide('loading-state');
+      show('controls', 'grid');
+      show('stats-bar', 'flex');
+      show('table-section');
       applyFilters();
+
     } catch (err) {
+      if (err.message === 'rate_limit_exceeded' || err.message === 'unauthorized') return;
       console.error(err);
-      document.getElementById('loading-state').style.display = 'none';
-      document.getElementById('error-state').style.display   = 'block';
-      const btn = document.getElementById('search-btn');
-      if (btn) { btn.textContent = 'Search'; btn.disabled = false; }
+      hide('loading-state');
+      show('error-state');
+    } finally {
+      btn.textContent = 'Search'; btn.disabled = false;
     }
   }
 
@@ -924,8 +809,7 @@
     if (sortKey === key) {
       sortDir = sortDir === 'asc' ? 'desc' : 'asc';
     } else {
-      sortKey = key;
-      sortDir = 'asc';
+      sortKey = key; sortDir = 'asc';
     }
     document.querySelectorAll('thead th').forEach(h => {
       h.classList.remove('sort-active');
@@ -954,8 +838,7 @@
     const minBonus = parseInt(document.getElementById('min-bonus').value) || 0;
 
     let result = allOases.filter(o => {
-      const d = dist(cx, cy, o.x, o.y);
-      if (d > radius) return false;
+      if (dist(cx, cy, o.x, o.y) > radius) return false;
       if (activeRes !== 'all' && !o.resources.includes(activeRes)) return false;
       if ((o.maxBonus || 0) < minBonus) return false;
       return true;
@@ -979,15 +862,58 @@
     document.getElementById('stat-crop').textContent     = result.filter(o => o.resources.includes('crop')).length;
     document.getElementById('stat-double').textContent   = result.filter(o => o.isDouble).length;
 
-    const capped = result.length > PREVIEW_CAP;
-    filtered = result.slice(0, PREVIEW_CAP);
+    // Cap preview untuk free user
+    const capped = !isPlus && result.length > PREVIEW_CAP;
+    filtered = isPlus ? result : result.slice(0, PREVIEW_CAP);
 
-    document.getElementById('stat-shown').textContent      = filtered.length;
+    document.getElementById('stat-shown').textContent       = filtered.length;
     document.getElementById('paywall-banner').style.display = capped ? 'flex' : 'none';
-    document.getElementById('info-cap').textContent         = capped ? `(preview capped at ${PREVIEW_CAP})` : '';
+    document.getElementById('info-cap').textContent         = capped ? `(free preview: first ${PREVIEW_CAP})` : '';
 
     currentPage = 1;
     renderTable();
+  }
+
+  // ── OASIS ICON ────────────────────────────────────────────────────
+  function oasisIcon(resources, maxBonus) {
+    const res = (resources || []).filter(r => RES_KEY[r]);
+    if (!res.length) return '';
+    if (maxBonus >= 50 && res.length === 1) {
+      const k = RES_KEY[res[0]];
+      return `<img src="${CDN}${k}-${k}_medium.png" style="height:22px;vertical-align:middle" title="+50% ${res[0]}">`;
+    }
+    if (res.length >= 2) {
+      const sorted = [...res].sort((a, b) => (a === 'crop' ? 1 : b === 'crop' ? -1 : 0));
+      const a = RES_KEY[sorted[0]], b = RES_KEY[sorted[1]];
+      return `<img src="${CDN}${a}-${b}_medium.png" style="height:22px;vertical-align:middle" title="${sorted[0]}+${sorted[1]}">`;
+    }
+    const k = RES_KEY[res[0]];
+    return `<img src="${CDN}${k}_tiny.png" style="height:16px;vertical-align:middle" title="+25% ${res[0]}">`;
+  }
+
+  // ── OASIS BONUS TEXT ──────────────────────────────────────────────
+  function oasisBonusText(resources, maxBonus) {
+    const res = (resources || []).filter(r => RES_KEY[r]);
+    if (!res.length) return '<span style="color:var(--text3)">—</span>';
+    if (maxBonus >= 50 && res.length === 1) {
+      return `<span style="color:${RES_COLOR[res[0]]};font-weight:700">50%</span>`;
+    }
+    if (res.length >= 2) {
+      const sorted = [...res].sort((a, b) => (a === 'crop' ? 1 : b === 'crop' ? -1 : 0));
+      const parts = sorted.slice(0, 2).map(r =>
+        `<span style="color:${RES_COLOR[r]};font-weight:700">25%</span>`
+      );
+      return parts.join('<span style="color:var(--text3);margin:0 4px">+</span>');
+    }
+    return `<span style="color:${RES_COLOR[res[0]]};font-weight:700">+25%</span>`;
+  }
+
+  // ── QUADRANT ──────────────────────────────────────────────────────
+  function getQuadrant(ox, oy, cx, cy) {
+    const dx = ox - cx, dy = oy - cy;
+    if (dx === 0 && dy === 0) return '<span class="quadrant-cell q-center">—</span>';
+    const q = (dy > 0 ? 'N' : 'S') + (dx > 0 ? 'E' : 'W');
+    return `<span class="quadrant-cell q-${q}">${q}</span>`;
   }
 
   // ── RENDER TABLE ──────────────────────────────────────────────────
@@ -1019,11 +945,10 @@
     body.innerHTML = page.map(o => {
       const d         = o._dist;
       const distClass = d < 10 ? 'dist-near' : d < 30 ? 'dist-mid' : 'dist-far';
-      const mapLink   = `https://ts5.x1.asia.travian.com/karte.php?x=${o.x}&y=${o.y}`;
+      const mapLink   = `https://${SERVER_DOMAIN}/karte.php?x=${o.x}&y=${o.y}`;
       const icon      = oasisIcon(o.resources, o.maxBonus);
       const bonusTxt  = oasisBonusText(o.resources, o.maxBonus);
       const quadrant  = getQuadrant(o.x, o.y, cx, cy);
-
       return `<tr>
         <td class="dist-cell ${distClass}">${d.toFixed(1)}</td>
         <td class="coord-cell"><a href="${mapLink}" target="_blank">(${o.x} | ${o.y})</a></td>
@@ -1042,7 +967,6 @@
     if (totalPages <= 1) { el.innerHTML = ''; return; }
 
     let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
-
     const start = Math.max(1, currentPage - 2);
     const end   = Math.min(totalPages, currentPage + 2);
     if (start > 1) html += `<button class="page-btn" onclick="goPage(1)">1</button><span class="page-info">…</span>`;
@@ -1050,7 +974,6 @@
       html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
     }
     if (end < totalPages) html += `<span class="page-info">…</span><button class="page-btn" onclick="goPage(${totalPages})">${totalPages}</button>`;
-
     html += `<span class="page-info">${currentPage} / ${totalPages}</span>`;
     html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
     el.innerHTML = html;
@@ -1064,22 +987,16 @@
     window.scrollTo({ top: document.getElementById('table-section').offsetTop - 20, behavior: 'smooth' });
   }
 
-  // ── LIVE FILTER (min-bonus and res only — no auto re-fetch) ─────────
-  ['min-bonus'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('change', () => { currentPage = 1; applyFilters(); });
-    }
+  // ── EVENT LISTENERS ────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('min-bonus').addEventListener('change', () => { currentPage = 1; applyFilters(); });
+    ['cx','cy','radius'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+    });
   });
 
-  // Enter key on coords triggers search
-  ['cx','cy','radius'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-  });
-
-  // ── INIT — show default state, wait for user input ─────────────────
-  document.getElementById('controls').style.display = 'grid';
+  // ── BOOT ─────────────────────────────────────────────────────────
+  init();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>

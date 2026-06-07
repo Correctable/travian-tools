@@ -16,10 +16,48 @@ const SERVERS = [
     slug:    'ts5.x1.asia',           // dipakai di URL: /ts5.x1.asia/statistics/
     label:   'TS5 Asia',              // nama tampil di UI
     domain:  'ts5.x1.asia.travian.com', // domain resmi server Travian
-    speed:   5,                       // kecepatan server (1x, 2x, 3x, 5x, 10x)
+    speed:   1,                       // kecepatan server (1x, 2x, 3x, 5x, 10x)
     region:  'Asia',                  // region (Asia, Europe, America, International)
     active:  true,                    // true = data tersedia di Turso
     isNew:   false,                   // true = tampilkan badge "NEW"
+  },
+
+  // ── Tournament Travian Qualification (TTQ) ───────────────
+  {
+    slug:    'ttq.x2.asia',
+    label:   'TTQ Asia 2026',
+    domain:  'ttq.x2.asia.travian.com',
+    speed:   2,
+    region:  'Asia',
+    active:  false,                   // set true setelah data Turso siap
+    isNew:   true,
+  },
+  {
+    slug:    'ttq.x2.america',
+    label:   'TTQ America 2026',
+    domain:  'ttq.x2.america.travian.com',
+    speed:   2,
+    region:  'America',
+    active:  false,
+    isNew:   true,
+  },
+  {
+    slug:    'ttq.x2.europe',
+    label:   'TTQ Europe 2026',
+    domain:  'ttq.x2.europe.travian.com',
+    speed:   2,
+    region:  'Europe',
+    active:  false,
+    isNew:   true,
+  },
+  {
+    slug:    'ttq.x2.arabics',
+    label:   'TTQ Arabics 2026',
+    domain:  'ttq.x2.arabics.travian.com',
+    speed:   2,
+    region:  'Arabics',
+    active:  false,
+    isNew:   true,
   },
 
   // ── Tambah server baru di bawah ini ──────────────────────
@@ -29,15 +67,6 @@ const SERVERS = [
   //   domain:  'ts1.x1.asia.travian.com',
   //   speed:   1,
   //   region:  'Asia',
-  //   active:  false,
-  //   isNew:   false,
-  // },
-  // {
-  //   slug:    'ts20.travian.com',
-  //   label:   'TS20 International',
-  //   domain:  'ts20.travian.com',
-  //   speed:   3,
-  //   region:  'International',
   //   active:  false,
   //   isNew:   false,
   // },
