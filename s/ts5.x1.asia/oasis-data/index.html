@@ -995,8 +995,13 @@
     });
   });
 
-  // ── BOOT ─────────────────────────────────────────────────────────
-  init();
+  // ── BOOT — tunggu supabase.js selesai init ────────────────────────
+  function waitForSupabase(cb, tries = 0) {
+    if (typeof window.getUser === 'function') { cb(); return; }
+    if (tries > 20) { console.error('[TravianTools] Supabase timeout'); return; }
+    setTimeout(() => waitForSupabase(cb, tries + 1), 100);
+  }
+  waitForSupabase(init);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
