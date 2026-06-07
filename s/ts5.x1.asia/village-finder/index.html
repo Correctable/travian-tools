@@ -214,27 +214,33 @@ td{padding:10px 14px;vertical-align:middle;}
 
 <div id="navbar-root"></div>
 
+<!-- BREADCRUMB -->
+<div style="position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:7px 40px;display:flex;align-items:center;gap:6px;font-size:0.72rem;color:var(--text3);flex-shrink:0;">
+  <a href="/" style="color:var(--text3);text-decoration:none;">Home</a>
+  <span style="opacity:.4;font-size:.6rem">›</span>
+  <a href="/s/" style="color:var(--text3);text-decoration:none;">Servers</a>
+  <span style="opacity:.4;font-size:.6rem">›</span>
+  <a href="/s/ts5.x1.asia/village-finder/" style="color:var(--text3);text-decoration:none;">ts5.x1.asia</a>
+  <span style="opacity:.4;font-size:.6rem">›</span>
+  <span style="color:var(--text2);font-weight:500;">Village Finder</span>
+</div>
+
 <main>
   <div class="page-header">
     <div class="page-header-top">
       <div class="page-icon">🌾</div>
-      <span class="badge-free">FREE</span>
+      <span class="badge-free">LOGIN REQUIRED</span>
+      <span id="quota-badge" style="display:none;font-size:0.6rem;font-weight:700;border-radius:100px;padding:3px 8px;background:var(--amber-bg);color:var(--amber);border:1px solid rgba(217,119,6,.2);"></span>
     </div>
     <h1>Village Finder</h1>
-    <p>Cari desa berdasarkan crop field, status kosong/terisi, dan jumlah oasis dalam 5×5.</p>
+    <p>Find villages by crop field type, tile status, and number of claimable oases within 5×5.</p>
   </div>
 
   <!-- Filter Panel -->
   <div class="filter-panel">
 
-    <!-- Row 1: Server + XY + Status -->
+    <!-- Row 1: XY + Status -->
     <div class="filter-row" style="margin-bottom:14px">
-      <div class="fg">
-        <label>Server</label>
-        <select id="serverSel">
-          <option value="ts5" data-tiles="ts5.x1.asia.travian.com">ts5.x1.asia</option>
-        </select>
-      </div>
       <div class="fg">
         <label>Center X, Y</label>
         <div class="xy-wrap">
@@ -350,12 +356,35 @@ td{padding:10px 14px;vertical-align:middle;}
     <div class="stat-item"><div class="stat-label">Max oasis 5×5</div><div class="stat-value" id="stMax">—</div></div>
   </div>
 
+  <!-- Auth gate -->
+  <div id="auth-gate" style="display:none;">
+    <div class="state-box">
+      <div class="si">🔐</div>
+      <h3>Login required</h3>
+      <p>Create a free account to use Village Finder. Free users get 5 searches/day.</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;flex-wrap:wrap;">
+        <a id="gate-login-link" href="/login/" style="height:40px;padding:0 20px;border-radius:9px;border:1.5px solid var(--border);background:var(--surface2);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;">Log In</a>
+        <a id="gate-register-link" href="/register/" style="height:40px;padding:0 20px;border-radius:9px;border:none;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;">Sign Up Free →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rate limit gate -->
+  <div id="rate-limit-gate" style="display:none;">
+    <div class="state-box">
+      <div class="si">⏳</div>
+      <h3>Daily limit reached</h3>
+      <p>You've used all <strong id="rl-limit-num">5</strong> searches for today. Resets at midnight UTC · <span id="rl-reset-time"></span></p>
+      <a href="/pricing/" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;height:40px;padding:0 20px;border-radius:9px;border:none;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;text-decoration:none;">Upgrade to Plus — 50 searches/day →</a>
+    </div>
+  </div>
+
   <!-- Table -->
-  <div class="table-wrap">
+  <div class="table-wrap" id="tableWrap">
     <div class="state-box" id="stateBox">
       <div class="si">🌾</div>
       <h3>Ready to search</h3>
-      <p>Pilih crop type, oasis filter, lalu klik Search.</p>
+      <p>Select a crop type, oasis filter, then click Search.</p>
     </div>
     <table id="mainTable" style="display:none">
       <thead>
@@ -375,87 +404,160 @@ td{padding:10px 14px;vertical-align:middle;}
   </div>
 
   <div class="info-note" id="infoNote" style="display:none">
-    💡 <b>Claimable Oasis</b> = jumlah oasis dalam grid 5×5 di sekitar tile (Chebyshev distance ≤ 2).
-    Status <b>Free</b> = tile kosong di map.sql. Distance dihitung dari titik X,Y yang kamu masukkan.
+    💡 <b>Claimable Oasis</b> = number of oases within a 5×5 grid around the tile (Chebyshev distance ≤ 2).
+    Status <b>Free</b> = unoccupied tile on the map. Distance is calculated from the X,Y coordinates you entered.
   </div>
 </main>
 
 <script>
-const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
+// ── CONSTANTS ────────────────────────────────────────────────
+const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
+const SERVER      = 'ts5';
+const SERVER_SLUG = 'ts5.x1.asia';
+const SERVER_DOMAIN = 'ts5.x1.asia.travian.com';
+const PREVIEW_CAP = 500;
 
-// state
-let results = [], sortKey = 'oasisCount', sortDir = -1, page = 1;
+// ── STATE ────────────────────────────────────────────────────
+let results = [], sortKey = 'dist', sortDir = 1, page = 1;
 const PG = 50;
+let currentUser = null;
+let userRole    = 'free';
+let isPlus      = false;
 
+// ── WAIT FOR SUPABASE ────────────────────────────────────────
+function waitForSupabase(cb, tries = 0) {
+  if (typeof window.getUser === 'function') { cb(); return; }
+  if (tries > 20) { cb(); return; }
+  setTimeout(() => waitForSupabase(cb, tries + 1), 100);
+}
+
+// ── INIT AUTH ────────────────────────────────────────────────
+async function initAuth() {
+  currentUser = await window.getUser().catch(() => null);
+  if (!currentUser) {
+    const encoded = encodeURIComponent(`/s/${SERVER_SLUG}/village-finder/`);
+    document.getElementById('gate-login-link').href    = `/login/?redirect=${encoded}`;
+    document.getElementById('gate-register-link').href = `/register/?redirect=${encoded}`;
+    document.getElementById('auth-gate').style.display = 'block';
+    document.getElementById('tableWrap').style.display  = 'none';
+    document.getElementById('searchBtn').disabled = true;
+    return;
+  }
+  userRole = currentUser.user_metadata?.role || 'free';
+  isPlus   = userRole === 'plus' || userRole === 'pro';
+
+  // Fetch quota
+  fetchQuotaUsed().then(used => updateQuotaBadge(used));
+}
+
+// ── QUOTA ────────────────────────────────────────────────────
+async function fetchQuotaUsed() {
+  try {
+    const session = await window.getSession();
+    const token   = session?.access_token;
+    const res = await fetch(
+      `${API_BASE}/api/quota?endpoint=village-finder`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+    const data = await res.json();
+    return data.used || 0;
+  } catch { return 0; }
+}
+
+function updateQuotaBadge(used) {
+  const badge = document.getElementById('quota-badge');
+  if (!badge) return;
+  if (isPlus) { badge.style.display = 'none'; return; }
+  const remaining = Math.max(0, 5 - (used || 0));
+  badge.style.display = 'inline-block';
+  badge.textContent   = `${remaining}/5 searches today`;
+  badge.style.color   = remaining <= 1 ? 'var(--red)' : 'var(--amber)';
+  badge.style.background   = remaining <= 1 ? 'var(--red-bg)' : 'var(--amber-bg)';
+  badge.style.borderColor  = remaining <= 1 ? 'rgba(220,38,38,.2)' : 'rgba(217,119,6,.2)';
+}
+
+// ── API ───────────────────────────────────────────────────────
 async function apiGet(endpoint, params={}) {
   const url = new URL(`${API_BASE}/api/${endpoint}`);
   Object.entries(params).forEach(([k,v]) => { if(v !== null && v !== undefined) url.searchParams.set(k, v); });
-  const res = await fetch(url.toString());
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const headers = {};
+  try {
+    const session = await window.getSession();
+    if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+  } catch {}
+  const res = await fetch(url.toString(), { headers });
+  if (res.status === 401) { document.getElementById('auth-gate').style.display='block'; document.getElementById('tableWrap').style.display='none'; throw new Error('unauthorized'); }
+  if (res.status === 429) {
+    const json = await res.json().catch(()=>({}));
+    showRateLimit(json);
+    throw new Error('rate_limit_exceeded');
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const json = await res.json();
-  if(!json.ok) throw new Error(json.error || 'API error');
+  if (!json.ok) throw new Error(json.error || 'API error');
   return json;
 }
 
+function showRateLimit(json) {
+  document.getElementById('tableWrap').style.display  = 'none';
+  document.getElementById('statsBar').style.display   = 'none';
+  document.getElementById('infoNote').style.display   = 'none';
+  document.getElementById('rate-limit-gate').style.display = 'block';
+  const el = document.getElementById('rl-limit-num');
+  if (el) el.textContent = json.limit || 5;
+  const now = new Date();
+  const reset = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
+  const diff  = reset - now;
+  const hh = Math.floor(diff / 3600000), mm = Math.floor((diff % 3600000) / 60000);
+  const resetEl = document.getElementById('rl-reset-time');
+  if (resetEl) resetEl.textContent = `resets in ${hh}h ${mm}m`;
+}
+
+// ── RUN SEARCH ────────────────────────────────────────────────
 async function runSearch() {
-  const serverSel   = document.getElementById('serverSel');
-  const server      = serverSel.value;
-  const serverTiles = serverSel.selectedOptions[0].dataset.tiles || server;
+  if (!currentUser) { document.getElementById('auth-gate').style.display='block'; return; }
+  if (!activeCrops.size) { alert('Select at least one field type.'); return; }
+
   const cx       = parseInt(document.getElementById('cx').value) || 0;
   const cy       = parseInt(document.getElementById('cy').value) || 0;
   const minOasis = parseInt(document.getElementById('minOasis').value) || 0;
   const status   = document.querySelector('input[name=status]:checked').value;
 
-  // selected crops
-  // collect active crops + their labels
-  if (!activeCrops.size) { alert('Select at least one field type.'); return; }
-
-  // for single-variant crops (18/15/9), label is their data-label
-  // for 7c/6c, user must pick at least one variant
-  const selectedFTs = [...document.querySelectorAll('.ft-check:checked')];
+  // Collect selected crops (support multi-crop)
+  const selectedFTs    = [...document.querySelectorAll('.ft-check:checked')];
   const selectedLabels = selectedFTs.map(el => el.dataset.label);
-
-  // add single-variant crops that have no checkbox (auto-selected)
   const singleVariants = {18:'0-0-0-18', 15:'1-1-1-15', 9:'3-3-3-9'};
   for (const [c, lbl] of Object.entries(singleVariants)) {
     if (activeCrops.has(Number(c)) && !selectedLabels.includes(lbl)) selectedLabels.push(lbl);
   }
-
   if (!selectedLabels.length) { alert('Select at least one field type variant.'); return; }
+
+  // Multi-crop: kirim semua crops yang aktif sekaligus
   const crops = [...activeCrops];
 
-  // selected oasis types — empty means "don't filter by oasis type"
-  const oasisTypes = [...document.querySelectorAll('.oasis-check:checked')].map(el=>el.value);
+  const oasisTypes  = [...document.querySelectorAll('.oasis-check:checked')].map(el=>el.value);
   const filterByOasis = oasisTypes.length > 0;
+  const minBonus    = parseInt(document.getElementById('minBonus').value) || 0;
 
   const btn = document.getElementById('searchBtn');
   btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Searching…';
   setState('loading');
+  document.getElementById('rate-limit-gate').style.display = 'none';
+  document.getElementById('auth-gate').style.display = 'none';
+  document.getElementById('tableWrap').style.display = 'block';
 
   try {
-    // Single Worker API call — returns tiles, villages, oases
-    const data = await apiGet('villages', {
-      server: server,
-      crops:  crops.join(','),
-      page:   1,
-    });
+    const data = await apiGet('villages', { server: SERVER, crops: crops.join(','), page: 1 });
 
     const tiles    = data.tiles    || [];
     const villages = data.villages || [];
     const oases    = data.oases    || [];
 
-    if (data.is_preview) {
-      console.info(`Village finder: preview mode — showing ${tiles.length} of ${data.total} tiles`);
-    }
-
-    // Build lookup: koordinat desa → data desa
+    // Village lookup
     const villageMap = {};
-    for (const v of villages) {
-      villageMap[`${v.x},${v.y}`] = v;
-    }
+    for (const v of villages) villageMap[`${v.x},${v.y}`] = v;
 
-    // Build oasis array, filter by minBonus
-    const minBonus = parseInt(document.getElementById('minBonus').value) || 0;
+    // Oasis array, filtered by minBonus
     const oasisArr = oases
       .filter(o => Number(o.max_bonus) >= minBonus)
       .map(o => {
@@ -474,37 +576,31 @@ async function runSearch() {
     // Score tiap tile
     const scored = tiles.map(t => {
       const tx = Number(t.x), ty = Number(t.y);
-      const key = `${tx},${ty}`;
-      const village = villageMap[key] || null;
+      const village    = villageMap[`${tx},${ty}`] || null;
       const isOccupied = !!village;
 
-      // hitung oasis dalam 5x5 (chebyshev ≤ 2)
-      const nearby = oasisArr.filter(o =>
-        Math.max(Math.abs(o.x - tx), Math.abs(o.y - ty)) <= 3
-      );
+      // Oasis dalam 5x5 (Chebyshev ≤ 2)
+      const nearby = oasisArr.filter(o => Math.max(Math.abs(o.x - tx), Math.abs(o.y - ty)) <= 2);
 
-      // Group by iconUrl for display (opsi B: icon + count)
       const iconGroups = {};
       for (const o of nearby) {
-        const key = o.iconUrl;
-        if (!iconGroups[key]) iconGroups[key] = { iconUrl: o.iconUrl, typeName: o.typeName, count: 0 };
-        iconGroups[key].count++;
+        if (!iconGroups[o.iconUrl]) iconGroups[o.iconUrl] = { iconUrl: o.iconUrl, typeName: o.typeName, count: 0 };
+        iconGroups[o.iconUrl].count++;
       }
 
       const oasisCount = {
-        crop: nearby.filter(o=>o.hasCrop).length,
-        wood: nearby.filter(o=>o.hasWood).length,
-        clay: nearby.filter(o=>o.hasClay).length,
-        iron: nearby.filter(o=>o.hasIron).length,
+        crop:  nearby.filter(o=>o.hasCrop).length,
+        wood:  nearby.filter(o=>o.hasWood).length,
+        clay:  nearby.filter(o=>o.hasClay).length,
+        iron:  nearby.filter(o=>o.hasIron).length,
         total: nearby.length,
       };
 
-      // hitung berdasarkan tipe yang dipilih user (kalau kosong = total semua)
       const selectedCount = filterByOasis
         ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
         : oasisCount.total;
 
-      // euclidean distance dari center
+      // Sort utama: distance dari center
       const dist = Math.sqrt((tx-cx)**2 + (ty-cy)**2);
 
       return {
@@ -516,77 +612,102 @@ async function runSearch() {
         oasisCount,
         iconGroups: Object.values(iconGroups),
         selectedCount,
-        oasisCountDisplay: oasisTypes.length === 1
-          ? oasisCount[oasisTypes[0]]
-          : selectedCount,
+        oasisCountDisplay: oasisTypes.length === 1 ? oasisCount[oasisTypes[0]] : selectedCount,
         dist: Math.round(dist * 100) / 100,
         pop: village ? Number(village.population) : 0,
-        player_id: village?.player_id || '',
-        player_name: village?.player_name || '',
-        alliance_id: village?.alliance_id || '',
+        player_id:    village?.player_id || '',
+        player_name:  village?.player_name || '',
+        alliance_id:  village?.alliance_id || '',
         alliance_tag: village?.alliance_tag || '',
       };
     });
 
     // Apply filters
     let filtered = scored.filter(t => {
-      // field_label must match one of selected labels
       if (!selectedLabels.includes(t.field_label)) return false;
       if (filterByOasis && t.selectedCount < minOasis) return false;
-      if (status === 'free' && t.isOccupied) return false;
+      if (status === 'free'     && t.isOccupied)  return false;
       if (status === 'occupied' && !t.isOccupied) return false;
       return true;
     });
 
+    // Sort by distance dulu sebelum preview cap
+    filtered.sort((a, b) => a.dist - b.dist);
 
+    // Preview cap — Free: 500, Plus/Pro: semua
+    const total = filtered.length;
+    const isCapped = !isPlus && total > PREVIEW_CAP;
+    if (isCapped) filtered = filtered.slice(0, PREVIEW_CAP);
+
+    // Update quota badge
+    if (data.quota_used !== undefined) updateQuotaBadge(data.quota_used);
 
     results = filtered;
     page = 1;
-    sortKey = 'oasisCountDisplay';
-    sortDir = -1;
+    sortKey = 'dist';
+    sortDir = 1;
 
-    // Stats
     const free = filtered.filter(t=>!t.isOccupied).length;
     const maxO = filtered.length ? Math.max(...filtered.map(t=>t.oasisCount.total)) : 0;
-    document.getElementById('stTotal').textContent = filtered.length.toLocaleString();
+    document.getElementById('stTotal').textContent = isCapped
+      ? `${filtered.length.toLocaleString()} (preview of ${total.toLocaleString()})`
+      : filtered.length.toLocaleString();
     document.getElementById('stFree').textContent  = free.toLocaleString();
     document.getElementById('stOcc').textContent   = (filtered.length - free).toLocaleString();
     document.getElementById('stMax').textContent   = maxO;
     document.getElementById('statsBar').style.display = 'flex';
     document.getElementById('infoNote').style.display = 'block';
 
+    // Paywall banner
+    let paywall = document.getElementById('paywall-banner');
+    if (!paywall) {
+      paywall = document.createElement('div');
+      paywall.id = 'paywall-banner';
+      paywall.style.cssText = 'margin-top:2px;background:linear-gradient(135deg,#0b1a3d,#1a3068);border:1px solid rgba(37,99,235,.25);border-radius:14px;padding:24px 22px;display:flex;align-items:center;gap:20px;';
+      document.getElementById('tableWrap').appendChild(paywall);
+    }
+    if (isCapped) {
+      paywall.style.display = 'flex';
+      paywall.innerHTML = `
+        <div style="font-size:1.5rem">🔒</div>
+        <div style="flex:1">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:4px;">Showing ${PREVIEW_CAP} of ${total.toLocaleString()} results</div>
+          <div style="font-size:0.8rem;color:rgba(255,255,255,.6);">Upgrade to <strong style="color:rgba(255,255,255,.85)">Plus</strong> to see all results — $1.50/month</div>
+        </div>
+        <a href="/pricing/" style="height:38px;padding:0 18px;border-radius:9px;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;text-decoration:none;display:inline-flex;align-items:center;white-space:nowrap;flex-shrink:0;">Upgrade to Plus →</a>`;
+    } else {
+      paywall.style.display = 'none';
+    }
+
     render();
 
   } catch(err) {
-    setState('error', err.message);
-    console.error(err);
+    if (err.message !== 'rate_limit_exceeded' && err.message !== 'unauthorized') {
+      setState('error', err.message);
+      console.error(err);
+    }
   } finally {
-    btn.disabled = false; btn.textContent = 'Search';
+    btn.disabled = false; btn.innerHTML = '🔍 Search';
   }
 }
 
-// Resource name → CDN key
-const RES_KEY = { wood: 'lumber', clay: 'clay', iron: 'iron', crop: 'crop' };
-const CDN = '/cdn/icons/resource/';
+// ── ICON URL ──────────────────────────────────────────────────
+const CDN = 'https://travian.sonybukansoni.com/cdn/icons/resource/';
 
-// typeName → icon URL
-// e.g. "Wood" → lumber_tiny.png (25%), "Wood" with isDouble → lumber-lumber_medium.png
-// "Clay+Crop" → clay-crop_medium.png
 function oasisIconUrl(typeName, isDouble) {
-  const parts = typeName.toLowerCase().split('+').map(s => s.trim());
-  const keys = parts.map(p => {
-    if (p === 'wood' || p === 'lumber') return 'lumber';
-    if (p === 'clay' || p === 'earth') return 'clay';
-    if (p === 'iron' || p === 'metal') return 'iron';
-    if (p === 'crop' || p === 'grain' || p === 'wheat') return 'crop';
-    return p;
+  const parts = (typeName||'').toLowerCase().split('+').map(s => s.trim());
+  const keys  = parts.map(p => {
+    if (p.includes('wood') || p.includes('lumber')) return 'lumber';
+    if (p.includes('clay') || p.includes('earth'))  return 'clay';
+    if (p.includes('iron') || p.includes('metal'))  return 'iron';
+    if (p.includes('crop') || p.includes('grain') || p.includes('wheat')) return 'crop';
+    return p || 'crop';
   });
-  if (keys.length === 1 && !isDouble) return `${CDN}${keys[0]}_tiny.png`;
-  if (keys.length === 1 && isDouble)  return `${CDN}${keys[0]}-${keys[0]}_medium.png`;
-  return `${CDN}${keys[0]}-${keys[1]}_medium.png`;
+  if (keys.length >= 2)              return `${CDN}${keys[0]}-${keys[1]}_medium.png`;
+  if (isDouble)                      return `${CDN}${keys[0]}-${keys[0]}_medium.png`;
+  return `${CDN}${keys[0]}_tiny.png`;
 }
 
-// Parse resources array for type detection
 function parseResources(resources, bonusStr) {
   let arr = [];
   try { arr = JSON.parse(resources || '[]'); } catch(e) {}
@@ -597,14 +718,10 @@ function parseResources(resources, bonusStr) {
     if (s.includes('clay')) arr.push('clay');
     if (s.includes('iron')) arr.push('iron');
   }
-  return {
-    hasCrop: arr.includes('crop'),
-    hasWood: arr.includes('wood'),
-    hasClay: arr.includes('clay'),
-    hasIron: arr.includes('iron'),
-  };
+  return { hasCrop: arr.includes('crop'), hasWood: arr.includes('wood'), hasClay: arr.includes('clay'), hasIron: arr.includes('iron') };
 }
 
+// ── RENDER ────────────────────────────────────────────────────
 function render() {
   const sorted = [...results].sort((a,b) => {
     let av = a[sortKey], bv = b[sortKey];
@@ -612,46 +729,41 @@ function render() {
     return String(av).localeCompare(String(bv)) * sortDir;
   });
 
-  const total = sorted.length;
+  const total      = sorted.length;
   const totalPages = Math.max(1, Math.ceil(total / PG));
   page = Math.min(page, totalPages);
-  const pageData = sorted.slice((page-1)*PG, page*PG);
+  const pageData   = sorted.slice((page-1)*PG, page*PG);
 
   if (!total) { setState('no-results'); return; }
 
-  document.getElementById('stateBox').style.display = 'none';
+  document.getElementById('stateBox').style.display  = 'none';
   document.getElementById('mainTable').style.display = 'table';
 
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = pageData.map(t => {
-    const cropClass = t.crop >= 15 ? 'c15' : t.crop >= 9 ? 'c9' : t.crop >= 7 ? 'c7' : 'c6';
-    const travelLink = `https://ts5.x1.asia.travian.com/position_details.php?x=${t.x}&y=${t.y}`;
+    const cropClass   = t.crop >= 15 ? 'c15' : t.crop >= 9 ? 'c9' : t.crop >= 7 ? 'c7' : 'c6';
+    const travelLink  = `https://${SERVER_DOMAIN}/position_details.php?x=${t.x}&y=${t.y}`;
+    const statsBase   = `/s/${SERVER_SLUG}/statistics`;
 
-    // build oasis icon bubbles (opsi B: icon + count, grouped)
-    const serverSlug = document.getElementById('serverSel').selectedOptions[0].dataset.tiles
-      .replace('.travian.com','');
     const iconBubbles = t.iconGroups.length
       ? t.iconGroups.map(g =>
           `<span class="icon-bubble" title="${esc(g.typeName)}">
-            <img src="${g.iconUrl}" alt="${esc(g.typeName)}" class="oasis-icon">
+            <img src="${g.iconUrl}" alt="${esc(g.typeName)}" class="oasis-icon" onerror="this.style.display='none'">
             <span class="icon-count">×${g.count}</span>
           </span>`
-        ).join('')
-        + `<span class="ob ob-total">${t.oasisCount.total} total</span>`
+        ).join('') + `<span class="ob ob-total">${t.oasisCount.total} total</span>`
       : '<span class="no-data">—</span>';
 
     const playerLink = t.player_id
-      ? `<a class="player-link" href="/statistics/${serverSlug}/player/?id=${t.player_id}">${esc(t.player_name)}</a>`
+      ? `<a class="player-link" href="${statsBase}/player/?id=${t.player_id}">${esc(t.player_name)}</a>`
       : '<span class="no-data">—</span>';
 
     const allianceLink = t.alliance_id && t.alliance_tag
-      ? `<a class="alliance-link" href="/statistics/${serverSlug}/alliance/?id=${t.alliance_id}"><span class="alliance-tag">${esc(t.alliance_tag)}</span></a>`
+      ? `<a class="alliance-link" href="${statsBase}/alliance/?id=${t.alliance_id}"><span class="alliance-tag">${esc(t.alliance_tag)}</span></a>`
       : '<span class="no-data">—</span>';
 
     return `<tr>
-      <td>
-        <a class="coord-link" href="${travelLink}" target="_blank">(${t.x}|${t.y})</a>
-      </td>
+      <td><a class="coord-link" href="${travelLink}" target="_blank">(${t.x}|${t.y})</a></td>
       <td>
         <div class="land-badge">
           <span class="crop-pill ${cropClass}">${t.crop}c</span>
@@ -659,15 +771,9 @@ function render() {
           <span class="status-text ${t.isOccupied?'occupied':'free'}">${t.isOccupied?'Occupied':'Free'}</span>
         </div>
       </td>
-      <td>
-        <div class="oasis-icons-row">
-          ${iconBubbles}
-        </div>
-      </td>
-      <td class="hide-m">
-        ${t.isOccupied ? `<span class="pop-val">${Number(t.pop).toLocaleString()}</span>` : '<span class="no-data">—</span>'}
-      </td>
-      <td><span class="dist-val">${t.dist.toFixed(2)}</span></td>
+      <td><div class="oasis-icons-row">${iconBubbles}</div></td>
+      <td class="hide-m">${t.isOccupied ? `<span class="pop-val">${Number(t.pop).toLocaleString()}</span>` : '<span class="no-data">—</span>'}</td>
+      <td><span class="dist-val">${t.dist.toFixed(1)}</span></td>
       <td class="hide-m">${playerLink}</td>
       <td class="hide-m">${allianceLink}</td>
     </tr>`;
@@ -679,7 +785,7 @@ function render() {
 
 function sortBy(key) {
   if (sortKey === key) sortDir *= -1;
-  else { sortKey = key; sortDir = -1; }
+  else { sortKey = key; sortDir = key === 'dist' ? 1 : -1; }
   page = 1;
   render();
 }
@@ -689,7 +795,7 @@ function updateArrows() {
     const el = document.getElementById(`arr-${k}`);
     if (!el) return;
     const th = el.closest('th');
-    if (k === sortKey) { el.textContent = sortDir===-1?'↓':'↑'; th?.classList.add('sorted'); }
+    if (k === sortKey) { el.textContent = sortDir === 1 ? '↑' : '↓'; th?.classList.add('sorted'); }
     else { el.textContent = '↕'; th?.classList.remove('sorted'); }
   });
 }
@@ -716,21 +822,21 @@ function renderPager(totalPages) {
 
 function pageRange(cur, total) {
   if (total<=7) return Array.from({length:total},(_,i)=>i+1);
-  if (cur<=4) return [1,2,3,4,5,'…',total];
+  if (cur<=4)   return [1,2,3,4,5,'…',total];
   if (cur>=total-3) return [1,'…',total-4,total-3,total-2,total-1,total];
   return [1,'…',cur-1,cur,cur+1,'…',total];
 }
 
 function setState(type, msg) {
   document.getElementById('mainTable').style.display = 'none';
-  document.getElementById('pager').style.display = 'none';
+  document.getElementById('pager').style.display     = 'none';
   const el = document.getElementById('stateBox');
   el.style.display = 'block';
   const cfg = {
-    loading: ['⏳','Fetching data…','Mengambil tiles, villages, dan oases dari Turso…'],
-    error:   ['⚠️','Connection error', msg||'Could not connect to server. Please try again.'],
-    'no-results': ['🔍','Tidak ada hasil','Coba ubah filter crop, oasis, atau status.'],
-    default: ['🌾','Ready to search','Pilih crop type, oasis filter, lalu klik Search.'],
+    loading:    ['⏳','Fetching data…','Loading tiles, villages, and oases from the database…'],
+    error:      ['⚠️','Connection error', msg||'Could not connect to server. Please try again.'],
+    'no-results':['🔍','No results found','Try adjusting the crop type, oasis filter, or status.'],
+    default:    ['🌾','Ready to search','Select a crop type, oasis filter, then click Search.'],
   };
   const [si,h3,p] = cfg[type]||cfg.default;
   el.innerHTML = `<div class="si">${si}</div><h3>${h3}</h3><p>${p}</p>`;
@@ -743,7 +849,7 @@ function esc(s) {
 document.getElementById('cx').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
 document.getElementById('cy').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
 
-// active crop counts set
+// ── CROP SELECTOR ─────────────────────────────────────────────
 const activeCrops = new Set();
 
 function toggleCropCount(btn) {
@@ -752,12 +858,10 @@ function toggleCropCount(btn) {
   if (activeCrops.has(crop)) {
     activeCrops.delete(crop);
     btn.classList.remove('active', colorMap[crop]);
-    // uncheck all variants of this crop
     document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = false);
   } else {
     activeCrops.add(crop);
     btn.classList.add('active', colorMap[crop]);
-    // for 9c/15c/18c auto-check the single variant
     if (crop !== 7 && crop !== 6) {
       document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = true);
     }
@@ -766,35 +870,33 @@ function toggleCropCount(btn) {
 }
 
 function updateVariantVisibility() {
-  const has7 = activeCrops.has(7);
-  const has6 = activeCrops.has(6);
-  const showVariants = has7 || has6;
-  document.getElementById('ftVariants').style.display = showVariants ? 'block' : 'none';
+  const has7 = activeCrops.has(7), has6 = activeCrops.has(6);
+  document.getElementById('ftVariants').style.display = (has7||has6) ? 'block' : 'none';
   document.getElementById('ftvg7').style.display = has7 ? 'flex' : 'none';
   document.getElementById('ftvg6').style.display = has6 ? 'flex' : 'none';
 }
 
 function selectAllFT() {
-  document.querySelectorAll('.ft-count-btn').forEach(btn => {
-    if (!btn.classList.contains('active')) toggleCropCount(btn);
-  });
+  document.querySelectorAll('.ft-count-btn').forEach(btn => { if (!btn.classList.contains('active')) toggleCropCount(btn); });
   document.querySelectorAll('.ft-check').forEach(el => el.checked = true);
 }
 function clearAllFT() {
   activeCrops.clear();
-  document.querySelectorAll('.ft-count-btn').forEach(btn => {
-    btn.className = 'ft-count-btn';
-  });
+  document.querySelectorAll('.ft-count-btn').forEach(btn => { btn.className = 'ft-count-btn'; });
   document.querySelectorAll('.ft-check').forEach(el => el.checked = false);
   updateVariantVisibility();
 }
 function selectCropFT(crop) {
   document.querySelectorAll(`.ft-check[data-crop="${crop}"]`).forEach(el => el.checked = true);
 }
+
+// ── BOOT ──────────────────────────────────────────────────────
+waitForSupabase(() => { initAuth(); });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
-<script src="/navbar.js"></script>>
+<script src="/navbar.js"></script>
 </body>
 </html>
