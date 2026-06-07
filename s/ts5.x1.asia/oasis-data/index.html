@@ -649,7 +649,8 @@
     hideAll();
     show('default-state');
     show('controls', 'grid');
-    updateQuotaInfo();
+    const used = await fetchQuotaUsed();
+    updateQuotaInfo(used);
   }
 
   // ── QUOTA INFO ───────────────────────────────────────────────────
@@ -1006,6 +1007,20 @@
     setTimeout(() => waitForSupabase(cb, tries + 1), 100);
   }
   waitForSupabase(init);
+
+// Fetch quota hari ini dari Worker
+async function fetchQuotaUsed() {
+  try {
+    const session = await window.getSession();
+    const token   = session?.access_token;
+    const res     = await fetch(
+      `${API_BASE}/api/quota?endpoint=oasis-data`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+    const data = await res.json();
+    return data.used || 0;
+  } catch { return 0; }
+}  
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
