@@ -82,7 +82,7 @@
         label: 'Explore',
         dropdown: [
           { icon: '🗺️', title: 'Interactive Map',  desc: 'Explore the live server map',       badge: 'FREE', serverTool: 'map',                        serverBased: true  },
-          { icon: '🌿', title: 'Village Finder',   desc: 'Search best village for settler',   badge: 'FREE', serverTool: 'village-finder',             serverBased: true  },
+          { icon: '🌿', title: 'Village Finder',   desc: 'Search best village for settler',   badge: 'PLUS', serverTool: 'village-finder',             serverBased: true  },
           { icon: '🌿', title: 'Oasis Database',   desc: 'All oasis for your farming needs',  badge: 'PLUS', serverTool: 'oasis-data',                 serverBased: true  },
         ],
       },
@@ -106,7 +106,7 @@
 
     allianceItems: [
       { icon: '🏰', title: 'Workspace',       desc: 'Alliance dashboard & overview',      badge: 'FREE', href: '/alliance/workspace/'           },
-      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PRO',  href: '/alliance/troop-summary/'    },
+      { icon: '💂', title: 'Troop Summary',   desc: 'Aggregate member troops',            badge: 'PLUS',  href: '/alliance/troop-summary/'    },
       { icon: '🗡️', title: 'Attack Plan',     desc: 'Coordinate multi-target attacks',    badge: 'SOON',  href: '#'    },
       { icon: '🛡️', title: 'Defense Plan',    desc: 'Organize defensive assignments',     badge: 'SOON',  href: '#'   },
       { icon: '🏺', title: 'Artifact Tracker',desc: 'Track alliance artifacts',           badge: 'SOON',  href: '#' },
@@ -198,15 +198,18 @@
   // ─── BUILD SERVER SWITCHER ─────────────────────────────────────────────────
   function buildServerSwitcher() {
     if (!activeServer) return '';
-    const serverItems = SERVERS_REF.filter(s => s.active).map(s => {
-      const isCurrent = s.slug === activeServer;
-      const newPath = window.location.pathname.replace(
+    const serverItems = SERVERS_REF.map(s => {
+      const isCurrent  = s.slug === activeServer;
+      const isActive   = s.active;
+      const newPath    = window.location.pathname.replace(
         new RegExp(`^/s/${activeServer}/`), `/s/${s.slug}/`
       );
+      const href = isActive ? newPath : '/s/';
+      const label = s.isNew ? `${s.label} <span style="font-size:0.55rem;font-weight:700;background:rgba(217,119,6,0.12);color:#d97706;padding:1px 5px;border-radius:4px;vertical-align:middle">NEW</span>` : s.label;
       return `
-      <a href="${newPath}" class="tt-sw-item${isCurrent ? ' tt-sw-item--current' : ''}">
-        <span class="tt-sw-item-label">${s.label}</span>
-        <span class="tt-sw-item-meta">${s.speed}× · ${s.domain}</span>
+      <a href="${href}" class="tt-sw-item${isCurrent ? ' tt-sw-item--current' : ''}">
+        <span class="tt-sw-item-label">${label}</span>
+        <span class="tt-sw-item-meta">${s.speed}× · ${s.region}${!isActive ? ' · <span style="color:#d97706">Soon</span>' : ''}</span>
         ${isCurrent ? '<span class="tt-sw-check">✓</span>' : ''}
       </a>`;
     }).join('');
@@ -220,7 +223,7 @@
         </svg>
       </button>
       <div class="tt-nav-dropdown tt-sw-dropdown">
-        <div class="tt-sw-header">Active Server</div>
+        <div class="tt-sw-header">Switch Server</div>
         ${serverItems}
         <a href="/s/" class="tt-sw-footer">
           <span>View all servers</span>
@@ -277,10 +280,17 @@
     if (!session) {
       actionsEl.innerHTML = `
         ${serverSwitcher}${sep}
+        <a href="https://discord.gg/traviantools" target="_blank" rel="noopener" class="tt-btn tt-btn-ghost" title="Join our Discord" style="padding:7px 10px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        </a>
         <a href="/login/"    class="tt-btn tt-btn-ghost">Log In</a>
         <a href="/register/" class="tt-btn tt-btn-primary">Sign Up Free</a>
       `;
       if (mobileCtaEl) mobileCtaEl.innerHTML = `
+        <a href="https://discord.gg/traviantools" target="_blank" rel="noopener" class="tt-btn tt-btn-ghost" style="width:100%;justify-content:center;gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Discord
+        </a>
         <a href="/login/"    class="tt-btn tt-btn-ghost"   style="width:100%;justify-content:center;">Log In</a>
         <a href="/register/" class="tt-btn tt-btn-primary" style="width:100%;justify-content:center;">Sign Up Free</a>
       `;
@@ -338,11 +348,23 @@
       </div>
     </div>`;
 
-    actionsEl.innerHTML = `${serverSwitcher}${sep}${avatarDropdown}`;
+    actionsEl.innerHTML = `${serverSwitcher}${sep}
+      <a href="https://discord.gg/traviantools" target="_blank" rel="noopener" class="tt-btn tt-btn-ghost" title="Join our Discord" style="padding:7px 10px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      </a>
+      ${!isPro ? `<a href="/pricing/" class="tt-btn tt-btn-ghost" style="color:#d97706;border-color:rgba(217,119,6,0.3);font-size:0.8rem;padding:6px 12px;">⬆ Upgrade</a>` : ''}
+      ${avatarDropdown}`;
 
-    // Mobile: tambah My Stuff + Alliance + logout
+    // Mobile: tambah Discord + Upgrade + My Stuff + Alliance + logout
     if (mobileCtaEl) {
       mobileCtaEl.innerHTML = `
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+          <a href="https://discord.gg/traviantools" target="_blank" rel="noopener" class="tt-btn tt-btn-ghost" style="flex:1;justify-content:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057c.002.022.015.043.032.056a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            Discord
+          </a>
+          ${!isPro ? `<a href="/pricing/" class="tt-btn tt-btn-ghost" style="flex:1;justify-content:center;color:#d97706;border-color:rgba(217,119,6,0.3);">⬆ Upgrade</a>` : ''}
+        </div>
         <div class="tt-mob-group">
           <div class="tt-mob-label">My Stuff</div>
           ${NAVBAR_CONFIG.myStuffItems.map(i => `

@@ -604,7 +604,7 @@
       const session = await window.getSession();
       if (session) {
         const params  = new URLSearchParams(window.location.search);
-        const returnParam = params.get('return') || params.get('next');
+        const returnParam = params.get('redirect') || params.get('return') || params.get('next');
         if (returnParam && returnParam.startsWith('/') && !returnParam.startsWith('//')) {
           sessionStorage.removeItem('tt_login_return');
           window.location.replace(returnParam);
@@ -620,11 +620,10 @@
       }
     })();
 
-    // Ambil redirect target dari query param ?return= atau ?next=, fallback sessionStorage
+    // Ambil redirect target dari query param ?redirect= atau ?return= atau ?next=, fallback sessionStorage
     function getRedirectTarget() {
       const params = new URLSearchParams(window.location.search);
-      // Cek ?return= (dari join page) lalu ?next= (legacy), lalu sessionStorage
-      const returnParam = params.get('return') || params.get('next');
+      const returnParam = params.get('redirect') || params.get('return') || params.get('next');
       if (returnParam && returnParam.startsWith('/') && !returnParam.startsWith('//')) {
         sessionStorage.removeItem('tt_login_return');
         return returnParam;
