@@ -22,12 +22,11 @@
     body { background:#fff; color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
     body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,rgba(37,99,235,0.055) 1px,transparent 1px); background-size:32px 32px; pointer-events:none; z-index:0; }
 
-    /* ── PAGE HEADER (canonical pattern) ── */
     .page-header {
       position:relative; z-index:1;
       border-bottom:1px solid var(--border);
       background:var(--surface);
-      padding:28px 40px 24px;
+      padding:8px 40px;
     }
     .breadcrumb { display:flex; align-items:center; gap:6px; font-size:0.75rem; color:var(--text3); margin-bottom:10px; }
     .breadcrumb a { color:var(--text3); text-decoration:none; transition:color 0.15s; }
@@ -46,10 +45,8 @@
 
     .page-wrap { position:relative; z-index:1; max-width:1060px; margin:0 auto; padding:40px 24px 80px; }
 
-    /* Two-column layout */
     .layout { display:grid; grid-template-columns:1fr 380px; gap:24px; align-items:start; }
 
-    /* Paste area */
     .paste-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:24px; animation:fadeUp 0.35s ease 0.05s both; }
     .paste-label { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); margin-bottom:10px; }
     .paste-area {
@@ -67,15 +64,8 @@
     .btn-clear { font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:500; background:none; color:var(--text3); border:1px solid var(--border); border-radius:9px; padding:10px 18px; cursor:pointer; transition:all 0.15s; }
     .btn-clear:hover { color:var(--text2); border-color:var(--border2); background:var(--surface2); }
 
-    /* Strip notice */
-    .strip-notice {
-      margin-top:10px; padding:8px 12px;
-      background:var(--green-bg); border:1px solid rgba(5,150,105,0.2);
-      border-radius:8px; font-size:0.75rem; color:var(--green);
-      display:none;
-    }
+    .strip-notice { margin-top:10px; padding:8px 12px; background:var(--green-bg); border:1px solid rgba(5,150,105,0.2); border-radius:8px; font-size:0.75rem; color:var(--green); display:none; }
 
-    /* Share card */
     .share-card { background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:20px; animation:fadeUp 0.35s ease 0.1s both; position:sticky; top:80px; }
     .share-title { font-family:'Space Grotesk',sans-serif; font-size:0.9rem; font-weight:700; color:var(--navy); margin-bottom:14px; }
     .share-info { font-size:0.78rem; color:var(--text2); line-height:1.6; margin-bottom:16px; }
@@ -93,9 +83,8 @@
     .btn-copy:hover { background:var(--blue); }
     .btn-copy.copied { background:var(--green); }
     .share-note { font-size:0.72rem; color:var(--text3); margin-top:8px; line-height:1.5; }
-    .pro-note { background:var(--amber-bg); border:1px solid rgba(217,119,6,0.2); border-radius:8px; padding:10px 12px; font-size:0.75rem; color:var(--amber); line-height:1.5; margin-top:10px; }
+    .plus-note { background:var(--amber-bg); border:1px solid rgba(217,119,6,0.2); border-radius:8px; padding:10px 12px; font-size:0.75rem; color:var(--amber); line-height:1.5; margin-top:10px; }
 
-    /* Save Intel button in share card */
     .intel-divider { border:none; border-top:1px solid var(--border); margin:14px 0; }
     .btn-save-intel {
       width:100%; font-family:'DM Sans',sans-serif; font-size:0.875rem; font-weight:600;
@@ -105,22 +94,14 @@
       display:flex; align-items:center; justify-content:center; gap:8px;
       transition:all 0.18s; margin-top:10px;
     }
-    .btn-save-intel.active {
-      background:var(--purple-bg); color:var(--purple);
-      border-color:rgba(124,58,237,0.3); cursor:pointer; opacity:1;
-    }
+    .btn-save-intel.active { background:var(--purple-bg); color:var(--purple); border-color:rgba(124,58,237,0.3); cursor:pointer; opacity:1; }
     .btn-save-intel.active:hover { background:rgba(124,58,237,0.14); }
-    .btn-save-intel.saved {
-      background:var(--green-bg); color:var(--green);
-      border-color:rgba(5,150,105,0.3); cursor:default; opacity:1;
-    }
+    .btn-save-intel.saved { background:var(--green-bg); color:var(--green); border-color:rgba(5,150,105,0.3); cursor:default; opacity:1; }
     .intel-note { font-size:0.72rem; color:var(--text3); margin-top:6px; line-height:1.5; text-align:center; }
     .intel-note a { color:var(--blue2); text-decoration:none; font-weight:600; }
 
-    /* Error box */
     .parse-error { background:var(--red-bg); border:1px solid rgba(220,38,38,0.2); border-radius:10px; padding:12px 16px; font-size:0.825rem; color:var(--red); margin-top:14px; display:none; line-height:1.5; }
 
-    /* ── REPORT DISPLAY ── */
     .report-display { margin-top:28px; animation:fadeUp 0.4s ease both; display:none; }
     .report-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
     .report-header { padding:20px 24px; border-bottom:1px solid var(--border); background:var(--surface2); }
@@ -180,7 +161,6 @@
     .stat-icon-sm { width:14px; height:14px; object-fit:contain; vertical-align:middle; }
     .row-icon { width:14px; height:14px; object-fit:contain; vertical-align:middle; display:block; margin:0 auto; }
 
-    /* ── MODAL ── */
     .modal-backdrop { position:fixed; inset:0; background:rgba(15,33,83,0.35); backdrop-filter:blur(4px); z-index:1000; display:flex; align-items:center; justify-content:center; animation:fadeIn 0.15s ease; }
     .modal-box { background:var(--surface); border:1px solid var(--border); border-radius:18px; padding:28px; width:100%; max-width:460px; box-shadow:0 24px 64px rgba(15,33,83,0.15); animation:fadeUp 0.2s ease; }
     .modal-title { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:4px; }
@@ -229,7 +209,6 @@
       </div>
       <div class="page-badges">
         <span class="page-badge free">FREE</span>
-        <span class="page-badge no-login">No login required</span>
       </div>
     </div>
   </div>
@@ -237,7 +216,6 @@
   <div class="page-wrap">
     <div class="layout">
 
-      <!-- Left: paste area -->
       <div>
         <div class="paste-card">
           <div class="paste-label">Paste your report (Ctrl+A → Ctrl+C from Travian)</div>
@@ -253,7 +231,6 @@
         <div class="report-display" id="reportDisplay"></div>
       </div>
 
-      <!-- Right: share + intel card -->
       <div>
         <div class="share-card">
           <div class="share-title">🔗 Share this report</div>
@@ -276,7 +253,7 @@
             </div>
             <div class="share-note" id="shareNote"></div>
           </div>
-          <div class="pro-note">⭐ <b>Pro users</b> get permanent links + saved report history in their account.</div>
+          <div class="plus-note">⭐ <b>Plus & Pro users</b> get permanent links + saved report history in their account.</div>
 
           <hr class="intel-divider">
 
@@ -291,47 +268,30 @@
   </div>
 
   <script>
-    // ── PRE-PROCESSOR: strip full-page noise ──────────────────────────
+    // ── PRE-PROCESSOR ─────────────────────────────────────────────────
     function stripNoise(raw) {
       const lines = raw.split('\n');
-
-      // End markers — everything from here is footer noise
-      const endMarkers = [
-        /^task overview$/i,
-        /^homepage\s+discord/i,
-        /^©\s*200[0-9]/i,
-        /^village groups/i,
-      ];
-
-      // Find report start: line containing action keywords (title line)
+      const endMarkers = [/^task overview$/i,/^homepage\s+discord/i,/^©\s*200[0-9]/i,/^village groups/i];
       const titleRe = /\b(raids?|attacks?|scouts?|conquers?|reinforces?|returns?)\b/i;
       let startIdx = -1;
       for (let i = 0; i < lines.length; i++) {
         if (titleRe.test(lines[i].trim())) { startIdx = i; break; }
       }
-
-      // Find report end
       let endIdx = lines.length;
       for (let i = (startIdx > -1 ? startIdx : 0); i < lines.length; i++) {
         if (endMarkers.some(re => re.test(lines[i].trim()))) { endIdx = i; break; }
       }
-
       if (startIdx === -1) return { text: raw, stripped: false };
-
-      const extracted = lines.slice(startIdx, endIdx).join('\n');
-      const stripped = startIdx > 0 || endIdx < lines.length;
-      return { text: extracted, stripped };
+      return { text: lines.slice(startIdx, endIdx).join('\n'), stripped: startIdx > 0 || endIdx < lines.length };
     }
 
     // ── PARSER ────────────────────────────────────────────────────────
     function parseReport(raw) {
-      // Pre-process: strip noise
       const { text, stripped } = stripNoise(raw);
       window._lastStripped = stripped;
-
       const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
       const report = {
-        title: '', date: '',
+        title: '', date: '', type: 'battle',
         attacker: { alliance:'', player:'', village:'', coords:'', troops:[], sent:[], casualties:[], wounded:[], info:[] },
         defenders: [],
         bounty: { wood:0, clay:0, iron:0, crop:0, carry:0, maxCarry:0 },
@@ -341,7 +301,7 @@
       let i = 0;
       const reportKeywords = /\b(raids?|attacks?|scouts?|conquers?|reinforces?|returns?)\b/i;
       for (i = 0; i < lines.length; i++) {
-        if (reportKeywords.test(lines[i])) { report.title = lines[i]; break; }
+        if (reportKeywords.test(lines[i])) { report.title = lines[i]; if (/scouts?/i.test(lines[i])) report.type = 'scout'; break; }
       }
 
       const dateRe = /\d{2}\.\d{2}\.\d{2,4},?\s+\d{2}:\d{2}:\d{2}/;
@@ -350,28 +310,22 @@
         if (m) { report.date = m[0]; break; }
       }
 
-      // Server detection
       const serverRe = /([a-z0-9]+\.x\d+\.[a-z]+\.travian\.com|ts\d+\.x\d+\.[a-z]+)/i;
       for (let j = 0; j < Math.min(20, lines.length); j++) {
         const sm = lines[j].match(serverRe);
-        if (sm) {
-          window._reportServerSlug = sm[1].replace(/\.travian\.com$/, '');
-          break;
-        }
+        if (sm) { window._reportServerSlug = sm[1].replace(/\.travian\.com$/, ''); break; }
       }
       if (!window._reportServerSlug) {
         const urlParts = window.location.pathname.split('/').filter(Boolean);
         if (urlParts[0] === 's' && urlParts[1]) window._reportServerSlug = urlParts[1];
       }
 
-      // Find Attacker block
       let atkIdx = -1;
       for (let j = 0; j < lines.length; j++) {
         if (/^attacker$/i.test(lines[j])) { atkIdx = j; break; }
       }
       if (atkIdx !== -1) parseSide(lines, atkIdx + 1, report.attacker);
 
-      // Find ALL Defender blocks
       const defPositions = [];
       for (let j = 0; j < lines.length; j++) {
         if (/^defender$/i.test(lines[j])) defPositions.push(j);
@@ -387,8 +341,7 @@
         if (def.troops.length || def.player) report.defenders.push(def);
       }
 
-      // Bounty
-      const bountyIdx = lines.findIndex(l => /^bounty$/i.test(l));
+      const bountyIdx = lines.findIndex(l => /^(bounty|resources)$/i.test(l));
       if (bountyIdx !== -1) {
         const nums = [];
         for (let j = bountyIdx + 1; j < Math.min(bountyIdx + 15, lines.length); j++) {
@@ -409,7 +362,6 @@
         if (nums.length >= 4) report.bounty.crop = nums[3];
       }
 
-      // Statistics
       const statsIdx = lines.findIndex(l => /^statistics$/i.test(l));
       if (statsIdx !== -1) {
         for (let j = statsIdx + 1; j < Math.min(statsIdx + 20, lines.length); j++) {
@@ -473,14 +425,16 @@
         if (numRows >= 3) break;
       }
 
-      // Info lines — stop at known section headers OR at village-list patterns
       const afterTroops = troopHeaderIdx + 1 + numRows;
-      const stopWords = /^(bounty|defender|attacker|statistics|population:|loyalty:|villages\s+\d|village groups|task overview)$/i;
+      const stopWords = /^(bounty|resources|defender|attacker|statistics|village groups|task overview)$/i;
+      const isPlayerInfoLine = l => /^population:/i.test(l) || /^loyalty:/i.test(l) || /^villages\s+[\d\/]/i.test(l);
       const infoLines = [];
       for (let i = afterTroops; i < Math.min(afterTroops + 15, lines.length); i++) {
         if (stopWords.test(lines[i])) break;
+        if (isPlayerInfoLine(lines[i])) break;
         if (/^\d+h$/.test(lines[i])) break;
-        if (/^\d{3}\s+\w/.test(lines[i])) break; // village list pattern "001 Shift"
+        if (/^\d{3}\s+\w/.test(lines[i])) break;
+        if (i + 1 < lines.length && isPlayerInfoLine(lines[i + 1])) break;
         if (lines[i].length > 0) infoLines.push(lines[i]);
       }
       if (infoLines.length) side.info = infoLines;
@@ -520,7 +474,6 @@
         const alliHtml = side.alliance ? `<span class="side-alliance">[${esc(side.alliance)}]</span>` : '';
         const coordUrl = side.coords ? coordToUrl(side.coords) : '#';
         const serverSlug = window._reportServerSlug || 'ts5.x1.asia';
-        const playerHref = side.player ? `/s/${serverSlug}/statistics/player/?name=${encodeURIComponent(side.player)}` : '#';
         const troops = side.troops || [], sent = side.sent || [], casualties = side.casualties || [], wounded = side.wounded || [];
         const hasWounded = wounded.some(v => v !== null && v > 0);
 
@@ -541,8 +494,8 @@
           <div class="side-header">
             ${badge}
             <div>
-              <div class="side-player">${reinforcementTag}${alliHtml}<a class="player-link" href="${playerHref}">${esc(side.player || '—')}</a></div>
-              ${side.village ? `<div class="side-village">from <a href="${coordUrl}" target="_blank">${esc(side.village)} ${esc(side.coords)}</a></div>` : ''}
+              <div class="side-player">${reinforcementTag}${alliHtml}<span class="player-link">${esc(side.player || '—')}</span></div>
+              ${side.village ? `<div class="side-village">from ${coordUrl ? `<a href="${coordUrl}" target="_blank">${esc(side.village)} ${esc(side.coords)}</a>` : `<span>${esc(side.village)} ${esc(side.coords)}</span>`}</div>` : ''}
             </div>
           </div>
           ${troops.length ? `
@@ -560,16 +513,16 @@
       };
 
       const bounty = r.bounty;
-      const hasBounty = bounty.wood || bounty.clay || bounty.iron || bounty.crop;
+      const hasBounty = bounty.wood || bounty.clay || bounty.iron || bounty.crop || bounty.carry;
       const bountyHtml = hasBounty ? `
         <div style="border-top:1px solid var(--border);padding:12px 24px;background:var(--surface2)">
           <div class="bounty-row">
-            <span class="bounty-label">Bounty</span>
+            <span class="bounty-label">${r.type === 'scout' ? 'Resources' : 'Bounty'}</span>
             ${bounty.wood ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.wood}"> ${bounty.wood.toLocaleString()}</span>` : ''}
             ${bounty.clay ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.clay}"> ${bounty.clay.toLocaleString()}</span>` : ''}
             ${bounty.iron ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.iron}"> ${bounty.iron.toLocaleString()}</span>` : ''}
             ${bounty.crop ? `<span class="bounty-item"><img class="res-icon" src="${window.TT?.ICONS.crop}"> ${bounty.crop.toLocaleString()}</span>` : ''}
-            ${bounty.carry ? `<span class="bounty-carry">(${bounty.carry.toLocaleString()}/${bounty.maxCarry.toLocaleString()})</span>` : ''}
+            ${bounty.carry !== undefined ? `<span class="bounty-carry">(${bounty.carry.toLocaleString()}/${bounty.maxCarry.toLocaleString()})</span>` : ''}
           </div>
         </div>` : '';
 
@@ -610,9 +563,32 @@
 
     function coordToUrl(coords) {
       const m = coords.match(/[−\-]?\d+/g);
-      if (!m || m.length < 2) return '#';
+      if (!m || m.length < 2) return null;
       const x = m[0].replace('−','-'), y = m[1].replace('−','-');
-      return `https://ts5.x1.asia.travian.com/position_details.php?x=${x}&y=${y}`;
+      const slug = window._reportServerSlug;
+      if (!slug) return null;
+      return `https://${slug}.travian.com/position_details.php?x=${x}&y=${y}`;
+    }
+
+    // ── OUTCOME — derived from casualties, not from text keywords ─────
+    function calcOutcome(r) {
+      if (r.type === 'scout') return 'scout';
+
+      const atkSent = (r.attacker.sent || []).reduce((a,b) => a+(b||0), 0);
+      const atkCas  = (r.attacker.casualties || []).reduce((a,b) => a+(b||0), 0);
+      const defCas  = (r.defenders || []).reduce((sum, d) =>
+        sum + (d.casualties || []).reduce((a,b) => a+(b||0), 0), 0);
+
+      // Can't determine if no troop data available
+      if (atkSent === 0 && atkCas === 0 && defCas === 0) return 'unknown';
+
+      const atkSurvivors = atkSent - atkCas;
+
+      if (atkSurvivors > 0 && atkCas === 0) return 'attacker_won_clean';
+      if (atkSurvivors > 0 && atkCas > 0)   return 'attacker_won_losses';
+      if (atkSurvivors <= 0 && defCas === 0) return 'defender_won_clean';
+      if (atkSurvivors <= 0 && defCas > 0)   return 'defender_won_losses';
+      return 'unknown';
     }
 
     // ── MAIN ACTIONS ─────────────────────────────────────────────────
@@ -633,6 +609,7 @@
 
       try {
         parsedReport = parseReport(raw);
+        parsedReport.outcome = calcOutcome(parsedReport);
 
         if (!parsedReport.attacker.player && !parsedReport.defenders?.length) {
           throw new Error('Could not detect attacker/defender. Make sure you copy the full report page (Ctrl+A → Ctrl+C).');
@@ -645,12 +622,9 @@
         document.getElementById('shareBtn').disabled = false;
         document.getElementById('shareResult').style.display = 'none';
 
-        // Show strip notice if noise was removed
         if (window._lastStripped) stripNotice.style.display = 'block';
 
-        // Update Save Intel button state
         updateIntelBtn();
-
         display.scrollIntoView({ behavior:'smooth', block:'start' });
       } catch(e) {
         errEl.textContent = '⚠️ ' + e.message;
@@ -699,44 +673,68 @@
     }
 
     // ── INTEL MODAL ───────────────────────────────────────────────────
+    function buildSideEntry(r, role, defIdx) {
+      if (role === 'attacker') {
+        const a = r.attacker;
+        return { role: 'attacker', name: a.player, alliance: a.alliance, village: a.village, coords: a.coords, troopNames: a.troops || [], sent: a.sent || [], casualties: a.casualties || [] };
+      } else {
+        const d = r.defenders[defIdx];
+        return { role: 'defender', name: d.player, alliance: d.alliance, village: d.village, coords: d.coords, troopNames: d.troops || [], sent: d.sent || [], casualties: d.casualties || [] };
+      }
+    }
+
+    function buildTroopData(side) {
+      const troopData = {};
+      side.troopNames.forEach((name, i) => {
+        const val = side.sent[i] ?? null;
+        if (val !== null && val > 0) troopData[name] = val;
+      });
+      return troopData;
+    }
+
+    function renderTroopSummary(side) {
+      const troopData = buildTroopData(side);
+      const entries = Object.entries(troopData);
+      if (!entries.length) return '<em style="color:var(--text3)">No troops detected</em>';
+      return entries.map(([name, count]) => `<strong>${count.toLocaleString()}</strong> ${esc(name)}`).join(' · ');
+    }
+
+    function buildSummaryHTML(side, r) {
+      const troopLine = renderTroopSummary(side);
+      const totalCas = side.casualties.reduce((a,b) => a+(b||0), 0);
+      const bounty = r.bounty;
+      const totalBounty = bounty.wood + bounty.clay + bounty.iron + bounty.crop;
+      const roleBadge = side.role === 'attacker'
+        ? `<span style="font-size:0.65rem;font-weight:700;background:var(--red-bg);color:var(--red);border:1px solid rgba(220,38,38,0.2);border-radius:100px;padding:2px 8px;margin-right:6px;">⚔️ ATTACKER</span>`
+        : `<span style="font-size:0.65rem;font-weight:700;background:var(--blue-glow);color:var(--blue2);border:1px solid rgba(37,99,235,0.2);border-radius:100px;padding:2px 8px;margin-right:6px;">🛡️ DEFENDER</span>`;
+      return `
+        ${roleBadge}<strong>${esc(side.name || '—')}</strong>${side.alliance ? ` [${esc(side.alliance)}]` : ''}<br>
+        ${side.village ? `<span style="color:var(--text3)">Village:</span> ${esc(side.village)}${side.coords ? ' '+esc(side.coords) : ''}<br>` : ''}
+        <span style="color:var(--text3)">Troops:</span> ${troopLine}
+        ${totalCas ? `<br><span style="color:var(--text3)">Losses:</span> <strong style="color:var(--red)">${totalCas.toLocaleString()}</strong>` : ''}
+        ${totalBounty ? `<br><span style="color:var(--text3)">Bounty:</span> <strong>${totalBounty.toLocaleString()} res</strong>` : ''}
+      `;
+    }
+
     function openIntelModal() {
       if (!parsedReport) return;
       const r = parsedReport;
+      const sides = [];
+      if (r.attacker.player) sides.push(buildSideEntry(r, 'attacker'));
+      r.defenders.forEach((d, i) => { if (d.player) sides.push(buildSideEntry(r, 'defender', i)); });
+      if (!sides.length) return;
 
-      // Build target list from defender(s) — skip reinforcement NPCs
-      const targets = r.defenders
-        .filter(d => d.player && !d.isReinforcement)
-        .map(d => ({ name: d.player, alliance: d.alliance, village: d.village, coords: d.coords, troops: d.sent || [], casualties: d.casualties || [] }));
-
-      if (!targets.length && r.attacker.player) {
-        targets.push({ name: r.attacker.player, alliance: r.attacker.alliance, village: r.attacker.village, troops: r.attacker.sent || [], casualties: r.attacker.casualties || [] });
-      }
-
-      // Build server options
       const activeServers = (window.SERVERS || []).filter(s => s.active);
       const serverOptions = activeServers.length > 0
         ? activeServers.map(s => `<option value="${s.slug}">${s.label} (${s.slug})</option>`).join('')
         : `<option value="ts5.x1.asia">TS5 Asia (ts5.x1.asia)</option>`;
 
-      // Build target options
-      const targetOptions = targets.map((t, i) =>
-        `<option value="${i}">${t.name}${t.alliance ? ' ['+t.alliance+']' : ''}${t.village ? ' · '+t.village : ''}</option>`
-      ).join('');
-
-      // Summary
-      const mainDef = targets[0];
-      const totalTroops = mainDef ? (mainDef.troops.reduce((a,b) => a+(b||0), 0)) : 0;
-      const totalCas    = mainDef ? (mainDef.casualties.reduce((a,b) => a+(b||0), 0)) : 0;
-      const bounty = r.bounty;
-      const totalBounty = bounty.wood + bounty.clay + bounty.iron + bounty.crop;
-
-      const summaryHTML = mainDef ? `
-        <strong>${esc(mainDef.name)}</strong>${mainDef.alliance ? ` [${esc(mainDef.alliance)}]` : ''}<br>
-        ${mainDef.village ? `Village: ${esc(mainDef.village)} ${esc(mainDef.coords||'')}<br>` : ''}
-        Troops detected: <strong>${totalTroops.toLocaleString()}</strong>
-        ${totalCas ? ` · Losses: <strong>${totalCas.toLocaleString()}</strong>` : ''}<br>
-        ${totalBounty ? `Bounty: <strong>${totalBounty.toLocaleString()} res</strong>` : ''}
-      ` : `<em>Report: ${esc(r.title)}</em>`;
+      const sideOptions = sides.map((s, i) => {
+        const roleLabel = s.role === 'attacker' ? '⚔️ Attacker' : '🛡️ Defender';
+        const alliPart = s.alliance ? ` [${s.alliance}]` : '';
+        const villagePart = s.village ? ` · ${s.village}` : '';
+        return `<option value="${i}">${roleLabel}: ${s.name}${alliPart}${villagePart}</option>`;
+      }).join('');
 
       const modal = document.createElement('div');
       modal.className = 'modal-backdrop';
@@ -744,15 +742,14 @@
       modal.innerHTML = `
         <div class="modal-box">
           <div class="modal-title">🕵️ Save Intel</div>
-          <div class="modal-sub">Battle data will be saved to your Intelligence Hub.</div>
-          ${targets.length > 1 ? `
+          <div class="modal-sub">Choose whose data to save to your Intelligence Hub.</div>
           <div class="modal-field">
             <label class="modal-label">SAVE INTEL FOR</label>
-            <select class="modal-input" id="intel-target-select">${targetOptions}</select>
-          </div>` : ''}
+            <select class="modal-input" id="intel-target-select" onchange="updateIntelSummary()" style="cursor:pointer">${sideOptions}</select>
+          </div>
           <div class="modal-field">
             <label class="modal-label">SUMMARY</label>
-            <div class="modal-summary">${summaryHTML}</div>
+            <div class="modal-summary" id="intel-summary-box">${buildSummaryHTML(sides[0], r)}</div>
           </div>
           <div class="modal-field">
             <label class="modal-label">SERVER</label>
@@ -769,81 +766,69 @@
         </div>`;
       modal.addEventListener('click', e => { if (e.target === modal) closeIntelModal(); });
       document.body.appendChild(modal);
-      window._intelTargets = targets;
+      window._intelSides = sides;
       setTimeout(() => document.getElementById('intel-notes-input')?.focus(), 100);
     }
 
-    function closeIntelModal() {
-      document.getElementById('intel-modal')?.remove();
+    function updateIntelSummary() {
+      const idx = parseInt(document.getElementById('intel-target-select')?.value || '0');
+      const side = (window._intelSides || [])[idx];
+      const box = document.getElementById('intel-summary-box');
+      if (side && box) box.innerHTML = buildSummaryHTML(side, parsedReport);
     }
+
+    function closeIntelModal() { document.getElementById('intel-modal')?.remove(); }
 
     async function confirmSaveIntel() {
       const btn = document.getElementById('intel-save-btn');
-      btn.disabled = true;
-      btn.textContent = 'Saving…';
+      btn.disabled = true; btn.textContent = 'Saving…';
 
       const user = await window.getUser();
       if (!user) { closeIntelModal(); return; }
 
-      const targetIdx = parseInt(document.getElementById('intel-target-select')?.value || '0');
-      const target = (window._intelTargets || [])[targetIdx] || window._intelTargets?.[0];
+      const idx = parseInt(document.getElementById('intel-target-select')?.value || '0');
+      const side = (window._intelSides || [])[idx] || window._intelSides?.[0];
+      if (!side) { closeIntelModal(); return; }
+
       const serverSlug = document.getElementById('intel-server-select')?.value || 'ts5.x1.asia';
       const serverObj  = (window.SERVERS || []).find(s => s.slug === serverSlug);
       const serverKey  = serverObj?.slug?.split('.')[0] || 'ts5';
       const notes      = document.getElementById('intel-notes-input')?.value?.trim() || '';
       const r = parsedReport;
-
-      if (!target) { closeIntelModal(); return; }
-
-      // Build troop data object: { troopName: count }
-      const troopData = {};
-      if (target.troops && r.defenders) {
-        const defSide = r.defenders.find(d => d.player === target.name);
-        if (defSide) {
-          defSide.troops.forEach((name, i) => {
-            const sent = defSide.sent?.[i] ?? null;
-            if (sent !== null && sent > 0) troopData[name] = sent;
-          });
-        }
-      }
-
+      const troopData = buildTroopData(side);
       const bounty = r.bounty;
+
       const entry = {
-        user_id:     user.id,
-        server:      serverKey,
-        target_type: 'player',
-        target_id:   target.name.toLowerCase().replace(/\s+/g,'_'),
-        target_name: target.name,
-        source_type: 'battle_report',
+        user_id: user.id, server: serverKey, target_type: 'player',
+        target_id: (side.name || 'unknown').toLowerCase().replace(/\s+/g,'_'),
+        target_name: side.name || 'Unknown', source_type: 'battle_report',
         data: {
-          report_title:  r.title,
-          report_date:   r.date,
-          attacker:      { name: r.attacker.player, alliance: r.attacker.alliance },
-          defender:      { name: target.name, alliance: target.alliance, village: target.village, coords: target.coords },
-          defender_troops: troopData,
-          bounty:        { wood: bounty.wood, clay: bounty.clay, iron: bounty.iron, crop: bounty.crop },
-          total_bounty:  bounty.wood + bounty.clay + bounty.iron + bounty.crop,
-          server_slug:   serverSlug,
+          outcome: r.outcome || 'unknown', report_title: r.title, report_date: r.date,
+          saved_role: side.role,
+          attacker: { name: r.attacker.player, alliance: r.attacker.alliance },
+          defenders: (r.defenders || []).map(d => ({ name: d.player, alliance: d.alliance, village: d.village, coords: d.coords })),
+          target_village: side.village, target_coords: side.coords, target_alliance: side.alliance,
+          troops: troopData,
+          bounty: { wood: bounty.wood, clay: bounty.clay, iron: bounty.iron, crop: bounty.crop },
+          total_bounty: bounty.wood + bounty.clay + bounty.iron + bounty.crop,
+          server_slug: serverSlug,
         },
         content: notes,
       };
 
-      // If report was already shared, link it
       const sharedId = document.getElementById('shareLinkInput')?.value?.split('/r/').pop()?.split('?')[0];
       if (sharedId) entry.report_id = sharedId;
 
       try {
         const { error } = await window._supabase.from('intelligence_entries').insert(entry);
         if (error) throw error;
-
         closeIntelModal();
         const btn2 = document.getElementById('btnSaveIntel');
         const note = document.getElementById('intelNote');
         if (btn2) { btn2.className = 'btn-save-intel saved'; btn2.disabled = true; btn2.innerHTML = '✅ Intel Saved'; }
         if (note) note.innerHTML = 'View in <a href="/account/intelligence/">Intelligence Hub →</a>';
       } catch(err) {
-        btn.disabled = false;
-        btn.textContent = 'Save';
+        btn.disabled = false; btn.textContent = 'Save';
         alert('Failed to save: ' + err.message);
       }
     }
@@ -854,20 +839,63 @@
       const btn = document.getElementById('shareBtn');
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Saving…';
+
       try {
-        const ttlDays  = parseInt(document.getElementById('ttlSelect').value) || 14;
+        const ttlDays   = parseInt(document.getElementById('ttlSelect').value) || 14;
         const expiresAt = new Date(Date.now() + ttlDays * 86400 * 1000).toISOString();
-        const id = nanoid(10);
-        const raw = document.getElementById('reportInput').value.trim();
+        const id        = nanoid(10);
+        const raw       = document.getElementById('reportInput').value.trim();
+        const r         = parsedReport;
+
+        // Build meta — this is what saved-reports page reads instead of re-parsing raw text
+        const meta = {
+          outcome:  r.outcome || 'unknown',
+          title:    r.title   || '',
+          date:     r.date    || '',
+          server:   window._reportServerSlug || '',
+          attacker: {
+            name:     r.attacker.player    || '',
+            alliance: r.attacker.alliance  || '',
+            village:  r.attacker.village   || '',
+            coords:   r.attacker.coords    || '',
+          },
+          // First non-reinforcement defender
+          defender: (() => {
+            const main = (r.defenders || []).find(d => !d.isReinforcement) || r.defenders?.[0];
+            if (!main) return null;
+            return { name: main.player || '', alliance: main.alliance || '', village: main.village || '', coords: main.coords || '' };
+          })(),
+          bounty: {
+            wood:  r.bounty.wood  || 0,
+            clay:  r.bounty.clay  || 0,
+            iron:  r.bounty.iron  || 0,
+            crop:  r.bounty.crop  || 0,
+            total: (r.bounty.wood||0)+(r.bounty.clay||0)+(r.bounty.iron||0)+(r.bounty.crop||0),
+          },
+        };
+
+        const session = await window.getSession();
+        const userId  = session?.user?.id || null;
+
         const { error } = await window._supabase.from('shared_reports').insert({
-          id, content: raw,
-          user_id: (await window.getSession())?.user?.id || null,
+          id,
+          content:    raw,
+          meta,
+          user_id:    userId,
           expires_at: expiresAt,
         });
         if (error) throw error;
-        const link = `${window.location.origin}/r/${id}`;
+
+        const link = `${window.location.origin}/r/?id=${id}`;
         document.getElementById('shareLinkInput').value = link;
-        document.getElementById('shareNote').textContent = `Expires in ${ttlDays} days. Upgrade to Pro for permanent links.`;
+
+        // Tier-aware share note
+        const role   = session?.user?.user_metadata?.role || 'free';
+        const isPlus = role === 'plus' || role === 'pro';
+        document.getElementById('shareNote').textContent = isPlus
+          ? `Saved permanently to your account. View in Saved Reports.`
+          : `Expires in ${ttlDays} days. Upgrade to Plus for permanent links + saved history.`;
+
         document.getElementById('shareResult').style.display = 'block';
       } catch(e) {
         alert('Failed to save report: ' + e.message);

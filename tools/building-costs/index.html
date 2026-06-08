@@ -25,9 +25,11 @@ body{background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-heig
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(37,99,235,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
 
+/* ── NAVBAR ── */
+
 /* ── PAGE HEADER ── */
-.page-header{position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:28px 40px 24px}
-.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text3);margin-bottom:20px;flex-wrap:wrap}
+.page-header{position:relative;z-index:1;border-bottom:1px solid var(--border);background:var(--surface);padding:8px 40px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--text3);margin-bottom:10px;flex-wrap:wrap}
 .breadcrumb a{color:var(--text3);text-decoration:none;transition:color 0.15s}
 .breadcrumb a:hover{color:var(--blue2)}
 .breadcrumb span{color:var(--text2);font-weight:500}
@@ -42,7 +44,7 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 .page-badge.no-login{background:var(--blue-glow);color:var(--blue-light);border:1px solid rgba(59,130,246,0.2)}
 
 /* ── PAGE WRAPPER ── */
-.page-wrap{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:40px 24px 80px}
+.page-wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px 80px}
 
 /* ── MENU VIEW ── */
 .menu-search-bar{display:flex;align-items:center;gap:10px;margin-bottom:28px}
@@ -61,7 +63,7 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 .menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
 .menu-card{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1px solid var(--border);border-radius:12px;background:var(--surface);cursor:pointer;transition:all 0.18s;text-align:left;font-family:'DM Sans',sans-serif}
 .menu-card:hover{border-color:var(--card-color,var(--border2));background:var(--surface2);transform:translateY(-2px);box-shadow:0 4px 16px rgba(15,33,83,0.07)}
-.menu-card img{width:28px;height:28px;image-rendering:pixelated;border-radius:6px;flex-shrink:0;border:1px solid var(--border)}
+.menu-card img{width:28px;height:28px;image-rendering:auto;border-radius:6px;flex-shrink:0;border:1px solid var(--border)}
 .menu-card-info{min-width:0}
 .menu-card-name{font-size:0.8rem;font-weight:600;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .menu-card-sub{font-size:0.68rem;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -81,11 +83,12 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 .bitem{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 0;cursor:pointer;border-left:3px solid transparent;transition:background 0.1s,border-color 0.1s;margin:1px 0}
 .bitem:hover{background:rgba(37,99,235,0.04)}
 .bitem.active{border-left-color:var(--item-dot,var(--blue2));background:var(--item-bg,var(--blue-glow))}
-.bitem img{width:20px;height:20px;image-rendering:pixelated;border-radius:4px;margin-left:14px;flex-shrink:0}
+.bitem img{width:20px;height:20px;image-rendering:auto;border-radius:4px;margin-left:14px;flex-shrink:0}
 .bitem-name{font-size:0.78rem;color:var(--text);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 .bitem.active .bitem-name{font-weight:600;color:var(--item-text,var(--blue2))}
 .bitem-tribe{font-size:0.65rem;color:var(--text3);line-height:1.2}
 .menu-card-sub img, .bitem-tribe img { width:12px !important; height:12px !important; }
+
 /* detail panel */
 .detail-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
 
@@ -98,7 +101,7 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 /* detail header */
 .detail-header{padding:16px 20px 14px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--surface)}
 .bld-top{display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap}
-.bld-icon{width:44px;height:44px;image-rendering:pixelated;border-radius:10px;flex-shrink:0;border:1px solid var(--border)}
+.bld-icon{width:44px;height:44px;image-rendering:auto;border-radius:10px;flex-shrink:0;border:1px solid var(--border)}
 .bld-meta{flex:1;min-width:0}
 .bld-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}
 .bld-name{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;color:var(--navy)}
@@ -114,13 +117,23 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 .mb-select{font-size:0.75rem;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
 .mb-select:focus{border-color:var(--border2)}
 .ctrl-divider{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.toggle-btn{padding:4px 9px;font-size:0.75rem;font-weight:500;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all 0.15s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:4px}
+.toggle-btn:hover{border-color:var(--border2);color:var(--navy)}
+.toggle-btn.active{border-color:var(--blue2);background:var(--blue-glow);color:var(--blue2);font-weight:600;border-width:1.5px}
+.toggle-btn.active-amber{border-color:var(--amber);background:var(--amber-bg);color:var(--amber);font-weight:600;border-width:1.5px}
+.c-wh{color:#7c3aed;font-size:0.73rem}
+.c-gr{color:#0891b2;font-size:0.73rem}
+.storage-tag{display:inline-flex;align-items:center;gap:2px;font-size:0.7rem;font-weight:600;padding:1px 5px;border-radius:4px}
+.storage-tag.wh{background:rgba(124,58,237,0.1);color:#7c3aed}
+.storage-tag.gr{background:rgba(8,145,178,0.1);color:#0891b2}
+.storage-tag.great{font-style:italic}
 
 /* table */
 .table-scroll{flex:1;overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:0.8rem;min-width:500px;font-family:'DM Sans',sans-serif}
 thead th{padding:9px 10px;text-align:right;font-size:0.7rem;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface2);z-index:2;letter-spacing:0.02em}
 thead th:first-child{text-align:center;width:44px}
-thead th img{vertical-align:middle;image-rendering:pixelated;width:16px}
+thead th img{vertical-align:middle;image-rendering:auto;width:14px;height:14px}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.08s}
 tbody tr:hover{background:var(--surface2)}
 tbody tr.row-sel{background:var(--sel-bg,var(--blue-glow))!important;outline:1px solid var(--sel-dot,var(--blue2));outline-offset:-1px}
@@ -165,7 +178,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
 </head>
 <body>
 
-<!-- NAVBAR -->
+<!-- ── NAVBAR ── -->
 <div id="navbar-root"></div>
 
 <!-- PAGE HEADER -->
@@ -187,7 +200,6 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
     </div>
     <div class="page-badges">
       <span class="page-badge free">FREE</span>
-      <span class="page-badge no-login">No login required</span>
     </div>
   </div>
 </div>
@@ -206,6 +218,28 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
     </div>
     <div id="menu-cats"></div>
   </div>
+
+  <!-- SPLIT VIEW -->
+  <div id="split-view" class="split-wrap" style="display:none">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-search-wrap" style="position:relative">
+        <span class="sidebar-search-icon">🔍</span>
+        <input type="text" class="sidebar-search" id="sidebar-search" placeholder="Search…" oninput="onSidebarSearch(this.value)"/>
+      </div>
+      <div class="sidebar-list" id="sidebar-list"></div>
+    </div>
+    <!-- Detail -->
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-empty">
+        <div class="detail-empty-icon">🏗️</div>
+        <div class="detail-empty-title">Select a building</div>
+        <div class="detail-empty-hint">Click any building in the sidebar to see its upgrade costs and build times.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-wrap -->
 
   <!-- SPLIT VIEW -->
   <div id="split-view" class="split-wrap" style="display:none">
@@ -271,6 +305,19 @@ const MENU_LIST = [{"gid":1,"name":"Woodcutter","category":"resource"},{"gid":2,
 // factor = (mbLevel === 0 ? 5 : 0.964^(mbLevel-1)) / speed
 // Data di JSON kita = raw MB lv0 = baseTime * 5
 // Maka: base = sec / 5, lalu terapkan factor
+// ── STORAGE CAPACITY (dari knowledgebase.legends.travian.com) ────────────
+// Index = level, value = kapasitas
+const WH_CAP  = [0,1200,1700,2300,3100,4000,5000,6300,7800,9600,11800,14400,17600,21400,25900,31300,37900,45700,55100,66400,80000];
+const GR_CAP  = [0,1200,1700,2300,3100,4000,5000,6300,7800,9600,11800,14400,17600,21400,25900,31300,37900,45700,55100,66400,80000];
+const GWH_CAP = [0,3600,5100,6900,9300,12000,15000,18900,23400,28800,35400,43200,52800,64200,77700,93900,113700,137100,165300,199200,240000];
+const GGR_CAP = [0,3600,5100,6900,9300,12000,15000,18900,23400,28800,35400,43200,52800,64200,77700,93900,113700,137100,165300,199200,240000];
+
+// Cari level storage minimum yang cukup menampung amount
+function storageLvl(capArr, amount) {
+  const lv = capArr.findIndex(c => c >= amount);
+  return lv === -1 ? null : lv; // null = melampaui max
+}
+
 const TRIBE_ICON = {roman:'roman',gaul:'gaul',teuton:'teuton',egyptian:'egyptian',hun:'hun',spartan:'spartan',viking:'viking'};
 const GID_NAME = {};
 MENU_LIST.forEach(b => GID_NAME[b.gid] = b.name);
@@ -285,6 +332,8 @@ let speed        = 1;
 let mbLevel      = 0;
 let sel          = null;   // { anchor:number, range:[lo,hi]|null }
 let sidebarBuilt = false;
+let useGreatStorage = false;  // toggle great warehouse/granary
+let useAds          = false;  // toggle 25% faster with ads
 
 // ── HELPERS ───────────────────────────────────────────────────────────────
 function fmtTime(s) {
@@ -300,7 +349,9 @@ function adjTime(sec, overrideMB) {
   const base = sec / 5;
   const mb = overrideMB !== undefined ? overrideMB : mbLevel;
   const mbFactor = mb === 0 ? 5 : Math.pow(0.964, mb - 1);
-  return 10 * Math.round(base * mbFactor / speed / 10);
+  let t = 10 * Math.round(base * mbFactor / speed / 10);
+  if (useAds) t = Math.round(t * 0.75);
+  return t;
 }
 function tribeInfo(b) {
   if (!b.tribes || b.tribes === 'all') return null;
@@ -561,6 +612,13 @@ function renderHeader() {
         </select>` : `
         <div class="ctrl-divider"></div>
         <span class="ctrl-label" style="color:var(--text3);font-size:0.75rem">Build time is fixed (not affected by MB level)</span>`}
+        <div class="ctrl-divider"></div>
+        <button class="toggle-btn ${useGreatStorage?'active':''}" id="btn-great-storage" onclick="toggleGreatStorage()" title="Use Great Warehouse/Granary capacity for storage columns">
+          🏰 Great Storage
+        </button>
+        <button class="toggle-btn ${useAds?'active-amber':''}" id="btn-ads" onclick="toggleAds()" title="Ads reduce build time by 25%">
+          📺 Ads −25%
+        </button>
       </div>
     </div>
     <div class="table-scroll"><table id="bld-table"></table></div>`;
@@ -579,6 +637,52 @@ function renderHeader() {
 function onMBChange(val) {
   mbLevel = Number(val);
   renderTable();
+}
+
+function toggleGreatStorage() {
+  useGreatStorage = !useGreatStorage;
+  document.getElementById('btn-great-storage')?.classList.toggle('active', useGreatStorage);
+  renderTable();
+}
+
+function toggleAds() {
+  useAds = !useAds;
+  document.getElementById('btn-ads')?.classList.toggle('active-amber', useAds);
+  renderTable();
+}
+
+// Hitung WH/GR level yang dibutuhkan untuk suatu cost
+function calcStorageNeeded(amount, capArr) {
+  if (amount <= 0) return {count: 0, lv: 0};
+  const lv = capArr.findIndex(c => c >= amount);
+  if (lv !== -1) return {count: 1, lv};
+  // Butuh beberapa unit max lv20
+  const count = Math.ceil(amount / capArr[20]);
+  return {count, lv: 20};
+}
+
+function fmtStorage(amount, isGranary) {
+  const normalCap = isGranary ? GR_CAP : WH_CAP;
+  const greatCap  = isGranary ? GGR_CAP : GWH_CAP;
+  const cls       = isGranary ? 'gr' : 'wh';
+
+  if (amount <= 0) return '<span class="storage-tag ' + cls + '">—</span>';
+
+  if (useGreatStorage) {
+    const label = isGranary ? 'GGr' : 'GWh';
+    const {count, lv} = calcStorageNeeded(amount, greatCap);
+    if (count === 0) return '<span class="storage-tag ' + cls + ' great">—</span>';
+    const text = count > 1 ? count + '× ' + label + ' 20' : label + ' ' + lv;
+    const tip  = count + 'x Great ' + (isGranary ? 'Granary' : 'Warehouse') + ' lv' + lv;
+    return '<span class="storage-tag ' + cls + ' great" title="' + tip + '">' + text + '</span>';
+  } else {
+    const label = isGranary ? 'Gr' : 'Wh';
+    const {count, lv} = calcStorageNeeded(amount, normalCap);
+    if (count === 0) return '<span class="storage-tag ' + cls + '">—</span>';
+    const text = count > 1 ? count + '× ' + label + ' 20' : label + ' ' + lv;
+    const tip  = count + 'x ' + (isGranary ? 'Granary' : 'Warehouse') + ' lv' + lv;
+    return '<span class="storage-tag ' + cls + '" title="' + tip + '">' + text + '</span>';
+  }
 }
 
 // ── BONUS KEY MAP (global) ────────────────────────────────────────────────
@@ -621,10 +725,13 @@ function renderTable() {
     const src = MISC_ICONS.includes(icon) ? `${MISC_BASE}${icon}.png` : `${RES_BASE}${icon}.png`;
     return `<img src="${src}" alt="${alt}" onerror="this.style.display='none'">`;
   };
+  const whLabel = useGreatStorage ? 'GWh' : 'Wh';
+  const grLabel = useGreatStorage ? 'GGr' : 'Gr';
   table.innerHTML =
     '<colgroup>' +
       '<col style="width:44px"><col><col><col><col>' +
       '<col style="width:13%"><col style="width:72px"><col style="width:38px"><col style="width:38px">' +
+      '<col style="width:52px"><col style="width:52px">' +
       colBonus +
     '</colgroup>' +
     '<thead><tr>' +
@@ -633,10 +740,12 @@ function renderTable() {
       '<th>' + thImg('clay_tiny','🧱') + '</th>' +
       '<th>' + thImg('iron_tiny','⛏') + '</th>' +
       '<th>' + thImg('crop_tiny','🌾') + '</th>' +
-      '<th>' + thImg('resources_medium','∑') + ' Total</th>' +
+      '<th>' + thImg('sum_of_resource','∑') + ' Total</th>' +
       '<th>' + thImg('time','⏱') + '</th>' +
       '<th>' + thImg('population','Pop') + '</th>' +
       '<th>' + thImg('culture_point','CP') + '</th>' +
+      '<th class="c-wh" title="Minimum Warehouse level needed">'+whLabel+'</th>' +
+      '<th class="c-gr" title="Minimum Granary level needed">'+grLabel+'</th>' +
       thBonus +
     '</tr></thead>' +
     '<tbody id="tbody"></tbody>' +
@@ -692,6 +801,8 @@ function renderRows(c, hasBonus, getBonusVal) {
     tr.className = isAnch ? 'row-anchor' : (isSel ? 'row-sel' : '');
     tr.onclick = () => handleLvlClick(lvl.level);
     tr.onmousedown = (e) => { if(e.detail > 1) e.preventDefault(); }; // prevent double-click selection only
+    const maxNonCrop = Math.max(lvl.cost[0], lvl.cost[1], lvl.cost[2]);
+    const cropCost   = lvl.cost[3];
     tr.innerHTML = `
       <td class="${isSel?'sel-lv':''}">${lvl.level}</td>
       <td class="c-wood">${fmtN(lvl.cost[0])}</td>
@@ -702,6 +813,8 @@ function renderRows(c, hasBonus, getBonusVal) {
       <td class="c-dim">${fmtTime(t)}</td>
       <td class="c-dim">${lvl.pop}</td>
       <td class="c-dim">${lvl.cp}</td>
+      <td>${fmtStorage(maxNonCrop, false)}</td>
+      <td>${fmtStorage(cropCost, true)}</td>
       ${hasBonus ? '<td class="c-bonus">' + (bonus!=null?fmtN(bonus):'—') + '</td>' : ''}`;
     tbody.appendChild(tr);
   });
@@ -736,10 +849,12 @@ function renderRows(c, hasBonus, getBonusVal) {
       <td class="c-dim">${fmtTime(totals.time)}</td>
       <td class="c-dim">${fmtN(totals.pop)}</td>
       <td class="c-dim">${fmtN(totals.cp)}</td>
+      <td class="c-dim">—</td>
+      <td class="c-dim">—</td>
       ${hasBonus ? '<td class="c-dim">—</td>' : ''}
     </tr>
     <tr class="hint-row">
-      <td colspan="${hasBonus?10:9}">${selHint}</td>
+      <td colspan="${hasBonus?12:11}">${selHint}</td>
     </tr>`;
 }
 
@@ -747,6 +862,8 @@ function renderRows(c, hasBonus, getBonusVal) {
 renderMenuGrid();
 document.getElementById('menu-search').addEventListener('input', e => renderMenuGrid(e.target.value));
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
 <script src="/navbar.js"></script>
 </body>
 </html>

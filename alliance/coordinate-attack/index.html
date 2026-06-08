@@ -41,7 +41,7 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 #alliance-main   { flex: 1; min-width: 0; overflow-x: hidden; }
 
 /* ── PAGE HEADER ── */
-.page-header { position: relative; z-index: 1; border-bottom: 1px solid var(--border); background: var(--surface); padding: 28px 40px 24px; }
+.page-header { position: relative; z-index: 1; border-bottom: 1px solid var(--border); background: var(--surface); padding: 8px 40px; }
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; flex-wrap: wrap; }
 .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
 .breadcrumb a:hover { color: var(--blue2); }
@@ -157,7 +157,9 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 .commit-chip.mine { background: var(--blue-glow); border-color: var(--border2); color: var(--blue2); }
 .commit-empty { font-size: 0.75rem; color: var(--text3); font-style: italic; }
 
-/* proximity hint */
+/* target row type distinction */
+.target-row.type-real { background: rgba(220,38,38,0.025); border-left: 3px solid var(--red); padding-left: 17px; }
+.target-row.type-fake { background: rgba(217,119,6,0.025);  border-left: 3px solid var(--amber); padding-left: 17px; }
 .proximity-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; color: var(--text3); padding: 4px 9px; background: var(--surface2); border-radius: 7px; border: 1px solid var(--border); margin-top: 6px; }
 .send-hint { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; padding: 4px 9px; background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); border-radius: 7px; margin-top: 6px; font-weight: 600; }
 
@@ -214,6 +216,11 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 .btn-tbi-del { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: all 0.15s; flex-shrink: 0; }
 .btn-tbi-del:hover { background: var(--red-bg); color: var(--red); border-color: var(--red-border); }
 .target-add-resolve { margin-top: 6px; min-height: 22px; }
+
+/* server clock */
+.server-clock-row  { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 6px 10px; background: var(--navy); border-radius: 8px; }
+.server-clock-label{ font-size: 0.72rem; color: rgba(255,255,255,0.55); white-space: nowrap; }
+.server-clock-val  { font-family: 'Space Grotesk', monospace; font-size: 0.88rem; font-weight: 600; color: #fff; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 
 /* proximity table */
 .prox-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; margin-bottom: 16px; display: none; }
@@ -377,9 +384,27 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
               <input type="text" id="inputTitle" placeholder="e.g. Op Nightfall — June 14">
             </div>
             <div class="field">
-              <label>Landing ETA</label>
-              <input type="datetime-local" id="inputEta">
-              <div class="hint">All attacks in this plan should land at this time. Members calculate their own send time.</div>
+              <label>Landing ETA Timezone</label>
+              <select id="etaTimezone" onchange="onTimezoneChange()">
+                <option value="1"  selected>🕐 Server Time (UTC+1)</option>
+                <option value="0" >🌐 UTC (GMT+0)</option>
+                <option value="2" >UTC+2</option>
+                <option value="3" >UTC+3</option>
+                <option value="5" >UTC+5</option>
+                <option value="7" >UTC+7 (WIB)</option>
+                <option value="8" >UTC+8 (SGT/WITA)</option>
+                <option value="-5">UTC-5 (EST)</option>
+                <option value="-8">UTC-8 (PST)</option>
+              </select>
+              <div class="server-clock-row" id="serverClockRow">
+                <span class="server-clock-label">Server Time (UTC+1) now:</span>
+                <span class="server-clock-val" id="serverClockVal">—</span>
+              </div>
+            </div>
+            <div class="field">
+              <label>Landing ETA <span id="etaTzLabel" style="font-weight:400;color:var(--text3)">(Server Time UTC+1)</span></label>
+              <input type="datetime-local" id="inputEta" step="1">
+              <div class="hint">All attacks land at this time. Enter in the timezone selected above — stored as UTC internally.</div>
             </div>
             <div class="field">
               <label>Note for Members <span class="opt">(optional)</span></label>
@@ -670,6 +695,7 @@ function showList() {
   document.getElementById('pageSubtitle').textContent = 'Coordinate alliance attacks';
   document.getElementById('pageBadges').style.display = '';
   if (isCoord) document.getElementById('btnNew').classList.remove('hidden');
+  stopServerClock();
   loadPlans();
 }
 
@@ -695,6 +721,8 @@ function showCreate() {
   document.getElementById('newTargetResolve').innerHTML = '';
   selectNewTargetType('real');
   renderTargetBuildList();
+  onTimezoneChange();
+  startServerClock();
 }
 
 /* ════════════════════════════════════════
@@ -797,7 +825,9 @@ function renderCard(plan) {
   </div>
 
   <div class="targets-wrap" id="targets-${plan.id}">
-    ${targets.map(t => renderTargetRow(t, plan, isDimmed)).join('') || '<div style="padding:16px 20px;color:var(--text3);font-size:0.8rem">No targets in this plan.</div>'}
+    ${[...targets].sort((a,b) => a.attack_type === b.attack_type ? 0 : a.attack_type === 'real' ? -1 : 1)
+      .map(t => renderTargetRow(t, plan, isDimmed)).join('')
+      || '<div style="padding:16px 20px;color:var(--text3);font-size:0.8rem">No targets in this plan.</div>'}
   </div>
 </div>`;
 }
@@ -826,7 +856,7 @@ function renderTargetRow(target, plan, isDimmed) {
         const sendIn = Math.floor((sendMs - Date.now()) / 60000);
         if (sendIn > 0) {
           const h = Math.floor(sendIn / 60), m = sendIn % 60;
-          proxHtml += `<div class="send-hint">⏱ Send in ${h > 0 ? h + 'h ' : ''}${m}m (based on fastest village)</div>`;
+          proxHtml += `<div class="send-hint">⏱ Send in ${h > 0 ? h + 'h ' : ''}${m}m · based on slowest infantry, excl. TS &amp; hero</div>`;
         }
       }
     }
@@ -844,8 +874,9 @@ function renderTargetRow(target, plan, isDimmed) {
       }).join('')}${coms.length > 6 ? `<span style="font-size:.72rem;color:var(--text3)">+${coms.length-6}</span>` : ''}</div>`
     : `<div class="commit-empty">No commitments yet — be the first!</div>`;
 
-  // Send link (Travian Rally Point)
-  const serverDomain = (currentWs?.server || 'ts5') + '.x1.asia.travian.com';
+  // Send link (Travian Rally Point) — server field may be 'ts5' or 'ts5.x1.asia', strip to base
+  const serverBase   = (currentWs?.server || 'ts5').split('.')[0];
+  const serverDomain = serverBase + '.x1.asia.travian.com';
   const sendUrl = target.target_map_id
     ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=4&targetMapId=${target.target_map_id}`
     : null;
@@ -860,7 +891,7 @@ function renderTargetRow(target, plan, isDimmed) {
     : '';
 
   return `
-<div class="target-row" id="trow-${target.id}">
+<div class="target-row type-${target.attack_type}" id="trow-${target.id}">
   <div class="target-row-header">
     <div class="target-info">
       <span class="target-coord" onclick="copyCoord(${target.target_x},${target.target_y})" title="Click to copy">${target.target_x}|${target.target_y}</span>
@@ -961,7 +992,7 @@ function onCommitVillageChange() {
       const h = Math.floor(diff/60), m = diff % 60;
       wrap.innerHTML = `<div class="send-time-hint">
         <strong>⏱ Send by: ${sendStr}</strong>
-        ${h > 0 ? h + 'h ' : ''}${m}m from now · ${dist} tiles · based on slowest infantry speed
+        ${h > 0 ? h + 'h ' : ''}${m}m from now · ${dist} tiles · slowest infantry, excl. TS &amp; hero
       </div>`;
     } else {
       wrap.innerHTML = `<div class="send-time-hint" style="background:var(--red-bg);border-color:var(--red-border);color:var(--red)">
@@ -1199,12 +1230,12 @@ function renderProximityTable(tx, ty) {
    CREATE — SUBMIT
 ════════════════════════════════════════ */
 async function submitPlan() {
-  const title = document.getElementById('inputTitle').value.trim();
-  const eta   = document.getElementById('inputEta').value;
-  const note  = document.getElementById('inputNote').value.trim() || null;
+  const title   = document.getElementById('inputTitle').value.trim();
+  const etaUtc  = etaToUTC();
+  const note    = document.getElementById('inputNote').value.trim() || null;
 
-  if (!title) { showToast('Enter an operation title', 'error'); return; }
-  if (!eta)   { showToast('Landing ETA is required', 'error'); return; }
+  if (!title)   { showToast('Enter an operation title', 'error'); return; }
+  if (!etaUtc)  { showToast('Landing ETA is required', 'error'); return; }
   if (pendingTargets.length === 0) { showToast('Add at least one target', 'error'); return; }
 
   const btn = document.getElementById('btnSubmit');
@@ -1217,7 +1248,7 @@ async function submitPlan() {
       workspace_id: currentWs.id,
       created_by:   currentUser.id,
       title,
-      eta,
+      eta:  etaUtc,
       note,
       status: 'active',
     })
@@ -1255,8 +1286,60 @@ async function submitPlan() {
 }
 
 /* ════════════════════════════════════════
-   HELPERS
+   TIMEZONE & SERVER CLOCK
 ════════════════════════════════════════ */
+let clockInterval = null;
+
+function getSelectedOffset() {
+  return parseFloat(document.getElementById('etaTimezone')?.value ?? '1');
+}
+
+function startServerClock() {
+  stopServerClock();
+  function tick() {
+    const offset = 1; // Server Time is always UTC+1
+    const now    = new Date(Date.now() + offset * 3600000);
+    const hh = String(now.getUTCHours()).padStart(2,'0');
+    const mm = String(now.getUTCMinutes()).padStart(2,'0');
+    const ss = String(now.getUTCSeconds()).padStart(2,'0');
+    const el = document.getElementById('serverClockVal');
+    if (el) el.textContent = `${hh}:${mm}:${ss}`;
+  }
+  tick();
+  clockInterval = setInterval(tick, 1000);
+}
+
+function stopServerClock() {
+  if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+}
+
+function onTimezoneChange() {
+  const offset = getSelectedOffset();
+  const sign   = offset >= 0 ? '+' : '';
+  const label  = offset === 1 ? 'Server Time UTC+1' : `UTC${sign}${offset}`;
+  const el = document.getElementById('etaTzLabel');
+  if (el) el.textContent = `(${label})`;
+}
+
+// Convert local ETA input (in selected timezone) to UTC ISO string
+function etaToUTC() {
+  const raw    = document.getElementById('inputEta').value; // "2026-06-15T14:00"
+  if (!raw) return null;
+  const offset = getSelectedOffset(); // e.g. 1 for UTC+1
+  // Treat the input as "wall clock time in selected timezone"
+  // UTC = wall - offset
+  const localMs = new Date(raw).getTime(); // JS parses as local, so we correct:
+  // We need to neutralise JS's local timezone and apply our offset instead.
+  // Strategy: parse as UTC, then subtract offset.
+  const fakeUtcMs = Date.UTC(
+    ...raw.split('T')[0].split('-').map(Number),
+    ...raw.split('T')[1].split(':').map(Number)
+  );
+  const utcMs = fakeUtcMs - offset * 3600000;
+  return new Date(utcMs).toISOString();
+}
+
+
 function chebyshev(x1, y1, x2, y2) { return Math.max(Math.abs(x1 - x2), Math.abs(y1 - y2)); }
 function getMinutesLeft(eta) { return Math.floor((new Date(eta) - Date.now()) / 60000); }
 function formatCountdown(m)  { const h = Math.floor(m/60); return h > 0 ? `${h}h ${m%60}m` : `${m}m`; }

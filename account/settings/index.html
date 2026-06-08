@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: radial-gradient(circle, rgba(37,99,235,0.06) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 8px 40px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+    }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+
+    /* ── LAYOUT ── */
+    .page-wrap {
+      position: relative; z-index: 1;
+      max-width: 860px; margin: 0 auto;
+      padding: 40px 24px 80px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    /* ── SECTION CARD ── */
+    .section-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 18px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.9rem; font-weight: 700; color: var(--text);
+    }
+    .section-desc { font-size: 0.78rem; color: var(--text3); margin-top: 2px; }
+    .section-body { padding: 24px; }
+
+    /* ── PLAN BADGE ── */
+    .plan-badge {
+      font-size: 0.7rem; font-weight: 700; padding: 4px 12px;
+      border-radius: 100px; letter-spacing: 0.04em;
+    }
+    .plan-badge.free   { background: var(--green-bg);  color: var(--green);  border: 1px solid rgba(5,150,105,0.2); }
+    .plan-badge.plus   { background: var(--purple-bg); color: var(--purple); border: 1px solid rgba(124,58,237,0.2); }
+    .plan-badge.pro    { background: var(--amber-bg);  color: var(--amber);  border: 1px solid rgba(217,119,6,0.2); }
+
+    /* ── ACCOUNT INFO GRID ── */
+    .info-grid { display: flex; flex-direction: column; gap: 16px; }
+    .info-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 12px 16px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 10px;
+    }
+    .info-label { font-size: 0.75rem; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em; width: 100px; flex-shrink: 0; }
+    .info-value { font-size: 0.875rem; color: var(--text); font-weight: 500; flex: 1; }
+    .info-value.email { color: var(--blue2); }
+
+    /* ── AVATAR ── */
+    .avatar-section { display: flex; align-items: center; gap: 20px; margin-bottom: 24px; }
+    .avatar-lg {
+      width: 64px; height: 64px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--blue2), var(--cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .avatar-info { flex: 1; }
+    .avatar-name { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+    .avatar-email { font-size: 0.825rem; color: var(--text3); }
+
+    /* ── BILLING SECTION ── */
+    .billing-status {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; border-radius: 12px; margin-bottom: 20px;
+    }
+    .billing-status.free   { background: var(--surface2); border: 1px solid var(--border); }
+    .billing-status.plus   { background: var(--purple-bg); border: 1px solid rgba(124,58,237,0.2); }
+    .billing-status.pro    { background: var(--amber-bg); border: 1px solid rgba(217,119,6,0.2); }
+    .billing-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .billing-info { flex: 1; }
+    .billing-tier { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); }
+    .billing-detail { font-size: 0.8rem; color: var(--text3); margin-top: 3px; line-height: 1.5; }
+
+    .feature-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.825rem; color: var(--text2); }
+    .fi-yes { color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .fi-lim { color: var(--amber); font-weight: 700; flex-shrink: 0; font-size: 0.7rem; }
+
+    /* ── FORM ── */
+    .form-group { margin-bottom: 16px; }
+    .form-label {
+      display: block; font-size: 0.78rem; font-weight: 700;
+      color: var(--text); letter-spacing: 0.01em; margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%; height: 44px;
+      padding: 0 14px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; color: var(--text);
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: 10px; outline: none;
+      transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+    }
+    .form-input:focus {
+      border-color: var(--blue2); background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.08);
+    }
+    .form-input.error { border-color: var(--red); box-shadow: 0 0 0 3px rgba(220,38,38,0.08); }
+    .form-input::placeholder { color: var(--text3); }
+    .form-hint { font-size: 0.72rem; color: var(--text3); margin-top: 5px; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── ALERT ── */
+    .alert {
+      display: none; padding: 12px 16px; border-radius: 10px;
+      font-size: 0.825rem; font-weight: 500; margin-bottom: 16px;
+      border: 1px solid transparent; line-height: 1.5;
+    }
+    .alert-error   { background: var(--red-bg);   border-color: rgba(220,38,38,0.2); color: var(--red); }
+    .alert-success { background: var(--green-bg); border-color: rgba(5,150,105,0.2); color: var(--green); }
+    .alert.show { display: block; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      height: 42px; padding: 0 20px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 600;
+      cursor: pointer; transition: all 0.18s; border: none; white-space: nowrap;
+    }
+    .btn-primary { background: var(--blue2); color: #fff; box-shadow: 0 2px 8px rgba(37,99,235,0.22); }
+    .btn-primary:hover { background: var(--blue); box-shadow: 0 4px 14px rgba(37,99,235,0.32); }
+    .btn-primary:disabled { background: var(--text3); box-shadow: none; cursor: not-allowed; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text2); }
+    .btn-ghost:hover { border-color: var(--border2); color: var(--navy); background: var(--surface2); }
+    .btn-danger { background: var(--red-bg); border: 1.5px solid rgba(220,38,38,0.25); color: var(--red); }
+    .btn-danger:hover { background: var(--red); color: #fff; }
+    .btn-upgrade { background: var(--purple-bg); border: 1.5px solid rgba(124,58,237,0.3); color: var(--purple); }
+    .btn-upgrade:hover { background: var(--purple); color: #fff; }
+    .btn-sm { height: 36px; padding: 0 14px; font-size: 0.825rem; }
+
+    .spinner {
+      display: none; width: 15px; height: 15px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+    .btn.loading .spinner { display: inline-block; }
+    .btn.loading .btn-label { opacity: 0.7; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── DIVIDER ── */
+    .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+    /* ── DANGER ZONE ── */
+    .danger-zone { border-color: rgba(220,38,38,0.2); }
+    .danger-zone .section-header { border-color: rgba(220,38,38,0.15); }
+    .danger-zone .section-title { color: var(--red); }
+
+    /* ── LOADING SKELETON ── */
+    .skeleton { background: linear-gradient(90deg, var(--surface2) 25%, #eef2f8 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── AUTH GATE ── */
+    #auth-gate { display: none; text-align: center; padding: 80px 24px; }
+    #auth-gate .gate-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    #auth-gate h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; margin-bottom: 8px; color: var(--navy); }
+    #auth-gate p { font-size: 0.875rem; color: var(--text3); margin-bottom: 24px; }
+
+    @media (max-width: 600px) {
+      .page-header { padding: 20px 20px 16px; }
+      .page-wrap { padding: 24px 16px 60px; }
+      .section-body { padding: 16px; }
+      .form-row-2 { grid-template-columns: 1fr; }
+      .info-label { width: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="navbar-root"></div>
+
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/account/intelligence/">My Stuff</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Settings</span>
+  </div>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">⚙️</div>
+      <div>
+        <div class="page-title">Account Settings</div>
+        <div class="page-subtitle">Manage your profile, security, and billing.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth gate -->
+<div id="auth-gate">
+  <div class="gate-icon">🔐</div>
+  <h3>Login required</h3>
+  <p>Please log in to access your account settings.</p>
+  <a href="/login/?redirect=/account/settings/" class="btn btn-primary">Log In →</a>
+</div>
+
+<!-- Main content -->
+<div class="page-wrap" id="main-content" style="display:none;">
+
+  <!-- ── ACCOUNT INFO ── -->
+  <div class="section-card" style="animation: fadeUp 0.35s ease both;">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Profile</div>
+        <div class="section-desc">Your account information</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="avatar-section">
+        <div class="avatar-lg" id="avatar-initial">?</div>
+        <div class="avatar-info">
+          <div class="avatar-name" id="profile-username">—</div>
+          <div class="avatar-email" id="profile-email">—</div>
+        </div>
+        <span id="profile-plan-badge" class="plan-badge free">Free</span>
+      </div>
+      <div class="info-grid">
+        <div class="info-row">
+          <span class="info-label">Username</span>
+          <span class="info-value" id="info-username">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value email" id="info-email">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Plan</span>
+          <span class="info-value" id="info-plan">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member since</span>
+          <span class="info-value" id="info-since">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BILLING & PLAN ── -->
+  <div class="section-card" style="animation: fadeUp 0.35s 0.05s ease both;">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Plan & Billing</div>
+        <div class="section-desc">Your current plan and feature access</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <!-- Free tier -->
+      <div id="billing-free" class="billing-status free" style="display:none;">
+        <div class="billing-icon">🛡️</div>
+        <div class="billing-info">
+          <div class="billing-tier">Free Plan</div>
+          <div class="billing-detail">Access to all static tools, statistics, and limited explore features.</div>
+        </div>
+      </div>
+
+      <!-- Plus tier -->
+      <div id="billing-plus" class="billing-status plus" style="display:none;">
+        <div class="billing-icon">⭐</div>
+        <div class="billing-info">
+          <div class="billing-tier" style="color:var(--purple)">Plus Plan</div>
+          <div class="billing-detail">Full access to all tools, unlimited explore, and alliance features.</div>
+        </div>
+      </div>
+
+      <!-- Pro tier -->
+      <div id="billing-pro" class="billing-status pro" style="display:none;">
+        <div class="billing-icon">🚀</div>
+        <div class="billing-info">
+          <div class="billing-tier" style="color:var(--amber)">Pro Plan</div>
+          <div class="billing-detail">Advanced automation, unlimited everything, and priority support.</div>
+        </div>
+      </div>
+
+      <!-- Feature list -->
+      <div class="feature-list" id="feature-list"></div>
+
+      <!-- Upgrade CTA (free only) -->
+      <div id="upgrade-cta" style="display:none;">
+        <a href="/pricing/" class="btn btn-upgrade">⬆ Upgrade to Plus — $1.50/month</a>
+      </div>
+
+      <!-- Plus/Pro note -->
+      <div id="billing-note" style="display:none; font-size:0.78rem; color:var(--text3); line-height:1.6;">
+        Billing is managed manually. To extend or change your plan, contact Admin via
+        <a href="https://discord.gg/kwkWZxgYXy" style="color:var(--blue2); font-weight:600;">Discord</a>
+        or visit <a href="/pricing/" style="color:var(--blue2); font-weight:600;">/pricing/</a>.
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── CHANGE PASSWORD ── -->
+  <div class="section-card" style="animation: fadeUp 0.35s 0.1s ease both;">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Change Password</div>
+        <div class="section-desc">Update your login password</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="alert" id="pw-alert"></div>
+      <div class="form-group">
+        <label class="form-label">New Password</label>
+        <input type="password" class="form-input" id="pw-new" placeholder="Minimum 8 characters" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirm New Password</label>
+        <input type="password" class="form-input" id="pw-confirm" placeholder="Repeat new password" autocomplete="new-password">
+        <span class="form-hint">Must be at least 8 characters.</span>
+      </div>
+      <button class="btn btn-primary" id="pw-btn" onclick="changePassword()">
+        <div class="spinner"></div>
+        <span class="btn-label">Update Password</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── DANGER ZONE ── -->
+  <div class="section-card danger-zone" style="animation: fadeUp 0.35s 0.15s ease both;">
+    <div class="section-header">
+      <div>
+        <div class="section-title">Danger Zone</div>
+        <div class="section-desc">Irreversible actions — proceed with caution</div>
+      </div>
+    </div>
+    <div class="section-body">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:0.875rem;font-weight:600;color:var(--text);margin-bottom:3px;">Delete Account</div>
+          <div style="font-size:0.78rem;color:var(--text3);">Permanently delete your account and all associated data. This cannot be undone.</div>
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteAccount()">Delete Account</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Delete confirm modal -->
+<div id="delete-modal" style="display:none;position:fixed;inset:0;background:rgba(15,33,83,0.5);z-index:2000;display:none;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#fff;border-radius:20px;padding:32px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(15,33,83,0.2);">
+    <div style="font-size:2rem;margin-bottom:12px">⚠️</div>
+    <h3 style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;color:var(--navy);margin-bottom:8px;">Delete your account?</h3>
+    <p style="font-size:0.85rem;color:var(--text3);margin-bottom:20px;line-height:1.6;">This will permanently delete your account, intelligence entries, and all saved data. This action cannot be undone.</p>
+    <p style="font-size:0.8rem;color:var(--text2);margin-bottom:12px;">Type <strong>DELETE</strong> to confirm:</p>
+    <input type="text" id="delete-confirm-input" class="form-input" placeholder="Type DELETE" style="margin-bottom:16px;">
+    <div style="display:flex;gap:10px;justify-content:flex-end;">
+      <button class="btn btn-ghost btn-sm" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" id="delete-confirm-btn" onclick="deleteAccount()" disabled>Delete My Account</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+
+<script>
+  const FEATURE_MAP = {
+    free: [
+      { icon: '✓', cls: 'fi-yes', text: 'All static tools & simulators' },
+      { icon: '✓', cls: 'fi-yes', text: 'Statistics & inactive search' },
+      { icon: '✓', cls: 'fi-yes', text: 'Battle report share (7–30d TTL)' },
+      { icon: '~', cls: 'fi-lim', text: 'Map — alliance filter max 5 / player max 10' },
+      { icon: '~', cls: 'fi-lim', text: 'Oasis Database — preview 1,000 · 5×/day' },
+      { icon: '~', cls: 'fi-lim', text: 'Village Finder — preview 500 · single filter · 5×/day' },
+    ],
+    plus: [
+      { icon: '✓', cls: 'fi-yes', text: 'Everything in Free' },
+      { icon: '✓', cls: 'fi-yes', text: 'Unlimited map filters' },
+      { icon: '✓', cls: 'fi-yes', text: 'Oasis Database — full data · 50×/day' },
+      { icon: '✓', cls: 'fi-yes', text: 'Village Finder — full data · multi-filter · 50×/day' },
+      { icon: '✓', cls: 'fi-yes', text: 'Battle reports history · permanent share links' },
+      { icon: '✓', cls: 'fi-yes', text: 'Alliance: create workspace, coordinate attack/defense' },
+    ],
+    pro: [
+      { icon: '✓', cls: 'fi-yes', text: 'Everything in Plus' },
+      { icon: '✓', cls: 'fi-yes', text: 'Chrome Extension / Userscript' },
+      { icon: '✓', cls: 'fi-yes', text: 'Unlimited workspaces' },
+      { icon: '✓', cls: 'fi-yes', text: 'Priority support' },
+    ],
+  };
+
+  // ── WAIT FOR SUPABASE ────────────────────────────────
+  function waitForSupabase(cb, tries = 0) {
+    if (typeof window.getUser === 'function') { cb(); return; }
+    if (tries > 20) { cb(); return; }
+    setTimeout(() => waitForSupabase(cb, tries + 1), 100);
+  }
+
+  // ── INIT ─────────────────────────────────────────────
+  async function init() {
+    const user = await window.getUser().catch(() => null);
+
+    if (!user) {
+      document.getElementById('auth-gate').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('main-content').style.display = 'flex';
+
+    const role     = user.user_metadata?.role || 'free';
+    const username = user.user_metadata?.username || user.email.split('@')[0];
+    const initial  = username.charAt(0).toUpperCase();
+    const since    = new Date(user.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const planLabels = { free: 'Free', plus: 'Plus', pro: 'Pro' };
+
+    // Profile
+    document.getElementById('avatar-initial').textContent  = initial;
+    document.getElementById('profile-username').textContent = username;
+    document.getElementById('profile-email').textContent    = user.email;
+    document.getElementById('info-username').textContent    = username;
+    document.getElementById('info-email').textContent       = user.email;
+    document.getElementById('info-plan').textContent        = planLabels[role] || 'Free';
+    document.getElementById('info-since').textContent       = since;
+
+    // Plan badge
+    const badge = document.getElementById('profile-plan-badge');
+    badge.textContent = planLabels[role] || 'Free';
+    badge.className   = `plan-badge ${role}`;
+
+    // Billing section
+    document.getElementById(`billing-${role}`)?.style && (document.getElementById(`billing-${role}`).style.display = 'flex');
+
+    // Feature list
+    const features = FEATURE_MAP[role] || FEATURE_MAP.free;
+    document.getElementById('feature-list').innerHTML = features.map(f =>
+      `<div class="feature-item"><span class="${f.cls}">${f.icon}</span> ${f.text}</div>`
+    ).join('');
+
+    // CTA / note
+    if (role === 'free') {
+      document.getElementById('upgrade-cta').style.display = 'block';
+    } else {
+      document.getElementById('billing-note').style.display = 'block';
+    }
+
+    // Pre-fill delete confirm listener
+    document.getElementById('delete-confirm-input').addEventListener('input', function() {
+      document.getElementById('delete-confirm-btn').disabled = this.value !== 'DELETE';
+    });
+  }
+
+  // ── CHANGE PASSWORD ───────────────────────────────────
+  async function changePassword() {
+    const newPw  = document.getElementById('pw-new').value;
+    const confPw = document.getElementById('pw-confirm').value;
+    const alert  = document.getElementById('pw-alert');
+    const btn    = document.getElementById('pw-btn');
+
+    alert.className = 'alert'; alert.style.display = 'none';
+
+    if (!newPw || !confPw) {
+      showAlert(alert, 'Please fill in both fields.', 'error'); return;
+    }
+    if (newPw.length < 8) {
+      showAlert(alert, 'Password must be at least 8 characters.', 'error'); return;
+    }
+    if (newPw !== confPw) {
+      showAlert(alert, 'Passwords do not match.', 'error');
+      document.getElementById('pw-confirm').classList.add('error'); return;
+    }
+
+    btn.classList.add('loading'); btn.disabled = true;
+
+    const { error } = await window._supabase.auth.updateUser({ password: newPw });
+
+    btn.classList.remove('loading'); btn.disabled = false;
+
+    if (error) {
+      showAlert(alert, 'Failed to update password: ' + error.message, 'error');
+    } else {
+      showAlert(alert, '✓ Password updated successfully.', 'success');
+      document.getElementById('pw-new').value    = '';
+      document.getElementById('pw-confirm').value = '';
+    }
+  }
+
+  // ── DELETE ACCOUNT ────────────────────────────────────
+  function confirmDeleteAccount() {
+    const modal = document.getElementById('delete-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('delete-confirm-input').focus(), 100);
+  }
+  function closeDeleteModal() {
+    document.getElementById('delete-modal').style.display = 'none';
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('delete-confirm-btn').disabled = true;
+  }
+  async function deleteAccount() {
+    // Placeholder — actual delete requires a Supabase Edge Function or Worker
+    // since client SDK cannot delete its own auth.users row
+    alert('Account deletion requires contacting support.\nEmail: sonybukansoni@gmail.com');
+    closeDeleteModal();
+  }
+
+  // ── HELPERS ───────────────────────────────────────────
+  function showAlert(el, msg, type) {
+    el.textContent = msg;
+    el.className   = `alert alert-${type} show`;
+  }
+
+  document.getElementById('pw-new').addEventListener('input', () => {
+    document.getElementById('pw-confirm').classList.remove('error');
+    document.getElementById('pw-alert').className = 'alert';
+  });
+
+  // Close delete modal on backdrop click
+  document.getElementById('delete-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('delete-modal')) closeDeleteModal();
+  });
+
+  waitForSupabase(init);
+</script>
+
+</body>
+</html>

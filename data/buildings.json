@@ -8989,7 +8989,7 @@
       "category": "infrastructure",
       "unique": false,
       "tribes": "all",
-      "capitalOnly": true,
+      "capitalOnly": false,
       "fixed": false,
       "maxLevel": 20,
       "prerequisites": [
@@ -9268,7 +9268,7 @@
       "category": "infrastructure",
       "unique": false,
       "tribes": "all",
-      "capitalOnly": true,
+      "capitalOnly": false,
       "fixed": false,
       "maxLevel": 20,
       "prerequisites": [

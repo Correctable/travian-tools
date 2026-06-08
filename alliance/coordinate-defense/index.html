@@ -43,7 +43,7 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
   position: relative; z-index: 1;
   border-bottom: 1px solid var(--border);
   background: var(--surface);
-  padding: 28px 40px 24px;
+  padding: 8px 40px 8px;
 }
 .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--text3); margin-bottom: 10px; flex-wrap: wrap; }
 .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
@@ -61,8 +61,8 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 .page-badge.coord { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
 
 /* ── PAGE WRAP ── */
-.page-wrap { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 36px 32px 72px; }
-@media (max-width: 768px) { .page-header { padding: 20px 16px 16px; } .page-wrap { padding: 24px 16px 48px; } }
+.page-wrap { position: relative; z-index: 1; max-width: 1060px; margin: 0 auto; padding: 48px 24px 72px; }
+@media (max-width: 768px) { .page-header { padding: 8px 16px 8px; } .page-wrap { padding: 28px 16px 48px; } }
 
 /* ── GATE SCREENS ── */
 .gate { text-align: center; padding: 72px 24px; }
@@ -217,7 +217,8 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 
 /* unit picker */
 .unit-picker { display: flex; flex-wrap: wrap; gap: 6px; }
-.unit-pill   { padding: 4px 11px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface2); font-size: 0.75rem; font-weight: 500; color: var(--text3); cursor: pointer; transition: all 0.15s; }
+.unit-pill   { display:inline-flex; align-items:center; gap:5px; padding: 4px 10px 4px 5px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface2); font-size: 0.75rem; font-weight: 500; color: var(--text3); cursor: pointer; transition: all 0.15s; }
+.unit-pill-icon { width:18px; height:18px; display:inline-block; background-size:18px 180px; flex-shrink:0; }
 .unit-pill:hover   { border-color: var(--border2); color: var(--text2); }
 .unit-pill.selected { background: var(--blue-glow); color: var(--blue2); border-color: var(--border2); }
 
@@ -267,7 +268,14 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 @keyframes toastIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
 
 /* ── MISC ── */
+
+/* ── SERVER CLOCK ── */
+.server-clock-row  { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding: 6px 10px; background: var(--navy); border-radius: 8px; }
+.server-clock-label{ font-size: 0.72rem; color: rgba(255,255,255,0.55); white-space: nowrap; }
+.server-clock-val  { font-family: 'Space Grotesk', monospace; font-size: 0.88rem; font-weight: 600; color: #fff; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+
 #etaField.hidden { display: none; }
+#etaInputField.hidden { display: none; }
 @media (max-width: 600px) { .card-top { flex-direction: column; } .card-actions { width: 100%; justify-content: flex-end; } .toolbar { flex-direction: column; align-items: flex-start; } }
 </style>
 </head>
@@ -373,9 +381,27 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
             </div>
 
             <div class="field" id="etaField">
-              <label>Attack ETA</label>
-              <input type="datetime-local" id="inputEta">
-              <div class="hint">Estimated time the attack lands. Plan auto-closes after this time.</div>
+              <label>Attack ETA Timezone</label>
+              <select id="etaTimezone" onchange="onTimezoneChange()">
+                <option value="1"  selected>🕐 Server Time (UTC+1)</option>
+                <option value="0" >🌐 UTC (GMT+0)</option>
+                <option value="2" >UTC+2</option>
+                <option value="3" >UTC+3</option>
+                <option value="5" >UTC+5</option>
+                <option value="7" >UTC+7 (WIB)</option>
+                <option value="8" >UTC+8 (SGT/WITA)</option>
+                <option value="-5">UTC-5 (EST)</option>
+                <option value="-8">UTC-8 (PST)</option>
+              </select>
+              <div class="server-clock-row" id="serverClockRow">
+                <span class="server-clock-label">Server Time (UTC+1) now:</span>
+                <span class="server-clock-val" id="serverClockVal">—</span>
+              </div>
+            </div>
+            <div class="field" id="etaInputField">
+              <label>Attack ETA <span id="etaTzLabel" style="font-weight:400;color:var(--text3)">(Server Time UTC+1)</span></label>
+              <input type="datetime-local" id="inputEta" step="1">
+              <div class="hint">Plan auto-closes after this time. Enter in the timezone selected above — stored as UTC internally.</div>
             </div>
 
             <div class="field">
@@ -415,11 +441,11 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
               <div class="coord-row">
                 <div class="field">
                   <label>X Coordinate</label>
-                  <input type="number" id="manualX" placeholder="-131" onchange="resolveManual()">
+                  <input type="number" id="manualX" placeholder="-131" oninput="resolveManual()">
                 </div>
                 <div class="field">
                   <label>Y Coordinate</label>
-                  <input type="number" id="manualY" placeholder="177" onchange="resolveManual()">
+                  <input type="number" id="manualY" placeholder="177" oninput="resolveManual()">
                 </div>
               </div>
               <div id="resolveChipManual"></div>
@@ -663,6 +689,7 @@ function showList() {
   document.getElementById('pageBadges').style.display = '';
 
   if (isCoord) document.getElementById('btnNew').classList.remove('hidden');
+  stopServerClock();
   loadPlans();
 }
 
@@ -681,6 +708,8 @@ function showCreate() {
 
   buildUnitPicker();
   populateMemberSelect();
+  onTimezoneChange();
+  startServerClock();
 }
 
 /* ════════════════════════════════════════
@@ -713,7 +742,9 @@ function renderCard(plan) {
   const isFull    = remaining === 0;
 
   // Travian send-def link
-  const serverDomain = (currentWs?.server || 'ts5') + '.x1.asia.travian.com';
+  const _rawServer   = currentWs?.server || 'ts5';
+  const serverSlug   = _rawServer.replace(/\.x1\.asia(\.travian\.com)?$/, '').split('.')[0];
+  const serverDomain = `${serverSlug}.x1.asia.travian.com`;
   const sendUrl = plan.target_map_id
     ? `https://${serverDomain}/build.php?gid=16&tt=2&eventType=5&targetMapId=${plan.target_map_id}`
     : null;
@@ -917,6 +948,7 @@ function selectType(type) {
   formType = type;
   document.querySelectorAll('.type-opt').forEach(el => el.classList.toggle('selected', el.dataset.type === type));
   document.getElementById('etaField').classList.toggle('hidden', type === 'permanent');
+  document.getElementById('etaInputField').classList.toggle('hidden', type === 'permanent');
 }
 
 function setTargetMode(mode) {
@@ -1090,22 +1122,49 @@ function buildProxTable(tx, ty) {
 function buildUnitPicker() {
   const container = document.getElementById('unitPicker');
   if (!container || container.children.length > 0) return;
+  if (!window.TT) return;
 
-  const allPill = Object.assign(document.createElement('span'), { className: 'unit-pill', textContent: 'All def units' });
+  // Curated def units only — ordered by tribe
+  const CURATED = [
+    'u1',   // Legionnaire (Roman)
+    'u2',   // Praetorian (Roman)
+    'u12',  // Spearman (Teuton)
+    'u15',  // Paladin (Teuton)
+    'u21',  // Phalanx (Gaul)
+    'u25',  // Druidrider (Gaul)
+    'u51',  // Slave Militia (Egyptian)
+    'u52',  // Ash Warden (Egyptian)
+    'u55',  // Anhur Guard (Egyptian)
+    'u65',  // Marksman (Hun)
+  ];
+
+  // "All def units" pill (no icon)
+  const allPill = document.createElement('span');
+  allPill.className = 'unit-pill';
   allPill.dataset.unit = '__all__';
+  allPill.textContent = 'All def units';
   allPill.onclick = () => toggleUnit('__all__', allPill);
   container.appendChild(allPill);
 
-  if (!window.TT) return;
-  ['roman','teuton','gaul','egyptian','hun'].forEach(tribe => {
-    (TT.troopsByTribe[tribe] || [])
-      .filter(u => !u.isNPC && !u.isHero && u.stats.def_inf > 0)
-      .forEach(u => {
-        const pill = Object.assign(document.createElement('span'), { className: 'unit-pill', textContent: u.name, title: `${u.tribe} — ${u.name}` });
-        pill.dataset.unit = u.class_id;
-        pill.onclick = () => toggleUnit(u.class_id, pill);
-        container.appendChild(pill);
-      });
+  CURATED.forEach(classId => {
+    const u = TT.troopByClass[classId];
+    if (!u) return;
+
+    const spriteStyle = TT.getSpriteStyle(classId);
+    const pill = document.createElement('span');
+    pill.className = 'unit-pill';
+    pill.dataset.unit = classId;
+    pill.title = `${u.tribe_display} — ${u.name}`;
+    pill.onclick = () => toggleUnit(classId, pill);
+
+    if (spriteStyle) {
+      const icon = document.createElement('span');
+      icon.className = 'unit-pill-icon';
+      icon.style.cssText = spriteStyle;
+      pill.appendChild(icon);
+    }
+    pill.appendChild(document.createTextNode(u.name));
+    container.appendChild(pill);
   });
 }
 
@@ -1151,7 +1210,7 @@ async function submitPlan() {
     target_x:       targetX,
     target_y:       targetY,
     target_map_id:  targetMapId || null,
-    eta:            formType === 'incidental' ? (document.getElementById('inputEta').value || null) : null,
+    eta:            formType === 'incidental' ? (etaToUTC() || null) : null,
     crop_needed:    crop,
     crop_committed: 0,
     troop_priority,
@@ -1205,6 +1264,53 @@ function showToast(msg, type='') {
 document.getElementById('modalClose')?.addEventListener('click', function(e) {
   if (e.target === this) closeModal('modalClose');
 });
+
+
+/* ════════════════════════════════════════
+   TIMEZONE & SERVER CLOCK
+════════════════════════════════════════ */
+let clockInterval = null;
+
+function getSelectedOffset() {
+  return parseFloat(document.getElementById('etaTimezone')?.value ?? '1');
+}
+
+function startServerClock() {
+  stopServerClock();
+  function tick() {
+    const now = new Date(Date.now() + 3600000); // UTC+1 server time
+    const hh  = String(now.getUTCHours()).padStart(2,'0');
+    const mm  = String(now.getUTCMinutes()).padStart(2,'0');
+    const ss  = String(now.getUTCSeconds()).padStart(2,'0');
+    const el  = document.getElementById('serverClockVal');
+    if (el) el.textContent = `${hh}:${mm}:${ss}`;
+  }
+  tick();
+  clockInterval = setInterval(tick, 1000);
+}
+
+function stopServerClock() {
+  if (clockInterval) { clearInterval(clockInterval); clockInterval = null; }
+}
+
+function onTimezoneChange() {
+  const offset = getSelectedOffset();
+  const sign   = offset >= 0 ? '+' : '';
+  const label  = offset === 1 ? 'Server Time UTC+1' : `UTC${sign}${offset}`;
+  const el     = document.getElementById('etaTzLabel');
+  if (el) el.textContent = `(${label})`;
+}
+
+function etaToUTC() {
+  const raw = document.getElementById('inputEta')?.value;
+  if (!raw) return null;
+  const offset   = getSelectedOffset();
+  const [datePart, timePart] = raw.split('T');
+  const [Y, M, D] = datePart.split('-').map(Number);
+  const [h, m, s] = (timePart || '00:00:00').split(':').map(Number);
+  const fakeUtcMs = Date.UTC(Y, M - 1, D, h, m || 0, s || 0);
+  return new Date(fakeUtcMs - offset * 3600000).toISOString();
+}
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
