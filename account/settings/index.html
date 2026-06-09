@@ -219,6 +219,37 @@
     /* ── DIVIDER ── */
     .divider { height: 1px; background: var(--border); margin: 20px 0; }
 
+    /* ── PASSWORD INPUT WRAPPER ── */
+    .pw-wrap { position: relative; }
+    .pw-wrap .form-input { padding-right: 44px; }
+    .pw-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; padding: 4px;
+      color: var(--text3); display: flex; align-items: center; justify-content: center;
+      transition: color 0.15s;
+    }
+    .pw-toggle:hover { color: var(--text2); }
+    .pw-toggle svg { width: 18px; height: 18px; }
+
+    /* ── SUCCESS MODAL ── */
+    #pw-success-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,33,83,0.5); z-index: 2000;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    #pw-success-modal.open { display: flex; }
+    .pw-modal-box {
+      background: #fff; border-radius: 20px; padding: 36px 32px;
+      max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(15,33,83,0.2);
+      text-align: center; animation: fadeUp 0.25s ease both;
+    }
+    .pw-modal-icon { font-size: 2.8rem; margin-bottom: 14px; }
+    .pw-modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .pw-modal-desc { font-size: 0.875rem; color: var(--text3); line-height: 1.6; margin-bottom: 6px; }
+    .pw-modal-countdown { font-size: 0.8rem; color: var(--text2); font-weight: 600; margin-bottom: 24px; }
+    .pw-modal-btn { width: 100%; }
+
+
     /* ── DANGER ZONE ── */
     .danger-zone { border-color: rgba(220,38,38,0.2); }
     .danger-zone .section-header { border-color: rgba(220,38,38,0.15); }
@@ -307,6 +338,10 @@
           <span class="info-label">Plan</span>
           <span class="info-value" id="info-plan">—</span>
         </div>
+        <div class="info-row" id="info-expiry-row" style="display:none;">
+          <span class="info-label">Valid until</span>
+          <span class="info-value" id="info-expiry">—</span>
+        </div>
         <div class="info-row">
           <span class="info-label">Member since</span>
           <span class="info-value" id="info-since">—</span>
@@ -340,6 +375,7 @@
         <div class="billing-info">
           <div class="billing-tier" style="color:var(--purple)">Plus Plan</div>
           <div class="billing-detail">Full access to all tools, unlimited explore, and alliance features.</div>
+          <div class="billing-detail" id="billing-plus-expiry" style="margin-top:4px;font-weight:600;color:var(--purple);"></div>
         </div>
       </div>
 
@@ -349,6 +385,7 @@
         <div class="billing-info">
           <div class="billing-tier" style="color:var(--amber)">Pro Plan</div>
           <div class="billing-detail">Advanced automation, unlimited everything, and priority support.</div>
+          <div class="billing-detail" id="billing-pro-expiry" style="margin-top:4px;font-weight:600;color:var(--amber);"></div>
         </div>
       </div>
 
@@ -382,11 +419,23 @@
       <div class="alert" id="pw-alert"></div>
       <div class="form-group">
         <label class="form-label">New Password</label>
-        <input type="password" class="form-input" id="pw-new" placeholder="Minimum 8 characters" autocomplete="new-password">
+        <div class="pw-wrap">
+          <input type="password" class="form-input" id="pw-new" placeholder="Minimum 8 characters" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('pw-new', this)" aria-label="Show password">
+            <svg id="eye-new-show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eye-new-hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Confirm New Password</label>
-        <input type="password" class="form-input" id="pw-confirm" placeholder="Repeat new password" autocomplete="new-password">
+        <div class="pw-wrap">
+          <input type="password" class="form-input" id="pw-confirm" placeholder="Repeat new password" autocomplete="new-password">
+          <button type="button" class="pw-toggle" onclick="togglePw('pw-confirm', this)" aria-label="Show password">
+            <svg id="eye-confirm-show" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg id="eye-confirm-hide" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
         <span class="form-hint">Must be at least 8 characters.</span>
       </div>
       <button class="btn btn-primary" id="pw-btn" onclick="changePassword()">
@@ -415,6 +464,17 @@
     </div>
   </div>
 
+</div>
+
+<!-- Password success modal -->
+<div id="pw-success-modal">
+  <div class="pw-modal-box">
+    <div class="pw-modal-icon">🔐</div>
+    <div class="pw-modal-title">Password Updated!</div>
+    <div class="pw-modal-desc">Your password has been changed successfully. For your security, you'll be logged out so you can sign in with the new password.</div>
+    <div class="pw-modal-countdown" id="pw-modal-countdown">Logging out in 5 seconds…</div>
+    <button class="btn btn-primary pw-modal-btn" onclick="doLogout()">Log Out Now</button>
+  </div>
 </div>
 
 <!-- Delete confirm modal -->
@@ -496,6 +556,22 @@
     document.getElementById('info-plan').textContent        = planLabels[role] || 'Free';
     document.getElementById('info-since').textContent       = since;
 
+    // Plan expiry (stored in user_metadata.plan_expires_at — ISO date string)
+    const expiresAt = user.user_metadata?.plan_expires_at;
+    if (expiresAt && role !== 'free') {
+      const expDate = new Date(expiresAt);
+      const expStr  = expDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const daysLeft = Math.ceil((expDate - Date.now()) / 86400000);
+      const daysLabel = daysLeft > 0 ? `(${daysLeft} day${daysLeft !== 1 ? 's' : ''} left)` : '(expired)';
+      const expFull = `${expStr} ${daysLabel}`;
+
+      document.getElementById('info-expiry-row').style.display = '';
+      document.getElementById('info-expiry').textContent = expFull;
+
+      const billingExpEl = document.getElementById(`billing-${role}-expiry`);
+      if (billingExpEl) billingExpEl.textContent = `Active until ${expFull}`;
+    }
+
     // Plan badge
     const badge = document.getElementById('profile-plan-badge');
     badge.textContent = planLabels[role] || 'Free';
@@ -552,10 +628,39 @@
     if (error) {
       showAlert(alert, 'Failed to update password: ' + error.message, 'error');
     } else {
-      showAlert(alert, '✓ Password updated successfully.', 'success');
       document.getElementById('pw-new').value    = '';
       document.getElementById('pw-confirm').value = '';
+      showPwSuccessModal();
     }
+  }
+
+  // ── PASSWORD SUCCESS MODAL ────────────────────────────
+  let _logoutTimer = null;
+  function showPwSuccessModal() {
+    const modal = document.getElementById('pw-success-modal');
+    modal.classList.add('open');
+    let secs = 5;
+    const countdown = document.getElementById('pw-modal-countdown');
+    _logoutTimer = setInterval(() => {
+      secs--;
+      if (secs <= 0) { clearInterval(_logoutTimer); doLogout(); }
+      else countdown.textContent = `Logging out in ${secs} second${secs !== 1 ? 's' : ''}…`;
+    }, 1000);
+  }
+  async function doLogout() {
+    clearInterval(_logoutTimer);
+    await window._supabase.auth.signOut();
+    window.location.href = '/login/';
+  }
+
+  // ── TOGGLE PASSWORD VISIBILITY ────────────────────────
+  function togglePw(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    const suffix = inputId === 'pw-new' ? 'new' : 'confirm';
+    document.getElementById(`eye-${suffix}-show`).style.display = isHidden ? 'none' : '';
+    document.getElementById(`eye-${suffix}-hide`).style.display = isHidden ? '' : 'none';
   }
 
   // ── DELETE ACCOUNT ────────────────────────────────────
