@@ -82,7 +82,7 @@
         label: 'Explore',
         dropdown: [
           { icon: '🗺️', title: 'Interactive Map',  desc: 'Explore the live server map',       badge: 'FREE', serverTool: 'map',                        serverBased: true  },
-          { icon: '🌿', title: 'Village Finder',   desc: 'Search best village for settler',   badge: 'PLUS', serverTool: 'village-finder',             serverBased: true  },
+          { icon: '🏰', title: 'Village Finder',   desc: 'Search best village for settler',   badge: 'PLUS', serverTool: 'village-finder',             serverBased: true  },
           { icon: '🌿', title: 'Oasis Database',   desc: 'All oasis for your farming needs',  badge: 'PLUS', serverTool: 'oasis-data',                 serverBased: true  },
         ],
       },
@@ -101,7 +101,7 @@
     // Menu login-only — dirender oleh updateAuthState()
     myStuffItems: [
       { icon: '👁', title: 'Intelligence',           desc: 'Your personal data',         badge: 'FREE', href: '/account/intelligence/'     },
-      { icon: '⚔️', title: 'Archive',  desc: 'Saved report history',               badge: 'PRO',  href: '/account/saved-reports/'   },
+      { icon: '⚔️', title: 'Archive',  desc: 'Saved report history',               badge: 'PLUS',  href: '/account/saved-reports/'   },
     ],
 
     allianceItems: [
