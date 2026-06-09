@@ -560,6 +560,12 @@
           <input type="checkbox" class="chip-input tribe" id="hideGauls" value="3">
           <label class="chip-label" for="hideGauls"><img src="/cdn/icons/misc/gaul_medium.png" alt=" Gauls"></label>
 
+          <input type="checkbox" class="chip-input tribe" id="hideEgyptians" value="4">
+          <label class="chip-label" for="hideEgyptians"><img src="/cdn/icons/misc/egyptian_medium.png" alt=" Egyptians"></label>
+
+          <input type="checkbox" class="chip-input tribe" id="hideHuns" value="6">
+          <label class="chip-label" for="hideHuns"><img src="/cdn/icons/misc/hun_medium.png" alt=" Huns"></label>
+
           <input type="checkbox" class="chip-input tribe" id="hideNatars" value="5">
           <label class="chip-label" for="hideNatars"><img src="/cdn/icons/misc/natar_medium.png" alt=" Natars"></label>
         </div>
@@ -655,9 +661,9 @@
     const BASE_PATH   = `/s/${SERVER_SLUG}/statistics`;
     const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
 
-    const TRIBE_NAMES   = { 1:'Romans', 2:'Teutons', 3:'Gauls', 4:'Egyptians', 5:'Natars' };
+    const TRIBE_NAMES   = { 1:'Romans', 2:'Teutons', 3:'Gauls', 4:'Egyptians', 5:'Natars', 6:'Huns' };
     const CDN_SPRITE    = 'https://cdn.legends.travian.com/gpack/456.8/img_ltr/global/units';
-    const TRIBE_FOLDER  = { 1:'roman', 2:'teuton', 3:'gaul', 4:'egyptian', 5:'natar' };
+    const TRIBE_FOLDER  = { 1:'roman', 2:'teuton', 3:'gaul', 4:'egyptian', 5:'natar', 6:'hun' };
     function tribeIconHtml(tribeId, tribeName) {
       const folder = TRIBE_FOLDER[tribeId];
       if (!folder) return '<span style="color:var(--text3)">?</span>';
@@ -1049,7 +1055,9 @@
       document.getElementById('hideNPC').checked    = false;
       document.getElementById('itVillage').checked  = true;
       document.querySelectorAll('.chip-input.tribe').forEach(el => el.checked = false);
-      document.getElementById('hideNatars').checked = false;
+      document.getElementById('hideEgyptians').checked = false;
+      document.getElementById('hideHuns').checked      = false;
+      document.getElementById('hideNatars').checked    = false;
       hiddenAlliances.clear();
       hiddenPlayers.clear();
       renderTags('allianceTagsWrap', hiddenAlliances, 'allianceInput');
