@@ -1,0 +1,36 @@
+name: Travian Map Import — TTQ Europe
+
+on:
+  schedule:
+    - cron: "20 22 * * *"
+  workflow_dispatch:
+
+jobs:
+  import:
+    name: Download & Import map.sql (TTQ Europe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run import script
+        env:
+          TURSO_DATABASE_URL: ${{ secrets.TURSO_DATABASE_URL_TTQ_EU }}
+          TURSO_AUTH_TOKEN:   ${{ secrets.TURSO_AUTH_TOKEN_TTQ_EU }}
+        run: |
+          python scripts/import_map_ttq_europe.py
+
+      - name: Done
+        if: success()
+        run: echo "✅ Import TTQ Europe berhasil!"
+
+      - name: Failed
+        if: failure()
+        run: echo "❌ Import TTQ Europe gagal — cek log di atas"
