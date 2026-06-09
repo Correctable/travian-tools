@@ -29,7 +29,7 @@ const SERVERS = [
     domain:  'ttq.x2.asia.travian.com',
     speed:   2,
     region:  'Asia',
-    active:  false,                   // set true setelah data Turso siap
+    active:  true,                   // set true setelah data Turso siap
     isNew:   true,
   },
   {
@@ -38,7 +38,7 @@ const SERVERS = [
     domain:  'ttq.x2.america.travian.com',
     speed:   2,
     region:  'America',
-    active:  false,
+    active:  true,
     isNew:   true,
   },
   {
@@ -47,7 +47,7 @@ const SERVERS = [
     domain:  'ttq.x2.europe.travian.com',
     speed:   2,
     region:  'Europe',
-    active:  false,
+    active:  true,
     isNew:   true,
   },
   {
@@ -56,7 +56,7 @@ const SERVERS = [
     domain:  'ttq.x2.arabics.travian.com',
     speed:   2,
     region:  'Arabics',
-    active:  false,
+    active:  true,
     isNew:   true,
   },
 
