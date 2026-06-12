@@ -325,22 +325,6 @@
     }
 
     /* ── Footer ── */
-    .join-footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 0.78rem;
-      color: var(--text3);
-    }
-    .join-footer a {
-      color: var(--blue2);
-      text-decoration: none;
-    }
-    .join-footer a:hover { text-decoration: underline; }
-
-    @media (max-width: 540px) {
-      .join-card { padding: 32px 24px; }
-      .ws-name { font-size: 1.35rem; }
-    }
 
     /* ── Player picker modal ── */
     .modal-backdrop {
@@ -589,11 +573,14 @@
   </div>
 </div>
 
+<div id="footer-root"></div>
+
 <!-- Load order wajib -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
+<script src="/footer.js"></script>
 
 <script>
 (async function () {

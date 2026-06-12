@@ -818,19 +818,7 @@
   </div><!-- /page-wrap -->
 
   <!-- FOOTER -->
-  <footer style="position:relative;z-index:1;border-top:1px solid var(--border);background:var(--surface2);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;">
-    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-      <div style="width:28px;height:28px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem">⚔️</div>
-      <span style="font-family:'Space Grotesk',sans-serif;font-size:.875rem;font-weight:600;color:var(--text2)">TravianTools · sonybukansoni.com</span>
-    </a>
-    <div style="display:flex;align-items:center;gap:24px">
-      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Tools</a>
-      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Guides</a>
-      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Changelog</a>
-      <a href="#" style="font-size:.775rem;color:var(--text3);text-decoration:none">Contact</a>
-    </div>
-    <span style="font-size:.75rem;color:var(--text3)">© 2025 sonybukansoni.com</span>
-  </footer>
+  <div id="footer-root"></div>
 
   <div class="toast" id="toast"></div>
 
@@ -1292,5 +1280,6 @@ function showToast(msg, type) {
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
+<script src="/footer.js"></script>
 </body>
 </html>

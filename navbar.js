@@ -91,7 +91,7 @@
         dropdown: [
           { icon: '🌾', title: 'Field Production', desc: 'Simulate resource output per hour', badge: 'FREE', href: '/simulators/field-production/',    serverBased: false },
           { icon: '🏘️', title: 'Village Planner',  desc: 'Plan buildings & upgrade path',    badge: 'FREE', href: '/simulators/village-planner/',     serverBased: false },
-          { icon: '⚔️', title: 'Combat Simulator', desc: 'Simulate attack vs defense',       badge: 'SOON', href: '#',                               serverBased: false },
+          { icon: '⚔️', title: 'Combat Simulator', desc: 'Simulate attack vs defense',       badge: 'FREE', href: '/simulators/combat-simulator/', serverBased: false },
           { icon: '⏱️', title: 'Troop Training',   desc: 'Time & cost to build an army',     badge: 'SOON', href: '#',                               serverBased: false },
           { icon: '🌾', title: 'Crop Balance',     desc: 'Net crop after troop consumption', badge: 'SOON', href: '#',                               serverBased: false },
         ],

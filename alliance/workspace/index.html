@@ -74,12 +74,14 @@
     .page-title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+      line-height: 1.2;
     }
     .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
     .page-badges { display: flex; align-items: center; gap: 8px; }
     .page-badge {
       font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
       padding: 4px 10px; border-radius: 100px;
+      line-height: 1.2;
     }
     .page-badge.pro   { background: var(--amber-bg);  color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
     .page-badge.login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
@@ -812,10 +814,13 @@
   </main>
 </div><!-- /#alliance-layout -->
 
+<div id="footer-root"></div>
+
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
 <script src="/alliance-nav.js"></script>
+<script src="/footer.js"></script>
 
 <script>
   const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
@@ -835,7 +840,7 @@
       SERVERS.filter(s => s.active).forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.slug;
-        opt.dataset.server = s.server || s.slug.split('.')[0];
+        opt.dataset.server = s.apiKey;
         opt.textContent = `${s.label} (${s.slug})`;
         sel.appendChild(opt);
       });
@@ -1287,7 +1292,7 @@
     validateForm();
 
     if (!slug) { setDropTrigger('alliance', { text:'Select a server first', disabled:true }); return; }
-    const serverKey = opt.dataset.server || slug.split('.')[0];
+    const serverKey = opt.dataset.server;
 
     try {
       const res  = await fetch(`${API_BASE}/api/statistics?server=${serverKey}&type=alliances&page=1`);

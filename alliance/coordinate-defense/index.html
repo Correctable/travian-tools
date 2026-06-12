@@ -53,8 +53,8 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .page-title-group  { display: flex; align-items: center; gap: 14px; }
 .page-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
-.page-title    { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
-.page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+.page-title    { font-family: 'Space Grotesk', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1.2;}
+.page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; line-height: 1.2; }
 .page-badges   { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .page-badge    { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; padding: 4px 10px; border-radius: 100px; }
 .page-badge.free  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
@@ -518,12 +518,15 @@ body { font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text); 
 
 <div class="toast-container" id="toastContainer"></div>
 
+<div id="footer-root"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/data/troops.js"></script>
 <script src="/navbar.js"></script>
 <script src="/alliance-nav.js"></script>
+<script src="/footer.js"></script>
 
 <script>
 /* ════════════════════════════════════════

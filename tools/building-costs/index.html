@@ -162,14 +162,6 @@ tfoot tr.hint-row td{padding:6px 12px;font-size:0.7rem;color:var(--text3);text-a
 .cat-infra       { --c-dot:#2563eb; --c-bg:var(--blue-glow); --c-text:var(--blue2);  }
 
 /* ── FOOTER ── */
-footer{position:relative;z-index:1;border-top:1px solid var(--border);background:var(--surface2);padding:32px 40px;display:flex;align-items:center;justify-content:space-between}
-.footer-brand{display:flex;align-items:center;gap:10px;text-decoration:none}
-.footer-logo{width:28px;height:28px;background:linear-gradient(135deg,var(--blue2),var(--cyan));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.85rem}
-.footer-name{font-family:'Space Grotesk',sans-serif;font-size:0.875rem;font-weight:600;color:var(--text2)}
-.footer-links{display:flex;align-items:center;gap:24px}
-.footer-link{font-size:0.775rem;color:var(--text3);text-decoration:none;transition:color 0.15s}
-.footer-link:hover{color:var(--text2)}
-.footer-copy{font-size:0.75rem;color:var(--text3)}
 
 /* ── ANIMATIONS ── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -264,19 +256,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);background
 </div><!-- /page-wrap -->
 
 <!-- ── FOOTER ── -->
-<footer>
-  <a href="/" class="footer-brand">
-    <div class="footer-logo">⚔️</div>
-    <span class="footer-name">TravianTools · sonybukansoni.com</span>
-  </a>
-  <div class="footer-links">
-    <a href="#" class="footer-link">Tools</a>
-    <a href="#" class="footer-link">Guides</a>
-    <a href="#" class="footer-link">Changelog</a>
-    <a href="#" class="footer-link">Contact</a>
-  </div>
-  <span class="footer-copy">© 2025 sonybukansoni.com</span>
-</footer>
+<div id="footer-root"></div>
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
@@ -865,5 +845,6 @@ document.getElementById('menu-search').addEventListener('input', e => renderMenu
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="/supabase.js"></script>
 <script src="/navbar.js"></script>
+<script src="/footer.js"></script>
 </body>
 </html>

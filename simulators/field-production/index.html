@@ -391,20 +391,6 @@
     @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
 
     /* ── FOOTER ── */
-    footer {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border); background: var(--surface);
-      padding: 24px 40px; display: flex;
-      align-items: center; justify-content: space-between;
-    }
-    .footer-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .footer-logo {
-      width: 26px; height: 26px;
-      background: linear-gradient(135deg, var(--blue2), var(--cyan));
-      border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
-    }
-    .footer-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.825rem; font-weight: 600; color: var(--text2); }
-    .footer-copy { font-size: 0.72rem; color: var(--text3); }
 
     @media (max-width: 860px) {
       nav { padding: 0 16px; }
@@ -414,7 +400,7 @@
       .sim-toolbar { gap: 6px; }
       .sim-wrapper { flex-direction: column; }
       #resourceFieldContainer { width: 100%; max-width: 473px; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 20px 16px; }
+
     }
   </style>
 </head>
@@ -716,13 +702,7 @@
   </div>
 
   <!-- FOOTER -->
-  <footer>
-    <a href="/" class="footer-brand">
-      <div class="footer-logo">⚔️</div>
-      <span class="footer-name">TravianTools · sonybukansoni.com</span>
-    </a>
-    <span class="footer-copy">© 2025 sonybukansoni.com</span>
-  </footer>
+  <div id="footer-root"></div>
 
 <script>
 const CDN    = '/cdn/buildings/themes/default';
@@ -979,5 +959,6 @@ document.addEventListener('DOMContentLoaded',()=>{
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
+<script src="/footer.js"></script>
 </body>
 </html>

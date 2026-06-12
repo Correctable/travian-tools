@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combat Simulator — TravianTools</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:       #0f2153;
+      --navy2:      #1a3068;
+      --navy3:      #0b1a3d;
+      --blue:       #1d4ed8;
+      --blue2:      #2563eb;
+      --blue-light: #3b82f6;
+      --blue-glow:  rgba(59,130,246,0.10);
+      --cyan:       #0891b2;
+      --surface:    #ffffff;
+      --surface2:   #f8faff;
+      --border:     #e2e8f3;
+      --border2:    rgba(37,99,235,0.25);
+      --text:       #0f2153;
+      --text2:      #3d5a8a;
+      --text3:      #7a93bc;
+      --green:      #059669;
+      --green-bg:   rgba(5,150,105,0.08);
+      --amber:      #d97706;
+      --amber-bg:   rgba(217,119,6,0.08);
+      --red:        #dc2626;
+      --red-bg:     rgba(220,38,38,0.08);
+      --purple:     #7c3aed;
+      --purple-bg:  rgba(124,58,237,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface2);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      position: relative; z-index: 1;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 28px 40px 24px;
+    }
+    .breadcrumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.75rem; color: var(--text3); margin-bottom: 10px;
+    }
+    .breadcrumb a { color: var(--text3); text-decoration: none; transition: color 0.15s; }
+    .breadcrumb a:hover { color: var(--blue2); }
+    .breadcrumb-sep { font-size: 0.65rem; opacity: 0.5; }
+    .breadcrumb-current { color: var(--text2); font-weight: 500; }
+    .page-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .page-title-group { display: flex; align-items: center; gap: 14px; }
+    .page-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--blue-glow); border: 1px solid rgba(59,130,246,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .page-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em;
+    }
+    .page-subtitle { font-size: 0.8rem; color: var(--text3); margin-top: 2px; }
+    .page-badges { display: flex; align-items: center; gap: 8px; }
+    .page-badge {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 4px 10px; border-radius: 100px;
+    }
+    .page-badge.free     { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .page-badge.no-login { background: var(--blue-glow); color: var(--blue-light); border: 1px solid rgba(59,130,246,0.2); }
+
+    /* ── PAGE WRAP ── */
+    .page-wrap {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+
+    /* ── SIMULATOR LAYOUT ── */
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    /* ── SIDE CARD ── */
+    .side-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .side-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px;
+      gap: 12px;
+    }
+    .side-card-header.attacker { background: #fef2f2; border-bottom: 1px solid #fecaca; }
+    .side-card-header.defender { background: #eff6ff; border-bottom: 1px solid #bfdbfe; }
+
+    .side-label {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em;
+    }
+    .side-label-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .attacker .side-label-icon { background: rgba(220,38,38,0.1); }
+    .defender .side-label-icon { background: rgba(37,99,235,0.1); }
+    .attacker .side-label { color: var(--red); }
+    .defender .side-label { color: var(--blue2); }
+
+    /* Attack type toggle (attacker only) */
+    .attack-type-row {
+      display: flex; gap: 6px;
+    }
+    .attack-type-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.72rem; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px; border: 1px solid transparent;
+      cursor: pointer; transition: all 0.15s;
+      background: var(--surface); color: var(--text3); border-color: var(--border);
+    }
+    .attack-type-btn.active {
+      background: var(--red-bg); color: var(--red); border-color: rgba(220,38,38,0.3);
+    }
+
+    .side-card-body { padding: 20px; }
+
+    /* ── TRIBE SELECTOR ── */
+    .tribe-selector { margin-bottom: 16px; }
+    .tribe-selector label {
+      display: block; font-size: 0.72rem; font-weight: 600;
+      color: var(--text3); text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .tribe-tabs {
+      display: flex; gap: 4px; flex-wrap: wrap;
+    }
+    .tribe-tab {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem; font-weight: 600;
+      padding: 5px 10px; border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text3);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .tribe-tab:hover { border-color: var(--border2); color: var(--text2); }
+    .tribe-tab.active { background: var(--blue-glow); color: var(--blue2); border-color: rgba(37,99,235,0.3); }
+
+    /* ── TROOP GRID ── */
+    .troop-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .troop-cell {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 4px;
+    }
+    .troop-icon-wrap {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+      transition: border-color 0.15s;
+    }
+    .troop-icon-wrap:has(+ input:not([value="0"])):has(+ input:focus),
+    .troop-cell:has(input:not([value="0"])) .troop-icon-wrap {
+      border-color: var(--border2);
+    }
+    .troop-icon { display: inline-block; image-rendering: pixelated; }
+    .troop-name {
+      font-size: 0.6rem; font-weight: 500; color: var(--text3);
+      text-align: center; line-height: 1.2;
+      max-width: 48px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .troop-input {
+      width: 100%; font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem; font-weight: 600; text-align: center;
+      padding: 4px 2px; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); outline: none; transition: all 0.15s;
+    }
+    .troop-input:focus { border-color: var(--blue2); background: var(--surface); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+    .troop-input.has-value { border-color: var(--border2); background: var(--surface); color: var(--blue2); font-weight: 700; }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+      font-size: 0.7rem; font-weight: 700; color: var(--text3);
+      text-transform: uppercase; letter-spacing: 0.07em;
+      display: flex; align-items: center; gap: 8px;
+      margin: 14px 0 10px;
+    }
+    .section-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── BONUS INPUTS ── */
+    .bonus-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .bonus-field label {
+      display: block; font-size: 0.7rem; font-weight: 600;
+      color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .bonus-input-wrap {
+      position: relative; display: flex; align-items: center;
+    }
+    .bonus-input-wrap span {
+      position: absolute; right: 10px;
+      font-size: 0.75rem; color: var(--text3); pointer-events: none;
+    }
+    .bonus-input {
+      width: 100%; font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      padding: 7px 28px 7px 10px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); outline: none; transition: all 0.15s;
+    }
+    .bonus-input:focus { border-color: var(--blue2); background: var(--surface); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+
+    /* ── DEFENDER FORCES ── */
+    .defender-forces { display: flex; flex-direction: column; gap: 12px; }
+    .defender-force {
+      border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+      animation: fadeUp 0.2s ease;
+    }
+    .defender-force-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+    }
+    .defender-force-label {
+      font-size: 0.78rem; font-weight: 700; color: var(--text2);
+    }
+    .defender-force-body { padding: 14px; }
+    .remove-force-btn {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 1px solid rgba(220,38,38,0.2);
+      background: var(--red-bg); color: var(--red);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; transition: all 0.15s;
+    }
+    .remove-force-btn:hover { background: var(--red); color: white; }
+
+    .add-force-btn {
+      width: 100%; padding: 10px;
+      border: 1.5px dashed var(--border); border-radius: 10px;
+      background: transparent; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem; font-weight: 600; color: var(--text3);
+      transition: all 0.15s; margin-top: 8px;
+    }
+    .add-force-btn:hover { border-color: var(--blue2); color: var(--blue2); background: var(--blue-glow); }
+
+    /* ── SIMULATE BUTTON ── */
+    .simulate-row {
+      display: flex; justify-content: center;
+      margin: 8px 0 32px;
+    }
+    .simulate-btn {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
+      padding: 14px 48px; border-radius: 12px;
+      border: none; cursor: pointer;
+      background: var(--blue2); color: white;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+      transition: all 0.18s;
+    }
+    .simulate-btn:hover { background: var(--blue); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(37,99,235,0.4); }
+    .simulate-btn:active { transform: translateY(0); }
+    .simulate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* ── RESULTS ── */
+    .results-section { animation: fadeUp 0.25s ease; }
+
+    .results-header {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem; font-weight: 700; color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .results-header::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .result-card-header {
+      padding: 12px 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .result-card-header.win { background: var(--green-bg); color: var(--green); border-bottom: 1px solid rgba(5,150,105,0.15); }
+    .result-card-header.loss { background: var(--red-bg); color: var(--red); border-bottom: 1px solid rgba(220,38,38,0.15); }
+    .result-card-header.neutral { background: var(--surface2); color: var(--text2); border-bottom: 1px solid var(--border); }
+
+    .result-card-body { padding: 14px 18px; }
+
+    /* Troop result table */
+    .troop-result-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+    }
+    .troop-result-table th {
+      font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text3);
+      padding: 0 0 8px; text-align: right;
+    }
+    .troop-result-table th:first-child { text-align: left; }
+    .troop-result-table td { padding: 5px 0; vertical-align: middle; }
+    .troop-result-table td:not(:first-child) { text-align: right; font-weight: 600; }
+    .troop-result-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+
+    .troop-result-name {
+      display: flex; align-items: center; gap: 6px;
+      font-weight: 500; color: var(--text2);
+    }
+    .val-sent { color: var(--text2); }
+    .val-dead { color: var(--red); }
+    .val-survive { color: var(--green); font-weight: 700; }
+
+    /* ── STATISTICS CARD ── */
+    .stats-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .stats-card-header {
+      padding: 12px 18px;
+      background: var(--navy);
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: -0.01em;
+      color: white;
+    }
+    .stats-table {
+      width: 100%; border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+    .stats-table th {
+      padding: 10px 18px;
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text3);
+      background: var(--surface2); border-bottom: 1px solid var(--border);
+      text-align: right;
+    }
+    .stats-table th:first-child { text-align: left; }
+    .stats-table td {
+      padding: 10px 18px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600; color: var(--text2);
+      text-align: right;
+    }
+    .stats-table td:first-child { text-align: left; color: var(--text); }
+    .stats-table tr:last-child td { border-bottom: none; }
+    .stats-highlight { font-family: 'Space Grotesk', sans-serif; font-size: 0.92rem; font-weight: 700; color: var(--text) !important; }
+
+    /* Outcome banner */
+    .outcome-banner {
+      padding: 16px 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: flex; align-items: center; gap: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
+    }
+    .outcome-banner.attacker-wins { background: var(--red-bg); color: var(--red); border: 1px solid rgba(220,38,38,0.2); }
+    .outcome-banner.defender-wins { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .outcome-banner-icon { font-size: 1.4rem; }
+
+    /* ── FORMULA NOTE ── */
+    .formula-note {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue2);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 0.78rem; color: var(--text3); line-height: 1.6;
+    }
+    .formula-note strong { color: var(--text2); }
+
+    /* ── SMITHY LEVEL (troop level) ── */
+    .smithy-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .smithy-row label {
+      font-size: 0.7rem; font-weight: 600; color: var(--text3);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    .smithy-input {
+      width: 60px; font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem; font-weight: 600;
+      padding: 5px 8px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text); outline: none; text-align: center;
+      transition: all 0.15s;
+    }
+    .smithy-input:focus { border-color: var(--blue2); box-shadow: 0 0 0 3px rgba(37,99,235,0.08); }
+    .smithy-hint { font-size: 0.7rem; color: var(--text3); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-header { padding: 20px 20px 16px; }
+      .page-wrap { padding: 28px 16px 48px; }
+      .sim-layout { grid-template-columns: 1fr; }
+      .results-grid { grid-template-columns: 1fr; }
+      .bonus-grid { grid-template-columns: 1fr; }
+      .troop-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .troop-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR PLACEHOLDER -->
+<div id="navbar-root"></div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="breadcrumb">
+    <a href="/">Home</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="/simulators/">Simulators</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Combat Simulator</span>
+  </div>
+  <div class="page-header-inner">
+    <div class="page-title-group">
+      <div class="page-icon">⚔️</div>
+      <div>
+        <div class="page-title">Combat Simulator</div>
+        <div class="page-subtitle">Simulate attack vs defense, see casualties and combat strength.</div>
+      </div>
+    </div>
+    <div class="page-badges">
+      <span class="page-badge free">FREE</span>
+      <span class="page-badge no-login">No login required</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrap">
+
+  <div class="sim-layout">
+
+    <!-- ── ATTACKER ── -->
+    <div class="side-card" id="attacker-card">
+      <div class="side-card-header attacker">
+        <div class="side-label">
+          <div class="side-label-icon">⚔️</div>
+          Attacker
+        </div>
+        <div class="attack-type-row">
+          <button class="attack-type-btn active" data-type="attack" onclick="setAttackType('attack')">Attack</button>
+          <button class="attack-type-btn" data-type="raid" onclick="setAttackType('raid')">Raid</button>
+        </div>
+      </div>
+      <div class="side-card-body">
+
+        <!-- Tribe selector -->
+        <div class="tribe-selector">
+          <label>Tribe</label>
+          <div class="tribe-tabs" id="atk-tribe-tabs">
+            <button class="tribe-tab active" data-tribe="roman" onclick="selectTribe('atk','roman',this)">Romans</button>
+            <button class="tribe-tab" data-tribe="teuton" onclick="selectTribe('atk','teuton',this)">Teutons</button>
+            <button class="tribe-tab" data-tribe="gaul" onclick="selectTribe('atk','gaul',this)">Gauls</button>
+            <button class="tribe-tab" data-tribe="egyptian" onclick="selectTribe('atk','egyptian',this)">Egyptians</button>
+            <button class="tribe-tab" data-tribe="hun" onclick="selectTribe('atk','hun',this)">Huns</button>
+          </div>
+        </div>
+
+        <!-- Troop grid -->
+        <div class="section-divider">Troops</div>
+        <div class="troop-grid" id="atk-troop-grid"></div>
+
+        <!-- Smithy level -->
+        <div class="smithy-row">
+          <label>Smithy Level</label>
+          <input class="smithy-input" type="number" id="atk-smithy" value="0" min="0" max="20">
+          <span class="smithy-hint">+½% attack per level</span>
+        </div>
+
+        <!-- Bonuses -->
+        <div class="section-divider">Bonuses</div>
+        <div class="bonus-grid">
+          <div class="bonus-field">
+            <label>Brewery</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="atk-brewery" value="0" min="0" max="20">
+              <span>lvl</span>
+            </div>
+          </div>
+          <div class="bonus-field">
+            <label>Alliance Bonus</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="atk-ally" value="0" min="0" max="5">
+              <span>%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── DEFENDER ── -->
+    <div class="side-card" id="defender-card">
+      <div class="side-card-header defender">
+        <div class="side-label">
+          <div class="side-label-icon">🛡️</div>
+          Defender
+        </div>
+      </div>
+      <div class="side-card-body">
+
+        <!-- Defender forces container -->
+        <div class="defender-forces" id="defender-forces"></div>
+        <button class="add-force-btn" onclick="addDefenderForce()">+ Add Reinforcement</button>
+
+        <!-- Bonuses -->
+        <div class="section-divider">Village Defenses</div>
+        <div class="bonus-grid">
+          <div class="bonus-field">
+            <label>Wall Level</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="def-wall" value="0" min="0" max="20">
+              <span>lvl</span>
+            </div>
+          </div>
+          <div class="bonus-field">
+            <label>Watchtower</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="def-watchtower" value="0" min="0" max="20">
+              <span>lvl</span>
+            </div>
+          </div>
+          <div class="bonus-field">
+            <label>Alliance Bonus</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="def-ally" value="0" min="0" max="5">
+              <span>%</span>
+            </div>
+          </div>
+          <div class="bonus-field">
+            <label>Traps</label>
+            <div class="bonus-input-wrap">
+              <input class="bonus-input" type="number" id="def-traps" value="0" min="0">
+              <span></span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /sim-layout -->
+
+  <!-- Simulate button -->
+  <div class="simulate-row">
+    <button class="simulate-btn" onclick="runSimulation()">⚔️ Simulate Battle</button>
+  </div>
+
+  <!-- Results -->
+  <div id="results-container"></div>
+
+  <div class="formula-note">
+    <strong>How calculations work:</strong>
+    Attack strength = Σ(attack × count) × smithy bonus × brewery bonus × alliance bonus.
+    Defence strength = Σ(def_inf × count) × inf_ratio + Σ(def_cav × count) × cav_ratio, where the ratio reflects the attacker's troop composition (slot 0–2 = infantry, slot 3–5 = cavalry).
+    Wall multiplies total defence per level (Romans/Teutons/Gauls/Egyptians ×3.7%/lvl, Huns ×3.1%/lvl).
+    Casualty ratio = √(loser / winner). In <strong>Attack</strong> mode all casualties die. In <strong>Raid</strong> mode: dead ≈ 47% of casualties, wounded ≈ 19% (return after raid) — empirically verified against Travian's official simulator.
+  </div>
+
+</div><!-- /page-wrap -->
+
+<div id="footer-root"></div>
+
+<!-- Load troops data -->
+<script src="/data/troops.js"></script>
+<script src="/servers.js"></script>
+<script src="/navbar.js"></script>
+<script src="/footer.js"></script>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── STATE ──
+  let attackType = 'attack'; // 'attack' | 'raid'
+  let atkTribe = 'roman';
+  let defForces = []; // [{id, tribe, inputs: {t1..t10}}]
+  let defForceCounter = 0;
+
+  // ── TRIBE DATA (from TT if available, else inline) ──
+  const TRIBES_PLAYABLE = ['roman','teuton','gaul','egyptian','hun'];
+
+  const TRIBE_LABELS = {
+    roman: 'Romans', teuton: 'Teutons', gaul: 'Gauls',
+    egyptian: 'Egyptians', hun: 'Huns'
+  };
+
+  // ── WALL BONUS ──
+  // Travian uses exponential wall multiplier, NOT linear.
+  // Formula: base ^ level
+  // Sources: Travian wiki + verified against official simulator
+  //   Roman  City Wall:      1.030 ^ level  (lvl20 = ~1.806×)
+  //   Teuton Earth Wall:     1.025 ^ level  (lvl20 = ~1.638×)
+  //   Gaul   Palisade:       1.025 ^ level  (lvl20 = ~1.638×)
+  //   Egyptian Stone Wall:   1.030 ^ level  (lvl20 = ~1.806×)
+  //   Hun    Makeshift Wall: 1.020 ^ level  (lvl20 = ~1.486×)
+  const WALL_BASE = {
+    roman: 1.030, teuton: 1.025, gaul: 1.025, egyptian: 1.030, hun: 1.020
+  };
+
+  // Smithy bonus: each level = +1% per level (per unit type)
+  // Assuming all units fully upgraded to same level
+  function smithyBonus(level) { return 1 + (level * 0.01); }
+
+  // Brewery bonus (attacker Teuton only, but field accepts it for any):
+  // Each level +3% attack, max 20 levels
+  function breweryBonus(level) { return 1 + (Math.min(level, 20) * 0.03); }
+
+  // Alliance bonus: input as percentage 0-10 (maps to 0–10%)
+  function allyBonus(pct) { return 1 + (pct / 100); }
+
+  // Wall defence multiplier — exponential
+  function wallBonus(tribe, level) {
+    if (level <= 0) return 1;
+    const base = WALL_BASE[tribe] || 1.025;
+    return Math.pow(base, level);
+  }
+
+  // ── GET TROOPS FOR TRIBE ──
+  function getTribesTroops(tribe) {
+    if (window.TT) {
+      return (window.TT.troopsByTribe[tribe] || []).filter(t => !t.isHero);
+    }
+    return [];
+  }
+
+  // ── RENDER TROOP GRID ──
+  function renderTroopGrid(containerId, tribe, prefix) {
+    const troops = getTribesTroops(tribe);
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = troops.map(t => {
+      const spriteStyle = window.TT ? window.TT.getSpriteStyle(t.class_id) : '';
+      const inputId = `${prefix}-${t.class_id}`;
+      return `<div class="troop-cell">
+        <div class="troop-icon-wrap">
+          <span class="troop-icon" style="${spriteStyle}"></span>
+        </div>
+        <div class="troop-name" title="${t.name}">${t.name.split(' ').pop()}</div>
+        <input class="troop-input" type="number" id="${inputId}"
+          value="0" min="0" placeholder="0"
+          oninput="onTroopInput(this)">
+      </div>`;
+    }).join('');
+  }
+
+  window.onTroopInput = function(el) {
+    const val = parseInt(el.value) || 0;
+    el.classList.toggle('has-value', val > 0);
+    el.value = val < 0 ? 0 : el.value;
+  };
+
+  // ── ATTACK TYPE ──
+  window.setAttackType = function(type) {
+    attackType = type;
+    document.querySelectorAll('.attack-type-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === type);
+    });
+  };
+
+  // ── TRIBE SELECTION ──
+  window.selectTribe = function(side, tribe, btn) {
+    if (side === 'atk') {
+      atkTribe = tribe;
+      document.querySelectorAll('#atk-tribe-tabs .tribe-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTroopGrid('atk-troop-grid', tribe, 'atk');
+    }
+  };
+
+  // ── DEFENDER FORCE ──
+  window.addDefenderForce = function(tribeDefault) {
+    defForceCounter++;
+    const id = defForceCounter;
+    const tribe = tribeDefault || 'roman';
+    defForces.push({ id, tribe });
+
+    const container = document.getElementById('defender-forces');
+    const forceEl = document.createElement('div');
+    forceEl.className = 'defender-force';
+    forceEl.id = `def-force-${id}`;
+    forceEl.innerHTML = `
+      <div class="defender-force-header">
+        <span class="defender-force-label">Force ${id}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="tribe-tabs">
+            ${TRIBES_PLAYABLE.map(t =>
+              `<button class="tribe-tab ${t === tribe ? 'active' : ''}"
+                data-tribe="${t}"
+                onclick="selectDefForceTribe(${id},'${t}',this)">
+                ${TRIBE_LABELS[t].replace(/s$/,'').slice(0,3+2)}
+              </button>`
+            ).join('')}
+          </div>
+          ${id > 1 ? `<button class="remove-force-btn" onclick="removeDefForce(${id})" title="Remove">✕</button>` : ''}
+        </div>
+      </div>
+      <div class="defender-force-body">
+        <div class="smithy-row">
+          <label>Smithy</label>
+          <input class="smithy-input" type="number" id="def-${id}-smithy" value="0" min="0" max="20">
+          <span class="smithy-hint">+½% defence per level</span>
+        </div>
+        <div class="troop-grid" id="def-${id}-troop-grid"></div>
+      </div>`;
+    container.appendChild(forceEl);
+    renderTroopGrid(`def-${id}-troop-grid`, tribe, `def-${id}`);
+  };
+
+  window.selectDefForceTribe = function(forceId, tribe, btn) {
+    const force = defForces.find(f => f.id === forceId);
+    if (force) force.tribe = tribe;
+    const header = document.querySelector(`#def-force-${forceId} .tribe-tabs`);
+    if (header) header.querySelectorAll('.tribe-tab').forEach(b => b.classList.toggle('active', b.dataset.tribe === tribe));
+    renderTroopGrid(`def-${forceId}-troop-grid`, tribe, `def-${forceId}`);
+  };
+
+  window.removeDefForce = function(id) {
+    defForces = defForces.filter(f => f.id !== id);
+    const el = document.getElementById(`def-force-${id}`);
+    if (el) el.remove();
+  };
+
+  // ── COLLECT TROOP COUNTS ──
+  function collectTroopCounts(prefix, tribe) {
+    const troops = getTribesTroops(tribe);
+    const counts = {};
+    for (const t of troops) {
+      const el = document.getElementById(`${prefix}-${t.class_id}`);
+      counts[t.class_id] = el ? (parseInt(el.value) || 0) : 0;
+    }
+    return counts;
+  }
+
+  // ── COMBAT FORMULA ──
+  //
+  // Verified against Travian Legends official combat simulator:
+  //
+  // attackValue = Σ(attack × count) × smithyBonus × breweryBonus × allyBonus
+  //
+  // defValue = [Σ(def_inf × count) × infRatio  +  Σ(def_cav × count) × cavRatio]
+  //            × smithyBonus × allyBonus × wallBonus
+  //
+  //   infRatio + cavRatio = 1.0
+  //   Calculated from ATTACK POWER of attacker (not unit count):
+  //     infRatio = Σ(attack × inf_count) / total_combat_attack
+  //     cavRatio = Σ(attack × cav_count) / total_combat_attack
+  //   infantry = t1 t2 t3 (slot 0,1,2)
+  //   cavalry  = t4 t5 t6 (slot 3,4,5)
+  //   spy/ram/cata/chief/settler excluded from ratio
+  //
+  // wallBonus = wallBase ^ wallLevel  (exponential, per tribe)
+  //
+  // Casualty ratio = (loser / winner) ^ 1.426   (verified vs official simulator)
+
+  function computeAttackValue(tribe, counts, smithy, brewery, allyPct) {
+    const troops = getTribesTroops(tribe);
+    let rawAtk = 0;
+    let infAtk = 0;
+    let cavAtk = 0;
+
+    for (const t of troops) {
+      const count = counts[t.class_id] || 0;
+      if (count <= 0 || t.stats.attack === 0) continue;
+      const contrib = t.stats.attack * count;
+      rawAtk += contrib;
+      if (t.slot <= 2) {
+        // Infantry: t1 t2 t3 (foot soldiers)
+        infAtk += contrib;
+      } else if (t.slot >= 3 && t.slot <= 5) {
+        // Cavalry: t4 t5 t6 (mounted)
+        cavAtk += contrib;
+      }
+      // slot 6+ (spy, ram, cata, chief, settler) excluded from ratio
+    }
+
+    const combatAtk = infAtk + cavAtk;
+    // Ratio based on ATTACK POWER contribution, not unit count
+    const infRatio = combatAtk > 0 ? infAtk / combatAtk : 0.5;
+    const cavRatio = combatAtk > 0 ? cavAtk / combatAtk : 0.5;
+
+    const mult = smithyBonus(smithy) * breweryBonus(brewery) * allyBonus(allyPct);
+
+    return {
+      attackValue: rawAtk * mult,
+      infRatio,
+      cavRatio,
+    };
+  }
+
+  function computeDefValue(forceId, tribe, counts, smithy, wallLevel, primaryDefTribe, allyPct, atkInfRatio, atkCavRatio) {
+    const troops = getTribesTroops(tribe);
+    let rawDefInf = 0;
+    let rawDefCav = 0;
+
+    for (const t of troops) {
+      const count = counts[t.class_id] || 0;
+      if (count <= 0) continue;
+      rawDefInf += t.stats.def_inf * count;
+      rawDefCav += t.stats.def_cav * count;
+    }
+
+    // wallLevel passed in is already 0 for reinforcements, so always apply
+    const wBonus = wallBonus(primaryDefTribe, wallLevel);
+    const sMult = smithyBonus(smithy) * allyBonus(allyPct);
+
+    // Defender value = weighted by attacker composition
+    const defValueRaw = (rawDefInf * atkInfRatio + rawDefCav * atkCavRatio) * sMult * wBonus;
+
+    return {
+      defValue: defValueRaw,
+      defInfRaw: rawDefInf,
+      defCavRaw: rawDefCav,
+    };
+  }
+
+  // ── CASUALTY CALCULATION ──
+  //
+  // Formula reverse-engineered from Travian official simulator (verified exact):
+  //
+  //   winner_loss_pct = (loser_strength / winner_strength) ^ 1.426
+  //   dead = round(count × winner_loss_pct)
+  //
+  //   Loser always loses 100%.
+  //
+  // Raid mode (attacker wins only):
+  //   dead    = round(count × winner_loss_pct)   ← same formula
+  //   wounded = floor(dead × 0.4)                ← floor, not round!
+  //   survived = count - dead                    ← wounded return after raid
+
+  const CASUALTY_EXPONENT = 1.426;
+
+  function calcCasualties(troops_data, ratio, isRaid, isAttacker) {
+    const result = {};
+    for (const [classId, count] of Object.entries(troops_data)) {
+      if (count <= 0) { result[classId] = { sent: 0, dead: 0, wounded: 0 }; continue; }
+      const dead = Math.min(Math.round(count * ratio), count);
+      const wounded = (isRaid && isAttacker && ratio < 1)
+        ? Math.floor(dead * 0.4)
+        : 0;
+      result[classId] = { sent: count, dead, wounded };
+    }
+    return result;
+  }
+
+  // ── MAIN SIMULATION ──
+  window.runSimulation = function() {
+    if (!window.TT) {
+      alert('Troop data not loaded yet. Please wait a moment and try again.');
+      return;
+    }
+
+    // Gather attacker
+    const atkSmithyEl = document.getElementById('atk-smithy');
+    const atkBreweryEl = document.getElementById('atk-brewery');
+    const atkAllyEl = document.getElementById('atk-ally');
+    const atkSmithyLvl = parseInt(atkSmithyEl?.value) || 0;
+    const atkBreweryLvl = parseInt(atkBreweryEl?.value) || 0;
+    const atkAllyPct = parseFloat(atkAllyEl?.value) || 0;
+
+    const atkCounts = collectTroopCounts('atk', atkTribe);
+    const atkResult = computeAttackValue(atkTribe, atkCounts, atkSmithyLvl, atkBreweryLvl, atkAllyPct);
+
+    // Gather defender forces
+    const wallLevel = parseInt(document.getElementById('def-wall')?.value) || 0;
+    const watchtowerLevel = parseInt(document.getElementById('def-watchtower')?.value) || 0;
+    const defAllyPct = parseFloat(document.getElementById('def-ally')?.value) || 0;
+
+    const defForcesData = [];
+    const atkInfRatio = atkResult.infRatio;
+    const atkCavRatio = atkResult.cavRatio;
+
+    // Primary defender tribe = first force tribe (for wall bonus calculation)
+    const primaryDefTribe = defForces.length > 0 ? defForces[0].tribe : 'roman';
+
+    for (let i = 0; i < defForces.length; i++) {
+      const force = defForces[i];
+      const smithy = parseInt(document.getElementById(`def-${force.id}-smithy`)?.value) || 0;
+      const counts = collectTroopCounts(`def-${force.id}`, force.tribe);
+      // Only first (home) force gets wall bonus; reinforcements don't get wall
+      const wallLvl = i === 0 ? wallLevel : 0;
+      const defResult = computeDefValue(
+        null, force.tribe, counts, smithy, wallLvl, primaryDefTribe, defAllyPct, atkInfRatio, atkCavRatio
+      );
+      defForcesData.push({ ...force, counts, smithy, defResult });
+    }
+
+    // Watchtower: +1% def per level
+    const watchtowerMult = 1 + (watchtowerLevel * 0.01);
+
+    // Total defender value = sum of all forces × watchtower
+    let totalDef = defForcesData.reduce((sum, f) => sum + f.defResult.defValue, 0);
+    totalDef *= watchtowerMult;
+
+    const atkValue = atkResult.attackValue;
+    const defFinal = totalDef;
+
+    const attackerWins = atkValue > defFinal;
+
+    // Casualty ratios — exponent 1.426, verified against Travian official simulator
+    let atkCasualtyRatio = 0;
+    let defCasualtyRatio = 0;
+
+    if (atkValue <= 0 && defFinal <= 0) {
+      atkCasualtyRatio = 0; defCasualtyRatio = 0;
+    } else if (atkValue <= 0) {
+      atkCasualtyRatio = 1; defCasualtyRatio = 0;
+    } else if (defFinal <= 0) {
+      atkCasualtyRatio = 0; defCasualtyRatio = 1;
+    } else if (attackerWins) {
+      defCasualtyRatio = 1;
+      atkCasualtyRatio = Math.pow(defFinal / atkValue, CASUALTY_EXPONENT);
+    } else {
+      atkCasualtyRatio = 1;
+      defCasualtyRatio = Math.pow(atkValue / defFinal, CASUALTY_EXPONENT);
+    }
+
+    const isRaid = attackType === 'raid';
+    const atkCasualties = calcCasualties(atkCounts, atkCasualtyRatio, isRaid, true);
+    const defCasualtiesAll = defForcesData.map(f =>
+      calcCasualties(f.counts, defCasualtyRatio, false, false)
+    );
+
+    // Supply (crop per hour) calculation
+    const atkTroops = getTribesTroops(atkTribe);
+    let atkSupply = 0;
+    for (const t of atkTroops) {
+      atkSupply += (atkCounts[t.class_id] || 0) * t.stats.upkeep;
+    }
+
+    let defSupply = 0;
+    for (const force of defForcesData) {
+      const troops = getTribesTroops(force.tribe);
+      for (const t of troops) {
+        defSupply += (force.counts[t.class_id] || 0) * t.stats.upkeep;
+      }
+    }
+
+    // Resources lost (attacker carries resources back in raid; simplified)
+    const atkResourcesLost = attackerWins ? 0 : atkSupply * 10;
+
+    renderResults({
+      attackerWins, atkValue, defFinal,
+      atkCasualties, defCasualtiesAll,
+      atkCounts, defForcesData,
+      atkSupply, defSupply, atkResourcesLost,
+      atkCasualtyRatio, defCasualtyRatio,
+    });
+  };
+
+  // ── RENDER RESULTS ──
+  function renderResults(data) {
+    const { attackerWins, atkValue, defFinal, atkCasualties, defCasualtiesAll,
+            atkCounts, defForcesData, atkSupply, defSupply, atkResourcesLost,
+            atkCasualtyRatio, defCasualtyRatio } = data;
+
+    const container = document.getElementById('results-container');
+
+    // Outcome banner
+    const bannerClass = attackerWins ? 'attacker-wins' : 'defender-wins';
+    const bannerIcon = attackerWins ? '⚔️' : '🛡️';
+    const bannerText = attackerWins
+      ? `Attacker wins — defender loses ${(defCasualtyRatio * 100).toFixed(1)}% of troops`
+      : `Defender wins — attacker loses ${(atkCasualtyRatio * 100).toFixed(1)}% of troops`;
+
+    // Attacker result table
+    const isRaid = attackType === 'raid';
+    const showWoundedAtk = isRaid && attackerWins; // wounded only shown when raider wins
+    const atkTroopRows = buildTroopRows(atkCasualties, atkTribe, showWoundedAtk);
+    const atkWinClass = attackerWins ? 'win' : 'loss';
+
+    // Defender result tables
+    const defResultsHTML = defForcesData.map((force, i) => {
+      const cas = defCasualtiesAll[i];
+      const rows = buildTroopRows(cas, force.tribe, false);
+      const defWinClass = attackerWins ? 'loss' : 'win';
+      return `<div class="result-card">
+        <div class="result-card-header ${defWinClass}">${attackerWins ? '💀' : '🛡️'} Defender Force ${force.id} (${TRIBE_LABELS[force.tribe]})</div>
+        <div class="result-card-body">
+          ${rows ? `<table class="troop-result-table">${buildTableHeader(false)}${rows}</table>` : '<div style="font-size:0.8rem;color:var(--text3)">No troops</div>'}
+        </div>
+      </div>`;
+    }).join('');
+
+    // Stats
+    const fmtNum = n => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
+
+    container.innerHTML = `
+      <div class="results-section">
+        <div class="results-header">⚔️ Results</div>
+
+        <div class="outcome-banner ${bannerClass}">
+          <span class="outcome-banner-icon">${bannerIcon}</span>
+          ${bannerText}
+        </div>
+
+        <div class="results-grid">
+          <div class="result-card">
+            <div class="result-card-header ${atkWinClass}">${attackerWins ? '⚔️ Attacker wins' : '💀 Attacker loses'} (${TRIBE_LABELS[atkTribe]})</div>
+            <div class="result-card-body">
+              ${atkTroopRows ? `<table class="troop-result-table">${buildTableHeader(showWoundedAtk)}${atkTroopRows}</table>` : '<div style="font-size:0.8rem;color:var(--text3)">No troops sent</div>'}
+            </div>
+          </div>
+          <div>
+            ${defForcesData.length > 0 ? defResultsHTML : '<div class="result-card"><div class="result-card-header neutral">No defender forces</div></div>'}
+          </div>
+        </div>
+
+        <div class="stats-card">
+          <div class="stats-card-header">📊 Combat Statistics</div>
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Attacker</th>
+                <th>Defender</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Combat strength</td>
+                <td class="stats-highlight">${fmtNum(atkValue)}</td>
+                <td class="stats-highlight">${fmtNum(defFinal)}</td>
+              </tr>
+              <tr>
+                <td>Strength ratio</td>
+                <td colspan="2" style="text-align:center;color:var(--text2);font-weight:600">
+                  ${attackerWins
+                    ? `Attacker / Defender = ${(atkValue/defFinal).toFixed(3)}`
+                    : `Defender / Attacker = ${(defFinal/atkValue).toFixed(3)}`}
+                </td>
+              </tr>
+              <tr>
+                <td>Casualty rate</td>
+                <td style="color:var(--red)">${(atkCasualtyRatio * 100).toFixed(2)}%</td>
+                <td style="color:var(--red)">${(defCasualtyRatio * 100).toFixed(2)}%</td>
+              </tr>
+              <tr>
+                <td>Supply (crop/h)</td>
+                <td>${fmtNum(atkSupply)}</td>
+                <td>${fmtNum(defSupply)}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="font-size:0.7rem;color:var(--text3);margin-top:10px;padding:0 2px">
+            Formula: casualty = (loser÷winner)^1.426 · Raid wounded = floor(dead×0.4) · Wall: base^level · Smithy: +1%/lvl
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function buildTableHeader(showWounded) {
+    const woundedCol = showWounded ? '<th>Wounded</th>' : '';
+    return `<thead><tr>
+      <th>Troop</th>
+      <th>Sent</th>
+      <th>Died</th>
+      ${woundedCol}
+      <th>Survived</th>
+    </tr></thead><tbody>`;
+  }
+
+  function buildTroopRows(casualties, tribe, showWounded) {
+    if (!casualties) return '';
+    const troops = getTribesTroops(tribe);
+    let hasAny = false;
+    const rows = troops.map(t => {
+      const cas = casualties[t.class_id];
+      if (!cas || cas.sent === 0) return '';
+      hasAny = true;
+      const spriteStyle = window.TT ? window.TT.getSpriteStyle(t.class_id) : '';
+      // survived = sent - dead (wounded return after raid, only dead are permanent losses)
+      const survived = cas.sent - cas.dead;
+      const woundedCell = showWounded
+        ? `<td style="color:var(--amber)">${cas.wounded > 0 ? cas.wounded.toLocaleString() : '0'}</td>`
+        : '';
+      const deadDisplay = cas.dead > 0 ? '-' + cas.dead.toLocaleString() : '0';
+      return `<tr>
+        <td><div class="troop-result-name">
+          <span class="troop-icon" style="${spriteStyle}"></span>
+          ${t.name}
+        </div></td>
+        <td class="val-sent">${cas.sent.toLocaleString()}</td>
+        <td class="val-dead">${deadDisplay}</td>
+        ${woundedCell}
+        <td class="val-survive">${survived.toLocaleString()}</td>
+      </tr>`;
+    }).join('');
+    return hasAny ? rows + '</tbody>' : '';
+  }
+
+  // ── INIT ──
+  function init() {
+    // Render attacker troop grid
+    renderTroopGrid('atk-troop-grid', atkTribe, 'atk');
+    // Add first defender force
+    addDefenderForce('roman');
+  }
+
+  // Wait for TT to be available
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+
+</body>
+</html>

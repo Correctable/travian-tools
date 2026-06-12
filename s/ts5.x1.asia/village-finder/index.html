@@ -73,6 +73,13 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:36px 24p
 .status-label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text2);transition:all 0.15s;background:var(--surface);user-select:none;}
 .status-radio:checked + .status-label{background:var(--blue-glow);border-color:var(--blue-light);color:var(--blue2);}
 
+/* quadrant radio */
+.quad-radios{display:flex;gap:6px;flex-wrap:wrap;}
+.quad-radio{display:none;}
+.quad-label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--border);border-radius:7px;cursor:pointer;font-size:0.8rem;font-weight:600;color:var(--text2);transition:all 0.15s;background:var(--surface);user-select:none;}
+.quad-label:hover{border-color:var(--purple);color:var(--purple);}
+.quad-radio:checked + .quad-label{background:var(--purple-bg);border-color:var(--purple);color:var(--purple);}
+
 .filter-divider{width:100%;height:1px;background:var(--border);margin:14px 0;}
 
 .btn-search{font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;background:var(--blue2);color:#fff;border:none;border-radius:8px;padding:9px 22px;cursor:pointer;transition:background 0.18s,transform 0.1s;white-space:nowrap;align-self:flex-end;}
@@ -254,7 +261,7 @@ td{padding:10px 14px;vertical-align:middle;}
   <!-- Filter Panel -->
   <div class="filter-panel">
 
-    <!-- Row 1: XY + Status -->
+    <!-- Row 1: XY + Radius + Quadrant + Status -->
     <div class="filter-row" style="margin-bottom:14px">
       <div class="fg">
         <label>Center X, Y</label>
@@ -262,6 +269,25 @@ td{padding:10px 14px;vertical-align:middle;}
           <input type="number" class="coord" id="cx" value="0" placeholder="X">
           <span>|</span>
           <input type="number" class="coord" id="cy" value="0" placeholder="Y">
+        </div>
+      </div>
+      <div class="fg">
+        <label>Radius</label>
+        <input type="number" id="radius" value="20" min="1" max="200" style="width:80px">
+      </div>
+      <div class="fg">
+        <label>Quadrant</label>
+        <div class="quad-radios">
+          <input type="radio" class="quad-radio" name="quadrant" id="qAll" value="all" checked>
+          <label class="quad-label" for="qAll">All</label>
+          <input type="radio" class="quad-radio" name="quadrant" id="qNE" value="NE">
+          <label class="quad-label" for="qNE">↗ NE</label>
+          <input type="radio" class="quad-radio" name="quadrant" id="qNW" value="NW">
+          <label class="quad-label" for="qNW">↖ NW</label>
+          <input type="radio" class="quad-radio" name="quadrant" id="qSE" value="SE">
+          <label class="quad-label" for="qSE">↘ SE</label>
+          <input type="radio" class="quad-radio" name="quadrant" id="qSW" value="SW">
+          <label class="quad-label" for="qSW">↙ SW</label>
         </div>
       </div>
       <div class="fg">
@@ -390,7 +416,7 @@ td{padding:10px 14px;vertical-align:middle;}
       <div class="si">⏳</div>
       <h3>Daily limit reached</h3>
       <p>You've used all <strong id="rl-limit-num">5</strong> searches for today. Resets at midnight UTC · <span id="rl-reset-time"></span></p>
-      <a href="/pricing/" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;height:40px;padding:0 20px;border-radius:9px;border:none;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;text-decoration:none;">Upgrade to Plus — 50 searches/day →</a>
+      <a href="/pricing/" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;height:40px;padding:0 20px;border-radius:9px;border:none;background:var(--blue2);color:#fff;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;text-decoration:none;">Upgrade to Plus — 20 searches/day →</a>
     </div>
   </div>
 
@@ -423,6 +449,8 @@ td{padding:10px 14px;vertical-align:middle;}
     Status <b>Free</b> = unoccupied tile on the map. Distance is calculated from the X,Y coordinates you entered.
   </div>
 </main>
+
+<div id="footer-root"></div>
 
 <script>
 // ── CONSTANTS ────────────────────────────────────────────────
@@ -462,7 +490,7 @@ async function initAuth() {
   isPlus   = userRole === 'plus' || userRole === 'pro';
 
   // Fetch quota
-  fetchQuotaUsed().then(used => updateQuotaBadge(used));
+  fetchQuotaUsed().then(({ used, limit }) => { quotaLimit = limit; updateQuotaBadge(used); });
 }
 
 // ── QUOTA ────────────────────────────────────────────────────
@@ -475,20 +503,38 @@ async function fetchQuotaUsed() {
       { headers: { 'Authorization': `Bearer ${token}` } }
     );
     const data = await res.json();
-    return data.used || 0;
-  } catch { return 0; }
+    return { used: data.used || 0, limit: data.limit || 5 };
+  } catch { return { used: 0, limit: 5 }; }
 }
+
+let quotaLimit = 5; // cache limit dari Worker
 
 function updateQuotaBadge(used) {
   const badge = document.getElementById('quota-badge');
   if (!badge) return;
-  if (isPlus) { badge.style.display = 'none'; return; }
-  const remaining = Math.max(0, 5 - (used || 0));
   badge.style.display = 'inline-block';
-  badge.textContent   = `${remaining}/5 searches today`;
-  badge.style.color   = remaining <= 1 ? 'var(--red)' : 'var(--amber)';
-  badge.style.background   = remaining <= 1 ? 'var(--red-bg)' : 'var(--amber-bg)';
-  badge.style.borderColor  = remaining <= 1 ? 'rgba(220,38,38,.2)' : 'rgba(217,119,6,.2)';
+
+  if (userRole === 'pro') {
+    badge.textContent       = 'Unlimited';
+    badge.style.color       = 'var(--green)';
+    badge.style.background  = 'var(--green-bg)';
+    badge.style.borderColor = 'rgba(5,150,105,.2)';
+  } else if (isPlus) {
+    const limit     = quotaLimit || 20;
+    const todayUsed = used || 0;
+    badge.textContent       = `${todayUsed}/${limit} searches today`;
+    badge.style.color       = 'var(--blue2)';
+    badge.style.background  = 'var(--blue-glow)';
+    badge.style.borderColor = 'rgba(37,99,235,.2)';
+  } else {
+    const limit     = 5;
+    const todayUsed = used || 0;
+    const remaining = Math.max(0, limit - todayUsed);
+    badge.textContent       = `${todayUsed}/${limit} searches today`;
+    badge.style.color       = remaining <= 1 ? 'var(--red)'    : 'var(--amber)';
+    badge.style.background  = remaining <= 1 ? 'var(--red-bg)' : 'var(--amber-bg)';
+    badge.style.borderColor = remaining <= 1 ? 'rgba(220,38,38,.2)' : 'rgba(217,119,6,.2)';
+  }
 }
 
 // ── API ───────────────────────────────────────────────────────
@@ -541,8 +587,10 @@ async function runSearch() {
 
   const cx       = parseInt(document.getElementById('cx').value) || 0;
   const cy       = parseInt(document.getElementById('cy').value) || 0;
+  const radius   = Math.min(200, Math.max(1, parseInt(document.getElementById('radius').value) || 20));
   const minOasis = parseInt(document.getElementById('minOasis').value) || 0;
   const status   = document.querySelector('input[name=status]:checked').value;
+  const quadrant = document.querySelector('input[name=quadrant]:checked').value;
 
   // Collect selected crops
   const selectedFTs    = [...document.querySelectorAll('.ft-check:checked')];
@@ -566,7 +614,7 @@ async function runSearch() {
   document.getElementById('tableWrap').style.display = 'block';
 
   try {
-    const data = await apiGet('villages', { server: SERVER, crops: crops.join(','), page: 1 });
+    const data = await apiGet('villages', { server: SERVER, crops: crops.join(','), cx, cy, radius, page: 1 });
 
     const tiles    = data.tiles    || [];
     const villages = data.villages || [];
@@ -598,8 +646,13 @@ async function runSearch() {
       const village    = villageMap[`${tx},${ty}`] || null;
       const isOccupied = !!village;
 
-      // Oasis dalam 5x5 (Chebyshev ≤ 2)
-      const nearby = oasisArr.filter(o => Math.max(Math.abs(o.x - tx), Math.abs(o.y - ty)) <= 2);
+      // Oasis dalam 5x5 (Chebyshev ≤ 2) — toroidal wrap
+      const MAP_WRAP = 401;
+      const nearby = oasisArr.filter(o => {
+        const cdx = Math.min(Math.abs(o.x - tx), MAP_WRAP - Math.abs(o.x - tx));
+        const cdy = Math.min(Math.abs(o.y - ty), MAP_WRAP - Math.abs(o.y - ty));
+        return Math.max(cdx, cdy) <= 2;
+      });
 
       const iconGroups = {};
       for (const o of nearby) {
@@ -619,7 +672,9 @@ async function runSearch() {
         ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
         : oasisCount.total;
 
-      const dist = Math.sqrt((tx-cx)**2 + (ty-cy)**2);
+      const ddx  = Math.min(Math.abs(tx-cx), MAP_WRAP - Math.abs(tx-cx));
+      const ddy  = Math.min(Math.abs(ty-cy), MAP_WRAP - Math.abs(ty-cy));
+      const dist = Math.sqrt(ddx*ddx + ddy*ddy);
 
       return {
         x: tx, y: ty,
@@ -649,6 +704,13 @@ async function runSearch() {
       if (filterByOasis && t.selectedCount < minOasis) return false;
       if (status === 'free'     && t.isOccupied)  return false;
       if (status === 'occupied' && !t.isOccupied) return false;
+      // quadrant filter — posisi absolut tile di peta
+      if (quadrant !== 'all') {
+        if (quadrant === 'NE' && !(t.x >= 0 && t.y >= 0)) return false;
+        if (quadrant === 'NW' && !(t.x <  0 && t.y >= 0)) return false;
+        if (quadrant === 'SE' && !(t.x >= 0 && t.y <  0)) return false;
+        if (quadrant === 'SW' && !(t.x <  0 && t.y <  0)) return false;
+      }
       return true;
     });
 
@@ -869,6 +931,7 @@ function esc(s) {
 
 document.getElementById('cx').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
 document.getElementById('cy').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
+document.getElementById('radius').addEventListener('keydown', e => { if(e.key==='Enter') runSearch(); });
 
 // ── CROP SELECTOR ─────────────────────────────────────────────
 const activeCrops = new Set();
@@ -941,5 +1004,6 @@ waitForSupabase(() => { initAuth(); });
 <script src="/supabase.js"></script>
 <script src="/servers.js"></script>
 <script src="/navbar.js"></script>
+<script src="/footer.js"></script>
 </body>
 </html>

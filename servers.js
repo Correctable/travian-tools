@@ -20,6 +20,7 @@ const SERVERS = [
     region:  'Asia',                  // region (Asia, Europe, America, International)
     active:  true,                    // true = data tersedia di Turso
     isNew:   false,                   // true = tampilkan badge "NEW"
+    apiKey: 'ts5'                    // API key untuk fetch data Turso (lihat README.md)
   },
 
   // ── Tournament Travian Qualification (TTQ) ───────────────
@@ -31,6 +32,7 @@ const SERVERS = [
     region:  'Asia',
     active:  true,                   // set true setelah data Turso siap
     isNew:   true,
+    apiKey: 'ttq_asia'                    // API key untuk fetch data Turso (lihat README.md)
   },
   {
     slug:    'ttq.x2.america',
@@ -40,6 +42,7 @@ const SERVERS = [
     region:  'America',
     active:  true,
     isNew:   true,
+    apiKey: 'ttq_america'
   },
   {
     slug:    'ttq.x2.europe',
@@ -49,6 +52,7 @@ const SERVERS = [
     region:  'Europe',
     active:  true,
     isNew:   true,
+    apiKey: 'ttq_europe'
   },
   {
     slug:    'ttq.x2.arabics',
@@ -58,6 +62,7 @@ const SERVERS = [
     region:  'Arabics',
     active:  true,
     isNew:   true,
+    apiKey: 'ttq_arabics'
   },
 
   // ── Tambah server baru di bawah ini ──────────────────────
