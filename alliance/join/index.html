@@ -867,8 +867,11 @@
     try {
       const url   = new URL(val);
       const token = url.searchParams.get('token');
+      const role  = url.searchParams.get('role');
       if (!token) throw new Error();
-      window.location.href = '/alliance/join/?token=' + encodeURIComponent(token);
+      let dest = '/alliance/join/?token=' + encodeURIComponent(token);
+      if (role) dest += '&role=' + encodeURIComponent(role);
+      window.location.href = dest;
     } catch {
       errEl.textContent = 'That doesn\'t look like a valid invite link. Make sure you copied the full link.';
       errEl.style.display = 'block';
