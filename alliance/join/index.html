@@ -459,6 +459,28 @@
       <div class="loading-sub">Please wait a moment</div>
     </div>
 
+    <!-- STATE: paste invite link -->
+    <div id="state-paste" class="state">
+      <div class="ws-icon">🔗</div>
+      <div class="state-title">Join a Workspace</div>
+      <div class="state-sub">Paste the invite link shared by your coordinator below.</div>
+      <div style="margin-bottom:16px;">
+        <input
+          type="text"
+          id="paste-input"
+          placeholder="https://traviantools.com/alliance/join/?token=…"
+          style="width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.875rem;color:var(--navy);background:var(--surface);outline:none;transition:border-color 0.15s,box-shadow 0.15s;"
+          oninput="clearPasteError()"
+          onkeydown="if(event.key==='Enter') goToLink()"
+        />
+        <div id="paste-error" style="display:none;margin-top:6px;font-size:0.78rem;color:var(--red);"></div>
+      </div>
+      <div class="btn-gap">
+        <button class="btn-primary" onclick="goToLink()">Continue →</button>
+        <a href="/alliance/workspace/" class="btn-ghost">← Back</a>
+      </div>
+    </div>
+
     <!-- STATE: invalid / expired token -->
     <div id="state-invalid" class="state">
       <div class="error-icon">🔗</div>
@@ -598,7 +620,7 @@
   const TOKEN   = params.get('token');
   const RETURN_URL = window.location.pathname + window.location.search;
 
-  if (!TOKEN) { showState('invalid'); return; }
+  if (!TOKEN) { showState('paste'); return; }
 
   let tokenData       = null;
   let allPlayers      = [];
@@ -830,6 +852,33 @@
   }
 
   $('btn-retry').addEventListener('click', () => window.location.reload());
+
+  window.goToLink = function () {
+    const val = document.getElementById('paste-input').value.trim();
+    const errEl = document.getElementById('paste-error');
+    errEl.style.display = 'none';
+
+    if (!val) {
+      errEl.textContent = 'Please paste an invite link first.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    try {
+      const url   = new URL(val);
+      const token = url.searchParams.get('token');
+      if (!token) throw new Error();
+      window.location.href = '/alliance/join/?token=' + encodeURIComponent(token);
+    } catch {
+      errEl.textContent = 'That doesn\'t look like a valid invite link. Make sure you copied the full link.';
+      errEl.style.display = 'block';
+    }
+  };
+
+  window.clearPasteError = function () {
+    const errEl = document.getElementById('paste-error');
+    if (errEl) errEl.style.display = 'none';
+  };
 
 })();
 </script>
