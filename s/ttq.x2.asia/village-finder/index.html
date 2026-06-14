@@ -623,7 +623,7 @@ async function runSearch() {
 
     // Village lookup
     const villageMap = {};
-    for (const v of villages) villageMap[`${v.x},${v.y}`] = v;
+    for (const v of villages) villageMap[`${parseInt(v.x)},${parseInt(v.y)}`] = v;
 
     // Oasis array — semua oasis dipakai untuk hitung nearby, minBonus dihitung per tile
     const oasisArr = oases
@@ -643,7 +643,7 @@ async function runSearch() {
     // Score tiap tile
     const scored = tiles.map(t => {
       const tx = Number(t.x), ty = Number(t.y);
-      const village    = villageMap[`${tx},${ty}`] || null;
+      const village    = villageMap[`${parseInt(tx)},${parseInt(ty)}`] || null;
       const isOccupied = !!village;
 
       // Oasis dalam 5x5 (Chebyshev ≤ 2) — toroidal wrap
@@ -820,8 +820,8 @@ function parseResources(resources, bonusStr) {
 }
 
 
-    const TRIBE_NAMES  = { 1:'Romans', 2:'Teutons', 3:'Gauls', 4:'Egyptians', 5:'Natars', 6:'Huns' };
-    const TRIBE_FOLDER = { 1:'roman', 2:'teuton', 3:'gaul', 4:'egyptian', 5:'natar', 6:'hun' };
+    const TRIBE_NAMES  = { 1:'Romans', 2:'Teutons', 3:'Gauls', 5:'Natars', 6:'Egyptians', 7:'Huns' };
+    const TRIBE_FOLDER = { 1:'roman', 2:'teuton', 3:'gaul', 5:'natar', 6:'egyptian', 7:'hun' };
     function tribeIconHtml(tribeId) {
       const folder = TRIBE_FOLDER[tribeId];
       const name   = TRIBE_NAMES[tribeId] || 'Unknown';
