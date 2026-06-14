@@ -820,7 +820,14 @@ function parseResources(resources, bonusStr) {
 // ── RENDER ────────────────────────────────────────────────────
 function render() {
   const sorted = [...results].sort((a,b) => {
-    let av = a[sortKey], bv = b[sortKey];
+    let av, bv;
+    if (sortKey === 'oasisCount') {
+      av = a.oasisCount?.total ?? 0;
+      bv = b.oasisCount?.total ?? 0;
+    } else {
+      av = a[sortKey];
+      bv = b[sortKey];
+    }
     if (typeof av === 'number') return (av - bv) * sortDir;
     return String(av).localeCompare(String(bv)) * sortDir;
   });
@@ -887,7 +894,7 @@ function sortBy(key) {
 }
 
 function updateArrows() {
-  ['dist','crop','oasisCount','pop','oasisCountDisplay'].forEach(k => {
+  ['dist','crop','oasisCount','pop'].forEach(k => {
     const el = document.getElementById(`arr-${k}`);
     if (!el) return;
     const th = el.closest('th');
