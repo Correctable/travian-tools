@@ -435,7 +435,8 @@ td{padding:10px 14px;vertical-align:middle;}
           <th onclick="sortBy('oasisCount')">Claimable Oasis <span class="arr" id="arr-oasisCount"></span></th>
           <th onclick="sortBy('pop')" class="hide-m">Population <span class="arr" id="arr-pop"></span></th>
           <th onclick="sortBy('dist')">Distance <span class="arr" id="arr-dist2"></span></th>
-          <th class="hide-m">Player</th>
+          <th onclick="sortBy('player_name')" class="hide-m">Player <span class="arr" id="arr-player_name">↕</span></th>
+          <th onclick="sortBy('tribe')" class="hide-m">Tribe <span class="arr" id="arr-tribe">↕</span></th>
           <th class="hide-m">Alliance</th>
         </tr>
       </thead>
@@ -703,6 +704,7 @@ async function runSearch() {
         player_name:  village?.player_name || '',
         alliance_id:  village?.alliance_id || '',
         alliance_tag: village?.alliance_tag || '',
+        tribe:        village ? Number(village.tribe) : 0,
       };
     });
 
@@ -817,6 +819,16 @@ function parseResources(resources, bonusStr) {
   return { hasCrop: arr.includes('crop'), hasWood: arr.includes('wood'), hasClay: arr.includes('clay'), hasIron: arr.includes('iron') };
 }
 
+
+    const TRIBE_NAMES  = { 1:'Romans', 2:'Teutons', 3:'Gauls', 4:'Egyptians', 5:'Natars', 6:'Huns' };
+    const TRIBE_FOLDER = { 1:'roman', 2:'teuton', 3:'gaul', 4:'egyptian', 5:'natar', 6:'hun' };
+    function tribeIconHtml(tribeId) {
+      const folder = TRIBE_FOLDER[tribeId];
+      const name   = TRIBE_NAMES[tribeId] || 'Unknown';
+      if (!folder) return `<span class="no-data">—</span>`;
+      return `<img src="/cdn/icons/misc/${folder}_medium.png" width="20" height="20" title="${name}" style="display:inline-block;vertical-align:middle;" onerror="this.replaceWith(document.createTextNode('${name}'))">`;
+    }
+
 // ── RENDER ────────────────────────────────────────────────────
 function render() {
   const sorted = [...results].sort((a,b) => {
@@ -878,6 +890,7 @@ function render() {
       <td class="hide-m">${t.isOccupied ? `<span class="pop-val">${Number(t.pop).toLocaleString()}</span>` : '<span class="no-data">—</span>'}</td>
       <td><span class="dist-val">${t.dist.toFixed(1)}</span></td>
       <td class="hide-m">${playerLink}</td>
+      <td class="hide-m">${t.tribe ? tribeIconHtml(t.tribe) : '<span class="no-data">—</span>'}</td>
       <td class="hide-m">${allianceLink}</td>
     </tr>`;
   }).join('');
@@ -894,7 +907,7 @@ function sortBy(key) {
 }
 
 function updateArrows() {
-  ['dist','crop','oasisCount','pop'].forEach(k => {
+  ['dist','crop','oasisCount','pop','tribe','player_name'].forEach(k => {
     const el = document.getElementById(`arr-${k}`);
     if (!el) return;
     const th = el.closest('th');
