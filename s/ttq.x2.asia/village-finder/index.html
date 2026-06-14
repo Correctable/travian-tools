@@ -624,9 +624,8 @@ async function runSearch() {
     const villageMap = {};
     for (const v of villages) villageMap[`${v.x},${v.y}`] = v;
 
-    // Oasis array, filtered by minBonus
+    // Oasis array — semua oasis dipakai untuk hitung nearby, minBonus dihitung per tile
     const oasisArr = oases
-      .filter(o => Number(o.max_bonus) >= minBonus)
       .map(o => {
         const res = parseResources(o.resources, o.bonus_str);
         const isDouble = Number(o.max_bonus) >= 50 && (o.type_name||'').indexOf('+') === -1;
@@ -672,6 +671,17 @@ async function runSearch() {
         ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
         : oasisCount.total;
 
+      // Hitung total bonus dari oasis nearby sesuai oasis type yang dipilih (atau semua jika tidak ada filter)
+      const bonusOases = filterByOasis
+        ? nearby.filter(o => oasisTypes.some(type =>
+            (type === 'crop' && o.hasCrop) ||
+            (type === 'wood' && o.hasWood) ||
+            (type === 'clay' && o.hasClay) ||
+            (type === 'iron' && o.hasIron)
+          ))
+        : nearby;
+      const totalBonus = bonusOases.reduce((s, o) => s + o.maxBonus, 0);
+
       const ddx  = Math.min(Math.abs(tx-cx), MAP_WRAP - Math.abs(tx-cx));
       const ddy  = Math.min(Math.abs(ty-cy), MAP_WRAP - Math.abs(ty-cy));
       const dist = Math.sqrt(ddx*ddx + ddy*ddy);
@@ -685,6 +695,7 @@ async function runSearch() {
         oasisCount,
         iconGroups: Object.values(iconGroups),
         selectedCount,
+        totalBonus,
         oasisCountDisplay: oasisTypes.length === 1 ? oasisCount[oasisTypes[0]] : selectedCount,
         dist: Math.round(dist * 100) / 100,
         pop: village ? Number(village.population) : 0,
@@ -702,6 +713,8 @@ async function runSearch() {
       if (t.oasisCount.total < minOasis) return false;
       // filter tambahan per oasis type kalau dicentang
       if (filterByOasis && t.selectedCount < minOasis) return false;
+      // filter minBonus — total bonus dari oasis nearby harus >= minBonus
+      if (minBonus > 0 && t.totalBonus < minBonus) return false;
       if (status === 'free'     && t.isOccupied)  return false;
       if (status === 'occupied' && !t.isOccupied) return false;
       // quadrant filter — posisi absolut tile di peta
