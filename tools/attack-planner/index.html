@@ -1370,21 +1370,23 @@ function calcDistance(x1, y1, x2, y2, mapWidth) {
 // Returns travel time in SECONDS
 function calcTravelTime(dist, troopSpeed, serverSpeed, tsLevel, bootsPct, artifactMult) {
   const ts = Math.min(20, Math.max(0, Number(tsLevel) || 0));
-  const bootsBonus = 1 + ((Number(bootsPct) || 0) / 100);
+  const tsBonus = ts * 20 / 100;
+  const bootsBonus = (Number(bootsPct) || 0) / 100;
   const baseSpeed = troopSpeed * serverSpeed * artifactMult;
 
   if (dist <= 20) return (dist / baseSpeed) * 3600;
 
-  const beyond20Speed = baseSpeed * bootsBonus * (ts > 0 ? 1 + (ts * 20 / 100) : 1);
+  const beyond20Speed = baseSpeed * (1 + tsBonus + bootsBonus);
   const hours = (20 / baseSpeed) + ((dist - 20) / beyond20Speed);
   return hours * 3600;
 }
 
 // ── FORMAT ─────────────────────────────────────────────────
 function fmtDuration(secs) {
+  secs = Math.round(secs);
   const h = Math.floor(secs / 3600);
   const m = Math.floor((secs % 3600) / 60);
-  const s = Math.floor(secs % 60);
+  const s = secs % 60;
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 function fmtDate(date) {
