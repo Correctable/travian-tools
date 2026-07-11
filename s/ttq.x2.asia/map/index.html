@@ -339,12 +339,24 @@ body{display:flex;flex-direction:column}
 
 <div id="footer-root"></div>
 
+<!-- Shared dependencies must load before the map application. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="/supabase.js"></script>
+<script src="/servers.js"></script>
+<script src="/s/shared/server-config.js"></script>
+
 <script>
 /* ── CONFIG ──────────────────────────────────────────────── */
-const SERVER      = 'ttq_asia';
-const SERVER_SLUG = 'ttq.x2.asia';
-const BASE_PATH   = `/s/${SERVER_SLUG}`;
-const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
+if (!window.SERVER_CONFIG) {
+  throw new Error('Map not found: server configuration not available.');
+}
+
+const {
+  apiKey: SERVER,
+  slug: SERVER_SLUG,
+  basePath: BASE_PATH,
+  apiBase: API_BASE,
+} = window.SERVER_CONFIG;
 
 /* ── TIER LIMITS ─────────────────────────────────────────── */
 const FILTER_LIMITS = {
@@ -922,9 +934,6 @@ waitForSupabase(() => {
 });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="/supabase.js"></script>
-<script src="/servers.js"></script>
 <script src="/navbar.js"></script>
 <script src="/footer.js"></script>
 </body>
