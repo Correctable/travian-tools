@@ -30,7 +30,9 @@ const TRIBE_N  = {1:'Roman',2:'Teuton',3:'Gaul',4:'Egyptian',5:'Hun',6:'Spartan'
 
 /* ── STATE ────────────────────────────────────────────────── */
 let subjects   = [];
-const isFocusMode = () => subjects.length > 0;
+function isFocusMode() {
+  return subjects.length > 0;
+}
 let allData    = [];
 let dotMode    = 'flat';
 let tribeFilter= 0;
@@ -584,4 +586,3 @@ waitForSupabase(() => {
     autoLoadFromUrl();
   });
 });
-
