@@ -1,3 +1,6 @@
+(() => {
+'use strict';
+
 /* ── CONFIG ──────────────────────────────────────────────── */
 if (!window.SERVER_CONFIG) {
   throw new Error('Map not found: server configuration not available.');
@@ -586,3 +589,14 @@ waitForSupabase(() => {
     autoLoadFromUrl();
   });
 });
+
+// Functions referenced by inline HTML event attributes.
+Object.assign(window, {
+  buildMap,
+  saveSvg,
+  setColorMode,
+  setDotMode,
+  setTribe,
+  syncSl,
+});
+})();
