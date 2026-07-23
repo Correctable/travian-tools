@@ -1921,6 +1921,11 @@ function calculate() {
   document.getElementById('sum-landing').textContent = `${dayStr} ${timeStr}`;
 
   document.getElementById('share-link').value = '';
+  // A freshly calculated plan should be ready to send in chronological order.
+  // Keep a user's chosen column/direction when one is already active.
+  if (!currentSort.key || currentSort.direction === 0) {
+    currentSort = { key: 'depart', direction: 1 };
+  }
   reapplyCurrentSort();
   showToast(`Calculated ${calculatedCount} departure time${calculatedCount !== 1 ? 's' : ''}! ⚔️`, 'ok');
 }
