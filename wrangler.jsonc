@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "travian-tools",
-  "compatibility_date": "2026-05-27",
+  "name": "travian-api",
+  "compatibility_date": "2026-05-28",
   "observability": {
     "enabled": true
   },
