@@ -23,8 +23,8 @@ from datetime import date, datetime, timezone
 
 # ── Konfigurasi ───────────────────────────────────────────────────────────────
 
-MAP_SQL_URL  = "http://ttq.x2.arabics.travian.com/map.sql"
-SERVER_CODE  = "ttq_arabics"
+MAP_SQL_URL  = "http://ts9.x1.america.travian.com/map.sql"
+SERVER_CODE  = "america_9"
 
 TURSO_URL    = os.environ.get("TURSO_DATABASE_URL", "").rstrip("/")
 TURSO_TOKEN  = os.environ.get("TURSO_AUTH_TOKEN", "")
