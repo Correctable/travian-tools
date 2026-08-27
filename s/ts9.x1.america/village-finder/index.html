@@ -237,7 +237,7 @@ td{padding:10px 14px;vertical-align:middle;}
     <span class="breadcrumb-sep">›</span>
     <a href="/s/">Servers</a>
     <span class="breadcrumb-sep">›</span>
-    <a href="/s/ttq.x2.arabics/village-finder/">ttq.x2.arabics</a>
+    <a href="/s/ttq.x2.asia/village-finder/">ttq.x2.asia</a>
     <span class="breadcrumb-sep">›</span>
     <span class="breadcrumb-current">Village Finder</span>
   </div>
@@ -435,7 +435,8 @@ td{padding:10px 14px;vertical-align:middle;}
           <th onclick="sortBy('oasisCount')">Claimable Oasis <span class="arr" id="arr-oasisCount"></span></th>
           <th onclick="sortBy('pop')" class="hide-m">Population <span class="arr" id="arr-pop"></span></th>
           <th onclick="sortBy('dist')">Distance <span class="arr" id="arr-dist2"></span></th>
-          <th class="hide-m">Player</th>
+          <th onclick="sortBy('player_name')" class="hide-m">Player <span class="arr" id="arr-player_name">↕</span></th>
+          <th onclick="sortBy('tribe')" class="hide-m">Tribe <span class="arr" id="arr-tribe">↕</span></th>
           <th class="hide-m">Alliance</th>
         </tr>
       </thead>
@@ -455,9 +456,9 @@ td{padding:10px 14px;vertical-align:middle;}
 <script>
 // ── CONSTANTS ────────────────────────────────────────────────
 const API_BASE    = 'https://travian-api.sonybukansoni.workers.dev';
-const SERVER      = 'ttq_arabics';
-const SERVER_SLUG = 'ttq.x2.arabics';
-const SERVER_DOMAIN = 'ttq.x2.arabics.travian.com';
+const SERVER      = 'ttq_asia';
+const SERVER_SLUG = 'ttq.x2.asia';
+const SERVER_DOMAIN = 'ttq.x2.asia.travian.com';
 const PREVIEW_CAP = 500;
 
 // ── STATE ────────────────────────────────────────────────────
@@ -622,11 +623,10 @@ async function runSearch() {
 
     // Village lookup
     const villageMap = {};
-    for (const v of villages) villageMap[`${v.x},${v.y}`] = v;
+    for (const v of villages) villageMap[`${parseInt(v.x)},${parseInt(v.y)}`] = v;
 
-    // Oasis array, filtered by minBonus
+    // Oasis array — semua oasis dipakai untuk hitung nearby, minBonus dihitung per tile
     const oasisArr = oases
-      .filter(o => Number(o.max_bonus) >= minBonus)
       .map(o => {
         const res = parseResources(o.resources, o.bonus_str);
         const isDouble = Number(o.max_bonus) >= 50 && (o.type_name||'').indexOf('+') === -1;
@@ -643,7 +643,7 @@ async function runSearch() {
     // Score tiap tile
     const scored = tiles.map(t => {
       const tx = Number(t.x), ty = Number(t.y);
-      const village    = villageMap[`${tx},${ty}`] || null;
+      const village    = villageMap[`${parseInt(tx)},${parseInt(ty)}`] || null;
       const isOccupied = !!village;
 
       // Oasis dalam 5x5 (Chebyshev ≤ 2) — toroidal wrap
@@ -672,6 +672,17 @@ async function runSearch() {
         ? oasisTypes.reduce((s, type) => s + (oasisCount[type]||0), 0)
         : oasisCount.total;
 
+      // Hitung total bonus dari oasis nearby sesuai oasis type yang dipilih (atau semua jika tidak ada filter)
+      const bonusOases = filterByOasis
+        ? nearby.filter(o => oasisTypes.some(type =>
+            (type === 'crop' && o.hasCrop) ||
+            (type === 'wood' && o.hasWood) ||
+            (type === 'clay' && o.hasClay) ||
+            (type === 'iron' && o.hasIron)
+          ))
+        : nearby;
+      const totalBonus = bonusOases.reduce((s, o) => s + o.maxBonus, 0);
+
       const ddx  = Math.min(Math.abs(tx-cx), MAP_WRAP - Math.abs(tx-cx));
       const ddy  = Math.min(Math.abs(ty-cy), MAP_WRAP - Math.abs(ty-cy));
       const dist = Math.sqrt(ddx*ddx + ddy*ddy);
@@ -685,6 +696,7 @@ async function runSearch() {
         oasisCount,
         iconGroups: Object.values(iconGroups),
         selectedCount,
+        totalBonus,
         oasisCountDisplay: oasisTypes.length === 1 ? oasisCount[oasisTypes[0]] : selectedCount,
         dist: Math.round(dist * 100) / 100,
         pop: village ? Number(village.population) : 0,
@@ -692,6 +704,7 @@ async function runSearch() {
         player_name:  village?.player_name || '',
         alliance_id:  village?.alliance_id || '',
         alliance_tag: village?.alliance_tag || '',
+        tribe:        village ? Number(village.tribe) : 0,
       };
     });
 
@@ -702,6 +715,8 @@ async function runSearch() {
       if (t.oasisCount.total < minOasis) return false;
       // filter tambahan per oasis type kalau dicentang
       if (filterByOasis && t.selectedCount < minOasis) return false;
+      // filter minBonus — total bonus dari oasis nearby harus >= minBonus
+      if (minBonus > 0 && t.totalBonus < minBonus) return false;
       if (status === 'free'     && t.isOccupied)  return false;
       if (status === 'occupied' && !t.isOccupied) return false;
       // quadrant filter — posisi absolut tile di peta
@@ -804,10 +819,27 @@ function parseResources(resources, bonusStr) {
   return { hasCrop: arr.includes('crop'), hasWood: arr.includes('wood'), hasClay: arr.includes('clay'), hasIron: arr.includes('iron') };
 }
 
+
+    const TRIBE_NAMES  = { 1:'Romans', 2:'Teutons', 3:'Gauls', 5:'Natars', 6:'Egyptians', 7:'Huns' };
+    const TRIBE_FOLDER = { 1:'roman', 2:'teuton', 3:'gaul', 5:'natar', 6:'egyptian', 7:'hun' };
+    function tribeIconHtml(tribeId) {
+      const folder = TRIBE_FOLDER[tribeId];
+      const name   = TRIBE_NAMES[tribeId] || 'Unknown';
+      if (!folder) return `<span class="no-data">—</span>`;
+      return `<img src="/cdn/icons/misc/${folder}_medium.png" width="20" height="20" title="${name}" style="display:inline-block;vertical-align:middle;" onerror="this.replaceWith(document.createTextNode('${name}'))">`;
+    }
+
 // ── RENDER ────────────────────────────────────────────────────
 function render() {
   const sorted = [...results].sort((a,b) => {
-    let av = a[sortKey], bv = b[sortKey];
+    let av, bv;
+    if (sortKey === 'oasisCount') {
+      av = a.oasisCount?.total ?? 0;
+      bv = b.oasisCount?.total ?? 0;
+    } else {
+      av = a[sortKey];
+      bv = b[sortKey];
+    }
     if (typeof av === 'number') return (av - bv) * sortDir;
     return String(av).localeCompare(String(bv)) * sortDir;
   });
@@ -858,6 +890,7 @@ function render() {
       <td class="hide-m">${t.isOccupied ? `<span class="pop-val">${Number(t.pop).toLocaleString()}</span>` : '<span class="no-data">—</span>'}</td>
       <td><span class="dist-val">${t.dist.toFixed(1)}</span></td>
       <td class="hide-m">${playerLink}</td>
+      <td class="hide-m">${t.tribe ? tribeIconHtml(t.tribe) : '<span class="no-data">—</span>'}</td>
       <td class="hide-m">${allianceLink}</td>
     </tr>`;
   }).join('');
@@ -874,7 +907,7 @@ function sortBy(key) {
 }
 
 function updateArrows() {
-  ['dist','crop','oasisCount','pop','oasisCountDisplay'].forEach(k => {
+  ['dist','crop','oasisCount','pop','tribe','player_name'].forEach(k => {
     const el = document.getElementById(`arr-${k}`);
     if (!el) return;
     const th = el.closest('th');

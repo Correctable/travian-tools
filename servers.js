@@ -22,6 +22,16 @@ const SERVERS = [
     isNew:   false,                   // true = tampilkan badge "NEW"
     apiKey: 'ts5'                    // API key untuk fetch data Turso (lihat README.md)
   },
+  {
+    slug:    'ts9.x1.america',           
+    label:   'TS9 America',              
+    domain:  'ts9.x1.america.travian.com', 
+    speed:   1,                       
+    region:  'America',                  
+    active:  true,                    
+    isNew:   true,                   
+    apiKey: 'america_9'                    
+  },
 
   // ── Tournament Travian Qualification (TTQ) ───────────────
   {
@@ -31,18 +41,8 @@ const SERVERS = [
     speed:   2,
     region:  'Asia',
     active:  true,                   // set true setelah data Turso siap
-    isNew:   true,
+    isNew:   false,
     apiKey: 'ttq_asia'                    // API key untuk fetch data Turso (lihat README.md)
-  },
-  {
-    slug:    'ttq.x2.america',
-    label:   'TTQ America 2026',
-    domain:  'ttq.x2.america.travian.com',
-    speed:   2,
-    region:  'America',
-    active:  true,
-    isNew:   true,
-    apiKey: 'ttq_america'
   },
   {
     slug:    'ttq.x2.europe',
@@ -51,18 +51,8 @@ const SERVERS = [
     speed:   2,
     region:  'Europe',
     active:  true,
-    isNew:   true,
+    isNew:   false,
     apiKey: 'ttq_europe'
-  },
-  {
-    slug:    'ttq.x2.arabics',
-    label:   'TTQ Arabics 2026',
-    domain:  'ttq.x2.arabics.travian.com',
-    speed:   2,
-    region:  'Arabics',
-    active:  true,
-    isNew:   true,
-    apiKey: 'ttq_arabics'
   },
 
   // ── Tambah server baru di bawah ini ──────────────────────
