@@ -288,6 +288,7 @@
       flex-shrink: 0;
     }
     .sc-badge.active { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,0.2); }
+    .sc-badge.archived { background: var(--blue-glow); color: var(--blue2); border: 1px solid var(--border2); }
     .sc-badge.soon   { background: var(--surface2); color: var(--text3); border: 1px solid var(--border); }
     .sc-badge.new    { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(217,119,6,0.2); }
 
@@ -446,6 +447,7 @@
       <div class="filter-tabs">
         <button class="filter-tab active" data-filter="all">All</button>
         <button class="filter-tab" data-filter="active">Active</button>
+        <button class="filter-tab" data-filter="archived">Archived</button>
         <button class="filter-tab" data-filter="soon">Coming Soon</button>
       </div>
     </div>
@@ -482,7 +484,8 @@ const SERVER_LIST = (typeof SERVERS !== 'undefined') ? SERVERS : [
     label:   'TS5 Asia',
     domain:  'ts5.x1.asia.travian.com',
     speed:   1,
-    active:  true,
+    active:  false,
+    archived: true,
     isNew:   false,
   },
   {
@@ -500,7 +503,8 @@ const SERVER_LIST = (typeof SERVERS !== 'undefined') ? SERVERS : [
     domain:  'ttq.x2.asia.travian.com',
     speed:   2,
     region:  'Asia',
-    active:  true,                   // set true setelah data Turso siap
+    active:  false,
+    archived: true,
     isNew:   false,
   },
   {
@@ -511,6 +515,15 @@ const SERVER_LIST = (typeof SERVERS !== 'undefined') ? SERVERS : [
     region:  'Europe',
     active:  true,
     isNew:   false,
+  },
+  {
+    slug:    'garuda.x3.indonesia',
+    label:   'Garuda 2026',
+    domain:  'garuda.x3.indonesia.travian.com',
+    speed:   3,
+    region:  'International',
+    active:  true,
+    isNew:   true,
   },
 ];
 
@@ -561,13 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── FETCH SNAP DATA ─────────────────────────────────────────
 async function fetchSnapData() {
-  const activeServers = SERVER_LIST.filter(s => s.active);
-  if (!activeServers.length) return;
+  const availableServers = SERVER_LIST.filter(s => s.active || s.archived);
+  if (!availableServers.length) return;
 
   const TURSO_URL   = 'https://travian-stats-correctable.turso.io';
   const TURSO_TOKEN = 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicm8iLCJpYXQiOjE3Nzk2MDM3ODcsImlkIjoiMDE5ZTU4MmMtNWEwMS03YWIxLTg3NTgtNWNmYzllOWMyY2U3IiwicmlkIjoiMzNmMzgyNDItMTU3Yy00N2FjLWFkMzQtNDFhZDRhZDFhNjhhIn0.jXrskYytK1bpe7YkS0GigPktGeoRPZR7L-1Vto8-wWgBeKC5FthmH6wUgVzKuLy-9xEKDZY117xBfHqgIi2eAw';
 
-  const slugList = activeServers.map(s => `'${s.slug}'`).join(',');
+  const slugList = availableServers.map(s => `'${s.slug}'`).join(',');
 
   try {
     const res = await fetch(`${TURSO_URL}/v2/pipeline`, {
@@ -619,7 +632,8 @@ function renderGrid() {
   // Filter
   let list = SERVER_LIST.filter(s => {
     if (currentFilter === 'active' && !s.active) return false;
-    if (currentFilter === 'soon' && s.active) return false;
+    if (currentFilter === 'archived' && !s.archived) return false;
+    if (currentFilter === 'soon' && (s.active || s.archived)) return false;
     if (searchQuery) {
       const q = searchQuery;
       if (!s.label.toLowerCase().includes(q) && !s.slug.includes(q) && !s.domain.includes(q)) return false;
@@ -637,8 +651,9 @@ function renderGrid() {
   empty.classList.remove('show');
 
   const activeCount = list.filter(s => s.active).length;
+  const archivedCount = list.filter(s => s.archived).length;
   const totalCount  = list.length;
-  count.innerHTML = `<strong>${totalCount}</strong> server${totalCount !== 1 ? 's' : ''} — <strong>${activeCount}</strong> active`;
+  count.innerHTML = `<strong>${totalCount}</strong> server${totalCount !== 1 ? 's' : ''} — <strong>${activeCount}</strong> active · <strong>${archivedCount}</strong> archived`;
 
   grid.innerHTML = list.map((s, i) => buildCard(s, i)).join('');
 }
@@ -647,7 +662,8 @@ function buildCard(s, idx) {
   const snap = snapData[s.slug] || null;
   const delay = (idx * 0.06).toFixed(2);
 
-  const href = s.active
+  const available = s.active || s.archived;
+  const href = available
     ? `/s/${s.slug}/${redirectTo || 'statistics'}/`
     : '#';
 
@@ -655,9 +671,11 @@ function buildCard(s, idx) {
     ? `<span class="sc-badge new">NEW</span>`
     : s.active
       ? `<span class="sc-badge active">ACTIVE</span>`
+      : s.archived
+        ? `<span class="sc-badge archived">ARCHIVED</span>`
       : `<span class="sc-badge soon">SOON</span>`;
 
-  const statsHtml = s.active ? `
+  const statsHtml = available ? `
     <div class="sc-stats">
       <div class="sc-stat">
         <div class="sc-stat-label">Speed</div>
@@ -689,7 +707,7 @@ function buildCard(s, idx) {
   `;
 
   return `
-    <a href="${href}" class="server-card${s.active ? '' : ' soon'}" style="animation-delay: ${delay}s">
+    <a href="${href}" class="server-card${available ? '' : ' soon'}" style="animation-delay: ${delay}s">
       <div class="sc-head">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="sc-icon">🌐</div>
