@@ -930,8 +930,7 @@
               <div class="form-group">
                 <label class="form-label">Game server</label>
                 <select class="form-control" id="game-server" onchange="changeGameServer()">
-                  <option value="ttq_asia" selected>TTQ Asia</option>
-                  <option value="ts5">TS5</option>
+                  <option value="america_9" selected>America 9</option>
                   <option value="manual">Without server (manual)</option>
                 </select>
               </div>
@@ -1190,7 +1189,7 @@ const TROOPS = {
 
 // ── CONFIG ────────────────────────────────────────────────
 const API_BASE = 'https://travian-api.sonybukansoni.workers.dev';
-const DEFAULT_SERVER = 'ttq_asia';
+const DEFAULT_SERVER = 'america_9';
 
 function getCurrentServer() {
   return document.getElementById('game-server')?.value || DEFAULT_SERVER;
