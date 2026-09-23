@@ -21,7 +21,7 @@
   --purple:#7c3aed;--purple-bg:rgba(124,58,237,0.08);
 }
 
-body{background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
+body{display:flex;flex-direction:column;background:#fff;color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(circle,rgba(37,99,235,0.06) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
 body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:500px;background:radial-gradient(ellipse,rgba(37,99,235,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
 
@@ -44,7 +44,7 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 .page-badge.no-login{background:var(--blue-glow);color:var(--blue-light);border:1px solid rgba(59,130,246,0.2)}
 
 /* ── PAGE WRAPPER ── */
-.page-wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+.page-wrap{position:relative;z-index:1;flex:1;width:100%;max-width:1200px;margin:0 auto;padding:40px 24px 80px}
 
 /* ── MENU VIEW ── */
 .menu-search-bar{display:flex;align-items:center;gap:10px;margin-bottom:28px}
@@ -133,7 +133,7 @@ body::after{content:'';position:fixed;top:-180px;left:50%;transform:translateX(-
 table{width:100%;border-collapse:collapse;font-size:0.8rem;min-width:500px;font-family:'DM Sans',sans-serif}
 thead th{padding:9px 10px;text-align:right;font-size:0.7rem;font-weight:600;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;background:var(--surface2);z-index:2;letter-spacing:0.02em}
 thead th:first-child{text-align:center;width:44px}
-thead th img{vertical-align:middle;image-rendering:auto;width:14px;height:14px}
+thead th img{vertical-align:middle;image-rendering:auto;width:14px;height:14px;object-fit:contain}
 tbody tr{border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.08s}
 tbody tr:hover{background:var(--surface2)}
 tbody tr.row-sel{background:var(--sel-bg,var(--blue-glow))!important;outline:1px solid var(--sel-dot,var(--blue2));outline-offset:-1px}
@@ -147,8 +147,8 @@ td.sel-lv{color:var(--sel-dot,var(--blue2))!important}
 .c-bonus{color:var(--blue2);font-weight:500}
 
 /* tfoot total */
-tfoot tr.total-row td{padding:9px 10px;font-weight:600;border-top:2px solid var(--sel-dot,var(--border2))}
-tfoot tr.total-row{background:var(--sel-bg,var(--surface2))}
+tfoot tr.total-row td{position:sticky;bottom:0;padding:9px 10px;font-weight:600;background:var(--surface2);border-top:2px solid var(--sel-dot,var(--border2));z-index:3}
+tfoot tr.total-row{background:var(--surface2)}
 tfoot .total-label{text-align:center;font-size:0.7rem;color:var(--text3)}
 tfoot .total-label.active{color:var(--sel-dot,var(--blue2));font-weight:700}
 tfoot tr.hint-row td{padding:6px 12px;font-size:0.7rem;color:var(--text3);text-align:center;background:var(--surface2);border-top:1px solid var(--border)}
@@ -819,6 +819,9 @@ function renderRows(c, hasBonus, getBonusVal) {
     : `${sel.range[1]-sel.range[0]+1} levels selected · Click any row to reset`;
 
   tfoot.innerHTML = `
+    <tr class="hint-row">
+      <td colspan="${hasBonus?12:11}">${selHint}</td>
+    </tr>
     <tr class="total-row">
       <td class="total-label ${sel?'active':''}">${selLabel}</td>
       <td class="c-wood">${fmtN(totals[0])}</td>
@@ -832,9 +835,6 @@ function renderRows(c, hasBonus, getBonusVal) {
       <td class="c-dim">—</td>
       <td class="c-dim">—</td>
       ${hasBonus ? '<td class="c-dim">—</td>' : ''}
-    </tr>
-    <tr class="hint-row">
-      <td colspan="${hasBonus?12:11}">${selHint}</td>
     </tr>`;
 }
 
