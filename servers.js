@@ -6,9 +6,10 @@
  * 
  * CARA TAMBAH SERVER BARU:
  * 1. Tambah entry baru di array SERVERS di bawah
- * 2. Set active: false kalau data Turso belum ada (tampil sebagai "Coming Soon")
- * 3. Set active: true kalau data sudah ada — otomatis muncul di select-server & navbar
- * 4. Tidak perlu buat folder atau file HTML baru apapun
+ * 2. Set active: false kalau server belum berjalan atau belum ada datanya
+ * 3. Set archived: true kalau server sudah selesai tetapi datanya tetap tersedia
+ * 4. Set active: true kalau data server sedang berjalan
+ * 5. Tidak perlu buat folder atau file HTML baru apapun
  */
 
 const SERVERS = [
@@ -18,7 +19,8 @@ const SERVERS = [
     domain:  'ts5.x1.asia.travian.com', // domain resmi server Travian
     speed:   1,                       // kecepatan server (1x, 2x, 3x, 5x, 10x)
     region:  'Asia',                  // region (Asia, Europe, America, International)
-    active:  true,                    // true = data tersedia di Turso
+    active:  false,                   // false = server sudah selesai
+    archived: true,                   // data arsip tetap dapat diakses
     isNew:   false,                   // true = tampilkan badge "NEW"
     apiKey: 'ts5'                    // API key untuk fetch data Turso (lihat README.md)
   },
@@ -40,7 +42,8 @@ const SERVERS = [
     domain:  'ttq.x2.asia.travian.com',
     speed:   2,
     region:  'Asia',
-    active:  true,                   // set true setelah data Turso siap
+    active:  false,                  // server sudah selesai
+    archived: true,                  // data arsip tetap dapat diakses
     isNew:   false,
     apiKey: 'ttq_asia'                    // API key untuk fetch data Turso (lihat README.md)
   },
@@ -53,6 +56,16 @@ const SERVERS = [
     active:  true,
     isNew:   false,
     apiKey: 'ttq_europe'
+  },
+  {
+    slug:    'garuda.x3.indonesia',
+    label:   'Garuda 2026',
+    domain:  'garuda.x3.indonesia.travian.com',
+    speed:   3,
+    region:  'International',
+    active:  true,
+    isNew:   true,
+    apiKey: 'garuda_2026'
   },
 
   // ── Tambah server baru di bawah ini ──────────────────────
