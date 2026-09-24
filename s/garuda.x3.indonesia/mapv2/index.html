@@ -89,6 +89,13 @@ function numberValue(row,...names){
   return Number(value);
 }
 
+function payloadRows(payload,...names){
+  for(const name of names){
+    if(Array.isArray(payload[name])) return payload[name];
+  }
+  return [];
+}
+
 function normalizeOtherTile(row){
   const raw=String(row.type||row.terrain||row.tile_type||row.type_name||row.name||row.kind||'').toLowerCase();
   const type=raw.includes('mount')||raw.includes('gunung')?'Gunung'
@@ -136,16 +143,21 @@ async function loadChunk(cxk,cyk){
     if(!r.ok) throw new Error(`HTTP ${r.status}`);
     const d=await r.json();
     if(!d.ok) throw new Error(d.error||'map-tiles failed');
-    (d.other||[]).forEach(row=>{
+    payloadRows(d,'other_tiles','other','others').forEach(row=>{
       const x=numberValue(row,'x','coord_x','tile_x'),y=numberValue(row,'y','coord_y','tile_y');
       if(Number.isFinite(x)&&Number.isFinite(y)) liveTiles.set(`${x},${y}`,normalizeOtherTile(row));
     });
-    (d.oases||[]).forEach(row=>{
-      const k=`${Number(row.x)},${Number(row.y)}`;
+    payloadRows(d,'oases','oasis').forEach(row=>{
+      const x=numberValue(row,'x','coord_x','tile_x'),y=numberValue(row,'y','coord_y','tile_y');
+      const k=`${x},${y}`;
+      if(!Number.isFinite(x)||!Number.isFinite(y)) return;
       if(!liveTiles.has(k)) liveOases++;
       liveTiles.set(k,normalizeOasis(row));
     });
-    (d.tiles||[]).forEach(row=>liveEmpty.set(`${Number(row.x)},${Number(row.y)}`,normalizeVillageTile(row)));
+    payloadRows(d,'village_tiles','tiles','villages').forEach(row=>{
+      const x=numberValue(row,'x','coord_x','tile_x'),y=numberValue(row,'y','coord_y','tile_y');
+      if(Number.isFinite(x)&&Number.isFinite(y)) liveEmpty.set(`${x},${y}`,normalizeVillageTile(row));
+    });
     chunkState.set(key,'done');
   }catch(err){
     chunkState.set(key,'failed'); chunkErrors++;   // tidak di-retry otomatis, mencegah loop
