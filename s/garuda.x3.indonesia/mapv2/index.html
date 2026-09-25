@@ -316,11 +316,11 @@ function oasisImage(name){
 
 function drawOasisIcon(cx,cy,cell,name,fallback){
   const image=oasisImage(name);
-  const size=Math.max(10,Math.min(cell*0.68,42));
+  const radius=cell*0.3;
+  drawBadge(cx,cy,radius,fallback,null,0);
+  const size=Math.max(8,Math.min(cell*0.34,22));
   if(image&&image.complete&&image.naturalWidth){
     ctx.drawImage(image,cx-size/2,cy-size/2,size,size);
-  }else{
-    drawBadge(cx,cy,size/2,fallback,null,0);
   }
 }
 
