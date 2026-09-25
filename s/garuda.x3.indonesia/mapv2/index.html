@@ -134,12 +134,19 @@ function normalizeOtherTile(row){
 }
 
 function normalizeOasis(row){
-  const name=String(row.type_name||'').toLowerCase(), res=String(row.resources||'').toLowerCase();
-  const pick=t=>/crop|gandum|wheat|grain/.test(t)?'crop':/iron|besi/.test(t)?'iron':/clay|liat/.test(t)?'clay':/wood|lumber|kayu/.test(t)?'wood':null;
-  const resource=pick(name)||pick(res)||'wood';
+  const name=String(row.type_name||''), res=String(row.resources||'');
+  const source=`${name} ${res}`.toLowerCase();
+  const resources=[];
+  const addResource=(key)=>{if(!resources.includes(key)) resources.push(key);};
+  if(/wood|lumber|kayu/.test(source)) addResource('lumber');
+  if(/clay|liat|earth/.test(source)) addResource('clay');
+  if(/iron|besi|metal/.test(source)) addResource('iron');
+  if(/crop|gandum|wheat|grain/.test(source)) addResource('crop');
+  const keys=resources.length?resources:['lumber'];
   const bonus=String(row.bonus_str||'');
-  const isDouble=(bonus.match(/%/g)||[]).length>=2||Number(row.max_bonus)>=50;
-  return {kind:'oasis',data:{resource,type_name:row.type_name||'',bonus_str:bonus,is_double:isDouble?1:0}};
+  const isDouble=keys.length===1&&(Number(row.max_bonus)>=50||/50\s*%/.test(bonus));
+  const iconName=keys.length>=2?`${keys[0]}-${keys[1]}_medium`:isDouble?`${keys[0]}-${keys[0]}_medium`:`${keys[0]}_tiny`;
+  return {kind:'oasis',data:{resource:keys[0]==='lumber'?'wood':keys[0],resources:keys,iconName,type_name:name,bonus_str:bonus,is_double:isDouble?1:0}};
 }
 
 function normalizeVillageTile(row){
@@ -268,6 +275,8 @@ function rnd(x,y,salt){return (h32(x+salt*1000003,y-salt*7919)%100000)/100000;}
 const ALLIANCES=["WAR","WOLF","WTF","XXL","ZZZ","GOD","RIP","FURY","NOVA","IRON"];
 const TRIBE_C={1:'#5f7fae',2:'#a2564f',3:'#5c9463',4:'#b39a4a',5:'#8a6ea8',6:'#5f9aa8'};
 const OASIS_ICON={wood:'🌲',clay:'🧱',iron:'⛏️',crop:'🌾'};
+const RESOURCE_ICON_BASE='/cdn/icons/resource/';
+const oasisImages=new Map();
 const RESOURCE_TERRAIN={wood:'Hutan',clay:'TanahLiat',iron:'Gunung',crop:'Danau'};
 const OTHER_TYPES=["Hutan","Gunung","Danau","TanahLiat"];
 function hashColor(str,s=55,l=45){let h=0;for(let i=0;i<str.length;i++)h=str.charCodeAt(i)+((h<<5)-h);return `hsl(${Math.abs(h)%360},${s}%,${l}%)`;}
@@ -288,6 +297,32 @@ const liveVillages = new Map();
 const liveEmpty = new Map();   // village_tiles (slot kosong + tipe field)
 let liveOases = 0;
 let dataStatus = 'Connecting…';
+
+function oasisIconName(resource,isDouble){
+  const key=resource==='wood'?'lumber':resource;
+  return isDouble?`${key}-${key}_medium`:`${key}_tiny`;
+}
+
+function oasisImage(name){
+  if(!oasisImages.has(name)){
+    const image=new Image();
+    image.onload=()=>render();
+    image.onerror=()=>oasisImages.set(name,null);
+    image.src=`${RESOURCE_ICON_BASE}${name}.png`;
+    oasisImages.set(name,image);
+  }
+  return oasisImages.get(name);
+}
+
+function drawOasisIcon(cx,cy,cell,name,fallback){
+  const image=oasisImage(name);
+  const size=Math.max(10,Math.min(cell*0.68,42));
+  if(image&&image.complete&&image.naturalWidth){
+    ctx.drawImage(image,cx-size/2,cy-size/2,size,size);
+  }else{
+    drawBadge(cx,cy,size/2,fallback,null,0);
+  }
+}
 
 function liveTileAt(x,y){
   return liveTiles.get(`${x},${y}`) || null;
@@ -312,7 +347,7 @@ function tileAt(x,y){
     const isDouble=rnd(x,y,6)<0.12;
     const resources=['wood','clay','iron','crop'];
     const resource=resources[Math.floor(rnd(x,y,7)*4)];
-    return {kind:'oasis',data:{resource,type_name:RESOURCE_TERRAIN[resource],is_double:isDouble?1:0,bonus_str:isDouble?'50%':'25%'}};
+    return {kind:'oasis',data:{resource,type_name:RESOURCE_TERRAIN[resource],iconName:oasisIconName(resource,isDouble),is_double:isDouble?1:0,bonus_str:isDouble?'50%':'25%'}};
   }
   const region=regionInfo(x,y);
   const grey=isGreyZone(x,y);
@@ -436,7 +471,7 @@ function render(){
         else if(t.data.resource==='crop') drawLake(sx,sy,cell);
         else if(t.data.resource==='wood') drawForest(sx,sy,cell,x,y);
         else drawCanyon(sx,sy,cell,x,y);
-        if(detailed) drawBadge(cx,cy,cell*0.3, t.data.is_double?'#c9a24b':'#4a7a4a', withIcon?OASIS_ICON[t.data.resource]:null, cell*0.32);
+        if(detailed) drawOasisIcon(cx,cy,cell,t.data.iconName||oasisIconName(t.data.resource,t.data.is_double),t.data.is_double?'#c9a24b':'#4a7a4a');
         else { ctx.fillStyle=t.data.is_double?'#c9a24b':'#e8e3d8'; ctx.beginPath();ctx.arc(cx,cy,cell*0.22,0,Math.PI*2);ctx.fill(); }
         continue;
       }
