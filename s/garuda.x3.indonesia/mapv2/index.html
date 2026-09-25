@@ -294,8 +294,6 @@ function liveTileAt(x,y){
 }
 
 function tileAt(x,y){
-  const live = liveTileAt(x,y);
-  if(live) return live;
   if(!liveMode&&x===0&&y===0){
     return {kind:'village',data:{village_name:'Ibu Kota',player_name:'Kamu',alliance_tag:'YOU',population:320,is_capital:1,tribe:1}};
   }
@@ -304,6 +302,8 @@ function tileAt(x,y){
     if(village.is_natar) return {kind:'natar',data:{...village,camp_name:village.village_name||'Natar Village'}};
     return {kind:'village',data:village};
   }
+  const live = liveTileAt(x,y);
+  if(live) return live;
   if(liveMode){ const e=liveEmpty.get(`${x},${y}`)||{kind:'empty',data:{field_label:'-'}}; if(isGreyZone(x,y)) return {kind:e.kind,data:{...e.data,grey:true}}; return e; }
   const rOther=rnd(x,y,1);
   if(rOther<0.045) return {kind:'other',data:{type:OTHER_TYPES[Math.floor(rnd(x,y,5)*4)]}};
